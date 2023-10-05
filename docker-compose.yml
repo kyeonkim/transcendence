@@ -1,0 +1,9 @@
+services:
+  postgresql:
+    build:
+      context: ./db
+    image: postgresdb
+    container_name: postgre_container
+    ports: 
+      - "5432:5432"
+    restart: always
