@@ -1,15 +1,15 @@
-"use client"
+"use client";
 import React from 'react';
-import axios from 'axios';
 
-function handleLogin() {
-	axios.get('http://10.13.9.4:3000/42login')
-		.then(function (response) {
-			console.log(response.data);
-		})
-		.catch(function (error) {
-			console.log(error);
-		})
+async function handleLogin() {
+	try {
+		const url = 'https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-a530d138cf1c33d448191cb250ee026f61f01d4d4cbbe62e0ff18ee285f9f290&redirect_uri=http%3A%2F%2F10.13.8.3%3A3000%2Foauth%2FCallback&response_type=code';
+	
+		window.location.href = url;
+	}
+	catch (err) {
+		console.error('Error1: ', err);
+	}
 }
 
 export const Login = () => {

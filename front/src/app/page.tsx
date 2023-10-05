@@ -1,5 +1,5 @@
 import React from 'react'
-import { Login } from '../components/Loginpage'
+import { Login } from '@/pages/Loginpage'
 
 export default function Home() {
   return (
