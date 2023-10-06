@@ -6,4 +6,21 @@ services:
     container_name: postgre_container
     ports: 
       - "5432:5432"
+    networks:
+      - transcendence_net
     restart: always
+  nestjs:
+    build: ./back
+    image: back_server
+    container_name: nest_container
+    volumes:
+      - ./back/src:/app/transcendence_nest_server/src
+    ports:
+      - "4242:4242"
+    networks:
+      - transcendence_net
+    restart: always
+
+networks:
+  transcendence_net:
+    driver: bridge

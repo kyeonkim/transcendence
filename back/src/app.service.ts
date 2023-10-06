@@ -12,7 +12,7 @@ export class AppService {
     let id:number = 42;
     this.logger.debug("Logging...");
     this.logger.debug("id : " + id);
-    return 'Hello World!';
+    return 'Hello World!!!';
   }
 
   getSeoul(): string
