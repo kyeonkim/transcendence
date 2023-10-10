@@ -1,8 +1,7 @@
-// api/callback.js
-
 import axios from 'axios';
+import { NextApiRequest, NextApiResponse } from 'next';
 
-export default async (req, res) => {
+const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { code } = req.query;
 
   console.log('code:', code);
@@ -16,14 +15,11 @@ export default async (req, res) => {
       grant_type: 'authorization_code'
     });
 
-    console.log('response:', response.data);
-
-    // Send the response data to the client
-    res.status(200).json(response.data);
+    res.status(200).json({ data: response.data });
+    // res.status(200);
   } catch (error) {
-    console.error('Error:', error);
-
-    // Send an error response to the client
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: 'Internal server error 2' });
   }
 };
+
+export default handler;

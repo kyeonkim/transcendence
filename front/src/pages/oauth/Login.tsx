@@ -1,9 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/router';
 
 const Login = () => {
   const router = useRouter();
+  const [userData, setUserData] = useState(null);
 
   useEffect(() => {
     const { code } = router.query;
@@ -14,19 +15,18 @@ const Login = () => {
           const response = await axios.post('/api/callback', { code });
           console.log('data:', response.data);
 
-          if (response.data.userData) {
+          setUserData(response.data);
+          if (userData)
             router.push('/main');
-          } else {
+          else
             router.push('/signup');
-          }
         } catch (error) {
           console.error('Error:', error);
+          }
         }
+        handleCallback();
       };
-
-      handleCallback();
-    }
-  }, [router.query]);
+    }, [router.query]);
 
   return (
     <div>
