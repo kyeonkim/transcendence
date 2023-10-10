@@ -1,14 +1,17 @@
 services:
   postgresql:
-    build:
-      context: ./db
-    image: postgresdb
+    image: postgres:latest
     container_name: postgre_container
+    restart: always
+    environment:
+      - POSTGRES_USER=myuser
+      - POSTGRES_PASSWORD=mypassword
+    volumes:
+      - ./db:/var/lib/postgresql/data
     ports: 
       - "5432:5432"
     networks:
       - transcendence_net
-    restart: always
   nestjs:
     build: ./back
     image: back_server
@@ -20,7 +23,6 @@ services:
     networks:
       - transcendence_net
     restart: always
-
 networks:
   transcendence_net:
     driver: bridge
