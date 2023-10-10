@@ -1,21 +1,24 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/router';
 
 const Login = () => {
   const router = useRouter();
-  const [userData, setUserData] = useState(null);
 
   useEffect(() => {
     const { code } = router.query;
 
+    console.log('code:', code);
     if (code) {
       const handleCallback = async () => {
         try {
-          const response = await axios.post('/api/callback', { code });
+          const response = await axios.post('/api/callback', null, {
+            params: {
+              code: code
+            }
+          });
           console.log('data:', response.data);
-
-          setUserData(response.data);
+          const userData = await axios.post('http://10.28.4.11:4242/auth/token' , response.data);
           if (userData)
             router.push('/main');
           else
