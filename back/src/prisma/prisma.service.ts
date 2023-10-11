@@ -1,12 +1,10 @@
-import { Injectable } from '@nestjs/common';
-import { createUserDto } from './dto/create-user.dto';
+import { Injectable , OnModuleInit } from '@nestjs/common';
+import { PrismaClient } from '@prisma/client';
 
 @Injectable()
-export class PrismaService {
-
-    async CreateUser(user : createUserDto) : Promise<boolean>
-    {
-
-        return true;
+// export class PrismaService{}
+export class PrismaService extends PrismaClient implements OnModuleInit{
+    async onModuleInit() {
+        await this.$connect();
     }
 }
