@@ -1,3 +1,3 @@
-export class createUserDto {
+export class tokenDto {
     access_token: string;
   }

@@ -1,19 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
-
-import { createUserDto } from './dto/create-user.dto';
+import { tokenDto } from './dto/token.dto';
 
 @Injectable()
 export class AuthService {
 	constructor(private readonly httpService: HttpService) {}
 
-	async PostAuth(user : createUserDto) : Promise<boolean> {
+	async PostAuth(token : tokenDto) : Promise<boolean>
+	{
 		const getTokenConfig = {
 			url: '/oauth/token/info',
 			method: 'get',
 			baseURL : 'https://api.intra.42.fr/',
-			headers : {'Authorization': `Bearer ${user.access_token}`}
+			headers : {'Authorization': `Bearer ${token.access_token}`}
 		};
 		try {
 			const { data } = await firstValueFrom(this.httpService.request(getTokenConfig));
