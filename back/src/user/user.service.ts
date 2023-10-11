@@ -4,10 +4,10 @@ import { firstValueFrom } from 'rxjs';
 import { tokenDto } from './dto/token.dto';
 
 @Injectable()
-export class AuthService {
+export class UserService {
 	constructor(private readonly httpService: HttpService) {}
 
-	async PostAuth(token : tokenDto) : Promise<boolean>
+    async PostAuth(token : tokenDto) : Promise<boolean>
 	{
 		const getTokenConfig = {
 			url: '/oauth/token/info',

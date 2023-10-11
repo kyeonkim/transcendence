@@ -6,6 +6,7 @@ export class PrismaService {
 
     async CreateUser(user : createUserDto) : Promise<boolean>
     {
+
         return true;
     }
 }
