@@ -39,6 +39,7 @@ const Login = () => {
       <button onClick={handleVerify}>Verify OTP</button>
     </div>
   );
-};
+};  
 
 export default Login;
+  
