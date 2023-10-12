@@ -16,6 +16,10 @@ services:
     build: ./back
     image: back_server
     container_name: nest_container
+    env_file:
+      - .env
+    depends_on:
+      - postgresql
     volumes:
       - ./back/src:/app/transcendence_nest_server/src
     ports:
