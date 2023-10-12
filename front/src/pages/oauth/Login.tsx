@@ -6,6 +6,8 @@ const Login = () => {
   const router = useRouter();
   const { code } = router.query;
 
+  // 새로 고침하면 터지는데 이유가 뭘까?
+
   useEffect(() => {
 
     console.log('code:', code);
@@ -27,6 +29,8 @@ const Login = () => {
           // const userData = await axios.post('http://10.13.9.4:4242/auth/token' , response.data);
           // console.log('userData:', userData);
           // if (userData.data.sign)
+          
+            // main에서 token cookie 만들게하지 말고, server-side에서 token을 cookie 만들게 하는게 낫지 않을까?
             router.push({
             pathname: '/main',
             query: { access_token: '123',
