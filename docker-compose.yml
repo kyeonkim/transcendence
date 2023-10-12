@@ -8,8 +8,8 @@ services:
       - POSTGRES_PASSWORD=mypassword
     volumes:
       - ./db:/var/lib/postgresql/data
-    ports: 
-      - "5432:5432"
+    expose:
+      - 5432
     networks:
       - transcendence_net
   nestjs:
@@ -27,6 +27,7 @@ services:
     networks:
       - transcendence_net
     restart: always
+
 networks:
   transcendence_net:
     driver: bridge
