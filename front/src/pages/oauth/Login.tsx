@@ -22,7 +22,7 @@ const Login = () => {
           
           const userData = await axios.post('http://10.13.9.2:4242/user/auth', response.data);
           
-          // server-side 테스트용 api 
+          // server-side 테스트용 api 접근 코드
           // const userData = await axios.post('/api/user_auth', response.data);
           
           console.log('userData:', userData);
