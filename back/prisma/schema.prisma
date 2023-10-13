@@ -22,13 +22,16 @@ model User {
   ladder     Int      @default(1000)
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
+  friends    Friends[] @relation("following_user")
 }
 
-// model Frineds {
-//  following_user_id Int
-//  followed_user_id  Int
-//  created_at @default(now())
-// }
+model Friends {
+    id                Int      @default(autoincrement()) @id
+    following_user    User     @relation("following_user", fields: [following_user_id], references: [user_id])
+    following_user_id Int
+    followed_user_id  Int
+    created_at        DateTime @default(now())
+}
 
 //model Post {
 //  id        Int      @default(autoincrement()) @id

@@ -3,7 +3,7 @@ import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { tokenDto } from './dto/token.dto';
 import { PrismaService } from '../prisma/prisma.service';
-import { createUserDto } from './dto/create-user.dto';
+import { createUserDto } from './dto/user.dto';
 import { AxiosResponse } from 'axios';
 
 @Injectable()
@@ -39,7 +39,15 @@ export class UserService {
                 nick_name: 'Elsa Prisma2',
             },
         });
-        console.log(user);
+        const getUser = await this.prisma.user.findMany();
+        console.log(getUser);
+        const getUserAt = await this.prisma.user.findUnique({
+            where: {
+              user_id: 2,
+            },
+        });
+        console.log("===========");
+        console.log(getUserAt);
         const dummyData = {
             id: 1,
             title: '더미 데이터',
@@ -55,5 +63,58 @@ export class UserService {
             config: undefined
           };
           return Promise.resolve(axiosResponse);
+    }
+
+    async AddFriend(@Body() userData : createUserDto) : Promise<AxiosResponse>
+    {
+        // const addedfriend1 = await this.prisma.friends.create({
+        //     data: {
+        //         following_user_id: 1,
+        //         followed_user_id: 2,
+        //     }
+        // });
+        // const addedfriend2 = await this.prisma.friends.create({
+        //     data: {
+        //         following_user_id: 2,
+        //         followed_user_id: 1,
+        //     }
+        // });
+        // const addedfriend3 = await this.prisma.friends.create({
+        //     data: {
+        //         following_user_id: 1,
+        //         followed_user_id: 3,
+        //     }
+        // });
+        // const addedfriend4 = await this.prisma.friends.create({
+        //     data: {
+        //         following_user_id: 3,
+        //         followed_user_id: 1,
+        //     }
+        // });
+        const getFriends = await this.prisma.user.findUnique({
+            where: {
+              user_id: 2,
+            },
+            include: {
+              friends: true, // All posts where authorId == 20
+            },
+          });
+        
+        const dummyData = {
+            id: 1,
+            title: '더미 데이터',
+            content: '이것은 더미 데이터 예제입니다.',
+        };
+        const axiosResponse: AxiosResponse = {
+            data: dummyData,
+            status: 200,
+            statusText: 'OK',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            config: undefined
+          };
+        console.log(getFriends);
+        return Promise.resolve(axiosResponse);
     }
 }

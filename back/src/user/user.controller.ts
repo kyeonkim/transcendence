@@ -1,7 +1,7 @@
 import { Controller, Post, Body } from '@nestjs/common';
 import { UserService } from './user.service';
 import { tokenDto } from './dto/token.dto';
-import { createUserDto } from './dto/create-user.dto';
+import { createUserDto } from './dto/user.dto';
 import { ApiOperation } from '@nestjs/swagger';
 import { AxiosResponse } from 'axios';
 
@@ -21,5 +21,12 @@ export class UserController {
     CreateUser(@Body() user : createUserDto) : Promise<AxiosResponse>
     {
         return this.UserService.CreateUser(user);
+    }
+
+	@ApiOperation({summary: `친구 추가 API`, description: `해당 유저끼리 친구를 추가한다.`})
+	@Post("addfriend")
+	AddFriend(@Body() user : createUserDto) : Promise<AxiosResponse>
+    {
+		return this.UserService.AddFriend(user);
     }
 }

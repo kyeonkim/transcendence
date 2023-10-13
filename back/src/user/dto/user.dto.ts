@@ -11,3 +11,12 @@ export class createUserDto
     @ApiProperty()
     img_name: string;
 }
+
+export class addUserDto
+{
+    @ApiProperty()
+    first_user_id: number;
+
+    @ApiProperty()
+    second_user_id: number;
+}
