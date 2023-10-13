@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Param } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, ParseIntPipe } from '@nestjs/common';
 import { UserService } from './user.service';
 import { tokenDto } from './dto/token.dto';
 import { createUserDto, addFriendDto, getUserDto } from './dto/user.dto';
@@ -39,7 +39,7 @@ export class UserController {
 
 	@ApiOperation({summary: `아이디 유저 데이터 API`, description: `아이디로 유저 데이터를 가져온다.`})
 	@Get("getdata/id/:id")
-    GetUserDataById(@Param('id') id: number)
+    GetUserDataById(@Param('id', ParseIntPipe) id: number)
 	{
 		return this.UserService.GetUserDataById(id);
 	}
