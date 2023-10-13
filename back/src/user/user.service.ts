@@ -3,8 +3,9 @@ import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { tokenDto } from './dto/token.dto';
 import { PrismaService } from '../prisma/prisma.service';
-import { createUserDto } from './dto/user.dto';
+import { createUserDto, getUserDto, addFriendDto } from './dto/user.dto';
 import { AxiosResponse } from 'axios';
+import { get } from 'http';
 
 @Injectable()
 export class UserService {
@@ -13,7 +14,7 @@ export class UserService {
         private prisma: PrismaService
     ) {}
 
-    async PostAuth(token : tokenDto) : Promise<boolean>
+    async PostAuth(token : tokenDto)
 	{
 		const getTokenConfig = {
 			url: '/oauth/token/info',
@@ -23,97 +24,88 @@ export class UserService {
 		};
 		try {
 			const { data } = await firstValueFrom(this.httpService.request(getTokenConfig));
-			console.log(data);
-			console.log(data.resource_owner_id);
+            const userData = await this.prisma.user.findUnique({
+                where: {
+                  user_id: data.resource_owner_id,
+                },
+            });
+            if (userData === null)
+                return {sign: false, access_token: token.access_token};
+            else
+                return {sign: true, userdata: this.GetUserDataById(userData.user_id)}
 		} catch (error) {
-			console.error(error);
+            console.error(error);
 		}
-		return true;
 	}
 
-    async CreateUser(@Body() userData : createUserDto) : Promise<AxiosResponse>
+    async GetUserDataByNickName(nickname: string)
     {
-        const user = await this.prisma.user.create({
-            data: {
-                user_id: 2,
-                nick_name: 'Elsa Prisma2',
-            },
-        });
-        const getUser = await this.prisma.user.findMany();
-        console.log(getUser);
-        const getUserAt = await this.prisma.user.findUnique({
+        console.log("nick_name :", nickname);
+        const userData = await this.prisma.user.findUnique({
             where: {
-              user_id: 2,
+              nick_name: nickname,
             },
         });
-        console.log("===========");
-        console.log(getUserAt);
-        const dummyData = {
-            id: 1,
-            title: '더미 데이터',
-            content: '이것은 더미 데이터 예제입니다.',
-        };
-        const axiosResponse: AxiosResponse = {
-            data: dummyData,
-            status: 200,
-            statusText: 'OK',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            config: undefined
-          };
-          return Promise.resolve(axiosResponse);
+        console.log(userData);
+        return await Promise.resolve(userData);
     }
 
-    async AddFriend(@Body() userData : createUserDto) : Promise<AxiosResponse>
+    async GetUserDataById(id: number)
     {
-        const addedfriend1 = await this.prisma.friends.create({
-            data: {
-                following_user_id: 1,
-                followed_user_id: 2,
-            }
-        });
-        const addedfriend2 = await this.prisma.friends.create({
-            data: {
-                following_user_id: 2,
-                followed_user_id: 1,
-            }
-        });
-        const addedfriend3 = await this.prisma.friends.create({
-            data: {
-                following_user_id: 1,
-                followed_user_id: 3,
-            }
-        });
-        const addedfriend4 = await this.prisma.friends.create({
-            data: {
-                following_user_id: 3,
-                followed_user_id: 1,
-            }
-        });
-        const getFriends = await this.prisma.user.findUnique({
+        // console.log("user_id :", user_id.user_id);
+        const userData = await this.prisma.user.findUnique({
             where: {
-              user_id: 2,
+              user_id: id,
             },
-            include: {
-              friends: true, // All posts where authorId == 20
+        });
+        console.log(userData);
+        return await Promise.resolve(userData);
+    }
+
+    async CreateUser(@Body() userData : createUserDto)
+    {
+        const getTokenConfig = {
+			url: '/oauth/token/info',
+			method: 'get',
+			baseURL : 'https://api.intra.42.fr/',
+			headers : {'Authorization': `Bearer ${userData.access_token}`}
+		};
+		const { data } = await firstValueFrom(this.httpService.request(getTokenConfig));
+        const user = await this.prisma.user.create({
+            data: {
+                user_id: data.resource_owner_id,
+                nick_name: userData.nick_name,
+                img_name: userData.img_name,
             },
-          });
-        const dummyData = {
-            id: 1,
-            title: '더미 데이터',
-            content: '이것은 더미 데이터 예제입니다.',
-        };
-        const axiosResponse: AxiosResponse = {
-            data: dummyData,
-            status: 200,
-            statusText: 'OK',
-            headers: {
-              'Content-Type': 'application/json',
+        });
+        return {status: true, message: "success"};
+    }
+
+    /*
+     @return {status: true, message: "success"} 
+    */
+    async AddFriend(@Body() addFrined : addFriendDto)
+    {
+        const check =  await this.prisma.friends.findFirst({
+            where: {
+                following_user_id: addFrined.user_id,
+                followed_user_id: addFrined.friend_id,
             },
-            config: undefined
-          };
-        console.log(getFriends);
-        return Promise.resolve(axiosResponse);
+        });
+        if (check !== null)
+            return {status: false, message: "already frined"};
+        await this.prisma.friends.create({
+            data: {
+                following_user_id: addFrined.user_id,
+                followed_user_id: addFrined.friend_id,
+            },
+        });
+        await this.prisma.friends.create({
+            data: {
+                following_user_id: addFrined.friend_id,
+                followed_user_id: addFrined.user_id,
+            },
+        });
+        return {status: true, message: "success"};
     }
 }

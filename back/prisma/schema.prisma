@@ -16,7 +16,7 @@ model User {
   nick_name  String   @unique
   sign       Boolean  @default(false)
   state      Int      @default(0)
-  img_name   String   @default("default.png")
+  img_name   String?  @default("default.png")
   win        Int      @default(0)
   lose       Int      @default(0)
   ladder     Int      @default(1000)

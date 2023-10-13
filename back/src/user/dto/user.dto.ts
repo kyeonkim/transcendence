@@ -3,7 +3,7 @@ import { ApiProperty } from "@nestjs/swagger";
 export class createUserDto 
 {
     @ApiProperty()
-    user_id: number;
+    access_token: string;
 
     @ApiProperty()
     nick_name: string;
@@ -12,11 +12,20 @@ export class createUserDto
     img_name: string;
 }
 
-export class addUserDto
+export class addFriendDto
 {
     @ApiProperty()
-    first_user_id: number;
+    user_id: number;
 
     @ApiProperty()
-    second_user_id: number;
+    friend_id: number;
+}
+
+export class getUserDto
+{
+    @ApiProperty()
+    user_id: number;
+
+    @ApiProperty()
+    nick_name: string;
 }
