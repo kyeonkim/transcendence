@@ -33,8 +33,13 @@ export class UserService {
 
     async CreateUser(@Body() userData : createUserDto) : Promise<AxiosResponse>
     {
-        // await this.prisma.user.create(userData);
-
+        const user = await this.prisma.user.create({
+            data: {
+                user_id: 2,
+                nick_name: 'Elsa Prisma2',
+            },
+        });
+        console.log(user);
         const dummyData = {
             id: 1,
             title: '더미 데이터',

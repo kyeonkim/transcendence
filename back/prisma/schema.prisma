@@ -14,8 +14,9 @@ datasource db {
 model User {
   user_id    Int      @id
   nick_name  String   @unique
-  sign       Boolean
-  state      Int
+  sign       Boolean  @default(false)
+  state      Int      @default(0)
+  img_name   String   @default("default.png")
   win        Int      @default(0)
   lose       Int      @default(0)
   ladder     Int      @default(1000)

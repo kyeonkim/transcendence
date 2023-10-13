@@ -4,6 +4,7 @@ all:
 clean:
 	docker compose down -v
 fclean:
+	rm -rf ./db/*
 	docker compose down -v
 	docker image prune -af
 re:

@@ -27,6 +27,7 @@ services:
       postgresql:
         condition: service_healthy
     volumes:
+      - ./back/prisma:/app/transcendence_nest_server/prisma
       - ./back/src:/app/transcendence_nest_server/src
     ports:
       - "4242:4242"

@@ -10,4 +10,4 @@ WORKDIR /app/transcendence_nest_server
 
 RUN npm install
 
-CMD ["npm","run","start:dev"]
+ENTRYPOINT ["sh", "-c", "npx prisma migrate deploy && npm run start:dev"]
