@@ -19,31 +19,21 @@ const Login = () => {
               code: code
             }
           });
-          /*
-          access_token/sign 
-          
-          sign(true)-> to main(api)
-          
-          (false)-> to signup
-          */
-          // const userData = await axios.post('http://10.13.9.4:4242/auth/token' , response.data);
-          // console.log('userData:', userData);
-          // if (userData.data.sign)
-          
-            // main에서 token cookie 만들게하지 말고, server-side에서 token을 cookie 만들게 하는게 낫지 않을까?
+          const userData = await axios.post('http://10.13.9.2:4242/user/auth' , response.data);
+          console.log('userData:', userData);
+          if (userData.data.sign)
             router.push({
             pathname: '/main',
-            query: { access_token: '123',
-                     refresh_token: '2341'
-            },
-          },
-          '/main');
-          // else
-          //   router.push({
-          //     pathname: '/signup',
-          //     query: { oauth_token: '2323' },
-          //     },
-          //     '/signup');
+            query: {
+              access_token: userData.data.access_token,
+              refresh_token: userData.data.refresh_token,
+              },
+            }, '/main');
+          else
+            router.push({
+              pathname: '/signup',
+              query: { oauth_token: userData.data.access_token },
+              }, '/signup');
         } catch (error) {
           console.error('Error:', error);
           }

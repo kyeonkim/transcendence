@@ -26,17 +26,18 @@ const MyProfileCard = styled(Card) ({
 });
 
 interface MyProfileProps {
-  setMTbox: (num: number) => void;
+  setMTbox: (num: number, searchTarget: string) => void;
+
 }
 
 export default function MyProfile({ setMTbox }: MyProfileProps) {
 
   const handleMTbox = (num: number) => () => {
-    setMTbox(num);
+    setMTbox(num, '');
   }
     return (
       <MyProfileCard sx={{ maxWidth: 400, maxHeight: 500 }}>
-      <CardMedia
+      <CardMedia onClick={handleMTbox(1)}
         component="img"
         alt="favicon"
         height="355"

@@ -9,7 +9,7 @@ import { styled } from '@mui/system';
 
 const MainMatchingButton = styled(Button) ({
   position: 'absolute',
-  top: 0,
+  top: 55,
   left: 0,
   width: 400,
   height: 100,

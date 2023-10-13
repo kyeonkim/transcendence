@@ -15,6 +15,7 @@ import theme from "../util/theme/theme"
 import MyProfile from '@/components/profile/my_profile';
 import MatchingButton from '@/components/matching/matching';
 import SearchUser from '@/components/search_bar/search_user';
+import UserLists from '@/components/user_lists/user_lists';
 
 // styled component (컴포넌트 고정 style로 보임)
 import { styled } from '@mui/system';
@@ -24,8 +25,6 @@ import { styled } from '@mui/system';
 
 //mainbox
 import Mainbox from '../components/mainbox';
-
-
 
 // Top left Box
 const TLBox = styled(Box) ({
@@ -72,6 +71,7 @@ export default function Main() {
   const router = useRouter();
   const [cookies, setCookie] = useCookies(['access_token', 'refresh_token']);
   const [clicked, setClick] = useState(0);
+  const [id, setSearch] = useState('');
   const { access_token, refresh_token } = router.query;
   let   isLoggedIn = true;
   let   contentComponent;
@@ -106,37 +106,36 @@ export default function Main() {
 // 10-13 kshim Button의 기능이 main에 위치해있어서 좀 이상하다는 느낌 받았던 것 같습니다.
 // MyProfile Component 파일 안에서 동작을 수행하고 그 결과를 main의 state에 반영시키는 구조가 더 개인적인 취향에 맞긴한데, 그 경우 수행 결과를 state로 전달하는 방법을 알아야할 것 같습니다.
 
-  const handleClick = (value: number) => {
+  const handleClick = (value: number, searchTarget: string) => {
     setClick(value);
+    setSearch(searchTarget);
   }
-
 
   useEffect(() => {
       setCookieHandler();
   }, [router.query]);
 
   return (
-      <React.Fragment>
-        {/* <ThemeProvider theme={theme}> */}
+      //  <UserContext.Consumer>
+        <React.Fragment>
           <CssBaseline />
           <Container maxWidth="xs">
             <TLBox>
               <MyProfile setMTbox={handleClick}/>
             </TLBox>
             <MTBox>
-              <Mainbox mod={clicked}/>
+              <Mainbox mod={clicked} search={id}/>
             </MTBox>
             <MLBox>
+              <SearchUser setMTbox={handleClick}/>
               <MatchingButton />
-              <SearchUser />
             </MLBox>
             <BLBox>
-              
+              <UserLists />
             </BLBox>
           </Container>
-        {/* </ThemeProvider> */}
-          {/* <h1>Main</h1> */}
-      </React.Fragment>
+        </React.Fragment>
+      // </UserContext.Consumer>
     )
   }
   

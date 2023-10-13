@@ -1,5 +1,6 @@
 import React from 'react';
 import { useState } from 'react';
+// import { UserContext } from '../../pages/main'; 
 
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
@@ -13,46 +14,47 @@ import { styled } from '@mui/system';
 
 const MainSearchUser = styled(TextField) ({
   position: 'absolute',
-  top: 100,
+  top: 0,
   left: 0,
-  width: 350,
-  height: 0,
+  width: 400,
+  height: 100,
   color: "black"
 });
 
 const MainSearchButton = styled(Button) ({
     position: 'absolute',
-    top: 100,
-    left: 350,
-    width: 50,
-    height: 50,
+    top: 0,
+    left: 330,
+    width: 70,
+    height: 55,
     color: "black"
   });
 
+interface SearchUserProps {
+    setMTbox: (num: number, searchTarget: string) => void;
+}
 
-export default function SearchUser() {
-    
+export default function SearchUser({ setMTbox }: SearchUserProps) {
     const [searchTarget, setSearchTarget] = useState('');
 
-    const doSearchTarget = () => {
-        if (searchTarget == 'true')
-        {
-            alert("it's true!");
-        }
-        else
-        {
-            alert("it's not true!");
-        }
+    const handleMTbox = (num: number, searchTarget: string) => () => {
+        if (searchTarget === '')
+            return; // 검색어 비어있으면 창띄우기? 아무동작x?
+        setMTbox(num, searchTarget);
     }
-
     // searchTarget을 MainSearchUser에서 갱신
     return (
         <React.Fragment>
-            <MainSearchUser id="outlined_search_user" label="유저 검색" variant="outlined" onChange={(e) => setSearchTarget(e.target.value)}>
+            <MainSearchUser
+                id="outlined_search_user"
+                label="유저 검색"
+                variant="outlined"
+                onChange={(e) => setSearchTarget(e.target.value)}
+                >
                 Matching
             </MainSearchUser>
-            <MainSearchButton variant='contained' onClick={doSearchTarget}>
-                Search
+            <MainSearchButton variant='contained' onClick={handleMTbox(1, searchTarget)}>
+                검색
             </MainSearchButton>
         </React.Fragment>
     );

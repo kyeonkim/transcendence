@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
+import axios from 'axios';
 
 const ProfilePage: React.FC = () => {
   const router = useRouter();
@@ -26,26 +27,24 @@ const ProfilePage: React.FC = () => {
     setNickname(event.target.value);
   };
 
-  const handleSetData = () => {
+  const handleSetData = async () => {
 
     const data = {
-      oauth_token, //백앤드꺼
-      profileImage,
-      nickname
+      access_token: oauth_token,
+      nick_name: nickname,
+      img_name: profileImage
     };
-    /*
-      {
-        value : true or false,
-        access_token: '1234',
-        refresh_token: '1234'
-      }
-    */
-    // axios.post('/api/user', data);
-    // response.data ? true : false
-    //true -> main
-    //false ->nickname
-
-    console.log('data: ', data);
+   console.log('data: ', data);
+   const response = await axios.post('http://10.13.9.2:4242/user/create', data);
+   console.log('response: ', response);
+    if (response.data)
+      router.push({
+        pathname: '/main',
+        query: {
+          access_token: response.data.access_token,
+          refresh_token: response.data.refresh_token
+        },
+      }, '/main');
   }
 
   return (
@@ -79,11 +78,9 @@ const ProfilePage: React.FC = () => {
         />
       </div>
       <div style={{ marginTop: '20px' }}>
-        <Link href={`/main`}>
         <button onClick={handleSetData}>
           저장
         </button>
-        </Link>
       </div>
     </div>
   );

@@ -5,14 +5,15 @@ import Test3 from './mainbox/test3';
 
 const MainBox = (props: any) => {
   const value = props.mod;
+  const search = props.search;
 
   const handleRender = () => {
     if (value === 1)
-		return <Test1 />;
+      return <Test1 id={search}/>;
     else if (value === 2)
-		return <Test2 />;
+		  return <Test2 />;
     else
-		return <Test3 />;
+		  return <Test3 />;
   };	
 
   return <div>{handleRender()}</div>;
