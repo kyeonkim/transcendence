@@ -8,7 +8,7 @@ import Skeleton from '@mui/material/Skeleton';
 // styled component (컴포넌트 고정 style로 보임)
 import { styled } from '@mui/system';
 
-import { Main}
+// item component의 의미는?
 
 const MainChatRoomList = styled(Grid) ({
   position: 'absolute',

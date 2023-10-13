@@ -7,6 +7,7 @@ const Login = () => {
   const user = 'tester';
   const service = 'trans';
   // const secret = authenticator.generateSecret(); // -> 백에서 생성? 프론트에서 생성하고 전달? 
+  // const token = authenticator.generate(secret);
   const secret = '2testererereerer2wdwdwd'
   const otpauth = authenticator.keyuri(user, service, secret);
    
