@@ -18,7 +18,7 @@ const MainFriendPanal = styled(Box) ({
 
 
 export default function FriendListPanal (props: any) {
-  const {children, value, index} = props;
+  const {value, index} = props;
 
   return (
     <div

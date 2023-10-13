@@ -36,7 +36,7 @@ const ProfilePage: React.FC = () => {
     };
    console.log('data: ', data);
    const response = await axios.post('http://10.13.9.2:4242/user/create', data);
-   console.log('response: ', response);
+  //  console.log('response: ', response);
     if (response.data)
       router.push({
         pathname: '/main',

@@ -10,7 +10,6 @@ const Login = () => {
 
   useEffect(() => {
 
-    console.log('code:', code);
     if (code) {
       const handleCallback = async () => {
         try {
@@ -18,9 +17,16 @@ const Login = () => {
             params: {
               code: code
             }
-          });
-          const userData = await axios.post('http://10.13.9.2:4242/user/auth' , response.data);
+          })
+          console.log('responseData:', response.data);
+          
+          const userData = await axios.post('http://10.13.9.2:4242/user/auth', response.data);
+          
+          // server-side 테스트용 api 
+          // const userData = await axios.post('/api/user_auth', response.data);
+          
           console.log('userData:', userData);
+
           if (userData.data.sign)
             router.push({
             pathname: '/main',
@@ -36,8 +42,9 @@ const Login = () => {
               }, '/signup');
         } catch (error) {
           console.error('Error:', error);
-          }
+          
         }
+      }
         handleCallback();
       };
     }, [code]);

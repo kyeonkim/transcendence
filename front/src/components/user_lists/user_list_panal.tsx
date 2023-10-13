@@ -19,7 +19,7 @@ const MainUserPanal = styled(Box) ({
 
 export default function UserListPanal (props: any) {
 
-  const {children, value, index} = props;
+  const {value, index} = props;
 
   return (
     <div

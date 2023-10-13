@@ -18,7 +18,7 @@ const MainChannelPanal = styled(Box) ({
 
 
 export default function ChannelListPanal (props: any) {
-    const {children, value, index} = props;
+    const {value, index} = props;
 
   return (
     <div
