@@ -67,30 +67,30 @@ export class UserService {
 
     async AddFriend(@Body() userData : createUserDto) : Promise<AxiosResponse>
     {
-        // const addedfriend1 = await this.prisma.friends.create({
-        //     data: {
-        //         following_user_id: 1,
-        //         followed_user_id: 2,
-        //     }
-        // });
-        // const addedfriend2 = await this.prisma.friends.create({
-        //     data: {
-        //         following_user_id: 2,
-        //         followed_user_id: 1,
-        //     }
-        // });
-        // const addedfriend3 = await this.prisma.friends.create({
-        //     data: {
-        //         following_user_id: 1,
-        //         followed_user_id: 3,
-        //     }
-        // });
-        // const addedfriend4 = await this.prisma.friends.create({
-        //     data: {
-        //         following_user_id: 3,
-        //         followed_user_id: 1,
-        //     }
-        // });
+        const addedfriend1 = await this.prisma.friends.create({
+            data: {
+                following_user_id: 1,
+                followed_user_id: 2,
+            }
+        });
+        const addedfriend2 = await this.prisma.friends.create({
+            data: {
+                following_user_id: 2,
+                followed_user_id: 1,
+            }
+        });
+        const addedfriend3 = await this.prisma.friends.create({
+            data: {
+                following_user_id: 1,
+                followed_user_id: 3,
+            }
+        });
+        const addedfriend4 = await this.prisma.friends.create({
+            data: {
+                following_user_id: 3,
+                followed_user_id: 1,
+            }
+        });
         const getFriends = await this.prisma.user.findUnique({
             where: {
               user_id: 2,
@@ -99,7 +99,6 @@ export class UserService {
               friends: true, // All posts where authorId == 20
             },
           });
-        
         const dummyData = {
             id: 1,
             title: '더미 데이터',
