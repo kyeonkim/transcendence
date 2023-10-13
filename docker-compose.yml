@@ -3,9 +3,14 @@ services:
     image: postgres:latest
     container_name: postgre_container
     restart: always
-    environment:
-      - POSTGRES_USER=myuser
-      - POSTGRES_PASSWORD=mypassword
+    healthcheck:
+      test: pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}
+      interval: 10s
+      timeout: 60s
+      retries: 5
+      start_period: 80s
+    env_file:
+      - .env
     volumes:
       - ./db:/var/lib/postgresql/data
     expose:
@@ -19,7 +24,8 @@ services:
     env_file:
       - .env
     depends_on:
-      - postgresql
+      postgresql:
+        condition: service_healthy
     volumes:
       - ./back/src:/app/transcendence_nest_server/src
     ports:
