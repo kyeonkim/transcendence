@@ -1,19 +1,22 @@
 import { Controller, Post, Body, Get, Param, ParseIntPipe, UsePipes } from '@nestjs/common';
 import { UserService } from './user.service';
-import { IntraTokenDto, UserTokenDto } from './dto/token.dto';
+import { IntraTokenDto, UserTokenDto } from '../auth/dto/token.dto';
 import { createUserDto, addFriendDto, getUserDto } from './dto/user.dto';
 import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
-import { AxiosResponse } from 'axios';
+import { AuthService } from 'src/auth/auth.service';
 
 @Controller('user')
 export class UserController {
-    constructor(private readonly UserService: UserService) {}
+    constructor(
+		private readonly UserService: UserService,
+		private readonly AuthService: AuthService
+		) {}
 	
 	@ApiOperation({summary: `유저 확인 API`, description: `발급 받은 토큰을 통해 해당 유저가 가입되어 있는지 확인한다.`})
 	@Post("auth")
 	PostAuth(@Body() token : IntraTokenDto)
 	{
-		return this.UserService.PostAuth(token);
+		return this.AuthService.PostAuth(token);
 	}
 
 	@ApiOperation({summary: `유저 생성 API`, description: `새로생성된 유저를 db에 저장한다.`})
