@@ -12,17 +12,18 @@ datasource db {
 }
 
 model User {
-  user_id    Int      @id
-  nick_name  String   @unique
-  sign       Boolean  @default(false)
-  state      Int      @default(0)
-  img_name   String?  @default("default.png")
-  win        Int      @default(0)
-  lose       Int      @default(0)
-  ladder     Int      @default(1000)
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  user_id    Int       @id
+  nick_name  String    @unique
+  sign       Boolean   @default(false)
+  state      Int       @default(0)
+  img_name   String?   @default("default.png")
+  win        Int       @default(0)
+  lose       Int       @default(0)
+  ladder     Int       @default(1000)
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
   friends    Friends[] @relation("following_user")
+  tokens     Tokens?  @relation("tokens_user")
 }
 
 model Friends {
@@ -33,11 +34,11 @@ model Friends {
     created_at        DateTime @default(now())
 }
 
-//model Post {
-//  id        Int      @default(autoincrement()) @id
-//  title     String
-//  content   String?
-//  published Boolean? @default(false)
-//  author    User?    @relation(fields: [authorId], references: [id])
-//  authorId  Int?
-//}
+model Tokens {
+    id             Int      @default(autoincrement()) @id
+    tokens_user    User     @relation("tokens_user", fields: [tokens_user_id], references: [user_id])
+    tokens_user_id Int      @unique
+    access_token   String?
+    refresh_token  String?
+    created_at     DateTime @default(now())
+}
