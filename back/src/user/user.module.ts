@@ -3,10 +3,11 @@ import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { HttpModule } from '@nestjs/axios';
 import { PrismaModule } from 'src/prisma/prisma.module';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   controllers: [UserController],
   providers: [UserService],
-  imports: [HttpModule, PrismaModule]
+  imports: [HttpModule, PrismaModule, JwtModule]
 })
 export class UserModule {}
