@@ -12,5 +12,8 @@ re:
 	make all
 log:
 	docker compose logs -f
-
+db:
+	docker exec -it postgre_container bash
+server:
+	docker exec -it nest_container bash
 .PHONY: all clean fclean re
