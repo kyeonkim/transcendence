@@ -1,3 +1,5 @@
+'use Client'
+
 import { useCookies } from 'react-cookie';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
@@ -9,7 +11,7 @@ import Box from '@mui/material/Box';
 
 // ThemeProvider - app 전역에 적용할 수 있음.
 import { ThemeProvider } from '@mui/system';
-import theme from "../util/theme/theme"
+import theme from "../../util/theme/theme"
 
 import MyProfile from '@/components/profile/my_profile';
 import MatchingButton from '@/components/matching/matching';
@@ -23,7 +25,7 @@ import { styled } from '@mui/system';
 // import  Notlogin  from '../components/notlogin';
 
 //mainbox
-import Mainbox from '../components/mainbox';
+import Mainbox from '../../components/mainbox';
 
 // Top left Box
 const TLBox = styled(Box) ({
