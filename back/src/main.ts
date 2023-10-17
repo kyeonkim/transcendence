@@ -10,7 +10,27 @@ async function bootstrap() {
   .setTitle('Transcendence')
   .setDescription('The Transcendence API description')
   .setVersion('0.1')
-  .build();
+  .addBearerAuth(
+    {
+      type: 'http',
+      scheme: 'bearer',
+      bearerFormat: 'JWT',
+      name: 'JWT',
+      description: 'Enter JWT token',
+      in: 'header',
+    },
+    'JWT-auth', // This name here is important for matching up with @ApiBearerAuth() in your controller!
+  ).addBearerAuth(
+    {
+      type: 'http',
+      scheme: 'bearer',
+      bearerFormat: 'JWT',
+      name: 'JWT',
+      description: 'Enter JWT token',
+      in: 'header',
+    },
+    'JWT-nuth', // This name here is important for matching up with @ApiBearerAuth() in your controller!
+  ).build();
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);

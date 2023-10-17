@@ -6,6 +6,9 @@ import { IntraTokenDto } from 'src/auth/dto/token.dto';
 import { firstValueFrom } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
 
+import { PassportStrategy } from '@nestjs/passport';
+import { ExtractJwt, Strategy } from 'passport-jwt';
+
 @Injectable()
 export class AuthService {
     constructor(
@@ -79,7 +82,7 @@ export class AuthService {
 }
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
+export class JwtAccessStrategy extends PassportStrategy(Strategy, 'jwt-access') {
   constructor() {
     super({
       //Request에서 JWT 토큰을 추출하는 방법을 설정 -> Authorization에서 Bearer Token에 JWT 토큰을 담아 전송해야한다.
@@ -87,7 +90,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
       //true로 설정하면 Passport에 토큰 검증을 위임하지 않고 직접 검증, false는 Passport에 검증 위임
       ignoreExpiration: false,
       //검증 비밀 값(유출 주의)
-      secretOrKey: process.env.JWT_ACCESS_TOKEN_SECRET,
+      secretOrKey: "my sec",
       // passReqToCallback: true,
     });
   }
@@ -98,6 +101,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
    * @param payload 토큰 전송 내용
    */
   async validate(payload: any): Promise<any> {
-    return { email: payload.email };
+    console.log(payload)
+    return { status: true };
   }
 }

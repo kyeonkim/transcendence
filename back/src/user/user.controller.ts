@@ -1,9 +1,11 @@
-import { Controller, Post, Body, Get, Param, ParseIntPipe, UsePipes } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, ParseIntPipe, UsePipes, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { IntraTokenDto, UserTokenDto } from '../auth/dto/token.dto';
 import { createUserDto, addFriendDto, getUserDto } from './dto/user.dto';
 import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { AuthService } from 'src/auth/auth.service';
+
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('user')
 export class UserController {
@@ -47,11 +49,5 @@ export class UserController {
 		return this.UserService.GetUserDataById(id);
 	}
 
-	@ApiBearerAuth("token")
-	@Post("token/varify")
-	VarifyToken(@Body() token : UserTokenDto)
-	{
-		return token;
-		// return this.UserService.VarifyToken(token);
-	}
+
 }
