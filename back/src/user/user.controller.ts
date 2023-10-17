@@ -1,8 +1,8 @@
-import { Controller, Post, Body, Get, Param, ParseIntPipe } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, ParseIntPipe, UsePipes } from '@nestjs/common';
 import { UserService } from './user.service';
-import { tokenDto } from './dto/token.dto';
+import { IntraTokenDto, UserTokenDto } from './dto/token.dto';
 import { createUserDto, addFriendDto, getUserDto } from './dto/user.dto';
-import { ApiOperation } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { AxiosResponse } from 'axios';
 
 @Controller('user')
@@ -11,7 +11,7 @@ export class UserController {
 	
 	@ApiOperation({summary: `유저 확인 API`, description: `발급 받은 토큰을 통해 해당 유저가 가입되어 있는지 확인한다.`})
 	@Post("auth")
-	PostAuth(@Body() token : tokenDto)
+	PostAuth(@Body() token : IntraTokenDto)
 	{
 		return this.UserService.PostAuth(token);
 	}
@@ -42,5 +42,13 @@ export class UserController {
     GetUserDataById(@Param('id', ParseIntPipe) id: number)
 	{
 		return this.UserService.GetUserDataById(id);
+	}
+
+	@ApiBearerAuth("token")
+	@Post("token/varify")
+	VarifyToken(@Body() token : UserTokenDto)
+	{
+		return token;
+		// return this.UserService.VarifyToken(token);
 	}
 }
