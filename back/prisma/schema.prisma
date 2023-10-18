@@ -14,7 +14,6 @@ datasource db {
 model User {
   user_id    Int       @id
   nick_name  String    @unique
-  sign       Boolean   @default(false)
   state      Int       @default(0)
   img_name   String?   @default("default.png")
   win        Int       @default(0)
