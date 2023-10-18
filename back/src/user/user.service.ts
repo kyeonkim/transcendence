@@ -3,7 +3,7 @@ import { Injectable, Body, Inject, forwardRef } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { JwtService } from '@nestjs/jwt';
-import { IntraTokenDto, UserTokenDto } from '../auth/dto/token.dto';
+import { TokenDto } from '../auth/dto/token.dto';
 import { createUserDto, getUserDto, addFriendDto } from './dto/user.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuthService } from 'src/auth/auth.service';
@@ -100,8 +100,42 @@ export class UserService {
         });
         return {status: true, message: "success"};
     }
+
+    async DeleteUserById(nickname: string)
+    {
+        const user = await this.prisma.user.findUnique({
+            where: {
+              nick_name: nickname,
+            },
+        });
+        if (user == null)
+            return {status: false, message: "유저 찾기 실패"}
+        const id = user.user_id;
+
+        await this.prisma.friends.deleteMany({
+            where: {
+                OR: [
+                    {
+                        following_user_id: id,
+                    },
+                    {
+                        followed_user_id: id,
+                    },
+                ],
+            },
+        });
+        await this.prisma.tokens.deleteMany({
+            where: {
+                tokens_user_id: id,
+            },
+        });
+        await this.prisma.user.delete({
+            where: {
+                user_id: id,
+            },
+        });
+        return {status: true, message: "success", delete_user: user.nick_name};
+    }
 }
-function CreateToken(user_id: number) {
-    throw new Error('Function not implemented.');
-}
+
 
