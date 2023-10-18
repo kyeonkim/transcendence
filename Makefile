@@ -12,7 +12,7 @@ re:
 	make all
 log:
 	docker compose logs -f
-db:
+in-db:
 	docker exec -it postgre_container bash
 server:
 	docker exec -it nest_container bash
