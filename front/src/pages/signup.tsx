@@ -10,7 +10,7 @@ const ProfilePage: React.FC = () => {
   const { oauth_token } = router.query;
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [nickname, setNickname] = useState('');
-
+  const [filename, setFilename] = useState('');
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -18,9 +18,11 @@ const ProfilePage: React.FC = () => {
       reader.onload = (e) => {
         if (e.target) {
           setProfileImage(e.target.result as string);
+          setFilename(file.name);
         }
       };
       reader.readAsDataURL(file);
+      console.log('file: ', file.name)
     }
   };
 
@@ -33,7 +35,8 @@ const ProfilePage: React.FC = () => {
     const data = {
       access_token: oauth_token,
       nick_name: nickname,
-      img_name: profileImage
+      img_name: filename,
+      // img_data: profileImage,
     };
    console.log('data: ', data);
    const response = await axios.post('http://10.13.9.2:4242/user/create', data);

@@ -81,7 +81,6 @@ export default function Main() {
   }
 
   return (
-      //  <UserContext.Consumer>
         <React.Fragment>
           <CssBaseline />
           <GuardLogin>
@@ -101,9 +100,7 @@ export default function Main() {
             </BLBox>
           <Chatbox></Chatbox>
           </GuardLogin>
-          {/* </Container> */}
         </React.Fragment>
-      // </UserContext.Consumer>
     )
   }
   
