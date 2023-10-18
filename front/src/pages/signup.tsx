@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import axios from 'axios';
+import { setCookie } from 'cookies-next';
 
 const ProfilePage: React.FC = () => {
   const router = useRouter();
@@ -36,15 +37,17 @@ const ProfilePage: React.FC = () => {
     };
    console.log('data: ', data);
    const response = await axios.post('http://10.13.9.2:4242/user/create', data);
-  //  console.log('response: ', response);
-    if (response.data)
-      router.push({
-        pathname: '/main',
-        query: {
-          access_token: response.data.access_token,
-          refresh_token: response.data.refresh_token
-        },
-      }, '/main');
+   console.log("sign UP: ", response) 
+   if (response.data.status)
+    {
+      setCookie('access_token', response.data.token.access_token);
+      setCookie('refresh_token', response.data.token.refresh_token);
+      router.push('/main');
+    }
+    else
+    {
+      window.alert('중복된 닉네임');
+    }
   }
 
   return (

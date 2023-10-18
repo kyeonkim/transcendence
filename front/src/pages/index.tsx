@@ -1,7 +1,8 @@
 'use client'
 import React from 'react'
 import Button from '@mui/material/Button';
-import Cookies from 'universal-cookie';
+import { getCookie } from 'cookies-next';
+import { useRouter } from 'next/router';
 
 const buttonStyle = {
   color : 'white',
@@ -13,15 +14,12 @@ const buttonStyle = {
 
 
 export default function Home() {
-  const cookies = new Cookies();
-  const token = cookies.get('access_token');
-  const refresh_token = cookies.get('refresh_token');
+  const router = useRouter();
   const handleLogin = () => {
-    if (token && refresh_token)
-      window.location.href = '/main';
+    if (getCookie('access_token') && getCookie('refresh_token'))
+      router.push('/main');
     else
       window.location.href = 'https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-a530d138cf1c33d448191cb250ee026f61f01d4d4cbbe62e0ff18ee285f9f290&redirect_uri=http%3A%2F%2F10.13.8.3%3A3000%2Foauth%2FLogin&response_type=code';
-  
   };
 
 function ButtonUsage() {

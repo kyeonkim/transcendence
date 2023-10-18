@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/router';
 import userData from '../user_auth';
-
+import { deleteCookie } from 'cookies-next';
+import { setCookie } from 'cookies-next';
 const Login = () => {
   const router = useRouter();
   const { code } = router.query;
@@ -20,22 +21,20 @@ const Login = () => {
           console.log('responseData:', response.data);
           
           const userData = await axios.post('http://10.13.9.2:4242/user/auth', response.data);
-          
-          // server-side 테스트용 api 접근 코드
-          // const userData = await axios/api/user_aut.post('h', response.data);
-          // const userData = await axios.get('/api/user_auth', response.data);
-          
-          // const data = await userData();
-          // console.log('data:', data);
-          // console.log('userData:', userData);
+                    
+          console.log('userData:', userData);
           if (userData.data.sign)
-            router.push({
-            pathname: '/main',
-            query: {
-              access_token: userData.data.access_token,
-              refresh_token: userData.data.refresh_token,
-              },
-            }, '/main');
+          {
+            setCookie('access_token', userData.data.token.access_token, {
+              maxAge: 60 * 3,
+              // httpOnly: true,
+            });
+            setCookie('refresh_token', userData.data.token.refresh_token, {
+              maxAge: 60 * 3,
+              // httpOnly: true,
+            });
+            router.push('/main');
+          }
           else
             router.push({
               pathname: '/signup',

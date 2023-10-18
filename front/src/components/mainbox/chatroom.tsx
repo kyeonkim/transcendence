@@ -1,6 +1,6 @@
 import React from 'react';
 
-const test2 = () => {
+const ChatRoomList = () => {
 	return (
 		<div>
 			<h1>Chatroom List</h1>
@@ -8,4 +8,4 @@ const test2 = () => {
 	)
 }
 
-export default test2;
+export default ChatRoomList;

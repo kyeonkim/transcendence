@@ -12,20 +12,20 @@
   
   .leftHalfComponent {
 	flex: 0.4;
-	background-color: #6495ed; /* Adjust as needed */
+	background-color: #6495ed;
   }
   
   .rightHalfComponent {
 	flex: 1;
-	background-color: #32cd32; /* Adjust as needed */
+	background-color: #32cd32;
   }
   
-  .topThirdComponent {
+  .topComponent {
   height: 30%;
   display: flex;
   flex-direction: column;
   justify-content: space-around;
-  padding: 10px; /* Add some padding */
+  padding: 10px;
   background-color: #ffa500;
 }
 
@@ -35,29 +35,31 @@
 }
 
 .userImage {
-  width: 350px; /* Adjust as needed */
-  height: 350px; /* Adjust as needed */
+  width: 350px;
+  height: 350px;
   border-radius: 50%;
-  margin-right: 10px; /* Add margin to separate image and text */
+  margin-right: 10px;
 }
 
 .userName {
   font-weight: bold;
-  font-size: 70px; /* Adjust as needed */
-}
-
-.buttonContainer {
-  display: flex;
-  justify-content: flex-end;
+  font-size: 70px;
 }
 
 .roundButton {
   border-radius: 10%;
-  margin-left: 10px; /* Add margin between buttons */
+  margin-left: 10px;
 }
 
 .myprofilelink {
-  background-color: white; /* Set the background color to white */
+  background-color: white;
+  display: flex;
+  width: 400px;
+  height: 400px;
+}
+
+.matchbutton {
+  background-color: white;
   display: flex;
   width: 400px;
   height: 400px;
