@@ -1,4 +1,6 @@
-import { redirect } from 'next/navigation';
+// import { permanentRedirect } from 'next/navigation';
+
+import {redirect} from 'next/navigation';
 
 export default async function entrance () {
 
@@ -9,5 +11,7 @@ export default async function entrance () {
 //       redirect('/main');
 //     else
     // 쿠키 확인해서 그대로 main으로 보낼 수도 있음
-    redirect('/login');
+
+    // permanentRedirect('/index');
+    redirect('/entrance');
 }

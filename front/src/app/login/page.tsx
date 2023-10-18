@@ -1,33 +1,78 @@
-'use client'
-import React from 'react'
-import Button from '@mui/material/Button';
-// import Cookies from 'universal-cookie';
+import { permanentRedirect } from 'next/navigation';
+import axios from 'axios';
 
-const buttonStyle = {
-  color : 'white',
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  height: '100vh',
-};
+import Signup from './signup';
+
+import { setCookie } from 'cookies-next';
+
+export default async function Login ({searchParams}:any) {
+
+  console.log('code:', searchParams.code);
+
+  let status = false;
+  const code = searchParams.code;
+
+  let access_token;
+  let userData;
+
+  if (code)
+  {
+      try
+      {
+          const response = await axios.post('https://api.intra.42.fr/oauth/token', {
+          code: code,
+          client_id: process.env.NEXT_PUBLIC_CLIENT_ID,
+          client_secret: process.env.NEXT_PUBLIC_CLIENT_SECRET,
+          redirect_uri: process.env.NEXT_PUBLIC_REDIRECT_URI,
+          grant_type: 'authorization_code'
+          });
+
+          console.log('42api responses:', response.data);
+      
+          userData = await axios.post('http://10.13.9.2:4242/auth/login', {  
+          access_token: response.data.access_token
+          });
+          console.log('Login - userData:', userData.data);
+      
+          // signed를 안주는 식으로 변경된 것 같음.
+          // 동작 질묺드려보기.
+            // sign으로 주는 부분과 signed로 주는 부분이 있는건가? 확인 필요
+
+          
+          access_token = userData.data.access_token;
+          status = userData.data.status;
 
 
-export default function Home() {
-  const handleLogin = () => {
-      window.location.href = 'https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-0df03a6be6b8b865402f4b719f20c1dcc04c4a3d0f47e9a5f2c58b9baa87cd12&redirect_uri=http%3A%2F%2F10.13.8.1%3A3000%2Flogin%2F42api&response_type=code';
-  };
+      } catch (error) {
+           console.log('Login - error occured');
+           return (
+            <></>
+           );
+      }
 
-function ButtonUsage() {
-  return <Button variant="contained" onClick={handleLogin}>Hello world</Button>;
-}
+      if (status == true)
+      {
+          setCookie('access_token', userData.data.access_token, {
+            maxAge: 60 * 3,
+            // httpOnly: true,
+          });
+          setCookie('refresh_token', userData.data.refresh_token, {
+            maxAge: 60 * 3,
+            // httpOnly: true,
+          });
+          permanentRedirect('/main_frame');
+          // permanentRedirect는 NEXT_REDIRECT error를 바로 던져서 해당 route의 rendering을 막는다.
+      }
+  }
 
+  // 이미 등록된 상태에서 동기화 문제로 인해 원하는 렌더링이 안됨.
 
   return (
-    <div style={buttonStyle}>
-    {/* // <div> */}
-      {/* <button onClick={handleLogin}>login button</button> */}
-      <ButtonUsage />
-      {/* <Button variant="contained" onClick={handleLogin}>Hello world</Button> */}
+    <div>
+      <p>this is server component - 42api.</p>
+          <Signup access_token={access_token} />
     </div>
-  ) 
+      // <Login signed={signed}/>
+  );
+
 }

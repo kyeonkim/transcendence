@@ -68,7 +68,7 @@ const MTBox = styled(Box) ({
 });
 
 
-export default function Main() {
+export default function Main( props:any ) {
   const router = useRouter();
   const [cookies, setCookie] = useCookies(['access_token', 'refresh_token']);
   const [clicked, setClick] = useState(0);
