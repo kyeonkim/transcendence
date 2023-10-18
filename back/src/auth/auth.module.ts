@@ -7,9 +7,9 @@ import { UserModule } from 'src/user/user.module';
 import { AuthController } from './auth.controller';
 
 @Module({
+  controllers: [AuthController],
   providers: [AuthService, JwtAccessStrategy],
-  imports: [HttpModule, PrismaModule, JwtModule, forwardRef(()=> UserModule)],
-  exports: [AuthService],
-  controllers: [AuthController]
+  imports: [HttpModule, PrismaModule, JwtModule, forwardRef(()=>UserModule)],
+  exports: [AuthService]
 })
 export class AuthModule {}

@@ -1,17 +1,21 @@
-import { Injectable, Body } from '@nestjs/common';
+
+import { Injectable, Body, Inject, forwardRef } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
-import { IntraTokenDto, UserTokenDto } from '../auth/dto/token.dto';
-import { PrismaService } from '../prisma/prisma.service';
-import { createUserDto, getUserDto, addFriendDto } from './dto/user.dto';
 import { JwtService } from '@nestjs/jwt';
+import { IntraTokenDto, UserTokenDto } from '../auth/dto/token.dto';
+import { createUserDto, getUserDto, addFriendDto } from './dto/user.dto';
+import { PrismaService } from '../prisma/prisma.service';
+import { AuthService } from 'src/auth/auth.service';
 
 @Injectable()
 export class UserService {
     constructor(
+        @Inject(forwardRef(() => AuthService))
+        private readonly authService: AuthService,
         private readonly httpService: HttpService,
-        private prisma: PrismaService,
-        private jwtService: JwtService
+        private readonly prisma: PrismaService,
+        private readonly jwtService: JwtService,
         ) {}
 
 
@@ -35,7 +39,7 @@ export class UserService {
               user_id: id,
             },
         });
-        console.log(userData);
+        console.log("====================User_data=====================\n\n",userData);
         if (userData == null)
             return {status: false, message: "유저 찾기 실패"}
         else
@@ -51,15 +55,22 @@ export class UserService {
 			headers : {'Authorization': `Bearer ${userData.access_token}`}
 		};
 		const { data } = await firstValueFrom(this.httpService.request(getTokenConfig));
-        const user = await this.prisma.user.create({
+        const newUser = await this.prisma.user.create({
             data: {
                 user_id: data.resource_owner_id,
                 nick_name: userData.nick_name,
                 img_name: userData.img_name,
             },
         });
+        console.log("newUser ====\n\n",newUser);
         //닉네임중복체크
-        return {status: true, message: "success"};
+        if (newUser == null)
+            return {status: false, message: "이미 사용 중인  이름입니다."};
+        else
+        {
+            const tokenData = await this.authService.CreateToken(newUser.user_id);
+            return {status: true,  message: "success", userdata: newUser, token: tokenData};
+        }
     }
 
     /*
@@ -90,3 +101,7 @@ export class UserService {
         return {status: true, message: "success"};
     }
 }
+function CreateToken(user_id: number) {
+    throw new Error('Function not implemented.');
+}
+
