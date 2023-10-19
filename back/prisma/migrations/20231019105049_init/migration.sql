@@ -2,9 +2,8 @@
 CREATE TABLE "User" (
     "user_id" INTEGER NOT NULL,
     "nick_name" TEXT NOT NULL,
-    "sign" BOOLEAN NOT NULL DEFAULT false,
     "state" INTEGER NOT NULL DEFAULT 0,
-    "img_name" TEXT NOT NULL DEFAULT 'default.png',
+    "img_name" TEXT DEFAULT 'default.png',
     "win" INTEGER NOT NULL DEFAULT 0,
     "lose" INTEGER NOT NULL DEFAULT 0,
     "ladder" INTEGER NOT NULL DEFAULT 1000,
@@ -22,6 +21,16 @@ CREATE TABLE "Friends" (
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "Friends_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Tokens" (
+    "nick_name" TEXT NOT NULL,
+    "access_token" TEXT,
+    "refresh_token" TEXT,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "Tokens_pkey" PRIMARY KEY ("nick_name")
 );
 
 -- CreateIndex

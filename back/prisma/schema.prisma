@@ -22,7 +22,6 @@ model User {
   created_at DateTime  @default(now())
   updated_at DateTime  @updatedAt
   friends    Friends[] @relation("following_user")
-  tokens     Tokens?  @relation("tokens_user")
 }
 
 model Friends {
@@ -34,9 +33,7 @@ model Friends {
 }
 
 model Tokens {
-    id             Int      @default(autoincrement()) @id
-    tokens_user    User     @relation("tokens_user", fields: [tokens_user_id], references: [user_id])
-    tokens_user_id Int      @unique
+    nick_name      String   @id
     access_token   String?
     refresh_token  String?
     created_at     DateTime @default(now())
