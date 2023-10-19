@@ -3,32 +3,40 @@ import { Injectable, Body, Inject, forwardRef } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { JwtService } from '@nestjs/jwt';
-import { TokenDto } from '../auth/dto/token.dto';
-import { createUserDto, getUserDto, addFriendDto } from './dto/user.dto';
+import { SignUpDto, TokenDto } from '../auth/dto/token.dto';
+import { getUserDto, addFriendDto } from './dto/user.dto';
 import { PrismaService } from '../prisma/prisma.service';
-import { AuthService } from 'src/auth/auth.service';
 
 @Injectable()
 export class UserService {
     constructor(
-        @Inject(forwardRef(() => AuthService))
-        private readonly authService: AuthService,
         private readonly httpService: HttpService,
         private readonly prisma: PrismaService,
         private readonly jwtService: JwtService,
         ) {}
 
 
-    async GetUserDataByNickName(nickname: string)
+    async CreateUser(id: number, nickName: string)
     {
-        console.log("nick_name :", nickname);
+        const newUser = await this.prisma.user.create({
+            data: {
+                user_id: id,
+                nick_name: nickName,
+            },
+        });
+        return newUser;
+    }
+    
+    async GetUserDataByNickName(nickName: string)
+    {
+        console.log("nick_name :", nickName);
         const userData = await this.prisma.user.findUnique({
             where: {
-              nick_name: nickname,
+              nick_name: nickName,
             },
         });
         console.log(userData);
-        return await Promise.resolve(userData);
+        return Promise.resolve(userData);
     }
 
     async GetUserDataById(id: number)
@@ -43,34 +51,7 @@ export class UserService {
         if (userData == null)
             return {status: false, message: "유저 찾기 실패"}
         else
-            return await Promise.resolve(userData);
-    }
-
-    async CreateUser(@Body() userData : createUserDto)
-    {
-        const getTokenConfig = {
-			url: '/oauth/token/info',
-			method: 'get',
-			baseURL : 'https://api.intra.42.fr/',
-			headers : {'Authorization': `Bearer ${userData.access_token}`}
-		};
-		const { data } = await firstValueFrom(this.httpService.request(getTokenConfig));
-        const newUser = await this.prisma.user.create({
-            data: {
-                user_id: data.resource_owner_id,
-                nick_name: userData.nick_name,
-                img_name: userData.img_name,
-            },
-        });
-        console.log("newUser ====\n\n",newUser);
-        //닉네임중복체크
-        if (newUser == null)
-            return {status: false, message: "이미 사용 중인  이름입니다."};
-        else
-        {
-            const tokenData = await this.authService.CreateToken(newUser.user_id);
-            return {status: true,  message: "success", userdata: newUser, token: tokenData};
-        }
+            return Promise.resolve(userData);
     }
 
     /*
@@ -101,11 +82,11 @@ export class UserService {
         return {status: true, message: "success"};
     }
 
-    async DeleteUserById(nickname: string)
+    async DeleteUserById(nickName: string)
     {
         const user = await this.prisma.user.findUnique({
             where: {
-              nick_name: nickname,
+              nick_name: nickName,
             },
         });
         if (user == null)
@@ -126,7 +107,7 @@ export class UserService {
         });
         await this.prisma.tokens.deleteMany({
             where: {
-                tokens_user_id: id,
+                nick_name: nickName,
             },
         });
         await this.prisma.user.delete({
@@ -136,6 +117,8 @@ export class UserService {
         });
         return {status: true, message: "success", delete_user: user.nick_name};
     }
+
+    // async Upload
 }
 
 

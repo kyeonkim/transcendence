@@ -1,9 +1,8 @@
 import { Controller, Post, Body, Get, Param, ParseIntPipe, UsePipes, UseGuards, Delete } from '@nestjs/common';
 import { UserService } from './user.service';
-import { TokenDto } from '../auth/dto/token.dto';
-import { createUserDto, addFriendDto, getUserDto } from './dto/user.dto';
+import { SignUpDto, TokenDto } from '../auth/dto/token.dto';
+import { addFriendDto, getUserDto } from './dto/user.dto';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { AuthService } from 'src/auth/auth.service';
 
 import { AuthGuard } from '@nestjs/passport';
 
@@ -11,16 +10,7 @@ import { AuthGuard } from '@nestjs/passport';
 export class UserController {
     constructor(
 		private readonly UserService: UserService,
-		private readonly AuthService: AuthService
 		) {}
-
-	@ApiTags('User API')
-	@ApiOperation({summary: `유저 생성 API`, description: `새로생성된 유저를 db에 저장한다.`})
-    @Post("create")
-    CreateUser(@Body() user : createUserDto)
-    {
-        return this.UserService.CreateUser(user);
-    }
 
 	@ApiTags('User API')
 	@ApiOperation({summary: `친구 추가 API`, description: `해당 유저끼리 친구를 추가한다.`})

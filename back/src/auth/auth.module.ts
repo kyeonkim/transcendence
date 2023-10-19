@@ -9,10 +9,7 @@ import { AuthController } from './auth.controller';
 @Module({
     controllers: [AuthController],
     providers: [AuthService, JwtAccessStrategy, JwtRefreshStrategy],
-    imports: [HttpModule, PrismaModule, JwtModule, forwardRef(()=>UserModule), JwtModule.register({
-      secret: process.env.JWT_SECRET,
-  }),
-],
-  exports: [AuthService]
+    imports: [HttpModule, PrismaModule, JwtModule, UserModule],
+    exports: [AuthService]
 })
 export class AuthModule {}

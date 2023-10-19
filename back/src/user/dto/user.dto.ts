@@ -1,17 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
 
-export class createUserDto 
-{
-    @ApiProperty()
-    access_token: string;
-
-    @ApiProperty()
-    nick_name: string;
-    
-    @ApiProperty()
-    img_name: string;
-}
-
 export class addFriendDto
 {
     @ApiProperty()
