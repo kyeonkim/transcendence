@@ -1,7 +1,7 @@
 import React from 'react';
-import Test1 from './mainbox/test1';
-import Test2 from './mainbox/test2';
-import Test3 from './mainbox/test3';
+import ProfilePage from './mainbox/profile';
+import ChatRoomPage from './mainbox/chatroom';
+import MatchingButton from './mainbox/match';
 
 const MainBox = (props: any) => {
   const value = props.mod;
@@ -9,11 +9,11 @@ const MainBox = (props: any) => {
 
   const handleRender = () => {
     if (value === 1)
-      return <Test1 id={search}/>;
+      return <ProfilePage id={search}/>;
     else if (value === 2)
-		  return <Test2 />;
+		  return <ChatRoomPage />;
     else
-		  return <Test3 />;
+		  return <MatchingButton />;
   };	
 
   return <div>{handleRender()}</div>;

@@ -36,7 +36,7 @@ const ProfilePage: React.FC = () => {
       img_name: profileImage
     };
    console.log('data: ', data);
-   const response = await axios.post('http://10.13.9.2:4242/user/create', data);
+   const response = await axios.post('http://10.13.9.4:4242/user/create', data);
   //  console.log('response: ', response);
     if (response.data)
       router.push({

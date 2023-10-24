@@ -7,9 +7,9 @@ import Skeleton from '@mui/material/Skeleton';
 import { styled } from '@mui/system';
 
 
-const MainMatchingButton = styled(Button) ({
+const MainChatRoomButton = styled(Button) ({
   position: 'absolute',
-  top: 155,
+  top: 55,
   left: 0,
   width: 400,
   height: 100,
@@ -21,15 +21,15 @@ interface MyProfileProps {
   
 }
 
-export default function MatchingButton({ setMTbox }: MyProfileProps) {
+export default function ChatRoomButton({ setMTbox }: MyProfileProps) {
 
     const handleMTbox = (num: number) => () => {
         setMTbox(num, '');
     }
 
     return (
-        <MainMatchingButton variant="outlined" onClick={handleMTbox(3)}>
-            Matching
-        </MainMatchingButton>
+        <MainChatRoomButton variant="outlined" onClick={handleMTbox(2)}>
+            Chat Room List
+        </MainChatRoomButton>
     );
 }

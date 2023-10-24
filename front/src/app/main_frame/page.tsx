@@ -1,5 +1,7 @@
 import Main from './containers';
-import { getCookie } from 'cookies-next';
+// import { getCookie } from 'cookies-next';
+
+import { cookies } from 'next/headers';
 
 export default async function MainFrame () {
 
@@ -11,17 +13,25 @@ export default async function MainFrame () {
   // 재렌더링 동작 형태 고민해보기.
   // MainFrame에 어떻게 access_token, refresh_token 전달할지 생각해보기.
 
-  const access_token = getCookie('access_token');
-  const refresh_token = getCookie('refresh_token');
+  // const access_token = getCookie('access_token');
+  // const refresh_token = getCookie('refresh_token');
 
-  console.log('MainFrame: access_token getCookie:', getCookie('access_token'));
-  console.log('MainFrame: refresh_token getCookie:', getCookie('refresh_token'));
+  // console.log('MainFrame: access_token getCookie:', getCookie('access_token'));
+  // console.log('MainFrame: refresh_token getCookie:', getCookie('refresh_token'));
+
+  const cookieBox = cookies()
+
+  const access_cookie = cookieBox.get('access_token');
+  const refresh_cookie = cookieBox.get('refresh_token');
+
+  console.log('MainFrame: access_token getCookie:', access_cookie?.value);
+  console.log('MainFrame: refresh_token getCookie:', refresh_cookie?.value);
 
   return (
     <div>
       <p>this is main_frame</p>
+      {/* </ Main> */}
         {/* <Main access_token={access_token} refresh_token={refresh_token}/> */}
     </div>
   );
-
 }

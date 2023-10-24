@@ -3,89 +3,116 @@
 import axios from 'axios';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation'
 
 import { permanentRedirect } from 'next/navigation';
 
+import { redirect } from 'next/navigation';
+
 
 export default function Signup (props:any) {
-
-  const [profileImage, setProfileImage] = useState<string | null>(null);
-
+  const [profileImage, setFile] = useState<File>();
   const [nickname, setNickname] = useState('');
+  const [ImageUrl, setImageUrl] = useState<string | null>(null);
 
-  const access_token = props.access_token;
-
+  const router = useRouter();
+  const formData = new FormData()
+  
   let success = false;
 
-  console.log('access_token in props', access_token);
-
-
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-      const file = event.target.files?.[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          if (e.target) {
-            setProfileImage(e.target.result as string);
-          }
-        };
-        reader.readAsDataURL(file);
-      }
-    };
-
-  const handleNicknameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setNickname(event.target.value);
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    console.log("\n\n==============================file==============================\n\n", file); // kyeonkim
+    if (file) {
+      setFile(file);
+      const imageURL = URL.createObjectURL(file);
+      setImageUrl(imageURL)
+    }
   };
 
+  const handleNicknameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNickname(e.target.value);
+  };
 
   const handleSetData = async () => {
+    if (profileImage) {
+      // formData.append('nick_name', nickname);
+      formData.append('file', profileImage);
+    }
+    const response = await fetch('http://10.13.8.1:3000/api/user_create', {
+      method: 'POST',
+      body: JSON.stringify({
+        access_token: props.access_token,
+        nick_name: nickname,
+      }),
+      headers: {
+        Authorization: `Bearer ${props.access_token}`,
+      },
+    });
 
-    const data = {
-      access_token: access_token,
-      nick_name: nickname,
-      img_name: profileImage
-    };
-   console.log('data: ', data);
-   try
-   {
-      // const response = await axios.post('http://10.13.9.2:4242/user/create', data);
-      //  console.log('response: ', response);
+    if (!response.ok) {
+      console.log('signup login/api fail', response);
+      // router.replace('entrance');
+    }
 
-      // client component에서 하면, 외부로 드러난다. 감춰야 함.
+    // const res_img = await fetch('http://10.13.9.4:4242/user/upload', {
+    //   method: 'POST',
+    //   body: FormData,
+    // });
 
-      // const response = await axios.post('http://10.13.8.1:3000/login/api', {  
-      //     access_token: data.access_token,
-      //     nick_name: nickname,
-      //     img_name: 'default'
-      //   });
+    // console.log('profile: ', formData);
 
-      const response = await fetch('http://10.13.8.1:3000/login/api', {
-          method: "POST",
-          body: JSON.stringify({
-              access_token: data.access_token,
-              nick_name: data.nick_name,
-              img_name: data.img_name
-        })
-      });
+    for (let key of formData.keys()) {
+      console.log(key);
+    }  
 
-      if (!response.ok)
-      {
-          throw new Error ("axios post login/api - response error");
-      }
-      console.log('axios post login/api - response:', response);
-      success = true;
-      // 성공하면 여기서 main_frame으로?
+    for (let value of formData.values()) {
+    console.log(value);
+    }
 
-   }
-   catch (error)
-   {
-      // axios는 catch 가능한 객체 던짐
-      // fetch는 자체 확인 필요 (response.ok를 체크)
-      // next.js 13에서 axios로도 app router의 api 접근 가능한지 확인
-      // 예외 처리 후 entrance로?
-   }
+    const res_img = await axios.post('http://10.13.8.1.:3000/api/send_image',
+    formData,
+    {
+      headers: {
+      'Content-Type': 'multipart/form-data',
+    }}
+    );
+    
+    // console.log('profile: ', profileImage);
+    // const res_img = await axios.post('http://10.13.8.1.:3000/api/send_image',
+    // profileImage,
+    // {
+    //   headers: {
+    //   'Content-Type': 'multipart/form-data',
+    // }}
+    // );
 
-  }
+    // {
+      // file: profileImage,
+      // nick_name: nickname,
+    // });
+
+    // // api wrapper
+    // const res_img = await fetch('http://10.13.8.1.:3000/api/send_image', {
+    //   method: 'POST',
+    //   // body: formData,
+    //   body: {
+    //     file: profileImage
+    //   }
+    //   headers: {
+    //     'Content-Type': 'multipart/form-data',
+    //   }
+    // })
+    // console.log('profile: ', formData);
+    // console.log('after res_img - ', res_img);
+
+    if (res_img.ok) {
+      router.replace('/main_frame');
+    } else {
+      console.log('Image upload failed', res_img);
+    }
+  
+  };
 
 
   return (
@@ -105,7 +132,7 @@ export default function Signup (props:any) {
           {profileImage && (
               <div>
               <img
-                  src={profileImage}
+                  src={ImageUrl}
                   alt="프로필 사진"
                   style={{ width: '150px', height: '150px', borderRadius: '50%' }}
               />

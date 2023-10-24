@@ -1,9 +1,12 @@
-import { permanentRedirect } from 'next/navigation';
+
+
+import { redirect } from 'next/navigation';
 import axios from 'axios';
 
 import Signup from './signup';
+import CookieControl from './cookie_control';
 
-import { setCookie } from 'cookies-next';
+
 
 export default async function Login ({searchParams}:any) {
 
@@ -12,14 +15,16 @@ export default async function Login ({searchParams}:any) {
   let status = false;
   const code = searchParams.code;
 
+  let response;
   let access_token;
-  let userData;
+  let userData:any;
+  let cookie_control = false;
 
   if (code)
   {
       try
       {
-          const response = await axios.post('https://api.intra.42.fr/oauth/token', {
+          response = await axios.post('https://api.intra.42.fr/oauth/token', {
           code: code,
           client_id: process.env.NEXT_PUBLIC_CLIENT_ID,
           client_secret: process.env.NEXT_PUBLIC_CLIENT_SECRET,
@@ -28,51 +33,89 @@ export default async function Login ({searchParams}:any) {
           });
 
           console.log('42api responses:', response.data);
-      
-          userData = await axios.post('http://10.13.9.2:4242/auth/login', {  
-          access_token: response.data.access_token
-          });
-          console.log('Login - userData:', userData.data);
-      
-          // signed를 안주는 식으로 변경된 것 같음.
-          // 동작 질묺드려보기.
-            // sign으로 주는 부분과 signed로 주는 부분이 있는건가? 확인 필요
-
-          
-          access_token = userData.data.access_token;
-          status = userData.data.status;
-
 
       } catch (error) {
-           console.log('Login - error occured');
-           return (
-            <></>
-           );
-      }
 
-      if (status == true)
-      {
-          setCookie('access_token', userData.data.access_token, {
-            maxAge: 60 * 3,
-            // httpOnly: true,
-          });
-          setCookie('refresh_token', userData.data.refresh_token, {
-            maxAge: 60 * 3,
-            // httpOnly: true,
-          });
-          permanentRedirect('/main_frame');
-          // permanentRedirect는 NEXT_REDIRECT error를 바로 던져서 해당 route의 rendering을 막는다.
+          if (error.response)
+          {
+
+          }
+          else if (error.request)
+          {
+            console.log('Login - error occured');
+            return (
+             <></>
+            );
+          }
       }
   }
 
-  // 이미 등록된 상태에서 동기화 문제로 인해 원하는 렌더링이 안됨.
+  try
+  {
+    userData = await axios.post('http://10.13.8.1:3000/api/user_check', {
+      access_token: response?.data.access_token
+    });
+
+    console.log('user_check response - ', userData);
+    // access_token = userData.data.access_token;
+    // status = userData.data.status;
+
+
+    // NextResponst.json() 문법을 잘 모르겠다. data를 두 겹으로 넣게 되어버림.
+   
+    // console.log('user_check response - ', userData);
+    access_token = userData.data.data.access_token;
+    status = userData.data.data.status;
+
+
+    if (access_token == undefined
+      || access_token == null)
+      {
+        throw new Error ('to entrance');
+      }
+
+
+  }
+  catch (error)
+  {
+      console.log(error);
+      redirect('/entrance');
+  }
+
+
+  if (userData?.data.data.refresh_token != undefined
+    && userData?.data.data.refresh_token != null)
+  {
+      console.log('user_check success to cookie control');
+      cookie_control = true
+  }
 
   return (
     <div>
-      <p>this is server component - 42api.</p>
+      {cookie_control? (
+      <div>
+        <p>this is server component - 42api.</p>
+          <CookieControl access_token={userData?.data.data.access_token} refresh_token={userData?.data.data.refresh_token} />
+      </div>
+      ) : (
+      <div>
+        <p>this is server component - 42api.</p>
           <Signup access_token={access_token} />
+      </div>
+    )}
     </div>
-      // <Login signed={signed}/>
-  );
+  )
+
+
+  // 이미 등록된 상태에서 동기화 문제로 인해 원하는 렌더링이 안됨.
+
+  // return (
+  //   <div>
+  //     <p>this is server component - 42api.</p>
+  //         <Signup access_token={access_token} />
+  //     {/* <p>this is server component - 42api.</p> */}
+  //         {/* <CookieControl access_token={userData?.data.access_token} refresh_token={userData?.data.refresh_token}/> */}
+  //   </div>
+  // );
 
 }
