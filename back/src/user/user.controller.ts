@@ -1,10 +1,13 @@
-import { Controller, Post, Body, Get, Param, ParseIntPipe, UsePipes, UseGuards, Delete } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, ParseIntPipe, UsePipes, UseGuards, Delete, UseInterceptors, UploadedFile, ConsoleLogger } from '@nestjs/common';
 import { UserService } from './user.service';
 import { SignUpDto, TokenDto } from '../auth/dto/token.dto';
 import { addFriendDto, getUserDto } from './dto/user.dto';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { AuthGuard } from '@nestjs/passport';
+import { FileInterceptor } from '@nestjs/platform-express/multer';
+import { diskStorage } from 'multer';
+import { extname } from 'path'; // file 확장자만 가져오는 함수 - kyeonkim
 
 @Controller('user')
 export class UserController {
@@ -42,5 +45,37 @@ export class UserController {
     DeleteUserById(@Param('nickname') id: string)
 	{
 		return this.UserService.DeleteUserById(id);
+	}
+
+	@ApiTags('User API')
+	@ApiOperation({summary: `유저 이미지 업로드 API`, description: `회원가입 시 유저의 이미지를 저장한다.`})
+	@Post("upload")
+	@UseInterceptors(FileInterceptor("file", {
+		storage: diskStorage({
+		  destination: './storage',
+		  filename(_, file, callback): void {
+			const randomName = Array(32).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join('')
+			return callback(null, `${randomName}_${file.originalname}${extname(file.originalname)}`)
+		  }
+		})
+	  }))
+	@ApiConsumes('multipart/form-data')
+	@ApiBody({
+	schema: {
+		type: 'object',
+		properties: {
+		nick_name: { type: "string" },
+		file: {
+			type:'string',
+			format: 'binary'
+		},
+		},
+	},
+	})
+	UserFileUpload(@Body('nick_name') nickName : SignUpDto, @UploadedFile() file: Express.Multer.File)
+	{
+		console.log("nickname : ", nickName);
+		console.log("file : ", file);
+		return true;
 	}
 }
