@@ -1,16 +1,14 @@
-import { Inject, Injectable, UnauthorizedException, forwardRef } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
 import { SignUpDto, TokenDto } from 'src/auth/dto/token.dto';
 import { firstValueFrom } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
-import { v4 as uuid } from 'uuid';
 import { TokenExpiredError } from 'jsonwebtoken';
 
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { access } from 'fs';
 
 export type UserToken = {
 	nick_name: string;
@@ -78,6 +76,8 @@ export class AuthService {
 	{
 		try {
 			const authorizedId = await this.Auth42(token.access_token);
+			if (authorizedId === null)
+				return {status: false, access_token: token.access_token};
 			const userData = await this.prisma.user.findUnique({
 				where: {
 				  user_id: authorizedId,
@@ -92,12 +92,15 @@ export class AuthService {
 			}
 		} catch (error) {
 			console.error(error);
+			return {status: false, access_token: token.access_token};
 		}
 	}
 
     async SignUp(userData : SignUpDto)
     {
 		const authorizedId = await this.Auth42(userData.access_token);
+		if (authorizedId === null)
+			return {status: false, access_token: userData.access_token};
 		const newUser = await this.userService.CreateUser( authorizedId, userData.nick_name);
         console.log("newUser ====\n\n",newUser);
         if (newUser == null)
@@ -168,12 +171,11 @@ export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'jwt-refresh'
 	if (storedToken.access_token !== req.body.access_token)
 		throw new UnauthorizedException(); 
 	try {
-		const done_data = await this.jwtService.verifyAsync(storedToken.access_token, { secret: process.env.JWT_SECRET });
+		await this.jwtService.verifyAsync(storedToken.access_token, { secret: process.env.JWT_SECRET });
 	} catch (error) {
 		if (error instanceof TokenExpiredError)
 			return { status: true };
 	}
-	return {status: true};
 	throw new UnauthorizedException(); 
   }
 }

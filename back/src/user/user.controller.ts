@@ -1,13 +1,10 @@
-import { Controller, Post, Body, Get, Param, ParseIntPipe, UsePipes, UseGuards, Delete, UseInterceptors, UploadedFile, ConsoleLogger } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, ParseIntPipe, Delete, UseInterceptors, UploadedFile, Query } from '@nestjs/common';
 import { UserService } from './user.service';
-import { SignUpDto, TokenDto } from '../auth/dto/token.dto';
-import { addFriendDto, getUserDto } from './dto/user.dto';
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { addFriendDto, uploadImgDto } from './dto/user.dto';
+import { ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
 
-import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express/multer';
 import { diskStorage } from 'multer';
-import { extname } from 'path'; // file 확장자만 가져오는 함수 - kyeonkim
 
 @Controller('user')
 export class UserController {
@@ -42,9 +39,9 @@ export class UserController {
 	@ApiTags('Test API')
 	@ApiOperation({summary: `유저 삭제 데이터 API`, description: `닉네임으로 유저 데이터를 삭제한다.`})
 	@Delete("getdata/nickname/:nickname")
-    DeleteUserById(@Param('nickname') id: string)
+    DeleteUserById(@Param('nickname') nickName: string)
 	{
-		return this.UserService.DeleteUserById(id);
+		return this.UserService.DeleteUserById(nickName);
 	}
 
 	@ApiTags('User API')
@@ -53,29 +50,22 @@ export class UserController {
 	@UseInterceptors(FileInterceptor("file", {
 		storage: diskStorage({
 		  destination: './storage',
-		  filename(_, file, callback): void {
-			const randomName = Array(32).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join('')
-			return callback(null, `${randomName}_${file.originalname}${extname(file.originalname)}`)
+		  filename(req, file, callback): void {
+			return callback(null, `${req.query.nickname}`);
 		  }
 		})
 	  }))
 	@ApiConsumes('multipart/form-data')
-	@ApiBody({
-	schema: {
-		type: 'object',
-		properties: {
-		nick_name: { type: "string" },
-		file: {
-			type:'string',
-			format: 'binary'
-		},
-		},
-	},
-	})
-	UserFileUpload(@Body('nick_name') nickName : SignUpDto, @UploadedFile() file: Express.Multer.File)
+	UserFileUpload(@Query('nickname') nickName: string, @Body() img: uploadImgDto, @UploadedFile() file: Express.Multer.File)
 	{
-		console.log("nickname : ", nickName);
-		console.log("file : ", file);
-		return true;
+		return {status: true};
+	}
+
+	@ApiTags('User API')
+	@ApiOperation({summary: `유저 이미지 전달 API`, description: `유저의 이미지를 전달한다.`})
+	@Get("getimg/nickname/:nickname")
+	GetUserImageByNickName(@Param('nickname') nickName: string)
+	{
+		return this.UserService.GetUserImageByNickName(nickName);
 	}
 }

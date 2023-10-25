@@ -17,3 +17,9 @@ export class getUserDto
     @ApiProperty()
     nick_name: string;
 }
+
+export class uploadImgDto
+{
+    @ApiProperty({ type: 'string', format: 'binary', required: true })
+    file: Express.Multer.File;
+}

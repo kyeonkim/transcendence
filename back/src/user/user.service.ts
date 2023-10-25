@@ -1,11 +1,11 @@
 
-import { Injectable, Body, Inject, forwardRef } from '@nestjs/common';
+import { Injectable, Body, StreamableFile } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { firstValueFrom } from 'rxjs';
 import { JwtService } from '@nestjs/jwt';
-import { SignUpDto, TokenDto } from '../auth/dto/token.dto';
-import { getUserDto, addFriendDto } from './dto/user.dto';
+import { addFriendDto } from './dto/user.dto';
 import { PrismaService } from '../prisma/prisma.service';
+import { createReadStream } from 'node:fs';
+import { join } from 'path';
 
 @Injectable()
 export class UserService {
@@ -36,6 +36,8 @@ export class UserService {
             },
         });
         console.log(userData);
+        if (userData == null)
+            return {status: false, message: "유저 찾기 실패"}
         return Promise.resolve(userData);
     }
 
@@ -118,7 +120,9 @@ export class UserService {
         return {status: true, message: "success", delete_user: user.nick_name};
     }
 
-    // async Upload
+    async GetUserImageByNickName(nickName: string)
+    {
+        const file = createReadStream(join(process.cwd(),`./storage/${nickName}`));
+        return new StreamableFile(file);
+    }
 }
-
-
