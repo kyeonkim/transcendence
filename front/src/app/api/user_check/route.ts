@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { cookies } from 'next/headers';
-
 import { permanentRedirect } from "next/navigation";
 
 import axios from 'axios';
@@ -30,7 +28,6 @@ export async function POST (request: NextRequest)
         });
 
         
-
     }
     catch (error)
     {
@@ -64,10 +61,8 @@ export async function POST (request: NextRequest)
         // 예외 처리
         return (NextResponse.json(
             {
-                data: {
-                    status: response?.data.status,
-                    access_token: response?.data.access_token
-                }
+                status: response?.data.status,
+                access_token: response?.data.access_token
             },
             {status: 201, statusText: 'new user need to be created'}));
     }
@@ -92,76 +87,19 @@ export async function POST (request: NextRequest)
 
     const newResponse = NextResponse.json(
         {
-            data: {
             status: response?.data.token.status,
             access_token: response?.data.token.access_token,
             refresh_token: response?.data.token.refresh_token
-        }},
+        },
         {
             status: 200,
             statusText: "will be redirected to main_frame",
+            //headers:
         },
     );
 
-    newResponse.cookies.set({
-        name: 'access_token',
-        value: response?.data.token.access_token,
-        path: '/',
-        maxAge: 60 * 3,
-        // httpOnly: true
-    });
-    newResponse.cookies.set({
-        name: 'refresh_token',
-        value: response?.data.token.refresh_token,
-        path: '/',
-        maxAge: 60 * 3,
-        // httpOnly: true
-    });
 
-    console.log(newResponse);
-
-    // console.log('check for error position2');
-
-    // if (response?.data.token.status == true)
-    // {
-    //     // 이번에는 토큰이 설정 안된 것 같다. 그 이유는 무엇일까?
-
-    //     console.log('status:', response?.data.token.status);
-    //     cookies().set('access_token', response?.data.token.access_token, {
-    //         maxAge: 60 * 3,
-    //         // httpOnly: true,
-    //     });
-    //     // console.log(cookies().get('access_token'));
-    //     cookies().set('refresh_token', response?.data.token.refresh_token, {
-    //         maxAge: 60 * 3,
-    //         // httpOnly: true,
-    //     });
-    //     // permanentRedirect('/main_frame');
-    //     // 왜 나중에 다시 login 쪽으로 돌아가는가?
-    // }
-
-    // if (response?.data.token.status == true)
-    // {
-    //     // 이번에는 토큰이 설정 안된 것 같다. 그 이유는 무엇일까?
-
-    //     console.log('status:', response?.data.token.status);
-    //     cookies().set('access_token', response?.data.token.access_token, {
-    //         maxAge: 60 * 3,
-    //         // httpOnly: true,
-    //     });
-    //     // console.log(cookies().get('access_token'));
-    //     cookies().set('refresh_token', response?.data.token.refresh_token, {
-    //         maxAge: 60 * 3,
-    //         // httpOnly: true,
-    //     });
-    //     // permanentRedirect('/main_frame');
-    //     // 왜 나중에 다시 login 쪽으로 돌아가는가?
-    // }
 
     return (newResponse);
-    // return (NextResponse.json({
-    //     status: response?.data.token.status,
-    //     access_token: response?.data.token.access_token,
-    //     refresh_token: response?.data.token.refresh_token
-    // }));
+
 }

@@ -1,13 +1,9 @@
-'use client'
+"use client"
 
 import axios from 'axios';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation'
-
-import { permanentRedirect } from 'next/navigation';
-
-import { redirect } from 'next/navigation';
 
 
 export default function Signup (props:any) {
@@ -106,7 +102,10 @@ export default function Signup (props:any) {
     // console.log('profile: ', formData);
     // console.log('after res_img - ', res_img);
 
-    if (res_img.ok) {
+    // if (res_img.ok)
+
+    if (res_img.data.success == true)
+    {
       router.replace('/main_frame');
     } else {
       console.log('Image upload failed', res_img);

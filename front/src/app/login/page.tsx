@@ -9,7 +9,6 @@ import CookieControl from './cookie_control';
 
 
 export default async function Login ({searchParams}:any) {
-
   console.log('code:', searchParams.code);
 
   let status = false;
@@ -38,13 +37,16 @@ export default async function Login ({searchParams}:any) {
 
           if (error.response)
           {
-
+              console.log('Login - error response occured');
+              return (
+                <p> 42 /oauth/token response error </p>
+              );
           }
           else if (error.request)
           {
-            console.log('Login - error occured');
+            console.log('Login - error request occured');
             return (
-             <></>
+             <p>42 /oauth/token request error</p>
             );
           }
       }
@@ -57,16 +59,13 @@ export default async function Login ({searchParams}:any) {
     });
 
     console.log('user_check response - ', userData);
-    // access_token = userData.data.access_token;
-    // status = userData.data.status;
+    access_token = userData.data.access_token;
+    status = userData.data.status;
 
 
     // NextResponst.json() 문법을 잘 모르겠다. data를 두 겹으로 넣게 되어버림.
    
     // console.log('user_check response - ', userData);
-    access_token = userData.data.data.access_token;
-    status = userData.data.data.status;
-
 
     if (access_token == undefined
       || access_token == null)
@@ -83,8 +82,8 @@ export default async function Login ({searchParams}:any) {
   }
 
 
-  if (userData?.data.data.refresh_token != undefined
-    && userData?.data.data.refresh_token != null)
+  if (userData?.data.refresh_token != undefined
+    && userData?.data.refresh_token != null)
   {
       console.log('user_check success to cookie control');
       cookie_control = true
@@ -95,7 +94,7 @@ export default async function Login ({searchParams}:any) {
       {cookie_control? (
       <div>
         <p>this is server component - 42api.</p>
-          <CookieControl access_token={userData?.data.data.access_token} refresh_token={userData?.data.data.refresh_token} />
+          <CookieControl access_token={userData?.data.access_token} refresh_token={userData?.data.refresh_token} />
       </div>
       ) : (
       <div>
@@ -111,10 +110,10 @@ export default async function Login ({searchParams}:any) {
 
   // return (
   //   <div>
+  //     {/* <p>this is server component - 42api.</p>
+  //         <Signup access_token={access_token} /> */}
   //     <p>this is server component - 42api.</p>
-  //         <Signup access_token={access_token} />
-  //     {/* <p>this is server component - 42api.</p> */}
-  //         {/* <CookieControl access_token={userData?.data.access_token} refresh_token={userData?.data.refresh_token}/> */}
+  //         <CookieControl access_token={userData?.data.data.access_token} refresh_token={userData?.data.data.refresh_token}/>
   //   </div>
   // );
 

@@ -1,27 +1,42 @@
 'use client'
 
-import { getCookies, getCookie, setCookie, deleteCookie } from 'cookies-next';
 import { useRouter } from 'next/navigation';
 
-import { redirect } from 'next/navigation';
+import Link from 'next/link'
+import axios from 'axios';
 
-export default function CookieControl (props:any) {
-
+export default async function CookieControl (props:any) {
     const router = useRouter();
 
     const access_token = props.access_token;
     const refresh_token = props.refresh_token;
 
-    setCookie("access_token", access_token, {httpOnly:true, maxAge: 60 * 3});
-    setCookie("refresh_token", refresh_token, {httpOnly:true, maxAge: 60 * 3});
+    console.log("access_token -", access_token);
+    console.log("refresh_token -", refresh_token);
 
-    router.replace("/main_frame"); 
+
     
-    // redirect("/main_frame");
+    try
+    {
+        const response = await axios.post('http://10.13.8.1:3000/api/set_cookie', {
+            access_token: access_token,
+            refresh_token: refresh_token
+        });
+    
+        console.log('cookie_control - respone - ', response);
+    }
+    catch
+    {
+
+    }
+
+    router.replace("/main_frame");
 
     return (
         <div>
-            Cookie Setting
+            <p>cookie control</p>
         </div>
+
+        // <Link href="/main_frame"> to main_frame </Link>
     );
 }

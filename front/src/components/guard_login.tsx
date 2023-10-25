@@ -12,7 +12,7 @@ const GuardLogin = ({ children }: any ) => {
       console.log('GuardLogin: getRefreshCookie:', getCookie('refresh_token'));
 
 
-      await axios.get('http://10.13.9.2:4242/auth/token/varify', {
+      await axios.get('http://10.13.9.4:4242/auth/token/varify', {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${getCookie('access_token')}`,
@@ -23,7 +23,7 @@ const GuardLogin = ({ children }: any ) => {
         })
       .catch(async function (error) {
         console.log('GuardLogin: Error:', error);
-        await axios.post('http://10.13.9.2:4242/auth/token/refresh',{
+        await axios.post('http://10.13.9.4:4242/auth/token/refresh',{
           access_token: getCookie('access_token'),
         } ,{
           headers: {

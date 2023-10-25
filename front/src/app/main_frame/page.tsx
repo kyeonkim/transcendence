@@ -19,7 +19,7 @@ export default async function MainFrame () {
   // console.log('MainFrame: access_token getCookie:', getCookie('access_token'));
   // console.log('MainFrame: refresh_token getCookie:', getCookie('refresh_token'));
 
-  const cookieBox = cookies()
+  const cookieBox = cookies();
 
   const access_cookie = cookieBox.get('access_token');
   const refresh_cookie = cookieBox.get('refresh_token');

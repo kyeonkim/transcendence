@@ -73,12 +73,12 @@ export async function POST (request: NextRequest)
         cookieBox.set('access_token', response.data.token.access_token, {
             path: '/',
             maxAge: 60 * 3,
-            // httpOnly: true,
+            httpOnly: true,
         });
         cookieBox.set('refresh_token', response.data.token.refresh_token, {
             path: '/',
             maxAge: 60 * 3,
-            // httpOnly: true,
+            httpOnly: true,
         });
         // permanentRedirect('/main_frame');
         // 왜 나중에 다시 login 쪽으로 돌아가는가?
@@ -89,5 +89,9 @@ export async function POST (request: NextRequest)
             status: response?.data.token.status,
             access_token: response?.data.token.access_token,
             refresh_token: response?.data.token.refresh_token
-        }));
+        },
+        {
+            status: response?.status
+        }
+        ));
 }

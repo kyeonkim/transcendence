@@ -79,7 +79,13 @@ export async function POST (request: NextRequest)
 
     console.log('in api/send_image - ', response);
 
-    return (NextResponse.json({
-        status: response?.status, success: true
-    }));
+    return (NextResponse.json(
+        {
+            success: true
+        },
+        {
+            status: response?.status
+        }
+        )
+    );
 }
