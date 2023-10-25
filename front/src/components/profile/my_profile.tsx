@@ -10,7 +10,7 @@ import Button from '@mui/material/Button';
 
 // styled component (컴포넌트 고정 style로 보임)
 import { styled } from '@mui/system';
-
+import Image from 'next/image';
 import styles from '../mainbox/mainbox.module.css'
 
 // 왼쪽 위에 Card 놓기
@@ -20,39 +20,27 @@ import styles from '../mainbox/mainbox.module.css'
 
 interface MyProfileProps {
   setMTbox: (num: number, searchTarget: string) => void;
-
+  myNickname: string;
 }
 
-export default function MyProfile({ setMTbox }: MyProfileProps) {
+export default function MyProfile({ setMTbox, myNickname}: MyProfileProps) {
 
   const handleMTbox = (num: number) => () => {
-    setMTbox(num, '');
+    setMTbox(num, myNickname);
+  }
+
+  const imageLoader = ({ src }: any) => {
+    return `${process.env.NEXT_PUBLIC_API_URL}user/getimg/nickname/${src}`
   }
     return (
-    //   <MyProfileCard sx={{ maxWidth: 400, maxHeight: 500 }}>
-    //   <CardMedia onClick={handleMTbox(1)}
-    //     component="img"
-    //     alt="favicon"
-    //     height="355"
-    //    // image 나중에 변경하기
-    //     image="./favicon.ico"
-    //   />
-    //   {/* <CardContent>
-    //     <Typography gutterBottom variant="body1" component="div">
-    //       Test Name Typo body1
-    //     </Typography>
-    //     <Typography variant="body2" color="text.secondary">
-    //       introduction type body2
-    //     </Typography>
-    //   </CardContent> */}
-    //   <CardActions>
-    //     <Button size="small" onClick={handleMTbox(1)}>button1</Button>
-    //     <Button size="small" onClick={handleMTbox(2)}>button2</Button>
-    //     <Button size="small" onClick={handleMTbox(3)}>button3</Button>
-    //   </CardActions>
-    // </MyProfileCard>
-      <div className={styles.myprofilelink}>
-        <img src="./favicon.ico" alt="favicon" onClick={handleMTbox(1)}/>
-      </div>
+       <Image
+        loader={imageLoader}
+        src={`${myNickname}`}
+        className={styles.myprofilelink}
+        alt="User Image"
+        width={0}
+        height={0}
+        onClick={handleMTbox(1)}
+        />
   );
 }

@@ -19,7 +19,6 @@ import { styled } from '@mui/system';
 
 //mainbox
 import Mainbox from '@/components/mainbox';
-import zIndex from '@mui/material/styles/zIndex';
 
 // Top left Box
 const TLBox = styled(Box) ({
@@ -79,13 +78,14 @@ export default function Main() {
     setClick(value);
     setSearch(searchTarget);
   }
-
+  // 나중에 쿠키에 내닉네임 저장하던가해서 전역으로 사용필
+  let name = "min";
   return (
         <React.Fragment>
           <CssBaseline />
           {/* <GuardLogin> */}
             <TLBox>
-              <MyProfile setMTbox={handleClick}/>
+              <MyProfile setMTbox={handleClick} myNickname={name}/>
             </TLBox>
             <MTBox>
               <Mainbox mod={clicked} search={id}/>

@@ -6,7 +6,6 @@ import MatchingButton from './mainbox/match';
 const MainBox = (props: any) => {
   const value = props.mod;
   const search = props.search;
-
   const handleRender = () => {
     if (value === 1)
       return <ProfilePage id={search}/>;
