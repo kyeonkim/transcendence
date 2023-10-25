@@ -6,6 +6,7 @@ import { addFriendDto } from './dto/user.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { createReadStream } from 'node:fs';
 import { join } from 'path';
+import * as fs from 'fs';
 
 @Injectable()
 export class UserService {
@@ -38,7 +39,7 @@ export class UserService {
         console.log(userData);
         if (userData == null)
             return {status: false, message: "유저 찾기 실패"}
-        return Promise.resolve(userData);
+        return {status: true, userData: userData};
     }
 
     async GetUserDataById(id: number)
@@ -117,11 +118,14 @@ export class UserService {
                 user_id: id,
             },
         });
+        if(fs.existsSync(join(process.cwd(),`./storage/${nickName}`)))
+            fs.unlinkSync(join(process.cwd(),`./storage/${nickName}`));
         return {status: true, message: "success", delete_user: user.nick_name};
     }
-
     async GetUserImageByNickName(nickName: string)
     {
+        if(!fs.existsSync(join(process.cwd(),`./storage/${nickName}`)))
+            return new StreamableFile(createReadStream(join(process.cwd(),`./storage/default`)));
         const file = createReadStream(join(process.cwd(),`./storage/${nickName}`));
         return new StreamableFile(file);
     }
