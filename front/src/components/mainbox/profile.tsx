@@ -8,7 +8,11 @@ const ProfilePage = (props: any) => {
 	const search = props.id;
 
   const handleAddfriend = (id: string) => async () => {
+<<<<<<< HEAD
     await axios.post("http://10.13.9.2:4242/user/addfriend",
+=======
+    await axios.post("http://10.13.9.4:4242/user/addfriend",
+>>>>>>> FRONT-kshim
       {
         "user_id": 0,
         "friend_id": 0

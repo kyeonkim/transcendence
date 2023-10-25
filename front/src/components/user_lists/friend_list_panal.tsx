@@ -3,6 +3,7 @@ import React from 'react';
 
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import List from '@mui/material/List';
 
 // 로딩되기 전에 그림자 띄울 수 있음. 아직 적용하지 않았음. 
 import Skeleton from '@mui/material/Skeleton';
@@ -21,16 +22,8 @@ export default function FriendListPanal (props: any) {
   const {value, index} = props;
 
   return (
-    <div
-        hidden={value !== index}
-    >
-        {value === index && (
-            <MainFriendPanal sx={{ p: 2 }}>
-            <Typography>
-                test for text is changed. It is Friend Panal.
-            </Typography>
-            </MainFriendPanal>
-        )}
-    </div>
+    <List sx={{ width: '100%', height: '100%' ,maxWidth: 1143, maxHeight: 932 ,bgcolor: 'white', overflow: 'auto'}}>
+      
+    </List>
   );
 }

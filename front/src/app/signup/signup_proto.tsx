@@ -1,5 +1,6 @@
+'use client'
 import Link from 'next/link';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import axios from 'axios';
 import { setCookie } from 'cookies-next';
@@ -39,6 +40,7 @@ const ProfilePage: React.FC = () => {
       // img_data: profileImage,
     };
    console.log('data: ', data);
+<<<<<<< HEAD:front/src/pages/signup.tsx
    const response = await axios.post('http://10.13.9.2:4242/user/create', data);
    console.log("sign UP: ", response) 
    if (response.data.status)
@@ -51,6 +53,18 @@ const ProfilePage: React.FC = () => {
     {
       window.alert('중복된 닉네임');
     }
+=======
+   const response = await axios.post('http://10.13.9.4:4242/user/create', data);
+  //  console.log('response: ', response);
+    if (response.data)
+      router.push({
+        pathname: '/main',
+        query: {
+          access_token: response.data.access_token,
+          refresh_token: response.data.refresh_token
+        },
+      }, '/main');
+>>>>>>> FRONT-kshim:front/src/app/signup/signup_proto.tsx
   }
 
   return (

@@ -51,6 +51,7 @@ export default function MatchList() {
           }
         />
       </ListItem>
+<<<<<<< HEAD
 	  <Divider variant="inset" component="li" />
 	  <ListItem alignItems="flex-start">
         <ListItemAvatar>
@@ -518,3 +519,17 @@ export default function MatchList() {
     </List>
   );
 }
+=======
+    </List>
+  );
+}
+
+/*
+response:
+{
+  상대방 프로필사진
+  승리or패배
+  스코어
+}
+*/
+>>>>>>> FRONT-kshim
