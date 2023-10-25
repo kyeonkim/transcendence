@@ -25,7 +25,7 @@ export async function POST (request: NextRequest)
 
         console.log('api/user_check - data: ', data);
 
-        response = await axios.post('http://10.13.9.4:4242/auth/login', {  
+        response = await axios.post( `${process.env.NEXT_PUBLIC_API_URL}auth/login`, {  
             access_token: data.access_token,
         });
 
@@ -52,11 +52,6 @@ export async function POST (request: NextRequest)
             }))
         }
     }
-
-    console.log('check for error position');
-    console.log('check for response - ', response);
-    console.log('check for response.data - ', response?.data)
-
 
     if (response?.data.status == false)
     {
@@ -89,7 +84,7 @@ export async function POST (request: NextRequest)
 
     // 성공 시 main_frame으로 이동. cookie는 어떻게하는게 맞을까? 일단 access_token, refresh_token 보관은 필요함.
     // 실패 시 실패를 알리기 위한 구조를 반환하고 동작 처리
-
+    console.log('newResponse============================================');
     const newResponse = NextResponse.json(
         {
             data: {
@@ -117,8 +112,7 @@ export async function POST (request: NextRequest)
         maxAge: 60 * 3,
         // httpOnly: true
     });
-
-    console.log(newResponse);
+    // console.log(newResponse);
 
     // console.log('check for error position2');
 

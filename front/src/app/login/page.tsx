@@ -19,7 +19,6 @@ export default async function Login ({searchParams}:any) {
   let access_token;
   let userData:any;
   let cookie_control = false;
-
   if (code)
   {
       try
@@ -28,7 +27,7 @@ export default async function Login ({searchParams}:any) {
           code: code,
           client_id: process.env.NEXT_PUBLIC_CLIENT_ID,
           client_secret: process.env.NEXT_PUBLIC_CLIENT_SECRET,
-          redirect_uri: process.env.NEXT_PUBLIC_REDIRECT_URI,
+          redirect_uri: `${process.env.NEXT_PUBLIC_FRONT_URL}login`,
           grant_type: 'authorization_code'
           });
 
@@ -52,7 +51,7 @@ export default async function Login ({searchParams}:any) {
 
   try
   {
-    userData = await axios.post('http://10.13.8.1:3000/api/user_check', {
+    userData = await axios.post( `${process.env.NEXT_PUBLIC_FRONT_URL}api/user_check`, {
       access_token: response?.data.access_token
     });
 

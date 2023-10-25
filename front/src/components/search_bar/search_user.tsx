@@ -1,5 +1,6 @@
 import React from 'react';
 import { useState } from 'react';
+import axios from 'axios';
 // import { UserContext } from '../../pages/main'; 
 
 import TextField from '@mui/material/TextField';
@@ -37,9 +38,15 @@ interface SearchUserProps {
 export default function SearchUser({ setMTbox }: SearchUserProps) {
     const [searchTarget, setSearchTarget] = useState('');
 
-    const handleMTbox = (num: number, searchTarget: string) => () => {
+    const handleMTbox = (num: number, searchTarget: string) => async () => {
         if (searchTarget === '')
             return; // 검색어 비어있으면 창띄우기? 아무동작x?
+        else {
+            //여기서 미리검색해서 id를 props로 넘기는데 여기서그냥 유저데이타를 넘길까? 같은 api씀
+            const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}user/getdata/nickname/${searchTarget}`)
+            if (response.data.status === false)
+                return;
+        }
         setMTbox(num, searchTarget);
     }
     // searchTarget을 MainSearchUser에서 갱신

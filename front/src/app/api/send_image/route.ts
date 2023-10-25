@@ -16,10 +16,11 @@ export async function POST (request: NextRequest)
 
         const formData = await request.formData()
         console.log ('setdata - request.formData - ', formData);
-        const name = formData.get('file');
+        const name = formData.get('nick_name');
+        const file = formData.get('file');
 
         console.log ('name - ', name);
-
+        console.log ('file - ', file);
         // for (let key of request.body.keys()) {
         //     console.log(key);
         //   }  
@@ -32,17 +33,18 @@ export async function POST (request: NextRequest)
 
         // data = await request.json();
 
-        // response = await fetch('http://10.13.9.4:4242/user/upload', {
+        // response = await fetch(process.env.NEXT_PUBLIC_API_URL + 'user/upload', {
         //     method: "POST",
         //     body: data.Formdata,
         //   })
 
-        response = await axios.post('http://10.13.9.4:4242/user/upload',
+        response = await axios.post( `${process.env.NEXT_PUBLIC_API_URL}user/upload`,
                 formData,
                 {
-                    headers: {
-                    'Content-Type': 'multipart/form-data'
-                }});
+                    params: {
+                        nickname: name
+                    }
+                });
 
         console.log('api/load - ', response);
         // response = response.json();
@@ -79,7 +81,12 @@ export async function POST (request: NextRequest)
 
     console.log('in api/send_image - ', response);
 
-    return (NextResponse.json({
-        status: response?.status, success: true
-    }));
+    return (NextResponse.json(
+        {
+            success: true
+        },
+        {
+            status: response?.status
+        }
+    ));
 }

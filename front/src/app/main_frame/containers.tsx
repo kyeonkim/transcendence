@@ -1,5 +1,4 @@
-import { getCookie } from 'cookies-next';
-
+'use client';
 import { useState } from 'react';
 import React from 'react';
 
@@ -20,6 +19,7 @@ import { styled } from '@mui/system';
 
 //mainbox
 import Mainbox from '@/components/mainbox';
+import zIndex from '@mui/material/styles/zIndex';
 
 // Top left Box
 const TLBox = styled(Box) ({
@@ -44,11 +44,11 @@ const MLBox = styled(Box) ({
 // Bottom Left Box
 const BLBox = styled(Box) ({
   backgroundColor: 'green',
-  top: 650,
+  top: 655,
   left: 0,
   width: 400,
-  height:682,
-  position: 'absolute'
+  height:0,
+  position: 'absolute',
 });
 
 // Middle Top Box

@@ -30,8 +30,7 @@ export default async function MainFrame () {
   return (
     <div>
       <p>this is main_frame</p>
-      {/* </ Main> */}
-        {/* <Main access_token={access_token} refresh_token={refresh_token}/> */}
+      <Main />
     </div>
   );
 }
