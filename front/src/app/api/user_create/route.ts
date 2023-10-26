@@ -43,7 +43,7 @@ export async function POST (request: NextRequest)
         // }
         // console.log('api/user_create - response:', response.status);
 
-        response = await axios.post('http://10.13.9.4:4242/auth/signup', {
+        response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/signup`, {
             access_token: data.access_token,
             nick_name: data.nick_name,
             // img_name: data.img_name

@@ -8,7 +8,7 @@ const ProfilePage = (props: any) => {
 	const search = props.id;
 
   const handleAddfriend = (id: string) => async () => {
-    await axios.post("http://10.13.9.4:4242/user/addfriend",
+    await axios.post("`${process.env.NEXT_PUBLIC_API_URL}/user/addfriend`",
       {
         "user_id": 0,
         "friend_id": 0

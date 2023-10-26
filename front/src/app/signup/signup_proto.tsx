@@ -40,7 +40,7 @@ const ProfilePage: React.FC = () => {
       // img_data: profileImage,
     };
    console.log('data: ', data);
-   const response = await axios.post('http://10.13.9.2:4242/user/create', data);
+   const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/user/create`, data);
    console.log("sign UP: ", response) 
    if (response.data.status)
     {

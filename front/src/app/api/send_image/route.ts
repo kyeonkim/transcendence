@@ -32,12 +32,9 @@ export async function POST (request: NextRequest)
 
         // data = await request.json();
 
-        // response = await fetch('http://10.13.9.4:4242/user/upload', {
-        //     method: "POST",
-        //     body: data.Formdata,
-        //   })
 
-        response = await axios.post('http://10.13.9.4:4242/user/upload',
+        // response = await axios.post('http://10.13.9.4:4242/user/upload',
+        response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/user/upload`,
                 formData,
                 {
                     headers: {

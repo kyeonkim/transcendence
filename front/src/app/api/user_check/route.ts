@@ -23,7 +23,7 @@ export async function POST (request: NextRequest)
 
         console.log('api/user_check - data: ', data);
 
-        response = await axios.post('http://10.13.9.4:4242/auth/login', {  
+        response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {  
             access_token: data.access_token,
         });
 
