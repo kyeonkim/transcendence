@@ -5,7 +5,7 @@ const MatchingButton = () => {
 	return (
 		<div style={{ textAlign: 'center', marginTop: '50vh', transform: 'translateY(-50%)' }}>
 		<h1>Matching</h1>
-		<button style={styles.matchButton}>일반</button>
+		<button>일반</button>
 		<button>랭크</button>
 	  </div>
 	)

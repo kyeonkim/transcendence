@@ -1,14 +1,7 @@
 'use client'
-
 import axios from 'axios';
-
 import { useState } from 'react';
 import { useRouter } from 'next/navigation'
-
-import { permanentRedirect } from 'next/navigation';
-
-import { redirect } from 'next/navigation';
-
 
 export default function Signup (props:any) {
   const [profileImage, setFile] = useState<File>();
@@ -18,11 +11,8 @@ export default function Signup (props:any) {
   const router = useRouter();
   const formData = new FormData()
   
-  let success = false;
-
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    console.log("\n\n==============================file==============================\n\n", file); // kyeonkim
     if (file) {
       setFile(file);
       const imageURL = URL.createObjectURL(file);
@@ -45,22 +35,14 @@ export default function Signup (props:any) {
         access_token: props.access_token,
         nick_name: nickname,
       }),
-      headers: {
-        Authorization: `Bearer ${props.access_token}`,
-      },
+      // headers: {
+      //   Authorization: `Bearer ${props.access_token}`,
+      // },
     });
 
     if (!response.ok) {
       console.log('signup login/api fail', response);
-      // router.replace('entrance');
     }
-
-    // const res_img = await fetch(process.env.NEXT_PUBLIC_API_URL + 'user/upload', {
-    //   method: 'POST',
-    //   body: FormData,
-    // });
-
-    // console.log('profile: ', formData);
 
     const res_img = await axios.post(`${process.env.NEXT_PUBLIC_FRONT_URL}api/send_image`, formData)
 

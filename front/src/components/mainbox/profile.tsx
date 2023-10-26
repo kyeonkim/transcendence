@@ -13,7 +13,7 @@ import Image from 'next/image';
 
 
 const ProfilePage = (props: any) => {
-  const search = props.id;
+  const userNickname = props.id;
 
   const handleAddfriend = (id: any) => {
     console.log("add friend: " + id);
@@ -23,6 +23,7 @@ const ProfilePage = (props: any) => {
     console.log('차단: ', id);
   }
 
+  
   const imageLoader = ({ src }: any) => {
     return `${process.env.NEXT_PUBLIC_API_URL}user/getimg/nickname/${src}`
   }
@@ -31,24 +32,24 @@ const ProfilePage = (props: any) => {
     <div className={styles.mainContainer}>
       <div className={styles.topComponent}>
       <div className={styles.imageContainer}>
-          <Image loader={imageLoader} src={`${search}`} alt="User Image" className={styles.userImage} width={0} height={0} />
+          <Image loader={imageLoader} src={`${userNickname}`} alt="User Image" className={styles.userImage} width={0} height={0} />
           <div className={styles.userName}>
-            {`${search}`}
+            {`${userNickname}`}
           </div>
-          {search ? (
+          {userNickname ? (
             <div className={styles.imageContent}>
               <div className={styles.buttons}>
-                <Button variant="outlined" className={styles.roundButton} onClick={() => handleAddfriend(search)}>
+                <Button variant="outlined" className={styles.roundButton} onClick={() => handleAddfriend(userNickname)}>
                   친구 추가
                 </Button>
-                <Button variant="outlined" className={styles.roundButton} onClick={() => handleBlock(search)}>
+                <Button variant="outlined" className={styles.roundButton} onClick={() => handleBlock(userNickname)}>
                   차단
                 </Button>
               </div>
             </div>
           ) : (
             <div className={styles.imageContent}>
-              <Image loader={imageLoader} src={`${search}`} alt="User Image" className={styles.userImage} width={0} height={0} />
+              <Image loader={imageLoader} src={`${userNickname}`} alt="User Image" className={styles.userImage} width={0} height={0} />
               <div className={styles.buttons}>
                 <Button variant="outlined" className={styles.roundButton}>
                   프로필 수정
@@ -67,7 +68,7 @@ const ProfilePage = (props: any) => {
       <div className={styles.bottomHalfContainer}>
         <div className={styles.leftHalfComponent}></div>
         <div className={styles.rightHalfComponent}>
-          <Matchlist id={search} />
+          <Matchlist id={userNickname} />
         </div>
       </div>
     </div>
