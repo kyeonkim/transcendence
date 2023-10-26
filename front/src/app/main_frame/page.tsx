@@ -18,7 +18,7 @@ export default async function MainFrame () {
   // console.log('MainFrame: access_token getCookie:', getCookie('access_token'));
   // console.log('MainFrame: refresh_token getCookie:', getCookie('refresh_token'));
 
-  const cookieBox = cookies()
+  const cookieBox = cookies();
 
   const access_cookie = cookieBox.get('access_token');
   const refresh_cookie = cookieBox.get('refresh_token');
@@ -29,6 +29,11 @@ export default async function MainFrame () {
   // 하위 컴포넌트에서 자신이 누군지는 알아야될거같음 
 
   return (
-      <Main />
+      // <Main />
+      <div>
+        <p>
+          main_frame
+        </p>
+      </div>
   );
 }

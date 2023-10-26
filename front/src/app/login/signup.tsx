@@ -58,41 +58,41 @@ export default function Signup (props:any) {
   return (
       <div>
           <p>this is server component - SendImage.</p>
-              <div style={{ textAlign: 'center', marginTop: '50px' }}>
-          <h1>Set User</h1>
-          <div style={{ marginBottom: '20px' }}>
-              <label htmlFor="profileImage">Image: </label>
-              <input
-              type="file"
-              id="profileImage"
-              accept="image/*"
-              onChange={handleImageUpload}
-              />
-          </div>
-          {profileImage && (
-              <div>
-              <img
-                  src={ImageUrl}
-                  alt="프로필 사진"
-                  style={{ width: '150px', height: '150px', borderRadius: '50%' }}
-              />
+          <div style={{ textAlign: 'center', marginTop: '50px' }}>
+              <h1>Set User</h1>
+              <div style={{ marginBottom: '20px' }}>
+                  <label htmlFor="profileImage">Image: </label>
+                  <input
+                  type="file"
+                  id="profileImage"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  />
               </div>
-          )}
-      <div style={{ marginTop: '20px' }}>
-          <label htmlFor="nickname">Nickname: </label>
-          <input
-          type="text"
-          id="nickname"
-          value={nickname}
-          onChange={handleNicknameChange}
-          />
-      </div>
-      <div style={{ marginTop: '20px' }}>
-          <button onClick={handleSetData}>
-          저장
-          </button>
-      </div>
-    </div>
+              {profileImage && (
+                  <div>
+                  <img
+                      src={ImageUrl}
+                      alt="프로필 사진"
+                      style={{ width: '150px', height: '150px', borderRadius: '50%' }}
+                  />
+                  </div>
+              )}
+              <div style={{ marginTop: '20px' }}>
+                  <label htmlFor="nickname">Nickname: </label>
+                  <input
+                  type="text"
+                  id="nickname"
+                  value={nickname}
+                  onChange={handleNicknameChange}
+                  />
+              </div>
+              <div style={{ marginTop: '20px' }}>
+                  <button onClick={handleSetData}>
+                  저장
+                  </button>
+              </div>
+        </div>
     </div>
   );
   
