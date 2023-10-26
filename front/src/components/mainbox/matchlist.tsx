@@ -44,7 +44,7 @@ export default function MatchList(id: any) {
       }
     };
   }, [page]);
-
+  //
   useEffect(() => {
     const fetchData = async () => {
       const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}game/data`, {
