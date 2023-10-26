@@ -1,4 +1,5 @@
 
+import React from 'react';
 import { redirect } from 'next/navigation';
 import axios from 'axios';
 
@@ -93,32 +94,33 @@ export default function Login ({searchParams}:any) {
   if (code)
   {
     return (
-
       <div>
       {(async () => {
         try
         {
           const response = await Auth42(code);
-
+  
           console.log ('----in response of Auth42----');
-
+  
           responseData = response.data;
-
+  
           console.log('');
           console.log('responseData - ', responseData);
-
+  
           if (responseData?.refresh_token != undefined
             && responseData?.refresh_token != null)
           {
               console.log('user_check success to cookie control');
               cookie_control = true;
           }
-
+  
           if (cookie_control == true)
           {
             return (
               <div>
-                <p>this is server component - 42api.</p>
+                {/* <div>
+                  this is server component - 42api.
+                </div> */}
                   <CookieControl access_token={responseData?.access_token} refresh_token={responseData?.refresh_token} />
               </div>
             );
@@ -127,11 +129,13 @@ export default function Login ({searchParams}:any) {
           {
             return (
               <div>
-                <p>this is server component - 42api.</p>
+                {/* <div>
+                  this is server component - 42api.
+                </div> */}
                   <Signup access_token={responseData?.access_token} />
               </div>
             );
-
+  
           }
         }
         catch
@@ -139,15 +143,79 @@ export default function Login ({searchParams}:any) {
           console.log('/login - fail to call Auth42');
           redirect ('/entrance');
         }
-        })()};
-      </div>    
+        })()}
+      </div>   
     );
-
   }
   else
   {
     console.log('/login - no code to call Auth42');
     redirect ('/entrance');
+    return (<div></div>);
   }
+
+
+  // if (!code)
+  // {
+  //   console.log('/login - no code to call Auth42');
+  //   redirect ('/entrance');
+  //   return (
+  //     <div></div>
+  //   );
+  // }
+
+  // return (
+  //   <div>
+  //   {(async () => {
+  //     try
+  //     {
+  //       const response = await Auth42(code);
+
+  //       console.log ('----in response of Auth42----');
+
+  //       responseData = response.data;
+
+  //       console.log('');
+  //       console.log('responseData - ', responseData);
+
+  //       if (responseData?.refresh_token != undefined
+  //         && responseData?.refresh_token != null)
+  //       {
+  //           console.log('user_check success to cookie control');
+  //           cookie_control = true;
+  //       }
+
+  //       if (cookie_control == true)
+  //       {
+  //         return (
+  //           <div>
+  //             <div>
+  //               this is server component - 42api.
+  //             </div>
+  //               <CookieControl access_token={responseData?.access_token} refresh_token={responseData?.refresh_token} />
+  //           </div>
+  //         );
+  //       }
+  //       else
+  //       {
+  //         return (
+  //           <div>
+  //             <div>
+  //               this is server component - 42api.
+  //             </div>
+  //               <Signup access_token={responseData?.access_token} />
+  //           </div>
+  //         );
+
+  //       }
+  //     }
+  //     catch
+  //     {
+  //       console.log('/login - fail to call Auth42');
+  //       redirect ('/entrance');
+  //     }
+  //     })()}
+  //   </div>   
+  // );
 
 }

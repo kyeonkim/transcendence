@@ -9,7 +9,6 @@ import axios from 'axios';
 export default function CookieControl (props:any) {
 
     const router = useRouter();
-    const [count, setCount] = useState(0);
 
     const access_token = props.access_token;
     const refresh_token = props.refresh_token;
@@ -47,10 +46,8 @@ export default function CookieControl (props:any) {
 
             console.log('cookie set done');
 
-            setCount(count + 1);
-            console.log('count - ', count);
-        
-            // router.replace('/main_frame');
+            
+            router.replace('/main_frame');
 
         }
         catch (error)
@@ -63,21 +60,10 @@ export default function CookieControl (props:any) {
     }, []);
 
     console.log('in useEffect');
-        
-    if (count > 0)
-    {
-        console.log('before router.replace');
-        console.log('count - ', count);
-        router.replace('/main_frame');
-    }
-    if (response_error == true)
-    {
-        router.replace("/entrance");
-    }
 
     return (
         <div>
-            <p>Cookie Control</p>
+            <div>Cookie Control</div>
         </div>
       );
 }
