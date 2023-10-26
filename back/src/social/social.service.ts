@@ -1,6 +1,6 @@
 import { Body, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { addFriendDto } from 'src/user/dto/user.dto';
+import { friendDto } from 'src/user/dto/user.dto';
 
 @Injectable()
 export class SocialService {
@@ -25,61 +25,68 @@ export class SocialService {
             return {status: false, message: "친구 아님"};
         return {status: true, message: "친구"};
     }
-
-    /*
-     @return {status: true, message: "success"} 
-    */
    
-    async AddFriend(@Body() addFrined : addFriendDto)
+    async AddFriend(@Body() Friend : friendDto)
     {
         const check =  await this.prismaService.friends.findFirst({
             where: {
-                following_user_id: addFrined.user_id,
-                followed_user_id: addFrined.friend_id,
+                following_user_id: Friend.user_id,
+                followed_user_id: Friend.friend_id,
             },
         });
         if (check !== null)
             return {status: false, message: "already frined"};
         await this.prismaService.friends.create({
             data: {
-                following_user_id: addFrined.user_id,
-                followed_user_id: addFrined.friend_id,
+                following_user_id: Friend.user_id,
+                followed_user_id: Friend.friend_id,
             },
         });
         await this.prismaService.friends.create({
             data: {
-                following_user_id: addFrined.friend_id,
-                followed_user_id: addFrined.user_id,
+                following_user_id: Friend.friend_id,
+                followed_user_id: Friend.user_id,
             },
         });
         return {status: true, message: "success"};
     }
     
-    // async DeleteFriend(@Body() addFrined : addFriendDto)
-    // {
-    //     const check =  await this.prismaService.friends.findFirst({
-    //         where: {
-    //             following_user_id: addFrined.user_id,
-    //             followed_user_id: addFrined.friend_id,
-    //         },
-    //     });
-    //     if (check == null)
-    //         return {status: false, message: "not frined"};
-    //     await this.prismaService.friends.delete({
-    //         select: {
-    //                 following_user_id: addFrined.user_id,
-    //                 followed_user_id: addFrined.friend_id,
-    //             },
-    //         },
-    //     });
-    //     await this.prismaService.friends.delete({
-    //         where: {
-    //             following_user_id_followed_user_id: {
-    //                 following_user_id: addFrined.friend_id,
-    //                 followed_user_id: addFrined.user_id,
-    //             },
-    //         },
-    //     });
-    //     return {status: true, message: "success"};
-    // }
+    async DeleteFriend(@Body() Friend : friendDto)
+    {
+        const check = await this.prismaService.friends.findFirst({
+            where: {
+                following_user_id: Friend.user_id,
+                followed_user_id: Friend.friend_id,
+            },
+        });
+        if (check === null)
+            return {status: false, message: "not frined"};
+        try {
+            await this.prismaService.friends.deleteMany({
+                where: { following_user_id: Friend.friend_id,
+                    followed_user_id: Friend.user_id, },
+            },);
+            await this.prismaService.friends.deleteMany({
+                where: { following_user_id: Friend.user_id,
+                    followed_user_id: Friend.friend_id },
+            },);
+        }
+        catch (error) {
+            console.log("DeleteFriend failed error: ", error);
+            return {status: false, message: "DeleteFriend failed"}
+        }
+        return {status: true, message: "success"};
+    }
+
+    async GetFriendList(id: number)
+    {
+        const frinedList = await this.prismaService.friends.findMany({
+            where: {
+                following_user_id: id,
+            },
+        });
+        if (!frinedList.length)
+            return {status: false, message: "친구목록 없음" };
+        return {status: true, data: frinedList};
+    }
 }

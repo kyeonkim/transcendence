@@ -1,6 +1,6 @@
 import { Controller, Post, Body, Get, Param, ParseIntPipe, Delete, UseInterceptors, UploadedFile, Query } from '@nestjs/common';
 import { UserService } from './user.service';
-import { addFriendDto, uploadImgDto } from './dto/user.dto';
+import { friendDto, uploadImgDto } from './dto/user.dto';
 import { ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { FileInterceptor } from '@nestjs/platform-express/multer';

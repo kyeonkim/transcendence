@@ -2,7 +2,7 @@
 import { Injectable, Body, StreamableFile } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { JwtService } from '@nestjs/jwt';
-import { addFriendDto } from './dto/user.dto';
+import { friendDto } from './dto/user.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { createReadStream } from 'node:fs';
 import { join } from 'path';

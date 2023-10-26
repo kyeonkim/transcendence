@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 
-export class addFriendDto
+export class friendDto
 {
     @ApiProperty()
     user_id: number;
