@@ -84,44 +84,36 @@ export class UserService {
         });
         return {status: true, message: "success"};
     }
+    
+    // async DeleteFriend(@Body() addFrined : addFriendDto)
+    // {
+    //     const check =  await this.prisma.friends.findFirst({
+    //         where: {
+    //             following_user_id: addFrined.user_id,
+    //             followed_user_id: addFrined.friend_id,
+    //         },
+    //     });
+    //     if (check == null)
+    //         return {status: false, message: "not frined"};
+    //     await this.prisma.friends.delete({
+    //         select: {
+    //                 following_user_id: addFrined.user_id,
+    //                 followed_user_id: addFrined.friend_id,
+    //             },
+    //         },
+    //     });
+    //     await this.prisma.friends.delete({
+    //         where: {
+    //             following_user_id_followed_user_id: {
+    //                 following_user_id: addFrined.friend_id,
+    //                 followed_user_id: addFrined.user_id,
+    //             },
+    //         },
+    //     });
+    //     return {status: true, message: "success"};
+    // }
 
-    async DeleteUserById(nickName: string)
-    {
-        const user = await this.prisma.user.findUnique({
-            where: {
-              nick_name: nickName,
-            },
-        });
-        if (user == null)
-            return {status: false, message: "유저 찾기 실패"}
-        const id = user.user_id;
-
-        await this.prisma.friends.deleteMany({
-            where: {
-                OR: [
-                    {
-                        following_user_id: id,
-                    },
-                    {
-                        followed_user_id: id,
-                    },
-                ],
-            },
-        });
-        await this.prisma.tokens.deleteMany({
-            where: {
-                nick_name: nickName,
-            },
-        });
-        await this.prisma.user.delete({
-            where: {
-                user_id: id,
-            },
-        });
-        if(fs.existsSync(join(process.cwd(),`./storage/${nickName}`)))
-            fs.unlinkSync(join(process.cwd(),`./storage/${nickName}`));
-        return {status: true, message: "success", delete_user: user.nick_name};
-    }
+    
     async GetUserImageByNickName(nickName: string)
     {
         if(!fs.existsSync(join(process.cwd(),`./storage/${nickName}`)))
@@ -129,4 +121,5 @@ export class UserService {
         const file = createReadStream(join(process.cwd(),`./storage/${nickName}`));
         return new StreamableFile(file);
     }
+
 }

@@ -11,8 +11,8 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
 export type UserToken = {
+	user_id: number;
 	nick_name: string;
-	uuid: string;
 }
 
 @Injectable()
@@ -22,19 +22,20 @@ export class AuthService {
 		private readonly httpService: HttpService,
 		private jwtService: JwtService,
 		private prisma: PrismaService,
-        ) {}
+    ) {}
         
     async ReCreateToken(token: TokenDto)
     {
         //2. 우리가 최근에 발급한 access 토큰이고
 		const decoded = this.jwtService.decode(token.access_token);
 		const user_id = decoded['user_id'];// access 토큰 uid 비교필요
-        return await this.CreateToken(user_id);// 새토큰 발급
+		const nickname = decoded['nick_name'];// access 토큰 nick_name
+        return await this.CreateToken(user_id, nickname);// 새토큰 발급
     }
 
-	async CreateToken(nickName: string)
+	async CreateToken(id: number, nickName: string)
 	{
-		const payload = { nick_name: nickName };
+		const payload = { user_id: id , nick_name: nickName };
 		
 		const user_token = await this.prisma.tokens.upsert({
 			where: {
@@ -45,6 +46,7 @@ export class AuthService {
 				refresh_token:await this.jwtService.signAsync(payload, {expiresIn: '5m', secret: process.env.JWT_SECRET}),
 			},
 			create: {
+				user_id: id,
 				nick_name: nickName,
 				access_token: await this.jwtService.signAsync(payload, {expiresIn: '3m', secret: process.env.JWT_SECRET}),
 				refresh_token:await this.jwtService.signAsync(payload, {expiresIn: '5m', secret: process.env.JWT_SECRET}),
@@ -87,7 +89,7 @@ export class AuthService {
 				return {status: false, access_token: token.access_token};
 			else // access_token 발급 refresh_token 발급
 			{
-				const tokenData = await this.CreateToken(userData.nick_name);
+				const tokenData = await this.CreateToken(userData.user_id, userData.nick_name);
 				return {status: true, userdata: await this.userService.GetUserDataById(userData.user_id), token: tokenData};
 			}
 		} catch (error) {
@@ -107,7 +109,7 @@ export class AuthService {
             return {status: false, message: "이미 사용 중인  이름입니다."};
         else
         {
-            const tokenData = await this.CreateToken(newUser.nick_name);
+            const tokenData = await this.CreateToken(newUser.user_id, newUser.nick_name);
             return {status: true,  message: "success", userdata: newUser, token: tokenData};
         }
     }
@@ -163,7 +165,7 @@ export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'jwt-refresh'
   async validate(req: any, payload: UserToken): Promise<any> {
 	const storedToken = await this.prisma.tokens.findUnique({
 		where: {
-		  nick_name: payload.nick_name,
+		  user_id: payload.user_id,
 		},
 	});
 	if (storedToken == null)

@@ -37,7 +37,6 @@ export class AuthController {
 		return this.AuthService.ReCreateToken(token);
 	}
 
-
 	@ApiBearerAuth('JWT-auth')
 	@Get("token/varify")
 	@UseGuards(AuthGuard('jwt-access'))

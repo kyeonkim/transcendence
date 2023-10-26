@@ -36,13 +36,6 @@ export class UserController {
 		return this.UserService.GetUserDataById(id);
 	}
 
-	@ApiTags('Test API')
-	@ApiOperation({summary: `유저 삭제 데이터 API`, description: `닉네임으로 유저 데이터를 삭제한다.`})
-	@Delete("getdata/nickname/:nickname")
-    DeleteUserById(@Param('nickname') nickName: string)
-	{
-		return this.UserService.DeleteUserById(nickName);
-	}
 
 	@ApiTags('User API')
 	@ApiOperation({summary: `유저 이미지 업로드 API`, description: `회원가입 시 유저의 이미지를 저장한다.`})
@@ -68,4 +61,5 @@ export class UserController {
 	{
 		return this.UserService.GetUserImageByNickName(nickName);
 	}
+
 }
