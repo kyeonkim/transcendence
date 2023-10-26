@@ -29,11 +29,11 @@ export default async function MainFrame () {
   // 하위 컴포넌트에서 자신이 누군지는 알아야될거같음 
 
   return (
-      // <Main />
-      <div>
-        <p>
-          main_frame
-        </p>
-      </div>
+      <Main />
+      // <div>
+      //   <p>
+      //     main_frame
+      //   </p>
+      // </div>
   );
 }
