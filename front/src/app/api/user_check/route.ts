@@ -27,7 +27,9 @@ export async function POST (request: NextRequest)
             access_token: data.access_token,
         });
 
-        
+        console.log('---------------------------------------------------');
+        console.log('/auth/login response.data -', response.data);
+        console.log('---------------------------------------------------');
     }
     catch (error)
     {
@@ -62,29 +64,17 @@ export async function POST (request: NextRequest)
             {status: 201, statusText: 'new user need to be created'}));
     }
 
-
-
-
-    // if (response?.data.token.status == false)
-    // {
-    //     console.log('api/user_check failed');
-    //     // 예외 처리
-    //     return (NextResponse.json(
-    //         {data: {
-    //             status: response?.data.status,
-    //             access_token: response?.data.access_token
-    //         }},
-    //         {status: 201, statusText: 'new user need to be created'}));
-    // }
-
-    // 성공 시 main_frame으로 이동. cookie는 어떻게하는게 맞을까? 일단 access_token, refresh_token 보관은 필요함.
-    // 실패 시 실패를 알리기 위한 구조를 반환하고 동작 처리
     console.log('newResponse============================================');
+
+
     const newResponse = NextResponse.json(
         {
             status: response?.data.token.status,
             access_token: response?.data.token.access_token,
-            refresh_token: response?.data.token.refresh_token
+            refresh_token: response?.data.token.refresh_token,
+            nick_name: response?.data.userdata.nick_name,
+            user_id: response?.data.userdata.user_id
+
         },
         {
             status: 200,

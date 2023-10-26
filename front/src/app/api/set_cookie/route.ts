@@ -8,6 +8,8 @@ export async function POST (request: NextRequest)
     let data = await request.json();
     let access_token = data.access_token;
     let refresh_token = data.refresh_token;
+    let nick_name = data.nick_name;
+    let user_id = data.user_id;
 
     if (access_token != undefined && refresh_token != undefined
         && access_token != null && refresh_token != null)
@@ -23,6 +25,17 @@ export async function POST (request: NextRequest)
             maxAge: 60 * 3,
             httpOnly: true,
         });
+        cookieBox.set('nick_name', nick_name, {
+            path: '/',
+            maxAge: 60 * 3,
+            httpOnly: true,
+        });
+        cookieBox.set('user_id', user_id, {
+            path: '/',
+            maxAge: 60 * 3,
+            httpOnly: true,
+        });
+
         return (NextResponse.json(
             {
                 success: true

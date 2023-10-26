@@ -80,6 +80,16 @@ export async function POST (request: NextRequest)
             maxAge: 60 * 3,
             httpOnly: true,
         });
+        cookieBox.set('nick_name', response.data.token.nick_name, {
+            path: '/',
+            maxAge: 60 * 3,
+            httpOnly: true,
+        });
+        cookieBox.set('user_id', response.data.token.user_id, {
+            path: '/',
+            maxAge: 60 * 3,
+            httpOnly: true,
+        });
         // permanentRedirect('/main_frame');
         // 왜 나중에 다시 login 쪽으로 돌아가는가?
     }
