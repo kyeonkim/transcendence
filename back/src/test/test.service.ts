@@ -69,14 +69,28 @@ export class TestService {
 
     async CreateDummyGame()
     {
-        const dummyGame : gameDataDto = {
-            rank: true,
-            user_id: 0,
-            enemy_id: 1,
-            my_score: 11,
-            enemy_score: 0
-        };
-        for(let i = 0; i < 10; i++)
-            this.GameService.AddGameData(dummyGame);
+        for(let i = 0; i < 40; i++)
+            await this.GameService.AddGameData({
+                rank: true,
+                user_id: 0,
+                enemy_id: 1,
+                my_score: i,
+                enemy_score: 40 - i
+            });
+    }
+
+    async DeleteDummyGame()
+    {
+        try {
+            await this.prisma.game.deleteMany({
+                where: {
+                    user_id: 0,
+                },
+            });
+        }
+        catch(error) {
+            console.log("Delete DummyGame error: ", error);
+        }
+        return {status: true, message: "success"};
     }
 }
