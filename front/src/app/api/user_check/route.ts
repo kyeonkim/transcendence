@@ -93,44 +93,6 @@ export async function POST (request: NextRequest)
         },
     );
 
-<<<<<<< HEAD
-=======
-    newResponse.cookies.set({
-        name: 'access_token',
-        value: response?.data.token.access_token,
-        path: '/',
-        maxAge: 60 * 3,
-        // httpOnly: true
-    });
-    newResponse.cookies.set({
-        name: 'refresh_token',
-        value: response?.data.token.refresh_token,
-        path: '/',
-        maxAge: 60 * 3,
-        // httpOnly: true
-    });
-    // console.log(newResponse);
-
-    // console.log('check for error position2');
-
-    // if (response?.data.token.status == true)
-    // {
-    //     // 이번에는 토큰이 설정 안된 것 같다. 그 이유는 무엇일까?
-
-    //     console.log('status:', response?.data.token.status);
-    //     cookies().set('access_token', response?.data.token.access_token, {
-    //         maxAge: 60 * 3,
-    //         // httpOnly: true,
-    //     });
-    //     // console.log(cookies().get('access_token'));
-    //     cookies().set('refresh_token', response?.data.token.refresh_token, {
-    //         maxAge: 60 * 3,
-    //         // httpOnly: true,
-    //     });
-    //     // permanentRedirect('/main_frame');
-    //     // 왜 나중에 다시 login 쪽으로 돌아가는가?
-    // }
->>>>>>> FRONT
 
 
     return (newResponse);

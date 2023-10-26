@@ -88,10 +88,6 @@ export async function POST (request: NextRequest)
         {
             status: response?.status
         }
-<<<<<<< HEAD
         )
     );
-=======
-    ));
->>>>>>> FRONT
 }

@@ -64,7 +64,7 @@ export default function Login ({searchParams}:any) {
 
     try
     {
-      userData = await axios.post('http://10.13.8.1:3000/api/user_check', {
+      userData = await axios.post(`${process.env.NEXT_PUBLIC_FRONT_URL}api/user_check`, {
         access_token: data.access_token
       });
   
@@ -89,90 +89,58 @@ export default function Login ({searchParams}:any) {
     return (userData);
   }
 
-  // this.Auth42(code)
-  //         .then(function (response:any) {
-  //           console.log ('----in response of Auth42----');
-
-  //           responseData = response.data;
-  
-  //           console.log('');
-  //           console.log('responseData - ', responseData);
-  
-  //           if (responseData?.refresh_token != undefined
-  //             && responseData?.refresh_token != null)
-  //           {
-  //               console.log('user_check success to cookie control');
-  //               cookie_control = true;
-  //           }
-
-  //           <div>
-  //             {cookie_control? (
-  //             <div>
-  //               <p>this is server component - 42api.</p>
-  //                 <CookieControl access_token={responseData?.access_token} refresh_token={responseData?.refresh_token} />
-  //             </div>
-  //             ) : (
-  //             <div>
-  //               <p>this is server component - 42api.</p>
-  //                 <Signup access_token={responseData?.access_token} />
-  //             </div>
-  //           )}
-  //           </div>
-  //          }, function (error) {
-  //           console.log('/login - fail to call Auth42');
-  //           redirect ('/entrance');
-  //       })
 
   if (code)
   {
     return (
+
       <div>
-        {(async () => {
-          try
+      {(async () => {
+        try
+        {
+          const response = await Auth42(code);
+
+          console.log ('----in response of Auth42----');
+
+          responseData = response.data;
+
+          console.log('');
+          console.log('responseData - ', responseData);
+
+          if (responseData?.refresh_token != undefined
+            && responseData?.refresh_token != null)
           {
-            const response = await Auth42(code);
+              console.log('user_check success to cookie control');
+              cookie_control = true;
+          }
 
-            console.log ('----in response of Auth42----');
-
-            responseData = response.data;
-
-            console.log('');
-            console.log('responseData - ', responseData);
-
-            if (responseData?.refresh_token != undefined
-              && responseData?.refresh_token != null)
-            {
-                console.log('user_check success to cookie control');
-                cookie_control = true;
-            }
-
-            if (cookie_control == true)
-            {
-              return (
-                <div>
-                  <p>this is server component - 42api.</p>
-                    <CookieControl access_token={responseData?.access_token} refresh_token={responseData?.refresh_token} />
-                </div>
-              );
-            }
-            else
-            {
-              return (
-                <div>
+          if (cookie_control == true)
+          {
+            return (
+              <div>
+                <p>this is server component - 42api.</p>
+                  <CookieControl access_token={responseData?.access_token} refresh_token={responseData?.refresh_token} />
+              </div>
+            );
+          }
+          else
+          {
+            return (
+              <div>
                 <p>this is server component - 42api.</p>
                   <Signup access_token={responseData?.access_token} />
               </div>
-              );
+            );
 
-            }
           }
-          catch
-          {
-            console.log('/login - fail to call Auth42');
-            redirect ('/entrance');
-          }
-          })()};
-      </div>
+        }
+        catch
+        {
+          console.log('/login - fail to call Auth42');
+          redirect ('/entrance');
+        }
+        })()};
+      </div>    
     );
 
   }
@@ -181,41 +149,5 @@ export default function Login ({searchParams}:any) {
     console.log('/login - no code to call Auth42');
     redirect ('/entrance');
   }
-
-  
-
-  // return (
-  //   <div>
-  //     <p> /login - User Checking...... </p>
-  //   </div>
-  // );
-
-
-  // return (
-  //   <div>
-  //     {cookie_control? (
-  //     <div>
-  //       <p>this is server component - 42api.</p>
-  //         <CookieControl access_token={responseData?.access_token} refresh_token={responseData?.refresh_token} />
-  //     </div>
-  //     ) : (
-  //     <div>
-  //       <p>this is server component - 42api.</p>
-  //         <Signup access_token={responseData?.access_token} />
-  //     </div>
-  //   )}
-  //   </div>
-  // );
-
-  // 이미 등록된 상태에서 동기화 문제로 인해 원하는 렌더링이 안됨.
-
-  // return (
-  //   <div>
-  //     {/* <p>this is server component - 42api.</p>
-  //         <Signup access_token={access_token} /> */}
-  //     <p>this is server component - 42api.</p>
-  //         <CookieControl access_token={userData?.data.data.access_token} refresh_token={userData?.data.data.refresh_token}/>
-  //   </div>
-  // );
 
 }
