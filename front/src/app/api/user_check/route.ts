@@ -23,7 +23,7 @@ export async function POST (request: NextRequest)
 
         console.log('api/user_check - data: ', data);
 
-        response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {  
+        response = await axios.post( `${process.env.NEXT_PUBLIC_API_URL}auth/login`, {  
             access_token: data.access_token,
         });
 
@@ -49,11 +49,6 @@ export async function POST (request: NextRequest)
             }))
         }
     }
-
-    console.log('check for error position');
-    console.log('check for response - ', response);
-    console.log('check for response.data - ', response?.data)
-
 
     if (response?.data.status == false)
     {
@@ -84,7 +79,7 @@ export async function POST (request: NextRequest)
 
     // 성공 시 main_frame으로 이동. cookie는 어떻게하는게 맞을까? 일단 access_token, refresh_token 보관은 필요함.
     // 실패 시 실패를 알리기 위한 구조를 반환하고 동작 처리
-
+    console.log('newResponse============================================');
     const newResponse = NextResponse.json(
         {
             status: response?.data.token.status,
@@ -98,6 +93,44 @@ export async function POST (request: NextRequest)
         },
     );
 
+<<<<<<< HEAD
+=======
+    newResponse.cookies.set({
+        name: 'access_token',
+        value: response?.data.token.access_token,
+        path: '/',
+        maxAge: 60 * 3,
+        // httpOnly: true
+    });
+    newResponse.cookies.set({
+        name: 'refresh_token',
+        value: response?.data.token.refresh_token,
+        path: '/',
+        maxAge: 60 * 3,
+        // httpOnly: true
+    });
+    // console.log(newResponse);
+
+    // console.log('check for error position2');
+
+    // if (response?.data.token.status == true)
+    // {
+    //     // 이번에는 토큰이 설정 안된 것 같다. 그 이유는 무엇일까?
+
+    //     console.log('status:', response?.data.token.status);
+    //     cookies().set('access_token', response?.data.token.access_token, {
+    //         maxAge: 60 * 3,
+    //         // httpOnly: true,
+    //     });
+    //     // console.log(cookies().get('access_token'));
+    //     cookies().set('refresh_token', response?.data.token.refresh_token, {
+    //         maxAge: 60 * 3,
+    //         // httpOnly: true,
+    //     });
+    //     // permanentRedirect('/main_frame');
+    //     // 왜 나중에 다시 login 쪽으로 돌아가는가?
+    // }
+>>>>>>> FRONT
 
 
     return (newResponse);

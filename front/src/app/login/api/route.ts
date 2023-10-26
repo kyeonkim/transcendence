@@ -23,7 +23,7 @@ export async function POST (request: NextRequest)
 
         console.log('login/api - data: ', data);
 
-        // response = await fetch('http://10.13.9.4:4242/user/create', {
+        // response = await fetch(process.env.NEXT_PUBLIC_API_URL + 'user/create', {
         //     method: "POST",
         //     body: JSON.stringify({
         //         access_token: data.access_token,
@@ -43,7 +43,7 @@ export async function POST (request: NextRequest)
         // }
         // console.log('login/api - response:', response.status);
 
-        response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/user/create`, {
+        response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}user/create`, {
             access_token: data.access_token,
             nick_name: data.nick_name,
             img_name: data.img_name

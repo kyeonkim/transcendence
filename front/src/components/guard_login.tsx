@@ -12,7 +12,7 @@ const GuardLogin = ({ children }: any ) => {
       console.log('GuardLogin: getRefreshCookie:', getCookie('refresh_token'));
 
 
-      await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/auth/token/variy`, {
+      await axios.get(`${process.env.NEXT_PUBLIC_API_URL}auth/token/varify`, {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${getCookie('access_token')}`,
@@ -23,7 +23,7 @@ const GuardLogin = ({ children }: any ) => {
         })
       .catch(async function (error) {
         console.log('GuardLogin: Error:', error);
-        await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/token/variy`,{
+        await axios.post(`${process.env.NEXT_PUBLIC_API_URL}auth/token/refresh`,{
           access_token: getCookie('access_token'),
         } ,{
           headers: {

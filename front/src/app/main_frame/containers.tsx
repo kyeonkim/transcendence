@@ -1,5 +1,4 @@
-import { getCookie } from 'cookies-next';
-
+'use client';
 import { useState } from 'react';
 import React from 'react';
 
@@ -44,11 +43,11 @@ const MLBox = styled(Box) ({
 // Bottom Left Box
 const BLBox = styled(Box) ({
   backgroundColor: 'green',
-  top: 650,
+  top: 655,
   left: 0,
   width: 400,
-  height:682,
-  position: 'absolute'
+  height:0,
+  position: 'absolute',
 });
 
 // Middle Top Box
@@ -79,13 +78,14 @@ export default function Main() {
     setClick(value);
     setSearch(searchTarget);
   }
-
+  // 나중에 쿠키에 내닉네임 저장하던가해서 전역으로 사용필
+  let name = "min";
   return (
         <React.Fragment>
           <CssBaseline />
           {/* <GuardLogin> */}
             <TLBox>
-              <MyProfile setMTbox={handleClick}/>
+              <MyProfile setMTbox={handleClick} myNickname={name}/>
             </TLBox>
             <MTBox>
               <Mainbox mod={clicked} search={id}/>

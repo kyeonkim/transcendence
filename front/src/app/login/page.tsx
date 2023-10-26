@@ -30,7 +30,7 @@ export default function Login ({searchParams}:any) {
           code: code,
           client_id: process.env.NEXT_PUBLIC_CLIENT_ID,
           client_secret: process.env.NEXT_PUBLIC_CLIENT_SECRET,
-          redirect_uri: process.env.NEXT_PUBLIC_REDIRECT_URI,
+          redirect_uri: `${process.env.NEXT_PUBLIC_FRONT_URL}login`,
           grant_type: 'authorization_code'
           });
           

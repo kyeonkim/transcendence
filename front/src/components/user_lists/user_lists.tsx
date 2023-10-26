@@ -1,67 +1,69 @@
-import { useState } from 'react';
-import React from 'react';
-
-
+import * as React from 'react';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
-
-import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
 
-// 로딩되기 전에 그림자 띄울 수 있음. 아직 적용하지 않았음. 
-import Skeleton from '@mui/material/Skeleton';
+import FriendListPanel from './friend_list_panal';
 
-// styled component (컴포넌트 고정 style로 보임)
-import { styled } from '@mui/system';
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+}
 
-import ChannelListPanal from './channel_list_panal';
-import FriendListPanal from './friend_list_panal';
-import UserListPanal from './user_list_panal';
+function CustomTabPanel(props: TabPanelProps) {
+  const { children, value, index, ...other } = props;
 
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <Box sx={{ p: 3 }}>
+          <Typography>{children}</Typography>
+        </Box>
+      )}
+    </div>
+  );
+}
 
+function a11yProps(index: number) {
+  return {
+    id: `simple-tab-${index}`,
+    'aria-controls': `simple-tabpanel-${index}`,
+  };
+}
 
-const MainUserLists = styled(Tabs) ({
-  position: 'absolute',
-  top: 0,
-  left: 0,
-  width: 400,
-  height: 50,
-  color: "black"
-});
+export default function BasicTabs() {
+  const [value, setValue] = React.useState(0);
 
-const MainListSelected = styled(Tab) ({
-  
-})
+  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+    setValue(newValue);
+  };
 
-
-//aria-controls - 즉시 관련 하위 요소로 이동시켜주는 역할 (화면 복잡할 때, 즉시 포커스 전환)
-function indexProps(index: number) {
-    return {
-      id: `tab-${index}`,
-      'aria-controls': `simple-tab-${index}`
-    };
-  }
-
-export default function UserLists() {
-    const [value, setValue] = useState(0);
-
-    const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-        setValue(newValue);
-    };
-
-    return (
-        <React.Fragment>
-            <MainUserLists value={value} onChange={handleChange} aria-label="basic Tabs example">
-                <MainListSelected label="Channel" {...indexProps(0)} />
-                <MainListSelected label="Friend" {...indexProps(1)} />
-                <MainListSelected label="User" {...indexProps(2)} />
-            </MainUserLists>
-        <ChannelListPanal value={value} index={0}>
-        </ChannelListPanal>
-        <FriendListPanal value={value} index={1}>
-        </FriendListPanal>
-        <UserListPanal value={value} index={2}>
-        </UserListPanal>
-        </React.Fragment>
-    );
+  return (
+    <Box sx={{ width: '100%' }}>
+      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+        <Tabs value={value} onChange={handleChange} centered>
+          <Tab label="Friend list" {...a11yProps(0)} />
+          <Tab label="Channel list" {...a11yProps(1)} />
+          <Tab label="User list" {...a11yProps(2)} />
+        </Tabs>
+      </Box>
+      <CustomTabPanel value={value} index={0}>
+        <FriendListPanel />
+      </CustomTabPanel>
+      <CustomTabPanel value={value} index={1}>
+        Channel list
+      </CustomTabPanel>
+      <CustomTabPanel value={value} index={2}>
+        User list
+      </CustomTabPanel>
+    </Box>
+  );
 }

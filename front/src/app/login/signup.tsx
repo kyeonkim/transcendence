@@ -1,10 +1,7 @@
-"use client"
-
+'use client'
 import axios from 'axios';
-
 import { useState } from 'react';
 import { useRouter } from 'next/navigation'
-
 
 export default function Signup (props:any) {
   const [profileImage, setFile] = useState<File>();
@@ -14,11 +11,8 @@ export default function Signup (props:any) {
   const router = useRouter();
   const formData = new FormData()
   
-  let success = false;
-
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    console.log("\n\n==============================file==============================\n\n", file); // kyeonkim
     if (file) {
       setFile(file);
       const imageURL = URL.createObjectURL(file);
@@ -31,81 +25,28 @@ export default function Signup (props:any) {
   };
 
   const handleSetData = async () => {
+    formData.append('nick_name', nickname);
     if (profileImage) {
-      // formData.append('nick_name', nickname);
       formData.append('file', profileImage);
     }
-    const response = await fetch('http://10.13.8.1:3000/api/user_create', {
+    const response = await fetch( `${process.env.NEXT_PUBLIC_FRONT_URL}api/user_create`, {
       method: 'POST',
       body: JSON.stringify({
         access_token: props.access_token,
         nick_name: nickname,
       }),
-      headers: {
-        Authorization: `Bearer ${props.access_token}`,
-      },
+      // headers: {
+      //   Authorization: `Bearer ${props.access_token}`,
+      // },
     });
 
     if (!response.ok) {
       console.log('signup login/api fail', response);
-      // router.replace('entrance');
     }
 
-    // const res_img = await fetch('http://10.13.9.4:4242/user/upload', {
-    //   method: 'POST',
-    //   body: FormData,
-    // });
+    const res_img = await axios.post(`${process.env.NEXT_PUBLIC_FRONT_URL}api/send_image`, formData)
 
-    // console.log('profile: ', formData);
-
-    for (let key of formData.keys()) {
-      console.log(key);
-    }  
-
-    for (let value of formData.values()) {
-    console.log(value);
-    }
-
-    const res_img = await axios.post('http://10.13.8.1.:3000/api/send_image',
-    formData,
-    {
-      headers: {
-      'Content-Type': 'multipart/form-data',
-    }}
-    );
-    
-    // console.log('profile: ', profileImage);
-    // const res_img = await axios.post('http://10.13.8.1.:3000/api/send_image',
-    // profileImage,
-    // {
-    //   headers: {
-    //   'Content-Type': 'multipart/form-data',
-    // }}
-    // );
-
-    // {
-      // file: profileImage,
-      // nick_name: nickname,
-    // });
-
-    // // api wrapper
-    // const res_img = await fetch('http://10.13.8.1.:3000/api/send_image', {
-    //   method: 'POST',
-    //   // body: formData,
-    //   body: {
-    //     file: profileImage
-    //   }
-    //   headers: {
-    //     'Content-Type': 'multipart/form-data',
-    //   }
-    // })
-    // console.log('profile: ', formData);
-    // console.log('after res_img - ', res_img);
-
-    // if (res_img.ok)
-
-    if (res_img.data.success == true)
-    {
+    if (res_img.data.success == true) {
       router.replace('/main_frame');
     } else {
       console.log('Image upload failed', res_img);

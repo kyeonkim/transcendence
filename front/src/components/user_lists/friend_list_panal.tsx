@@ -1,29 +1,83 @@
-import { useState } from 'react';
-import React from 'react';
-
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
+import * as React from 'react';
 import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemText from '@mui/material/ListItemText';
+import ListItemAvatar from '@mui/material/ListItemAvatar';
+import IconButton from '@mui/material/IconButton';
+import Checkbox from '@mui/material/Checkbox';
+import Avatar from '@mui/material/Avatar';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import CommentIcon from '@mui/icons-material/Comment';
 
-// 로딩되기 전에 그림자 띄울 수 있음. 아직 적용하지 않았음. 
-import Skeleton from '@mui/material/Skeleton';
+export default function FriendListPanel() {
+  const [checked, setChecked] = React.useState([1]);
 
-// styled component (컴포넌트 고정 style로 보임)
-import { styled } from '@mui/system';
+  const handleChat = (user: string) => () => {
+    console.log("chat to " + user);
+  };
 
-const MainFriendPanal = styled(Box) ({
-    position: 'absolute',
-    top: 60,
-    backgroundColor: 'white'
-  })
+  const handleProfile = (user: string) => () => {
+    console.log('profile to ' + user);
+  }
 
-
-export default function FriendListPanal (props: any) {
-  const {value, index} = props;
+  const apiResponse = [
+    {id: 1, nickname: 'user1' },
+    {id: 2, nickname: 'user2' },
+    {id: 3, nickname: 'user3' },
+    {id: 3, nickname: 'user3' },
+    {id: 3, nickname: 'user3' },
+    {id: 3, nickname: 'user3' },
+    {id: 3, nickname: 'user3' },
+    {id: 3, nickname: 'user3' },
+    {id: 3, nickname: 'user3' },
+    {id: 3, nickname: 'user3' },
+    {id: 3, nickname: 'user3' },
+    {id: 3, nickname: 'user3' },
+    {id: 3, nickname: 'user3' },
+    {id: 3, nickname: 'user3' },
+    {id: 3, nickname: 'user3' },
+  ];
 
   return (
-    <List sx={{ width: '100%', height: '100%' ,maxWidth: 1143, maxHeight: 932 ,bgcolor: 'white', overflow: 'auto'}}>
-      
+    <List dense sx={{ width: '100%', maxWidth: 400, maxHeight: 580,bgcolor: 'background.paper', overflow: 'auto'}}>
+      {apiResponse.map((user) => {
+        const labelId = `checkbox-list-secondary-label-${user.id}`;
+        return (
+          <ListItem
+            key={user.id}
+            secondaryAction={
+              <IconButton
+                edge="end"
+                aria-label="comments"
+                onClick={handleChat(user.nickname)}
+              >
+                <CommentIcon />
+              </IconButton>
+            }
+            disablePadding
+          >
+            <ListItemButton onClick={handleProfile(user.nickname)}>
+              <ListItemAvatar>
+                  <Avatar
+                    // src={`user.profile_image`} 나중에 이미지 url넣음댈듯
+                />
+              </ListItemAvatar>
+              <ListItemText id={labelId} primary={`${user.nickname}`} />
+            </ListItemButton>
+          </ListItem>
+        );
+      })}
     </List>
   );
 }
+
+
+/*
+response example
+{
+  id
+  nickname
+  profile_image?
+}
+*/

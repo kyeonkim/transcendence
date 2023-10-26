@@ -1,5 +1,6 @@
 import React from 'react';
 import { useState } from 'react';
+import axios from 'axios';
 // import { UserContext } from '../../pages/main'; 
 
 import TextField from '@mui/material/TextField';
@@ -37,12 +38,21 @@ interface SearchUserProps {
 export default function SearchUser({ setMTbox }: SearchUserProps) {
     const [searchTarget, setSearchTarget] = useState('');
 
-    const handleMTbox = (num: number, searchTarget: string) => () => {
-        if (searchTarget === '')
-            return; // 검색어 비어있으면 창띄우기? 아무동작x?
-        setMTbox(num, searchTarget);
+    const handleMTbox =  async (num: number, searchTarget: string) => {
+        if (searchTarget) {
+            await axios.get(`${process.env.NEXT_PUBLIC_API_URL}user/getdata/nickname/${searchTarget}`)
+                .then((res) => {
+                    if (res.data.status === true)
+                        setMTbox(num, searchTarget);
+                })
+        }
     }
-    // searchTarget을 MainSearchUser에서 갱신
+
+    const handleEnterkey = (e: any) => {
+        if (e.key === 'Enter')
+            handleMTbox(1, searchTarget);
+    }
+
     return (
         <React.Fragment>
             <MainSearchUser
@@ -50,10 +60,14 @@ export default function SearchUser({ setMTbox }: SearchUserProps) {
                 label="유저 검색"
                 variant="outlined"
                 onChange={(e) => setSearchTarget(e.target.value)}
+                onKeyDown={handleEnterkey}
                 >
                 Matching
             </MainSearchUser>
-            <MainSearchButton variant='contained' onClick={handleMTbox(1, searchTarget)}>
+            <MainSearchButton
+                variant='contained'
+                onClick={() => handleMTbox(1, searchTarget)}
+                >
                 검색
             </MainSearchButton>
         </React.Fragment>
