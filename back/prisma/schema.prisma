@@ -48,6 +48,7 @@ model Game {
     rank        Boolean
     user_id     Int
     enemy_id    Int
+    enemy_name  String   @default("enemy")
     winner      Boolean
     user        User     @relation("game_user", fields: [user_id], references: [user_id])
     my_score    Int      @default(0)

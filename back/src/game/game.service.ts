@@ -12,11 +12,17 @@ export class GameService {
     {
         const isWin : boolean = gameData.my_score > gameData.enemy_score ? true : false;
         try {
+            const enemy = await this.prismaService.user.findUnique({
+                where: {
+                    user_id: gameData.enemy_id,
+                },
+            });
             await this.prismaService.game.create({
                 data: {
                     rank: gameData.rank,
                     user_id: gameData.user_id,
                     enemy_id: gameData.enemy_id,
+                    enemy_name: enemy.nick_name,
                     winner: isWin,
                     my_score: gameData.my_score,
                     enemy_score: gameData.enemy_score,
@@ -27,6 +33,7 @@ export class GameService {
                     rank: gameData.rank,
                     user_id: gameData.enemy_id,
                     enemy_id: gameData.user_id,
+                    enemy_name: enemy.nick_name,
                     winner: !isWin,
                     my_score: gameData.enemy_score,
                     enemy_score: gameData.my_score,
@@ -46,13 +53,14 @@ export class GameService {
             include: {
                 games: {
                     cursor: index ? { idx: index } : undefined,
-                    take: -10,
-                    skip: 0
+                    take: 10,
+                    skip: 0,
+                    orderBy: { idx: 'desc'},
                 },
             },
         });
         if (user.games.length == 0)
             return {status: false, message: "게임 데이터 찾기 실패"};
-        return {status: true, data: user.games.reverse()};
+        return {status: true, data: user.games};
     }
 }
