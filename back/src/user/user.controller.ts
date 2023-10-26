@@ -13,14 +13,6 @@ export class UserController {
 		) {}
 
 	@ApiTags('User API')
-	@ApiOperation({summary: `친구 추가 API`, description: `해당 유저끼리 친구를 추가한다.`})
-	@Post("addfriend")
-	AddFriend(@Body() user : addFriendDto)
-    {
-		return this.UserService.AddFriend(user);
-    }
-
-	@ApiTags('User API')
 	@ApiOperation({summary: `닉네임 유저 데이터 API`, description: `닉네임으로 유저 데이터를 가져온다.`})
 	@Get("getdata/nickname/:nickname")
     GetUserDataByNickName(@Param('nickname') nickname: string)

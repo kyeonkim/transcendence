@@ -57,62 +57,6 @@ export class UserService {
             return Promise.resolve(userData);
     }
 
-    /*
-     @return {status: true, message: "success"} 
-    */
-    async AddFriend(@Body() addFrined : addFriendDto)
-    {
-        const check =  await this.prisma.friends.findFirst({
-            where: {
-                following_user_id: addFrined.user_id,
-                followed_user_id: addFrined.friend_id,
-            },
-        });
-        if (check !== null)
-            return {status: false, message: "already frined"};
-        await this.prisma.friends.create({
-            data: {
-                following_user_id: addFrined.user_id,
-                followed_user_id: addFrined.friend_id,
-            },
-        });
-        await this.prisma.friends.create({
-            data: {
-                following_user_id: addFrined.friend_id,
-                followed_user_id: addFrined.user_id,
-            },
-        });
-        return {status: true, message: "success"};
-    }
-    
-    // async DeleteFriend(@Body() addFrined : addFriendDto)
-    // {
-    //     const check =  await this.prisma.friends.findFirst({
-    //         where: {
-    //             following_user_id: addFrined.user_id,
-    //             followed_user_id: addFrined.friend_id,
-    //         },
-    //     });
-    //     if (check == null)
-    //         return {status: false, message: "not frined"};
-    //     await this.prisma.friends.delete({
-    //         select: {
-    //                 following_user_id: addFrined.user_id,
-    //                 followed_user_id: addFrined.friend_id,
-    //             },
-    //         },
-    //     });
-    //     await this.prisma.friends.delete({
-    //         where: {
-    //             following_user_id_followed_user_id: {
-    //                 following_user_id: addFrined.friend_id,
-    //                 followed_user_id: addFrined.user_id,
-    //             },
-    //         },
-    //     });
-    //     return {status: true, message: "success"};
-    // }
-
     
     async GetUserImageByNickName(nickName: string)
     {

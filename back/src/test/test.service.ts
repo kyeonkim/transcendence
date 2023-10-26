@@ -3,6 +3,7 @@ import { gameDataDto } from 'src/game/dto/game.dto';
 import { UserService } from 'src/user/user.service';
 import { GameService } from 'src/game/game.service';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { SocialService } from 'src/social/social.service';
 import * as fs from 'fs';
 import { join } from 'path';
 
@@ -12,6 +13,7 @@ export class TestService {
         private readonly UserService: UserService,
         private readonly GameService: GameService,
         private readonly prisma: PrismaService,
+        private readonly SocialService: SocialService,
     ) {}
 
     async DeleteUserById(nickName: string)
@@ -62,20 +64,20 @@ export class TestService {
             for(let j = 0; j < 10; j++)
             {
                 if (i != j)
-                    this.UserService.AddFriend({user_id: i, friend_id: j});
+                    this.SocialService.AddFriend({user_id: i, friend_id: j});
             }
         }
     }
 
     async CreateDummyGame()
     {
-        for(let i = 0; i < 40; i++)
+        for(let i = 0; i < 95; i++)
             await this.GameService.AddGameData({
                 rank: true,
                 user_id: 0,
                 enemy_id: 1,
                 my_score: i,
-                enemy_score: 40 - i
+                enemy_score: 95 - i
             });
     }
 

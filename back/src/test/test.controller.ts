@@ -31,7 +31,7 @@ export class TestController {
 		return this.TestService.CreateDummyGame();
 	}
 
-	@ApiOperation({summary: `더더미  게임 데이터 삭제 API`, description: `더미게임데이터를 삭삭제제한한다.`})
+	@ApiOperation({summary: `더미  게임 데이터 삭제 API`, description: `더미게임데이터를 삭제한다.`})
 	@Delete("getdata/deletedummy")
     DeleteDummyGame()
 	{

@@ -4,7 +4,7 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.enableCors({origin: ["http://localhost:3000",  "http://10.13.8.3:3000"],});
+  app.enableCors({origin: ["http://localhost:3000",  "http://10.13.8.3:3000", "http://10.13.8.1:3000"],});
   
   const config = new DocumentBuilder()
   .setTitle('Transcendence')
