@@ -26,49 +26,65 @@ export class SocialService {
         return {status: true, message: "친구"};
     }
    
-    async AddFriend(@Body() Friend : friendDto)
+    async AddFriend(@Body() addFriend : friendDto)
     {
+        const friend = await this.prismaService.user.findUnique({
+            where: {
+                nick_name: addFriend.friend_nick_name,
+            },
+        });
         const check =  await this.prismaService.friends.findFirst({
             where: {
-                following_user_id: Friend.user_id,
-                followed_user_id: Friend.friend_id,
+                following_user_id: addFriend.user_id,
+                followed_user_id: friend.user_id,
             },
         });
         if (check !== null)
             return {status: false, message: "already frined"};
-        await this.prismaService.friends.create({
-            data: {
-                following_user_id: Friend.user_id,
-                followed_user_id: Friend.friend_id,
-            },
-        });
-        await this.prismaService.friends.create({
-            data: {
-                following_user_id: Friend.friend_id,
-                followed_user_id: Friend.user_id,
-            },
-        });
+        try 
+        {
+            await this.prismaService.friends.create({
+                data: {
+                    following_user_id: addFriend.user_id,
+                    followed_user_id: friend.user_id,
+                },
+            });
+            await this.prismaService.friends.create({
+                data: {
+                    following_user_id: friend.user_id,
+                    followed_user_id: addFriend.user_id,
+                },
+            });
+        } catch (error) {
+            console.log("AddFriend failed error: ", error);
+            return {status: false, message: "AddFriend failed"}
+        }
         return {status: true, message: "success"};
     }
     
-    async DeleteFriend(@Body() Friend : friendDto)
+    async DeleteFriend(@Body() delFriend : friendDto)
     {
+        const friend = await this.prismaService.user.findUnique({
+            where: {
+                nick_name: delFriend.friend_nick_name,
+            },
+        });
         const check = await this.prismaService.friends.findFirst({
             where: {
-                following_user_id: Friend.user_id,
-                followed_user_id: Friend.friend_id,
+                following_user_id: delFriend.user_id,
+                followed_user_id: delFriend.friend_id,
             },
         });
         if (check === null)
             return {status: false, message: "not frined"};
         try {
             await this.prismaService.friends.deleteMany({
-                where: { following_user_id: Friend.friend_id,
-                    followed_user_id: Friend.user_id, },
+                where: { following_user_id: friend.user_id,
+                    followed_user_id: delFriend.user_id, },
             },);
             await this.prismaService.friends.deleteMany({
-                where: { following_user_id: Friend.user_id,
-                    followed_user_id: Friend.friend_id },
+                where: { following_user_id: delFriend.user_id,
+                    followed_user_id: friend.user_id },
             },);
         }
         catch (error) {

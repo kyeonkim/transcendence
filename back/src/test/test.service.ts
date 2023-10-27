@@ -64,7 +64,7 @@ export class TestService {
             for(let j = 0; j < 10; j++)
             {
                 if (i != j)
-                    this.SocialService.AddFriend({user_id: i, friend_id: j});
+                    this.SocialService.AddFriend({user_id: i, friend_nick_name: `dummy${j}`});
             }
         }
     }
