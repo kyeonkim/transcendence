@@ -42,14 +42,14 @@ export class AuthService {
 				nick_name : nickName,
 			},
 			update: {
-				access_token: await this.jwtService.signAsync(payload, {expiresIn: '3m', secret: process.env.JWT_SECRET}),
-				refresh_token:await this.jwtService.signAsync(payload, {expiresIn: '5m', secret: process.env.JWT_SECRET}),
+				access_token: await this.jwtService.signAsync(payload, {expiresIn: '1h', secret: process.env.JWT_SECRET}),
+				refresh_token:await this.jwtService.signAsync(payload, {expiresIn: '1h', secret: process.env.JWT_SECRET}),
 			},
 			create: {
 				user_id: id,
 				nick_name: nickName,
-				access_token: await this.jwtService.signAsync(payload, {expiresIn: '3m', secret: process.env.JWT_SECRET}),
-				refresh_token:await this.jwtService.signAsync(payload, {expiresIn: '5m', secret: process.env.JWT_SECRET}),
+				access_token: await this.jwtService.signAsync(payload, {expiresIn: '1h', secret: process.env.JWT_SECRET}),
+				refresh_token:await this.jwtService.signAsync(payload, {expiresIn: '1h', secret: process.env.JWT_SECRET}),
 			},
 		});
 		if (user_token == null)
@@ -70,7 +70,8 @@ export class AuthService {
 			const { data } = await firstValueFrom(this.httpService.request(getTokenConfig));
 			return Number(data.resource_owner_id);
 		} catch (error) {
-			console.log(error); // error 처리 필요 - kyoenkim
+			console.log(`42인증 실페 ==================\n`,error); // error 처리 필요 - kyoenkim
+			return null;
 		}
 	}
 
