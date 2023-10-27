@@ -12,7 +12,6 @@ export class SocialController {
         private readonly SocialService: SocialService,
     ) {}
 
-	@ApiTags('User API')
 	@ApiOperation({summary: `친구 추가 API`, description: `해당 유저끼리 친구를 추가한다.`})
 	@UseGuards(AuthGuard('jwt-access'))
 	@Post("addfriend")

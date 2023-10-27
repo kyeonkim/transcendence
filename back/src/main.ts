@@ -5,7 +5,8 @@ import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.enableCors({origin: ["http://localhost:3000",  "http://10.13.8.3:3000", "http://10.13.8.1:3000"],});
+  app.enableCors();
+  // app.enableCors({origin: ["http://localhost:3000",  "http://10.13.8.3:3000", "http://10.13.8.1:3000", "http://localhost:4242", "file:///Users/junhyupa/Desktop/tsna/index.html"],});
   app.useGlobalPipes(
     new ValidationPipe({
       /**

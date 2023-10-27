@@ -6,8 +6,9 @@ import { AuthModule } from './auth/auth.module';
 import { GameModule } from './game/game.module';
 import { TestModule } from './test/test.module';
 import { SocialModule } from './social/social.module';
+import { EventModule } from './event/event.module';
 
 @Module({
-  imports: [HttpModule, PrismaModule, UserModule, AuthModule, GameModule, TestModule, SocialModule]
+  imports: [HttpModule, PrismaModule, UserModule, AuthModule, GameModule, TestModule, SocialModule, EventModule]
 })
 export class AppModule {}

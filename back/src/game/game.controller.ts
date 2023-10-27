@@ -24,5 +24,4 @@ export class GameController {
         const gameData = await this.GameService.GetGameDataById(id, index);
         return gameData;
     }
-    
 }
