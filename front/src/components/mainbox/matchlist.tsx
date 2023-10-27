@@ -11,17 +11,6 @@ import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography';
 
 export default function MatchList(id: any) {
-
-  id = 0;
-
-  // id = 프로필 주인의 닉네임
-  
-  // id를 통해 api로 전적 정보 받아오기 
-  // 요청할떄 index -1 (get요청으로 쿼리에 닉네임, 인덱스 넣어서 보내기)
-  
-  // 얼추 이것만 받아오고 상대방 프로필은 URL로?
-  // 스코어는 보류
-  //우선10개만받고 스크롤 끝에서 더 내리면 더 받아오는거 알아보기
   const [page, setPage] = useState(0);
   const [res, setRes] = useState<any>([]);
   const listRef = useRef<HTMLUListElement>(null);
@@ -30,7 +19,6 @@ export default function MatchList(id: any) {
     const handleScroll = () => {
       if (listRef.current && listRef.current.clientHeight + listRef.current.scrollTop === listRef.current.scrollHeight) {
         setPage((prevPage) => prevPage + 1);
-        console.log('스크롤 끝:', page);
       }
     };
   
@@ -44,7 +32,7 @@ export default function MatchList(id: any) {
       }
     };
   }, [page]);
-  //
+
   useEffect(() => {
     const fetchData = async () => {
       const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}game/data`, {
@@ -55,9 +43,6 @@ export default function MatchList(id: any) {
   
     fetchData();
   }, [page]);
-
-  
-  // ref={listRef}
   
   return (
     <List ref={listRef} sx={{ width: '100%', height: '100%', maxWidth: 1143, maxHeight: 932, bgcolor: 'white', overflow: 'auto', alignItems: 'center'}}>
@@ -65,11 +50,11 @@ export default function MatchList(id: any) {
         
         const listItemStyle = {
           border: '5px solid ' + (match.winner ? 'rgba(0, 0, 255, 0.4)' : 'rgba(255, 0, 0, 0.4)'), // 테두리 색상 설정
-          backgroundColor: match.winner ? 'rgba(0, 0, 255, 0.4)' : 'rgba(255, 0, 0, 0.4)', 
+          backgroundColor: match.winner ? 'rgba(0, 0, 255, 0.4)' : 'rgba(255, 0, 0, 0.4)', // 배경 색상 설정
           color: 'white', // 텍스트 색상
           padding: '10px', // 옵션: 패딩 설정
-          margin : '9px',
-          width: '1110px',
+          margin : '9px', // 옵션: 마진 설정
+          width: '1110px', // 옵션: 너비 설정
           borderRadius: '10px', // 옵션: 모서리를 둥글게 설정
         };
         

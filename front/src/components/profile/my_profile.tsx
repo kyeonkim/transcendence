@@ -7,7 +7,7 @@ import CardMedia from '@mui/material/CardMedia';
 // card 동작들 (card 안에 뭘 넣기)
 import CardActions from '@mui/material/CardActions';
 import Button from '@mui/material/Button';
-
+import Cookies from 'js-cookie';
 // styled component (컴포넌트 고정 style로 보임)
 import { styled } from '@mui/system';
 import Image from 'next/image';
@@ -28,7 +28,9 @@ export default function MyProfile({ setMTbox, myNickname}: MyProfileProps) {
   const handleMTbox = (num: number) => () => {
     setMTbox(num, myNickname);
   }
-
+  const my_id = Cookies.get('user_id');
+  const my_nick = Cookies.get('user_nickname');
+  console.log('my id and nick: ',my_id, my_nick);
   const imageLoader = ({ src }: any) => {
     return `${process.env.NEXT_PUBLIC_API_URL}user/getimg/nickname/${src}`
   }
