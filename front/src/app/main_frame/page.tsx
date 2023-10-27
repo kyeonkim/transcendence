@@ -30,10 +30,5 @@ export default async function MainFrame () {
 
   return (
       <Main />
-      // <div>
-      //   <p>
-      //     main_frame
-      //   </p>
-      // </div>
   );
 }

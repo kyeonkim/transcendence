@@ -10,13 +10,13 @@ import ListItemAvatar from '@mui/material/ListItemAvatar';
 import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography';
 
-export default function MatchList(id: any) {
+export default function MatchList(props: any) {
   const [page, setPage] = useState(0);
   const [res, setRes] = useState<any>([]);
   const listRef = useRef<HTMLUListElement>(null);
+  const userNickname = props.id;
 
   useEffect(() => {
-    id = 0;
     const handleScroll = () => {
       if (listRef.current && listRef.current.clientHeight + listRef.current.scrollTop === listRef.current.scrollHeight) {
         setPage((prevPage) => prevPage + 1);
@@ -37,7 +37,7 @@ export default function MatchList(id: any) {
   useEffect(() => {
     const fetchData = async () => {
       const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}game/data`, {
-        params: { id: id, index: res.length ? res[res.length - 1].idx - 1 : 0 },
+        params: { id: 0, index: res.length ? res[res.length - 1].idx - 1 : 0 },
       });
       setRes([...res, ...response.data.data]);
     };
@@ -82,10 +82,10 @@ export default function MatchList(id: any) {
           <React.Fragment key={index}>
             <ListItem alignItems="center" sx={listItemStyle}>
               <ListItemAvatar>
-                <Avatar alt="Remy Sharp" src={imageLoader({src: match.enemy_name})} sx={avatarStyle}/>
+                <Avatar alt="Remy Sharp" src={imageLoader({src: userNickname})} sx={avatarStyle}/>
               </ListItemAvatar>
               <Typography variant="h6" sx={{ ...textPrimaryStyle, fontSize: '50px' }}>
-                min
+                {userNickname}
               </Typography>
               <ListItemText
                 primary={`${match.my_score}:${match.enemy_score}`}

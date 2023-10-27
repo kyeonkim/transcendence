@@ -5,9 +5,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import IconButton from '@mui/material/IconButton';
-import Checkbox from '@mui/material/Checkbox';
 import Avatar from '@mui/material/Avatar';
-import ListItemIcon from '@mui/material/ListItemIcon';
 import CommentIcon from '@mui/icons-material/Comment';
 
 export default function FriendListPanel() {
@@ -22,22 +20,14 @@ export default function FriendListPanel() {
   }
 
   const apiResponse = [
-    {id: 1, nickname: 'user1' },
-    {id: 2, nickname: 'user2' },
-    {id: 3, nickname: 'user3' },
-    {id: 3, nickname: 'user3' },
-    {id: 3, nickname: 'user3' },
-    {id: 3, nickname: 'user3' },
-    {id: 3, nickname: 'user3' },
-    {id: 3, nickname: 'user3' },
-    {id: 3, nickname: 'user3' },
-    {id: 3, nickname: 'user3' },
-    {id: 3, nickname: 'user3' },
-    {id: 3, nickname: 'user3' },
-    {id: 3, nickname: 'user3' },
-    {id: 3, nickname: 'user3' },
-    {id: 3, nickname: 'user3' },
+    {id: 1, nickname: 'kshim'},
+    {id: 2, nickname: 'jun'},
+    {id: 3, nickname: 'dummy1'},
   ];
+
+  const imageLoader = ({ src }: any) => {
+    return `${process.env.NEXT_PUBLIC_API_URL}user/getimg/nickname/${src}`
+  }
 
   return (
     <List dense sx={{ width: '100%', maxWidth: 400, maxHeight: 580,bgcolor: 'background.paper', overflow: 'auto'}}>
@@ -60,7 +50,7 @@ export default function FriendListPanel() {
             <ListItemButton onClick={handleProfile(user.nickname)}>
               <ListItemAvatar>
                   <Avatar
-                    // src={`user.profile_image`} 나중에 이미지 url넣음댈듯
+                    src={imageLoader({src: user.nickname})}
                 />
               </ListItemAvatar>
               <ListItemText id={labelId} primary={`${user.nickname}`} />

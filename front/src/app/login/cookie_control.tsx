@@ -45,8 +45,7 @@ export default function CookieControl (props:any) {
         
         try
         {
-            const response = CookieSetter(access_token, refresh_token, nick_name, user_id);
-
+            CookieSetter(access_token, refresh_token, nick_name, user_id);
             console.log('cookie set done');
 
             

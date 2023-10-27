@@ -23,26 +23,6 @@ export async function POST (request: NextRequest)
 
         console.log('api/user_create - data: ', data);
 
-        // response = await fetch('http://10.13.9.4:4242/user/create', {
-        //     method: "POST",
-        //     body: JSON.stringify({
-        //         access_token: data.access_token,
-        //         nick_name: data.nick_name,
-        //         img_name: data.img_name
-        //     }),
-        // });
-
-
-        // console.log('api/user_create - response:', response.status);
-
-        // if (!response.ok)
-        // {
-        //     // error 발생한 경우
-        //     error_status = response.status;
-        //     throw new Error ("api/user_create - POST fetch error status");
-        // }
-        // console.log('api/user_create - response:', response.status);
-
         response = await axios.post(process.env.NEXT_PUBLIC_API_URL + 'auth/signup', {
             access_token: data.access_token,
             nick_name: data.nick_name,

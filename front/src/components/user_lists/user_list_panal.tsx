@@ -17,21 +17,16 @@ const MainUserPanal = styled(Box) ({
   })
 
 
-export default function UserListPanal (props: any) {
+export default function UserListPanal () {
 
-  const {value, index} = props;
 
   return (
-    <div
-        hidden={value !== index}
-    >
-        {value === index && (
+    <div>
             <MainUserPanal sx={{ p: 2 }}>
             <Typography>
                 test for text is changed. It is User List Panal.
             </Typography>
             </MainUserPanal>
-        )}
     </div>
   );
 }

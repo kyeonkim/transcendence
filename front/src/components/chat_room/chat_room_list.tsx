@@ -22,7 +22,7 @@ export default function ChatRoomList() {
     return (
         <MainChatRoomList container rowSpacing={1} columnSpacing={1}>
             <Grid item md={6}>
-                <Item>1</Item>
+                {/* <Item>1</Item> */}
             </Grid>
         </MainChatRoomList>
     );

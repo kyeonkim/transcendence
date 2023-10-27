@@ -57,7 +57,7 @@ export default function Signup (props:any) {
 
   return (
       <div>
-          <p>this is server component - SendImage.</p>
+          <div>this is server component - SendImage.</div>
           <div style={{ textAlign: 'center', marginTop: '50px' }}>
               <h1>Set User</h1>
               <div style={{ marginBottom: '20px' }}>
