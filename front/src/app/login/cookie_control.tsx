@@ -25,7 +25,7 @@ export default function CookieControl (props:any) {
     {
         try
         {
-            const response = await axios.post('http://10.13.8.1:3000/api/set_cookie', {
+            const response = await axios.post(`${process.env.NEXT_PUBLIC_FRONT_URL}api/set_cookie`, {
                 access_token: access_token,
                 refresh_token: refresh_token,
                 nick_name: nick_name,

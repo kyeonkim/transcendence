@@ -42,6 +42,7 @@ export default function SearchUser({ setMTbox }: SearchUserProps) {
         if (searchTarget) {
             await axios.get(`${process.env.NEXT_PUBLIC_API_URL}user/getdata/nickname/${searchTarget}`)
                 .then((res) => {
+                    // console.log(typeof res.data.userData.user_id)
                     if (res.data.status === true)
                         setMTbox(num, searchTarget);
                 })

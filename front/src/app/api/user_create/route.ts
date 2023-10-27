@@ -49,8 +49,8 @@ export async function POST (request: NextRequest)
             // img_name: data.img_name
         });
         // created 201
-
-
+        console.log("===============tettettettettettettettettettettettet");
+        console.log(typeof response.data.userdata.user_id)
     }
     catch (err)
     {
@@ -72,23 +72,23 @@ export async function POST (request: NextRequest)
         console.log('status:', response.data.status);
         cookieBox.set('access_token', response.data.token.access_token, {
             path: '/',
-            maxAge: 60 * 3,
-            httpOnly: true,
+            maxAge: 60 * 60 * 3,
+            // httpOnly: true,
         });
         cookieBox.set('refresh_token', response.data.token.refresh_token, {
             path: '/',
-            maxAge: 60 * 3,
-            httpOnly: true,
+            maxAge: 60 * 60 * 3,
+            // httpOnly: true,
         });
-        cookieBox.set('nick_name', response.data.token.nick_name, {
+        cookieBox.set('nick_name', response.data.userdata.nick_name, {
             path: '/',
-            maxAge: 60 * 3,
-            httpOnly: true,
+            maxAge: 60 * 60 *3,
+            // httpOnly: true,
         });
-        cookieBox.set('user_id', response.data.token.user_id, {
+        cookieBox.set('user_id', response.data.userdata.user_id, {
             path: '/',
-            maxAge: 60 * 3,
-            httpOnly: true,
+            maxAge: 60 * 60 * 3,
+            // httpOnly: true,
         });
         // permanentRedirect('/main_frame');
         // 왜 나중에 다시 login 쪽으로 돌아가는가?

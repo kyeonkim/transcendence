@@ -1,23 +1,13 @@
 'use client';
-import { useState } from 'react';
-import React from 'react';
-
-import CssBaseline from '@mui/material/CssBaseline';
+import React, { useState }from 'react';
+import { styled } from '@mui/system';
 import Box from '@mui/material/Box';
-
+import CssBaseline from '@mui/material/CssBaseline';
 import MyProfile from '@/components/profile/my_profile';
 import MatchingButton from '@/components/matching/matching';
 import ChatRoomButton from '@/components/chat_room/chat_room_button';
 import SearchUser from '@/components/search_bar/search_user';
 import UserLists from '@/components/user_lists/user_lists';
-import GuardLogin from '@/components/guard_login';
-// styled component (컴포넌트 고정 style로 보임)
-import { styled } from '@mui/system';
-
-// import Button from '@mui/material/Button';
-// import  Notlogin  from '../components/notlogin';
-
-//mainbox
 import Mainbox from '@/components/mainbox';
 
 // Top left Box
@@ -74,18 +64,17 @@ export default function Main() {
   const [clicked, setClick] = useState(0);
   const [id, setSearch] = useState('');
 
-  const handleClick = (value: number, searchTarget: string) => {
+  const handleClick = (value: number, searchTarget?: string) => {
     setClick(value);
-    setSearch(searchTarget);
+    setSearch(searchTarget || '');
   }
   // 나중에 쿠키에 내닉네임 저장하던가해서 전역으로 사용필
-  let name = "min";
   return (
         <React.Fragment>
           <CssBaseline />
           {/* <GuardLogin> */}
             <TLBox>
-              <MyProfile setMTbox={handleClick} myNickname={name}/>
+              <MyProfile setMTbox={handleClick}/>
             </TLBox>
             <MTBox>
               <Mainbox mod={clicked} search={id}/>

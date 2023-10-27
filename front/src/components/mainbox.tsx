@@ -8,7 +8,7 @@ const MainBox = (props: any) => {
   const search = props.search;
   const handleRender = () => {
     if (value === 1)
-      return <ProfilePage id={search}/>;
+      return <ProfilePage nickname={search}/>;
     else if (value === 2)
 		  return <ChatRoomPage />;
     else

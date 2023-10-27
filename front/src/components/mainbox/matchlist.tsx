@@ -16,6 +16,7 @@ export default function MatchList(id: any) {
   const listRef = useRef<HTMLUListElement>(null);
 
   useEffect(() => {
+    id = 0;
     const handleScroll = () => {
       if (listRef.current && listRef.current.clientHeight + listRef.current.scrollTop === listRef.current.scrollHeight) {
         setPage((prevPage) => prevPage + 1);
@@ -61,10 +62,15 @@ export default function MatchList(id: any) {
         const textPrimaryStyle = {
           fontWeight: 'bold', // 텍스트를 굵게 설정
           fontSize: '50px', // 폰트 크기 설정
-          marginLeft: '30px', // 왼쪽 마진 설정
-          marginRight: '30px', // 오른쪽 마진 설정
+          marginLeft: '20px', // 왼쪽 마진 설정
+          marginRight: '20px', // 오른쪽 마진 설정
         };
         
+        const textScoreStyle = {
+          fontWeight: 'bold', // 텍스트를 굵게 설정
+          fontSize: '50px', // 폰트 크기 설정
+
+        };
         const avatarStyle = {
           width: '90px', // 프로필 사진의 너비 조절
           height: '90px', // 프로필 사진의 높이 조절
@@ -83,7 +89,7 @@ export default function MatchList(id: any) {
               </Typography>
               <ListItemText
                 primary={`${match.my_score}:${match.enemy_score}`}
-                primaryTypographyProps={{ textAlign: 'center', sx: textPrimaryStyle }}
+                primaryTypographyProps={{ textAlign: 'center', sx: textScoreStyle }}
               />
               <Typography variant="h6" sx={{ ...textPrimaryStyle, fontSize: '50px' }}>
                 {match.enemy_name}

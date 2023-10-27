@@ -1,48 +1,30 @@
 import React from 'react';
-import Card from '@mui/material/Card';
-
-// 이미지나 영상등 담기
-import CardMedia from '@mui/material/CardMedia';
-
-// card 동작들 (card 안에 뭘 넣기)
-import CardActions from '@mui/material/CardActions';
-import Button from '@mui/material/Button';
-import Cookies from 'js-cookie';
-// styled component (컴포넌트 고정 style로 보임)
-import { styled } from '@mui/system';
 import Image from 'next/image';
 import styles from '../mainbox/mainbox.module.css'
-
-// 왼쪽 위에 Card 놓기
-
-// sx props 공부
-// gutterBottom이 무엇인가? variant의 값으로 가능한건? component="div"의 의미는?
+import { useCookies } from 'next-client-cookies';
 
 interface MyProfileProps {
-  setMTbox: (num: number, searchTarget: string) => void;
-  myNickname: string;
+  setMTbox: (num: number, searchTarget: string | undefined) => void;
 }
-
-export default function MyProfile({ setMTbox, myNickname}: MyProfileProps) {
+export default function MyProfile({ setMTbox }: MyProfileProps) {
+  const cookies = useCookies();
+  const my_nick = cookies.get('nick_name');
 
   const handleMTbox = (num: number) => () => {
-    setMTbox(num, myNickname);
+    setMTbox(num, my_nick);
   }
-  const my_id = Cookies.get('user_id');
-  const my_nick = Cookies.get('user_nickname');
-  console.log('my id and nick: ',my_id, my_nick);
   const imageLoader = ({ src }: any) => {
     return `${process.env.NEXT_PUBLIC_API_URL}user/getimg/nickname/${src}`
   }
-    return (
-       <Image
-        loader={imageLoader}
-        src={`${myNickname}`}
-        className={styles.myprofilelink}
-        alt="User Image"
-        width={0}
-        height={0}
-        onClick={handleMTbox(1)}
-        />
+  return (
+    <Image
+      loader={imageLoader}
+      src={`${my_nick}`}
+      className={styles.myprofilelink}
+      alt="User Image"
+      width={0}
+      height={0}
+      onClick={handleMTbox(1)}
+    />
   );
 }
