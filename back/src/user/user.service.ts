@@ -2,7 +2,6 @@
 import { Injectable, Body, StreamableFile } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { JwtService } from '@nestjs/jwt';
-import { friendDto } from './dto/user.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { createReadStream } from 'node:fs';
 import { join } from 'path';
@@ -37,7 +36,7 @@ export class UserService {
             },
         });
         console.log(userData);
-        if (userData == null)
+        if (userData === null)
             return {status: false, message: "유저 찾기 실패"}
         return {status: true, userData: userData};
     }
@@ -54,7 +53,7 @@ export class UserService {
         if (userData == null)
             return {status: false, message: "유저 찾기 실패"}
         else
-            return Promise.resolve(userData);
+            return {status: true, userData: userData};
     }
 
     
