@@ -21,17 +21,22 @@ model User {
   ladder     Int       @default(1000)
   created_at DateTime  @default(now())
   updated_at DateTime  @updatedAt
+  twoFA      Boolean   @default(false)
+  twoFA_key  String?
   friends    Friends[] @relation("following_user")
   games      Game[]    @relation("game_user")
   tokens     Tokens[]  @relation("token_user")
+  events     Event[]   @relation("event_user")
 }
 
 model Friends {
-    id                Int      @default(autoincrement()) @id
-    following_user    User     @relation("following_user", fields: [following_user_id], references: [user_id])
-    following_user_id Int
-    followed_user_id  Int
-    created_at        DateTime @default(now())
+    id                      Int      @default(autoincrement()) @id
+    following_user          User     @relation("following_user", fields: [following_user_id], references: [user_id])
+    following_user_id       Int
+    following_user_nickname String
+    followed_user_id        Int
+    followed_user_nickname  String
+    created_at              DateTime @default(now())
 }
 
 model Tokens {
@@ -54,4 +59,14 @@ model Game {
     my_score    Int      @default(0)
     enemy_score Int      @default(0)
     created_at  DateTime @default(now())
+}
+
+model Event {
+  id            Int      @default(autoincrement()) @id
+  to_id         Int
+  user          User     @relation("event_user",fields: [to_id], references: [user_id])
+  event_type    String
+  from_nickname String
+  chatroom_id   Int?
+  chatroom_name String?
 }
