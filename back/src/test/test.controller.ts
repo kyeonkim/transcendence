@@ -1,6 +1,8 @@
-import { Controller, Delete, Param, Post } from '@nestjs/common';
+import { Controller, Delete, Get, Param, Post, Query } from '@nestjs/common';
 import { TestService } from './test.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { SocialService } from 'src/social/social.service';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 
 @ApiTags('Test API')
@@ -8,6 +10,8 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 export class TestController {
     constructor(
         private readonly TestService: TestService,
+		private readonly SocialService: SocialService,
+		private readonly prisma: PrismaService,
     ) {}
 
 	@ApiOperation({summary: `더미유저 생생성 API`, description: `더미데이터를 생성한다.`})
@@ -17,11 +21,18 @@ export class TestController {
 		return this.TestService.CreateDummyUser();
 	}
 
+	@ApiOperation({summary: `더미유저 삭제 API`, description: `더미데이터를 삭제한다.`})
+	@Delete("deletedummy")
+	DeleteDummyUser()
+	{
+		return this.TestService.DeleteDummyUser();
+	}
+
 	@ApiOperation({summary: `유저 삭제 데이터 API`, description: `닉네임으로 유저 데이터를 삭제한다.`})
 	@Delete("getdata/nickname/:nickname")
-    DeleteUserById(@Param('nickname') nickName: string)
+    DeleteUserByNickName(@Param('nickname') nickName: string)
 	{
-		return this.TestService.DeleteUserById(nickName);
+		return this.TestService.DeleteUserByNickName(nickName);
 	}
 
 	@ApiOperation({summary: `더미 게임 데이터 추가 API`, description: `더미데이터를 생성한다.`})
@@ -36,5 +47,24 @@ export class TestController {
     DeleteDummyGame()
 	{
 		return this.TestService.DeleteDummyGame();
+	}
+
+	@ApiOperation({summary: `강제친구 추가 API`, description: `강제로 친구를 추가한다.`})
+	@Get("addfriend")
+	async AddFriend(@Query('user1') user1_id: number, @Query('user2') user2_id: number)
+	{
+		const user1 = await this.prisma.user.findUnique({
+			where: {
+				user_id: user1_id,
+			},
+		});
+		const user2 = await this.prisma.user.findUnique({
+			where: {
+				user_id: user2_id,
+			},
+		});
+		if (user1 === null || user2 === null)
+			return {status: false, message: "유저 찾기 실패"}
+		return await this.SocialService.AcceptFriend({user_id: user1.user_id, user_nickname: user1.nick_name, friend_nick_name: user2.nick_name});
 	}
 }

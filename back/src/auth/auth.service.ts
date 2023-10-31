@@ -2,13 +2,15 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
-import { SignUpDto, TokenDto } from 'src/auth/dto/token.dto';
+import { SignUpDto, TokenDto, TwoFADTO } from 'src/auth/dto/token.dto';
 import { firstValueFrom } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
 import { TokenExpiredError } from 'jsonwebtoken';
 
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
+import { authenticate } from 'passport';
+import { authenticator } from 'otplib';
 
 export type UserToken = {
 	user_id: number;
@@ -91,7 +93,11 @@ export class AuthService {
 			else // access_token 발급 refresh_token 발급
 			{
 				const tokenData = await this.CreateToken(userData.user_id, userData.nick_name);
-				return {status: true, userdata: await this.userService.GetUserDataById(userData.user_id), token: tokenData};
+				const user = await this.userService.GetUserDataById(userData.user_id);
+				if (user.status === false)
+					return {status: false, access_token: token.access_token};
+				else
+					return {status: true, userdata: user.userdata, token: tokenData};
 			}
 		} catch (error) {
 			console.error(error);
@@ -114,6 +120,52 @@ export class AuthService {
             return {status: true,  message: "success", userdata: newUser, token: tokenData};
         }
     }
+
+	async Active2FAQRCode(user: TwoFADTO)
+	{
+		const secret = authenticator.generateSecret();
+		//otpauth:// 환경변수화 필요
+		const otpauthUrl = authenticator.keyuri(user.user_nickname, `otpauth://`, secret);
+
+		await this.prisma.user.update({
+			where: {
+				user_id: user.user_id,
+			},
+			data: {
+				twoFA: true,
+				twoFA_key: secret
+			}
+		});
+		console.log(`secret: ${secret}`);
+		console.log("otpauthUrl: ", otpauthUrl);
+		return {status: true, message: "success", otpauthUrl: otpauthUrl};
+	}
+
+	async Active2FA(twofa: TwoFADTO)
+	{
+		const user = await this.prisma.user.findUnique({
+			where: {
+				user_id: twofa.user_id,
+			},
+		});
+		if (user === null)
+			return {status: false, message: "user not found"};
+		const isValid = authenticator.verify({ token: twofa.code , secret: user.twoFA_key});
+		if (isValid)
+		{
+			await this.prisma.user.update({
+				where: {
+					user_id: user.user_id,
+				},
+				data: {
+					twoFA: true,
+				}
+			});
+			return {status: true, message: "success"};
+		}
+		else
+			return {status: false, message: "fail"};
+	}
 }
 
 @Injectable()

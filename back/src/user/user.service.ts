@@ -53,7 +53,7 @@ export class UserService {
         if (userData == null)
             return {status: false, message: "유저 찾기 실패"}
         else
-            return {status: true, userData: userData};
+            return {status: true, userdata: userData};
     }
 
     

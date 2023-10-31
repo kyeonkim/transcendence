@@ -1,11 +1,13 @@
 import { Body, Injectable } from '@nestjs/common';
+import { EventService } from 'src/event/event.service';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { friendDto } from 'src/user/dto/user.dto';
+import { friendDto } from './dto/social.dto';
 
 @Injectable()
 export class SocialService {
     constructor(
         private readonly prismaService: PrismaService,
+        private readonly eventService: EventService
     ) {}
 
     async CheckFriend(user1_id: number, user2_name: string)
@@ -15,6 +17,8 @@ export class SocialService {
                 nick_name: user2_name,
             },
         });
+        if (user2 === null)
+            return {status: false, message: "not found user"};
         const frined = await this.prismaService.friends.findFirst({
             where: {
                 following_user_id: user1_id,
@@ -33,6 +37,53 @@ export class SocialService {
                 nick_name: addFriend.friend_nick_name,
             },
         });
+        if (friend === null)
+            return {status: false, message: "not found friend"}
+        const check =  await this.prismaService.friends.findFirst({
+            where: {
+                following_user_id: addFriend.user_id,
+                followed_user_id: friend.user_id,
+            },
+        });
+        if (check !== null)
+            return {status: false, message: "already frined"};
+        // try 
+        // {
+        //     await this.prismaService.friends.create({
+        //         data: {
+        //             following_user_id: addFriend.user_id,
+        //             followed_user_id: friend.user_id,
+        //         },
+        //     });
+        //     await this.prismaService.friends.create({
+        //         data: {
+        //             following_user_id: friend.user_id,
+        //             followed_user_id: addFriend.user_id,
+        //         },
+        //     });
+        // } catch (error) {
+        //     console.log("AddFriend failed error: ", error);
+        //     return {status: false, message: "AddFriend failed"}
+        // }
+        this.eventService.SendEvent({
+            to: friend.user_id,
+            type: "add_friend",
+            from: addFriend.user_nickname,
+            chatroom_id: 0,
+            chatroom_name: "",
+        })
+        return {status: true, message: "success"};
+    }
+
+    async AcceptFriend(@Body() addFriend : friendDto)
+    {
+        const friend = await this.prismaService.user.findUnique({
+            where: {
+                nick_name: addFriend.friend_nick_name,
+            },
+        });
+        if (friend === null)
+            return {status: false, message: "frined user not found"};
         const check =  await this.prismaService.friends.findFirst({
             where: {
                 following_user_id: addFriend.user_id,
@@ -46,12 +97,16 @@ export class SocialService {
             await this.prismaService.friends.create({
                 data: {
                     following_user_id: addFriend.user_id,
+                    following_user_nickname: addFriend.user_nickname,
                     followed_user_id: friend.user_id,
+                    followed_user_nickname: friend.nick_name,
                 },
             });
             await this.prismaService.friends.create({
                 data: {
                     following_user_id: friend.user_id,
+                    following_user_nickname: friend.nick_name,
+                    followed_user_nickname: addFriend.user_nickname,
                     followed_user_id: addFriend.user_id,
                 },
             });
@@ -59,6 +114,8 @@ export class SocialService {
             console.log("AddFriend failed error: ", error);
             return {status: false, message: "AddFriend failed"}
         }
+        await this.eventService.SendFriendEvent(addFriend.user_id,`친구 ${friend.nick_name}이 추가되었습니다.`);
+        await this.eventService.SendFriendEvent(friend.user_id, `친구 ${addFriend.user_nickname}이 추가되었습니다.`);
         return {status: true, message: "success"};
     }
     
@@ -91,6 +148,8 @@ export class SocialService {
             console.log("DeleteFriend failed error: ", error);
             return {status: false, message: "DeleteFriend failed"}
         }
+        await this.eventService.SendFriendEvent(delFriend.user_id, `친구 ${friend.nick_name}이 삭제되었습니다.`);
+        await this.eventService.SendFriendEvent(friend.user_id, `친구 ${delFriend.user_nickname}이 삭제되었습니다.`);
         return {status: true, message: "success"};
     }
 
@@ -99,6 +158,10 @@ export class SocialService {
         const frinedList = await this.prismaService.friends.findMany({
             where: {
                 following_user_id: id,
+            },
+            select: {
+                followed_user_nickname: true,
+                followed_user_id: true,
             },
         });
         if (!frinedList.length)

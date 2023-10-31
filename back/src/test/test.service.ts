@@ -16,14 +16,14 @@ export class TestService {
         private readonly SocialService: SocialService,
     ) {}
 
-    async DeleteUserById(nickName: string)
+    async DeleteUserByNickName(nickName: string)
     {
         const user = await this.prisma.user.findUnique({
             where: {
               nick_name: nickName,
             },
         });
-        if (user == null)
+        if (user === null)
             return {status: false, message: "유저 찾기 실패"}
         const id = user.user_id;
 
@@ -44,6 +44,23 @@ export class TestService {
                 nick_name: nickName,
             },
         });
+        await this.prisma.game.deleteMany({
+            where: {
+                OR: [
+                    {
+                        user_id: id,
+                    },
+                    {
+                        enemy_id: id,
+                    },
+                ],
+            },
+        });
+        await this.prisma.event.deleteMany({
+            where: {
+                to_id: id,
+            },
+        });
         await this.prisma.user.delete({
             where: {
                 user_id: id,
@@ -58,15 +75,28 @@ export class TestService {
     async CreateDummyUser()
     {
         for(let i = 0; i < 10; i++)
-            this.UserService.CreateUser(i, `dummy${i}`);
+        {
+            const user = await this.UserService.GetUserDataById(i);
+            if (user.status)
+                return {status: false, message: "이미 유저가 존재합니다."};
+            await this.UserService.CreateUser(i, `dummy${i}`);
+        }
         for(let i = 0; i < 10; i++)
         {
+            await this.SocialService.AcceptFriend({user_id: i,user_nickname: `dummy${i}`, friend_nick_name: `min`});
             for(let j = 0; j < 10; j++)
             {
                 if (i != j)
-                    this.SocialService.AddFriend({user_id: i, friend_nick_name: `dummy${j}`});
+                    await this.SocialService.AcceptFriend({user_id: i,user_nickname: `dummy${i}`, friend_nick_name: `dummy${j}`});
             }
         }
+    }
+
+    async DeleteDummyUser()
+    {
+
+        for(let i = 0; i < 10; i++)
+            await this.DeleteUserByNickName(`dummy${i}`);
     }
 
     async CreateDummyGame()
