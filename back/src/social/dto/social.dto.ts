@@ -1,7 +1,8 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsInt, IsOptional, IsString } from "class-validator";
 
-export class getUserDto
+
+export class friendDto
 {
     @ApiProperty()
     @IsInt()
@@ -9,11 +10,14 @@ export class getUserDto
 
     @ApiProperty()
     @IsString()
-    nick_name: string;
-}
+    user_nickname: string;
 
-export class uploadImgDto
-{
-    @ApiProperty({ type: 'string', format: 'binary', required: true })
-    file: Express.Multer.File;
+    @ApiProperty()
+    @IsInt()
+    @IsOptional()
+    friend_id?: number;
+
+    @ApiProperty()
+    @IsString()
+    friend_nick_name: string;
 }
