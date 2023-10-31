@@ -111,6 +111,8 @@ export default function Login ({searchParams}:any) {
             && responseData?.refresh_token != null)
           {
               console.log('user_check success to cookie control');
+
+              // 2차인증 진행 qrcode.react 사용? 테스트해보기
               cookie_control = true;
           }
   

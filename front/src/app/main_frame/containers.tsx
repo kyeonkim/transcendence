@@ -68,14 +68,24 @@ export default function Main() {
     setClick(value);
     setSearch(searchTarget || '');
   }
-  // 나중에 쿠키에 내닉네임 저장하던가해서 전역으로 사용필
+  /*
+  랜더링 sse
+  
+  handler1{
+    data : 1
+
+    setClick(1);
+    setSearch();
+  }
+
+  */
   return (
         <React.Fragment>
           <CssBaseline />
           {/* <GuardLogin> */}
-            <TLBox>
+            {/* <TLBox> */}
               <MyProfile setMTbox={handleClick}/>
-            </TLBox>
+            {/* </TLBox> */}
             <MTBox>
               <Mainbox mod={clicked} search={id}/>
             </MTBox>

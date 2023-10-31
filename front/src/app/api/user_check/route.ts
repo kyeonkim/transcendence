@@ -65,7 +65,7 @@ export async function POST (request: NextRequest)
     }
 
     console.log('newResponse============================================');
-
+    console.log('response.data -', response.data);
 
     const newResponse = NextResponse.json(
         {

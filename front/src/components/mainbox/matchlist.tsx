@@ -45,9 +45,23 @@ export default function MatchList(props: any) {
     fetchData();
   }, [page]);
   
+  const listStyle = {
+    width: '100%',
+    height: '100%',
+    maxWidth: 1600,
+    maxHeight: 932,
+    bgcolor: 'white',
+    overflow: 'auto',
+    alignItems: 'center',
+    p: 2,
+    margin: '10px',
+    borderRadius: '20px',
+    border: '5px solid #000', // 테두리 스타일과 색상을 지정
+  };
+
   return (
-    <List ref={listRef} sx={{ width: '100%', height: '100%', maxWidth: 1143, maxHeight: 932, bgcolor: 'white', overflow: 'auto', alignItems: 'center'}}>
-      {res.map((match, index) => {
+    <List ref={listRef} sx={listStyle}>
+      {res.map((match: any, index: any) => {
         
         const listItemStyle = {
           border: '5px solid ' + (match.winner ? 'rgba(0, 0, 255, 0.4)' : 'rgba(255, 0, 0, 0.4)'), // 테두리 색상 설정
@@ -55,7 +69,8 @@ export default function MatchList(props: any) {
           color: 'white', // 텍스트 색상
           padding: '10px', // 옵션: 패딩 설정
           margin : '9px', // 옵션: 마진 설정
-          width: '1110px', // 옵션: 너비 설정
+          width: '1200px', // 옵션: 너비 설정
+          marginLeft: '180px',
           borderRadius: '10px', // 옵션: 모서리를 둥글게 설정
         };
         
