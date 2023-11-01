@@ -144,16 +144,6 @@ export class AuthService {
 		const secret = authenticator.generateSecret();
 		//otpauth:// 환경변수화 필요
 		const otpauthUrl = authenticator.keyuri(user.user_nickname, `otpauth://`, secret);
-
-		// await this.prisma.user.update({
-		// 	where: {
-		// 		user_id: user.user_id,
-		// 	},
-		// 	data: {
-		// 		twoFA: true,
-		// 		twoFA_key: secret
-		// 	}
-		// });
 		console.log(`secret: ${secret}`);
 		console.log("otpauthUrl: ", otpauthUrl);
 		return {status: true, message: "success", secret: secret, otpauthUrl: otpauthUrl};
