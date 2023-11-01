@@ -61,12 +61,17 @@ export class EventService {
     }
 
     async DeleteAlarms(event_id: number) {
-        const rtn = await this.pismaService.event.delete({
-            where: {
-                id: event_id,
-            },
-        });
-        return rtn;
+        try {
+            const rtn = await this.pismaService.event.delete({
+                where: {
+                    id: event_id,
+                },
+            });
+            return rtn;
+        } catch (error) {
+            console.log('DeleteAlarms error: ', error);
+            return {status: false, message: 'DeleteAlarms failed'};
+        }
     }
 
     async DeletAllAlarmsByNick(nick_name: string) {
@@ -97,7 +102,7 @@ export class EventService {
         });
         if (before_event !== null)
             return {status: false, message: 'already send'}
-        await this.pismaService.event.create({
+        const alarm = await this.pismaService.event.create({
             data: {
                 to_id: event.to,
                 event_type: event.type,
@@ -108,7 +113,7 @@ export class EventService {
         })
         if (this.AlarmSseMap.get(event.to) === undefined)
             return {status: true, message: 'no client'};
-        this.AlarmSseMap.get(event.to).next({data: event});
+        this.AlarmSseMap.get(event.to).next({data: alarm});
         return {status: true, message: 'success'};
     }
 }

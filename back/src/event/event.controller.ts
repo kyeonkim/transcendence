@@ -41,6 +41,7 @@ export class EventController {
         return await this.EventService.DeletAllAlarmsByNick(nick_name);
     }
 
+    @ApiOperation({summary: `test용 이벤트 발생 `})
     @Post('test')
     async test(@Body() event: eventDto) {
         return await this.EventService.SendEvent(event);

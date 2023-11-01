@@ -107,8 +107,8 @@ export class SocialService {
                 data: {
                     following_user_id: friend.user_id,
                     following_user_nickname: friend.nick_name,
-                    followed_user_nickname: addFriend.user_nickname,
                     followed_user_id: addFriend.user_id,
+                    followed_user_nickname: addFriend.user_nickname,
                 },
             });
         } catch (error) {

@@ -121,8 +121,10 @@ export class AuthService {
 			return {status: true,
 					message: tokenData.message,
 					user_id: twofa.user_id,
-					user_nickname: twofa.user_nickname,
-					token: tokenData };
+					nick_name: twofa.user_nickname,
+					access_token: tokenData.access_token,
+					refresh_token: tokenData.refresh_token
+				};
 		}
 		return {status: false, message: "fail"};
 	}
