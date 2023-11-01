@@ -43,6 +43,7 @@ model Tokens {
     user_id        Int      @id
     user           User     @relation("token_user", fields: [user_id], references: [user_id])
     nick_name      String   @unique
+    twoFAPass      Boolean
     access_token   String?
     refresh_token  String?
     created_at     DateTime @default(now())
