@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SignUpDto, TokenDto, TwoFADTO } from './dto/token.dto';
@@ -48,6 +48,7 @@ export class AuthController {
 	}
 
 	@ApiOperation({summary: `2차인증 활성 qr API`, description: `2차인증을 활성화 하기위한 QR코드를 받는다.`})
+	// @UseGuards(AuthGuard('jwt-access'))
 	@Post("2fa/activeqr")
 	async Active2FAQRCode(@Body() twofa: TwoFADTO)
 	{
@@ -60,4 +61,12 @@ export class AuthController {
 	{
 		return await this.AuthService.Active2FA(twofa);
 	}
+
+	@ApiOperation({summary: `TEST 용 2차인증 비활성화 API`, description: `2차인증을 비활성화 한다.`})
+	@Delete("2fa/deactive/:id")
+	async Deactive2FA(@Param('id') id: number)
+	{
+		return await this.AuthService.Deactive2FA(id);
+	}
+
 }

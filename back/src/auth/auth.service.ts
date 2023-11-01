@@ -13,6 +13,7 @@ import { authenticate } from 'passport';
 import { authenticator } from 'otplib';
 
 export type UserToken = {
+	twoFAPass: boolean;
 	user_id: number;
 	nick_name: string;
 }
@@ -32,10 +33,11 @@ export class AuthService {
 		const decoded = this.jwtService.decode(token.access_token);
 		const user_id = decoded['user_id'];// access 토큰 uid 비교필요
 		const nickname = decoded['nick_name'];// access 토큰 nick_name
-        return await this.CreateToken(user_id, nickname);// 새토큰 발급
+		const twoFAPass = decoded['twoFAPass'];// access 토큰 nick_name
+        return await this.CreateToken(user_id, nickname, twoFAPass);// 새토큰 발급
     }
 
-	async CreateToken(id: number, nickName: string)
+	async CreateToken(id: number, nickName: string, twoFAPass: boolean)
 	{
 		const payload = { user_id: id , nick_name: nickName };
 		
@@ -46,12 +48,14 @@ export class AuthService {
 			update: {
 				access_token: await this.jwtService.signAsync(payload, {expiresIn: '1h', secret: process.env.JWT_SECRET}),
 				refresh_token:await this.jwtService.signAsync(payload, {expiresIn: '1h', secret: process.env.JWT_SECRET}),
+				twoFAPass: twoFAPass,
 			},
 			create: {
 				user_id: id,
 				nick_name: nickName,
 				access_token: await this.jwtService.signAsync(payload, {expiresIn: '1h', secret: process.env.JWT_SECRET}),
 				refresh_token:await this.jwtService.signAsync(payload, {expiresIn: '1h', secret: process.env.JWT_SECRET}),
+				twoFAPass: twoFAPass,
 			},
 		});
 		if (user_token == null)
@@ -92,12 +96,12 @@ export class AuthService {
 				return {status: false, access_token: token.access_token};
 			else // access_token 발급 refresh_token 발급
 			{
-				const tokenData = await this.CreateToken(userData.user_id, userData.nick_name);
+				const tokenData = await this.CreateToken(userData.user_id, userData.nick_name, !userData.twoFA);
 				const user = await this.userService.GetUserDataById(userData.user_id);
-				if (user.status === false)
+				if (user.status === false)//가입 x signup필요
 					return {status: false, access_token: token.access_token};
 				else
-					return {status: true, userdata: user.userdata, token: tokenData};
+					return {status: true, twoFAPass: !(user.userdata.twoFA), userdata: user.userdata, token: tokenData};
 			}
 		} catch (error) {
 			console.error(error);
@@ -116,7 +120,7 @@ export class AuthService {
             return {status: false, message: "이미 사용 중인  이름입니다."};
         else
         {
-            const tokenData = await this.CreateToken(newUser.user_id, newUser.nick_name);
+            const tokenData = await this.CreateToken(newUser.user_id, newUser.nick_name, !newUser.twoFA);
             return {status: true,  message: "success", userdata: newUser, token: tokenData};
         }
     }
@@ -127,44 +131,76 @@ export class AuthService {
 		//otpauth:// 환경변수화 필요
 		const otpauthUrl = authenticator.keyuri(user.user_nickname, `otpauth://`, secret);
 
-		await this.prisma.user.update({
-			where: {
-				user_id: user.user_id,
-			},
-			data: {
-				twoFA: true,
-				twoFA_key: secret
-			}
-		});
+		// await this.prisma.user.update({
+		// 	where: {
+		// 		user_id: user.user_id,
+		// 	},
+		// 	data: {
+		// 		twoFA: true,
+		// 		twoFA_key: secret
+		// 	}
+		// });
 		console.log(`secret: ${secret}`);
 		console.log("otpauthUrl: ", otpauthUrl);
-		return {status: true, message: "success", otpauthUrl: otpauthUrl};
+		return {status: true, message: "success", secret: secret, otpauthUrl: otpauthUrl};
 	}
 
 	async Active2FA(twofa: TwoFADTO)
 	{
-		const user = await this.prisma.user.findUnique({
-			where: {
-				user_id: twofa.user_id,
-			},
-		});
-		if (user === null)
-			return {status: false, message: "user not found"};
-		const isValid = authenticator.verify({ token: twofa.code , secret: user.twoFA_key});
+		const isValid = authenticator.verify({ token: twofa.code , secret: twofa.secret});
 		if (isValid)
 		{
-			await this.prisma.user.update({
+			const res = await this.prisma.user.update({
 				where: {
-					user_id: user.user_id,
+					user_id: twofa.user_id,
 				},
 				data: {
 					twoFA: true,
+					twoFA_key: twofa.secret,
 				}
 			});
+			if (res === null)
+				return {status: false, message: "fail"};
 			return {status: true, message: "success"};
 		}
 		else
 			return {status: false, message: "fail"};
+	}
+
+	async Deactive2FA(id: number)
+	{
+		// const user = await this.prisma.user.findUnique({
+		// 	where: {
+		// 		user_id: id,
+		// 	},
+		// });
+		// if (user === null)
+		// 	return {status: false, message: "user not found"};
+		await this.prisma.user.update({
+			where: {
+				user_id: id,
+			},
+			data: {
+				twoFA: false,
+				twoFA_key: null,
+			}
+		});
+		return {status: true, message: "success"};
+		// const isValid = authenticator.verify({ token: twofa.code , secret: user.twoFA_key});
+		// if (isValid)
+		// {
+		// 	await this.prisma.user.update({
+		// 		where: {
+		// 			user_id: user.user_id,
+		// 		},
+		// 		data: {
+		// 			twoFA: false,
+		// 		}
+		// 	});
+		// 	return {status: true, message: "success"};
+		// }
+		// else
+		// 	return {status: false, message: "fail"};
 	}
 }
 
@@ -216,6 +252,8 @@ export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'jwt-refresh'
    * @param payload 토큰 전송 내용
    */
   async validate(req: any, payload: UserToken): Promise<any> {
+	if (payload.twoFAPass === false)// 2차인증 필요
+		throw new UnauthorizedException();
 	const storedToken = await this.prisma.tokens.findUnique({
 		where: {
 		  user_id: payload.user_id,
