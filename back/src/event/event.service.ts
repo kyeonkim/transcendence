@@ -68,6 +68,22 @@ export class EventService {
         });
     }
 
+    async DeletAllAlarmsByNick(nick_name: string) {
+        const user = await this.pismaService.user.findUnique({
+            where: {
+                nick_name: nick_name,
+            },
+        });
+        if (user === null)
+            return {status: false, message: 'no user'};
+        await this.pismaService.event.deleteMany({
+            where: {
+                to_id: user.user_id,
+            },
+        });
+        return {status: true, message: 'success'};
+    }
+
     async SendEvent(event: eventDto) {
         await this.pismaService.event.create({
             data: {

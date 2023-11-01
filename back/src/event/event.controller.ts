@@ -13,31 +13,37 @@ export class EventController {
 
     @ApiOperation({summary: `SSE API`, description: `SSE 테스트를 위한 API`})
     @Sse('alarmsse/:id')
-    AlarmSse(@Req() req, @Param('id', ParseIntPipe) id : number) {
-        return this.EventService.AlarmSse(req, id);
+    async AlarmSse(@Req() req, @Param('id', ParseIntPipe) id : number) {
+        return await this.EventService.AlarmSse(req, id);
     }
 
     @ApiOperation({summary: `친구목록 랜더링 API`, description: `친구목록 랜더링 API`})
     @Sse('friendlist/:id')
-    FriendListSse(@Req() req, @Param('id', ParseIntPipe) id : number) {
-        return this.EventService.FriendListSse(req, id);
+    async FriendListSse(@Req() req, @Param('id', ParseIntPipe) id : number) {
+        return await this.EventService.FriendListSse(req, id);
     }
 
     @ApiOperation({summary: `GETAlarms API`, description: `최초 접속 시 쌓여있던 받기 위한 API`})
     @Get('getalarms/:id')
-    GetAlarms(@Param('id', ParseIntPipe) id : number) {
-        return this.EventService.GetAlarms(id);
+    async GetAlarms(@Param('id', ParseIntPipe) id : number) {
+        return await this.EventService.GetAlarms(id);
     }
 
     @ApiOperation({summary: `DeleteAlarms API`, description: `특정 ID 알람 삭제 API`})
     @Delete('deletealarms/:id')
-    DeleteAlarms(@Param('id', ParseIntPipe) id : number) {
-        return this.EventService.DeleteAlarms(id);
+    async DeleteAlarms(@Param('id', ParseIntPipe) id : number) {
+        return await this.EventService.DeleteAlarms(id);
+    }
+
+    @ApiOperation({summary: `알람 전체삭제 API`, description: `닉네임으로 모든 알람을 삭제한다 API`})
+    @Delete('deleteallalarms/:nick_name')
+    async DeletAllAlarmsByNick(@Param('nick_name') nick_name : string) {
+        return await this.EventService.DeletAllAlarmsByNick(nick_name);
     }
 
     @Post('test')
-    test(@Body() event: eventDto) {
-        return this.EventService.SendEvent(event);
+    async test(@Body() event: eventDto) {
+        return await this.EventService.SendEvent(event);
     }
 }
  
