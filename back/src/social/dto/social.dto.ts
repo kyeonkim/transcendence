@@ -10,11 +10,6 @@ export class friendDto
     event_id?: number;
 
     @ApiProperty()
-    @IsBoolean()
-    @IsOptional()
-    accept?: boolean;
-
-    @ApiProperty()
     @IsInt()
     user_id: number;
 
@@ -29,5 +24,5 @@ export class friendDto
 
     @ApiProperty()
     @IsString()
-    friend_nick_name: string;
+    friend_nickname: string;
 }

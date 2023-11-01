@@ -38,12 +38,12 @@ export class EventService {
         return this.FriendListSseMap.get(id);
     }
 
-    async SendFriendEvent(id: number, data: string)
+    async SendFriendEvent(id: number)
     {
         console.log('friend event', id);
         if (this.FriendListSseMap.get(id) === undefined)
             return {status: false, message: 'no client'};
-        this.FriendListSseMap.get(id).next({data: `${data} by ${id}`});
+        this.FriendListSseMap.get(id).next({data: 'friend event'});
         return {status:true, message: 'success'};
     }
 
@@ -61,11 +61,12 @@ export class EventService {
     }
 
     async DeleteAlarms(event_id: number) {
-        this.pismaService.event.delete({
+        const rtn = await this.pismaService.event.delete({
             where: {
                 id: event_id,
             },
         });
+        return rtn;
     }
 
     async DeletAllAlarmsByNick(nick_name: string) {
@@ -85,7 +86,7 @@ export class EventService {
     }
 
     async SendEvent(event: eventDto) {
-        const before_event = this.pismaService.event.findFirst({
+        const before_event = await this.pismaService.event.findFirst({
             where: {
                 to_id: event.to,
                 event_type: event.type,

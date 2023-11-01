@@ -83,11 +83,11 @@ export class TestService {
         }
         for(let i = 0; i < 10; i++)
         {
-            await this.SocialService.AcceptFriend({user_id: i,user_nickname: `dummy${i}`, friend_nick_name: `min`});
+            await this.SocialService.AcceptFriend({user_id: i,user_nickname: `dummy${i}`, friend_nickname: `min`});
             for(let j = 0; j < 10; j++)
             {
                 if (i != j)
-                    await this.SocialService.AcceptFriend({user_id: i,user_nickname: `dummy${i}`, friend_nick_name: `dummy${j}`});
+                    await this.SocialService.AcceptFriend({user_id: i,user_nickname: `dummy${i}`, friend_nickname: `dummy${j}`});
             }
         }
     }

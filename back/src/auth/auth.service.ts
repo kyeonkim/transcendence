@@ -118,7 +118,11 @@ export class AuthService {
 		if (isValid)
 		{
 			const tokenData = await this.CreateToken(twofa.user_id, twofa.user_nickname, true);
-			return {status: true, message: tokenData.message, token: tokenData};
+			return {status: true,
+					message: tokenData.message,
+					user_id: twofa.user_id,
+					user_nickname: twofa.user_nickname,
+					token: tokenData };
 		}
 		return {status: false, message: "fail"};
 	}

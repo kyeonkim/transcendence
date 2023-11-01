@@ -34,7 +34,7 @@ export class SocialService {
     {
         const friend = await this.prismaService.user.findUnique({
             where: {
-                nick_name: addFriend.friend_nick_name,
+                nick_name: addFriend.friend_nickname,
             },
         });
         if (friend === null)
@@ -78,11 +78,9 @@ export class SocialService {
     async AcceptFriend(@Body() addFriend : friendDto)
     {
         await this.eventService.DeleteAlarms(addFriend.event_id);
-        if (addFriend.accept === false)
-            return {status: true, message: "친구추가 요청 거절 성공"};
         const friend = await this.prismaService.user.findUnique({
             where: {
-                nick_name: addFriend.friend_nick_name,
+                nick_name: addFriend.friend_nickname,
             },
         });
         if (friend === null)
@@ -117,8 +115,8 @@ export class SocialService {
             console.log("AddFriend failed error: ", error);
             return {status: false, message: "AddFriend failed"}
         }
-        await this.eventService.SendFriendEvent(addFriend.user_id,`친구 ${friend.nick_name}이 추가되었습니다.`);
-        await this.eventService.SendFriendEvent(friend.user_id, `친구 ${addFriend.user_nickname}이 추가되었습니다.`);
+        await this.eventService.SendFriendEvent(addFriend.user_id);
+        await this.eventService.SendFriendEvent(friend.user_id);
         return {status: true, message: "success"};
     }
     
@@ -126,7 +124,7 @@ export class SocialService {
     {
         const friend = await this.prismaService.user.findUnique({
             where: {
-                nick_name: delFriend.friend_nick_name,
+                nick_name: delFriend.friend_nickname,
             },
         });
         const check = await this.prismaService.friends.findFirst({
@@ -151,8 +149,8 @@ export class SocialService {
             console.log("DeleteFriend failed error: ", error);
             return {status: false, message: "DeleteFriend failed"}
         }
-        await this.eventService.SendFriendEvent(delFriend.user_id, `친구 ${friend.nick_name}이 삭제되었습니다.`);
-        await this.eventService.SendFriendEvent(friend.user_id, `친구 ${delFriend.user_nickname}이 삭제되었습니다.`);
+        await this.eventService.SendFriendEvent(delFriend.user_id);
+        await this.eventService.SendFriendEvent(friend.user_id);
         return {status: true, message: "success"};
     }
 
