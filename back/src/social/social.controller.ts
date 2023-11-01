@@ -12,14 +12,21 @@ export class SocialController {
         private readonly SocialService: SocialService,
     ) {}
 
-	@ApiOperation({summary: `친구 추가 API`, description: `해당 유저끼리 친구를 추가한다.`})
+	@ApiOperation({summary: `친구 추가 요청 API`, description: `해당 유저끼리 친구를 요청한다.`})
 	// @UseGuards(AuthGuard('jwt-access'))
 	@Post("addfriend")
-	AddFriend(@Req() req, @Body() friend : friendDto)
+	async AddFriend(@Req() req, @Body() friend : friendDto)
     {
 		// ExtractJwt.fromAuthHeaderAsBearerToken()(req);
-		return this.SocialService.AddFriend(friend);
+		return await this.SocialService.AddFriend(friend);
     }
+
+	@ApiOperation({summary: `친구 추가 수락 API`, description: `해당 유저끼리 친구를 수락한다.`})
+	@Post("acceptfriend")
+	async AcceptFriend(@Body() friend : friendDto)
+	{
+		return await this.SocialService.AcceptFriend(friend);
+	}
 
     @ApiOperation({summary: `친구 확인 API`, description: `두 유저의 친구여부를 확인한다.`})
 	@Get("checkFriend")

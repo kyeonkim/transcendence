@@ -1,9 +1,19 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsInt, IsOptional, IsString } from "class-validator";
+import { IsBoolean, IsInt, IsOptional, IsString } from "class-validator";
 
 
 export class friendDto
 {
+    @ApiProperty()
+    @IsInt()
+    @IsOptional()
+    event_id?: number;
+
+    @ApiProperty()
+    @IsBoolean()
+    @IsOptional()
+    accept?: boolean;
+
     @ApiProperty()
     @IsInt()
     user_id: number;

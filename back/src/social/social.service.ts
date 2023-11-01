@@ -77,6 +77,9 @@ export class SocialService {
 
     async AcceptFriend(@Body() addFriend : friendDto)
     {
+        await this.eventService.DeleteAlarms(addFriend.event_id);
+        if (addFriend.accept === false)
+            return {status: true, message: "친구추가 요청 거절 성공"};
         const friend = await this.prismaService.user.findUnique({
             where: {
                 nick_name: addFriend.friend_nick_name,
