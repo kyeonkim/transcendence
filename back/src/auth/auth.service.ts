@@ -181,15 +181,9 @@ export class AuthService {
 			return {status: false, message: "fail"};
 	}
 
-	async Deactive2FA(id: number)
+	//remove
+	async Deactive2FAdev(id: number)
 	{
-		// const user = await this.prisma.user.findUnique({
-		// 	where: {
-		// 		user_id: id,
-		// 	},
-		// });
-		// if (user === null)
-		// 	return {status: false, message: "user not found"};
 		await this.prisma.user.update({
 			where: {
 				user_id: id,
@@ -200,21 +194,30 @@ export class AuthService {
 			}
 		});
 		return {status: true, message: "success"};
-		// const isValid = authenticator.verify({ token: twofa.code , secret: user.twoFA_key});
-		// if (isValid)
-		// {
-		// 	await this.prisma.user.update({
-		// 		where: {
-		// 			user_id: user.user_id,
-		// 		},
-		// 		data: {
-		// 			twoFA: false,
-		// 		}
-		// 	});
-		// 	return {status: true, message: "success"};
-		// }
-		// else
-		// 	return {status: false, message: "fail"};
+	}
+
+	async Deactive2FA(twofa: TwoFADTO)
+	{
+		const user = await this.prisma.user.findUnique({
+			where: {
+				user_id: twofa.user_id,
+			},
+		});
+		if (user === null)
+			return {status: false, message: "user not found"};
+		const isValid = authenticator.verify({ token: twofa.code , secret: user.twoFA_key});
+		if (!isValid)
+			return {status: false, message: "2fa auth fail"};
+		await this.prisma.user.update({
+			where: {
+				user_id: user.id,
+			},
+			data: {
+				twoFA: false,
+				twoFA_key: null,
+			}
+		});
+		return {status: true, message: "success"};
 	}
 }
 

@@ -70,11 +70,19 @@ export class AuthController {
 		return await this.AuthService.Active2FA(twofa);
 	}
 
+	//remove
 	@ApiOperation({summary: `TEST 용 2차인증 비활성화 API`, description: `2차인증을 비활성화 한다.`})
 	@Delete("2fa/deactive/:id")
-	async Deactive2FA(@Param('id') id: number)
+	async Deactive2FAdev(@Param('id') id: number)
 	{
-		return await this.AuthService.Deactive2FA(id);
+		return await this.AuthService.Deactive2FAdev(id);
 	}
 
+	@ApiOperation({summary: '2차인증 비활성화 API', description: '2차인증을 비활성화 한다.'})
+	@UseGuards(AuthGuard('jwt-access'))
+	@Delete("2fa/deactive")
+	async Deactive2FA(@Body() twofa: TwoFADTO)
+	{
+		return await this.AuthService.Deactive2FA(twofa);
+	}
 }
