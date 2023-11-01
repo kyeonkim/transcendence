@@ -47,6 +47,13 @@ export class AuthController {
 		// return this.UserService.VarifyToken(token);
 	}
 
+	@ApiOperation({summary: `2차인증 통과 API`, description: `2차인증을 통과를 토큰에 넣는다.`})
+	@Post("2fa/pass")
+	async TwoFAPass(@Body() twofa: TwoFADTO)
+	{
+		return await this.AuthService.TwoFAPass(twofa);
+	}
+
 	@ApiOperation({summary: `2차인증 활성 qr API`, description: `2차인증을 활성화 하기위한 QR코드를 받는다.`})
 	// @UseGuards(AuthGuard('jwt-access'))
 	@Post("2fa/activeqr")
@@ -56,6 +63,7 @@ export class AuthController {
 	}
 
 	@ApiOperation({summary: `2차인증 활성화 API`, description: `2차인증을 활성화 한다.`})
+	@UseGuards(AuthGuard('jwt-twoFA'))
 	@Post("2fa/active")
 	async Active2FA(@Body() twofa: TwoFADTO)
 	{

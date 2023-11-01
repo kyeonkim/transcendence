@@ -39,11 +39,11 @@ export class AuthService {
 
 	async CreateToken(id: number, nickName: string, twoFAPass: boolean)
 	{
-		const payload = { user_id: id , nick_name: nickName };
+		const payload = { user_id: id, nick_name: nickName, twoFAPass: twoFAPass };
 		
 		const user_token = await this.prisma.tokens.upsert({
 			where: {
-				nick_name : nickName,
+				user_id : id,
 			},
 			update: {
 				access_token: await this.jwtService.signAsync(payload, {expiresIn: '1h', secret: process.env.JWT_SECRET}),
@@ -107,6 +107,20 @@ export class AuthService {
 			console.error(error);
 			return {status: false, access_token: token.access_token};
 		}
+	}
+
+	async TwoFAPass(twofa: TwoFADTO)
+	{
+		const user = await this.prisma.user.findUnique({where: {user_id: twofa.user_id}});
+		if (user === null)
+			return {status: false, message: "user not found"};
+		const isValid = authenticator.verify({ token: twofa.code , secret: user.twoFA_key});
+		if (isValid)
+		{
+			const tokenData = await this.CreateToken(twofa.user_id, twofa.user_nickname, true);
+			return {status: true, message: tokenData.message, token: tokenData};
+		}
+		return {status: false, message: "fail"};
 	}
 
     async SignUp(userData : SignUpDto)
@@ -206,6 +220,33 @@ export class AuthService {
 
 @Injectable()
 export class JwtAccessStrategy extends PassportStrategy(Strategy, 'jwt-access') {
+  constructor(
+	private prisma: PrismaService,
+	private jwtService: JwtService
+  ) {
+	super({
+	  //Request에서 JWT 토큰을 추출하는 방법을 설정 -> Authorization에서 Bearer Token에 JWT 토큰을 담아 전송해야한다.
+	  jwtFromRequest:ExtractJwt.fromAuthHeaderAsBearerToken(),
+	  //true로 설정하면 Passport에 토큰 검증을 위임하지 않고 직접 검증, false는 Passport에 검증 위임
+	  ignoreExpiration: false,
+	  //검증 비밀 값(유출 주의)
+	  secretOrKey: process.env.JWT_SECRET,
+	});
+  }
+  /**
+   * @description 클라이언트가 전송한 Jwt 토큰 정보
+   *
+   * @param payload 토큰 전송 내용
+   */
+  async validate(payload: UserToken): Promise<any> {
+	if (payload.twoFAPass === false)// 2차인증 필요
+		throw new UnauthorizedException();
+	return { status: true };
+  }
+}
+
+@Injectable()
+export class TwoFAStrategy extends PassportStrategy(Strategy, 'jwt-twoFA') {
   constructor(
 	private prisma: PrismaService,
 	private jwtService: JwtService
