@@ -85,6 +85,17 @@ export class EventService {
     }
 
     async SendEvent(event: eventDto) {
+        const before_event = this.pismaService.event.findFirst({
+            where: {
+                to_id: event.to,
+                event_type: event.type,
+                from_nickname: event.from,
+                chatroom_id: event.chatroom_id,
+                chatroom_name: event.chatroom_name,
+            },
+        });
+        if (before_event !== null)
+            return {status: false, message: 'already send'}
         await this.pismaService.event.create({
             data: {
                 to_id: event.to,

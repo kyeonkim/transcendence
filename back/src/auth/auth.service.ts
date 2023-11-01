@@ -200,7 +200,7 @@ export class AuthService {
 			return {status: false, message: "2fa auth fail"};
 		await this.prisma.user.update({
 			where: {
-				user_id: user.id,
+				user_id: twofa.user_id,
 			},
 			data: {
 				twoFA: false,

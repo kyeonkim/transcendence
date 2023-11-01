@@ -65,14 +65,14 @@ export class SocialService {
         //     console.log("AddFriend failed error: ", error);
         //     return {status: false, message: "AddFriend failed"}
         // }
-        this.eventService.SendEvent({
+        const sent_res = await this.eventService.SendEvent({
             to: friend.user_id,
             type: "add_friend",
             from: addFriend.user_nickname,
             chatroom_id: 0,
             chatroom_name: "",
         })
-        return {status: true, message: "success"};
+        return {status: sent_res.status, message: sent_res.message};
     }
 
     async AcceptFriend(@Body() addFriend : friendDto)
