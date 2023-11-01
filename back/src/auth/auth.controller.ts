@@ -47,15 +47,17 @@ export class AuthController {
 		// return this.UserService.VarifyToken(token);
 	}
 
-	@ApiOperation({summary: `2차인증 통과 API`, description: `2차인증을 통과를 토큰에 넣는다.`})
+	@ApiOperation({summary: `2차인증 통과 API`, description: `2차인증 통과여부를 토큰에 넣는다.`})
+	@UseGuards(AuthGuard('jwt-twoFA'))
 	@Post("2fa/pass")
 	async TwoFAPass(@Body() twofa: TwoFADTO)
 	{
+		console.log(`twofa/pass call`, twofa);
 		return await this.AuthService.TwoFAPass(twofa);
 	}
 
 	@ApiOperation({summary: `2차인증 활성 qr API`, description: `2차인증을 활성화 하기위한 QR코드를 받는다.`})
-	// @UseGuards(AuthGuard('jwt-access'))
+	@UseGuards(AuthGuard('jwt-access'))
 	@Post("2fa/activeqr")
 	async Active2FAQRCode(@Body() twofa: TwoFADTO)
 	{
@@ -70,19 +72,19 @@ export class AuthController {
 		return await this.AuthService.Active2FA(twofa);
 	}
 
-	//remove
-	@ApiOperation({summary: `TEST 용 2차인증 비활성화 API`, description: `2차인증을 비활성화 한다.`})
-	@Delete("2fa/deactive/:id")
-	async Deactive2FAdev(@Param('id') id: number)
-	{
-		return await this.AuthService.Deactive2FAdev(id);
-	}
-
 	@ApiOperation({summary: '2차인증 비활성화 API', description: '2차인증을 비활성화 한다.'})
-	@UseGuards(AuthGuard('jwt-access'))
+	// @UseGuards(AuthGuard('jwt-access'))
 	@Delete("2fa/deactive")
 	async Deactive2FA(@Body() twofa: TwoFADTO)
 	{
 		return await this.AuthService.Deactive2FA(twofa);
+	}
+
+	//remove
+	@ApiOperation({summary: `TEST 용 2차인증 비활성화 API`, description: `2차인증을 비활성화 한다.`})
+	@Delete("2fa/deactivetest/:id")
+	async Deactive2FAdev(@Param('id') id: number)
+	{
+		return await this.AuthService.Deactive2FAdev(id);
 	}
 }

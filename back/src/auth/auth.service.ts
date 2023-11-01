@@ -245,7 +245,7 @@ export class JwtAccessStrategy extends PassportStrategy(Strategy, 'jwt-access') 
 }
 
 @Injectable()
-export class TwoFAStrategy extends PassportStrategy(Strategy, 'jwt-twoFA') {
+export class JwtTwoFAStrategy extends PassportStrategy(Strategy, 'jwt-twoFA') {
   constructor(
 	private prisma: PrismaService,
 	private jwtService: JwtService
