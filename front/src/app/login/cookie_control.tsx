@@ -6,39 +6,50 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 
 
-export default function CookieControl (props:any) {
-
+export default function CookieControl ({res}: {res: any}) {
     const router = useRouter();
+    const { access_token, refresh_token, nick_name, user_id } = res;
 
-    const access_token = props.access_token;
-    const refresh_token = props.refresh_token;
-    const nick_name = props.nick_name;
-    const user_id = props.user_id;
     let   response_error = false;
 
-    console.log("access_token -", access_token);
-    console.log("refresh_token -", refresh_token);
-    console.log("nick_name -", nick_name);
-    console.log("user_id -", user_id); 
-
+    // if (otp)
+    // {
+    //     //do modal for otp
+    //     //input 6 digit number and send to server
+    // }
+    console.log('cookie_control - res - ', res);
     async function CookieSetter (access_token:any, refresh_token:any, nick_name:any, user_id:any)
     {
-        try
-        {
-            const response = await axios.post(`${process.env.NEXT_PUBLIC_FRONT_URL}api/set_cookie`, {
-                access_token: access_token,
-                refresh_token: refresh_token,
-                nick_name: nick_name,
-                user_id: user_id
-            });
-        
-            console.log('cookie_control - respone - ', response.data);
-            return (response);
-        }
-        catch
-        {
+        await axios.post(`${process.env.NEXT_PUBLIC_FRONT_URL}api/set_cookie`, {
+            access_token: access_token,
+            refresh_token: refresh_token,
+            nick_name: nick_name,
+            user_id: user_id
+        })
+        .then((res) => {
+            console.log('cookie_control - respone - ', res.data);
+            return (res);
+        })
+        .catch((err) => {
+            console.log('cookie_control - error - ', err);
             throw new Error ('Cookie set fail');
-        }
+        });
+        // try
+        // {
+        //     const response = await axios.post(`${process.env.NEXT_PUBLIC_FRONT_URL}api/set_cookie`, {
+        //         access_token: access_token,
+        //         refresh_token: refresh_token,
+        //         nick_name: nick_name,
+        //         user_id: user_id
+        //     });
+        
+        //     console.log('cookie_control - respone - ', response.data);
+        //     return (response);
+        // }
+        // catch
+        // {
+        //     throw new Error ('Cookie set fail');
+        // }
     }
 
     useEffect(() => {
@@ -66,6 +77,7 @@ export default function CookieControl (props:any) {
     return (
         <div>
             <div>Cookie Control</div>
+            {/* {otp && <otpModal />} */}
         </div>
       );
 }

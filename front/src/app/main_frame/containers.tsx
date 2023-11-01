@@ -95,7 +95,7 @@ export default function Main() {
               <ChatRoomButton setMTbox={handleClick}/>
             </MLBox>
             <BLBox>
-              <UserLists />
+              <UserLists setMTbox={handleClick}/>
             </BLBox>
           <Chatbox></Chatbox>
           {/* </GuardLogin> */}

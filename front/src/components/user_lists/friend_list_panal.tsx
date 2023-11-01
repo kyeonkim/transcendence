@@ -22,20 +22,16 @@ export default function FriendListPanel() {
     const sseEvents = new EventSource(`${process.env.NEXT_PUBLIC_API_URL}event/friendlist/${cookies.get('user_id')}`);
     
     sseEvents.onopen = function() {
-      console.log("open connection - friend list panel");
     }
     
     sseEvents.onerror = function (error) {
-      // 에러 났을 때
     }
     
     sseEvents.onmessage = function (stream) {
-      console.log("@@@@@@@@@@@@@add friend event!!!@@@@@@");
       setRendering(stream.data);
     }
     return () => {
       sseEvents.close();
-      console.log('close connection - friend list panel');
     };
 
   }, [])
@@ -45,7 +41,8 @@ export default function FriendListPanel() {
       await axios.get(`${process.env.NEXT_PUBLIC_API_URL}social/getFriendList/${cookies.get('user_id')}`)
       .then((response) => {
         if (response.data.status) {
-          console.log("add friend list res===================",response.data.data);
+          console.log('friend list=======');
+          console.log(response);
           setHasFriend(true);
           setApiResponse(response.data.data);
         }
@@ -66,7 +63,6 @@ export default function FriendListPanel() {
   }
   
   const imageLoader = ({ src }: any) => {
-    console.log("image loader==============", src);
     return `${process.env.NEXT_PUBLIC_API_URL}user/getimg/nickname/${src}`
   }
   

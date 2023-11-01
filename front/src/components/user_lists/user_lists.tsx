@@ -21,10 +21,16 @@ import ThreePIcon from '@mui/icons-material/ThreeP';
 // get cookie
 import { useCookies } from 'next-client-cookies';
 
+import axios from 'axios';
+
 interface TabPanelProps {
   children?: React.ReactNode;
   index: number;
   value: number;
+}
+
+interface SearchUserProps {
+  setMTbox: (num: number, searchTarget: string) => void;
 }
 
 function CustomTabPanel(props: TabPanelProps) {
@@ -54,13 +60,12 @@ function a11yProps(index: number) {
   };
 }
 
-export default function BasicTabs() {
+export default function BasicTabs({ setMTbox }: SearchUserProps) {
   const [value, setValue] = useState(0);
   const [alarmCount, setAlarmCount] = useState(0);
 
   // Alarm 리스트 관리 - array를 추가하는 법
   const [AlarmList, setAlarmList] = useState<any>([]);
-
 
   const cookies = useCookies();
 
@@ -70,12 +75,67 @@ export default function BasicTabs() {
     setValue(newValue);
   };
   
-  const setAlarmCountHandler = () => {
-    setAlarmCount((prevAlarmCount) => prevAlarmCount + 1);
-    console.log('it workeed!!!');
+  const setAlarmCountHandler = (increment :boolean) => {
+    if (increment === true)
+    {
+      setAlarmCount((prevAlarmCount) => prevAlarmCount + 1);
+      console.log('it increased!!!');
+    }
+    else
+    {
+      if (alarmCount !== 0)
+      {
+        setAlarmCount((prevAlarmCount) => prevAlarmCount - 1);
+        console.log('it decreased!!!');
+      }
+    }
+
+  };
+
+  const setAlarmListAdd = (alarm: any) => {
+    setAlarmList((prevAlarmList :any) => 
+      [...prevAlarmList, alarm]);
+  }
+
+  const setAlarmListRemover = (alarm :any) => {
+
+    // alarm에서 추가는 그냥하면 되는데 제거 할 때 event_id - DB에서의 구분 기준. 반드시 보내서 제거하게 만들어야함
+    // 제거 기능
+    // array를 순회하여 특정 id를 찾는다.
+    const newAlarmList = AlarmList.filter(
+      (listAlarm :any) => listAlarm.id != alarm.id);
+
+    setAlarmList(newAlarmList);
+  }; 
+
+    // 초기 알람 목록 설정하기 (api)
+  const fetchAlarms = async () => {
+    console.log('start getalarms');
+    console.log('my user_id - ', cookies.get('user_id'));
+    await axios.get(`${process.env.NEXT_PUBLIC_API_URL}event/getalarms/${cookies.get('user_id')}`)
+    .then((response) => {
+      console.log('in alarmBaseList callback');
+      console.log('respone format - ', response);
+      if (response.data.status)
+      {
+        console.log('alarmList success - ', response.data);
+          // sse 요청이 자동으로 전달됨
+      }
+      else
+      {
+        console.log('alarmList fail - ', response.data);
+      }
+    })
+    .catch((err) => {
+      console.log('getalarm error');
+    })
+
   }
 
   useEffect(() => {
+    console.log('start BasicTabs');
+
+
     // 너와 나의 연결고리 만들어 주기
     const sseEvents = new EventSource(`${process.env.NEXT_PUBLIC_API_URL}event/alarmsse/${cookies.get('user_id')}`);
     // const sseEvents = new EventSource(`${process.env.NEXT_PUBLIC_API_URL}event/sse?id=${cookies.get('user_id')}`);
@@ -83,11 +143,10 @@ export default function BasicTabs() {
 
     console.log('my user_id - ', cookies.get('user_id'));
 
-    // const alarmQueue = new Bull('alarm_queue');
-
     sseEvents.onopen = function() {
         // 연결 됐을 때 
         console.log('----------established connection------------');
+        fetchAlarms();
     }
 
     sseEvents.onerror = function (error) {
@@ -95,35 +154,38 @@ export default function BasicTabs() {
     }
 
     sseEvents.onmessage = function (stream) {
-        // 메세지 받았을 때
+        // 메세지 받았을 때 - 기본적으로 추가
         const parsedData = JSON.parse(stream.data);
+        // const parsedData = stream.data;
 
-        setAlarmCountHandler();
-
-        //AlarmList에 append 하게 자식에 rerendering 신호 봬기
+      
+        setAlarmCountHandler(true);
+        setAlarmListAdd(parsedData);
 
         console.log('sseEvents occured!!! - ', alarmCount);
         console.log(' and these are datas!!! - ', parsedData);
-        // console.log('add job to queue');
-        // const job = alarmQueue.add(parsedData);
     }
 
-    // alarmQueue.process(async (job :any) => {
-    //     console.log('alarmQueue.process - ', job.data);
-    // });
 
     // rerendering될 때, 열려있던 EventSource는 어떻게 될까?
      // Component의 unmount나 re-rendering이 발생하면 기존 EventSource를 닫는다.
 
     // 백에 요청 보내서 AlarmList 초기 설정 준비.
 
+
     return () => {
         sseEvents.close();
         console.log('close connection - alarm');
     };
-    
-}, [])
 
+
+
+}, []);
+
+
+console.log('alarm list - ', AlarmList);
+
+// 알람 카운트 설정하기
 
   return (
     <Box sx={{ width: '100%' }}>
@@ -151,7 +213,11 @@ export default function BasicTabs() {
       </CustomTabPanel>
       <CustomTabPanel value={value} index={3}>
               AL
-        <AlarmListPanal alarmCountHandler={setAlarmCountHandler}/>
+        <AlarmListPanal
+          alarmList={AlarmList}
+          alarmListRemover={setAlarmListRemover}
+          alarmCountHandler={setAlarmCountHandler}
+          setMTbox={setMTbox}/>
       </CustomTabPanel>
     </Box>
   );

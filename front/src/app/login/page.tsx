@@ -5,7 +5,7 @@ import axios from 'axios';
 
 import Signup from './signup';
 import CookieControl from './cookie_control';
-
+import TwoFAPass from './twoFAPass';
 
 
 export default function Login ({searchParams}:any) {
@@ -23,35 +23,31 @@ export default function Login ({searchParams}:any) {
 
   async function Auth42 (code:any) {
 
-      let response;
       let responseDatabase;
-      try
-      {
-          response = await axios.post('https://api.intra.42.fr/oauth/token', {
-          code: code,
-          client_id: process.env.NEXT_PUBLIC_CLIENT_ID,
-          client_secret: process.env.NEXT_PUBLIC_CLIENT_SECRET,
-          redirect_uri: `${process.env.NEXT_PUBLIC_FRONT_URL}login`,
-          grant_type: 'authorization_code'
-          });
-          
-          responseDatabase = CheckUserInDatabase(response.data);
 
-          console.log('42api responses:', response.data);
-
-      } catch (error) {
-
-          if (error.response)
-          {
-              console.log('Login - error response occured');
-              return (error.response);
-          }
-          else if (error.request)
-          {
-            console.log('Login - error request occured');
-            return (error.request);
-          }
-      }
+      await axios.post('https://api.intra.42.fr/oauth/token', {
+        code: code,
+        client_id: process.env.NEXT_PUBLIC_CLIENT_ID,
+        client_secret: process.env.NEXT_PUBLIC_CLIENT_SECRET,
+        redirect_uri: `${process.env.NEXT_PUBLIC_FRONT_URL}login`,
+        grant_type: 'authorization_code'
+      })
+      .then((res) => {
+        responseDatabase = CheckUserInDatabase(res.data);
+        console.log('42api responses:', res.data);
+      })
+      .catch((err) => {
+        if (err.response)
+        {
+          console.log('Login - error response occured');
+          return (err.response);
+        }
+        else if (err.request)
+        {
+          console.log('Login - error request occured');
+          return (err.request);
+        }
+      });
 
       return (responseDatabase);
   };
@@ -72,7 +68,7 @@ export default function Login ({searchParams}:any) {
       console.log('user_check response - ', userData.data);
       access_token = userData.data.access_token;
       status = userData.data.status;
-  
+
       if (access_token == undefined
         || access_token == null)
         {
@@ -90,7 +86,6 @@ export default function Login ({searchParams}:any) {
     return (userData);
   }
 
-
   if (code)
   {
     return (
@@ -99,20 +94,22 @@ export default function Login ({searchParams}:any) {
         try
         {
           const response = await Auth42(code);
-  
-          console.log ('----in response of Auth42----');
-  
+
           responseData = response.data;
-  
-          console.log('');
-          console.log('responseData - ', responseData);
-  
+          console.log('2차 인증 필요?====', responseData);
+
           if (responseData?.refresh_token != undefined
             && responseData?.refresh_token != null)
           {
-              console.log('user_check success to cookie control');
-
-              // 2차인증 진행 qrcode.react 사용? 테스트해보기
+              if (responseData?.twoFAPass == false)
+              {
+                return (
+                <div>
+                  <TwoFAPass res={responseData}/>
+                </div>
+                )
+                // 자식 클라이언트 컴포넌트에서 6자리 숫자를 인풋받고 여기로 가져와서 2차인증 api 진행 후 cookie 생성
+              }
               cookie_control = true;
           }
   
@@ -120,14 +117,7 @@ export default function Login ({searchParams}:any) {
           {
             return (
               <div>
-                {/* <div>
-                  this is server component - 42api.
-                </div> */}
-                  <CookieControl
-                    access_token={responseData?.access_token}
-                    refresh_token={responseData?.refresh_token}
-                    nick_name={responseData?.nick_name}
-                    user_id={responseData?.user_id} />
+                  <CookieControl res={responseData} />
               </div>
             );
           }
@@ -135,9 +125,6 @@ export default function Login ({searchParams}:any) {
           {
             return (
               <div>
-                {/* <div>
-                  this is server component - 42api.
-                </div> */}
                   <Signup access_token={responseData?.access_token} />
               </div>
             );

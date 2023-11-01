@@ -8,12 +8,14 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useCookies } from 'next-client-cookies';
 import OtpModal from '../profile/otp';
+import TwoFAPass from '@/app/login/twoFAPass';
 
 
 const ProfilePage = (props: any) => {
   const [isFriend, setIsFriend] = useState(false);
   const [isBlock, setIsBlock] = useState(false);
   const [isOTP, setIsOTP] = useState(false);
+  const [isActivated, setIsActivated] = useState(false);
   const cookies = useCookies();
   
   const userNickname = props.nickname;
@@ -23,8 +25,39 @@ const ProfilePage = (props: any) => {
 
   console.log("my_id: " + my_id);
   console.log("userNickname: " + userNickname);
+
+  // useEffect(() => {
+  //   const sseEvents = new EventSource(`${process.env.NEXT_PUBLIC_API_URL}event/friendlist/${cookies.get('user_id')}`);
+    
+  //   sseEvents.onopen = function() {
+  //   }
+    
+  //   sseEvents.onerror = function (error) {
+  //   }
+    
+    // sseEvents.onmessage = function (stream) {
+    //   if (stream.data.nick === userNickname) {
+    //     setRendering(stream.data);
+    //   }
+  //   }
+  //   return () => {
+  //     sseEvents.close();
+  //   };
+
+  // }, [])
+
   useEffect(() => {
     const fetchData = async () => {
+      await axios.get(`${process.env.NEXT_PUBLIC_API_URL}user/getdata/nickname/${userNickname}`) 
+        .then((res) => {
+        if (res.data.userData.twoFA)
+          setIsActivated(true);
+        else
+          setIsActivated(false);
+        })
+      }
+
+    const fetchFriendData = async () => {
       await axios.get(`${process.env.NEXT_PUBLIC_API_URL}social/checkFriend`,{
         params: { user1: my_id , user2: userNickname},
       })
@@ -38,48 +71,9 @@ const ProfilePage = (props: any) => {
       });
     };
     fetchData();
-  }, [userNickname, isFriend]);
-  
-  //test
-//   useEffect(() => {
-//     const sseEvents = new EventSource(`${process.env.NEXT_PUBLIC_API_URL}event/alarmsse/${cookies.get('user_id')}`);
-//     // const sseEvents = new EventSource(`${process.env.NEXT_PUBLIC_API_URL}event/sse?id=${cookies.get('user_id')}`);
-
-//     console.log('my user_id - ', cookies.get('user_id'));
-
-//     sseEvents.onopen = function() {
-//         // 연결 됐을 때 
-//         console.log('----------established connection profile------------');
-//     }
-
-//     sseEvents.onerror = function (error) {
-//         // 에러 났을 때
-//     }
-
-//     sseEvents.onmessage = function (stream) {
-//         // 메세지 받았을 때
-//         const parsedData = JSON.parse(stream.data);
-
-//         // setCheck((Check) => Check + 1);
-
-//         //AlarmList에 append 하기
-
-
-        
-        
-//         // console.log('sseEvents occured!!! - ', Check);
-//         console.log(' and these are datas!!! - ', parsedData);
-//         // console.log('add job to queue');
-//         // const job = alarmQueue.add(parsedData);
-//     }
-
-
-//     return () => {
-//         sseEvents.close();
-//         console.log('close connection profile');
-//     };
-    
-// }, [])
+    if (userNickname !== my_nick)
+      fetchFriendData();
+  }, [userNickname, isFriend, isOTP]);
 
   const handleFriend = async () => {
     if (isFriend) {
@@ -92,19 +86,25 @@ const ProfilePage = (props: any) => {
         data: {
           user_id: my_id,
           user_nickname: my_nick,
-          friend_nick_name: userNickname
+          friend_nickname: userNickname
         }})
       .then((res) => {
         console.log(res.data)
         setIsFriend(false);
       })
+      .catch((err) => {
+        //토큰이 만료되었을때
+        //리프레쉬토큰을들고 토큰 재발급후 쿠키에 저장해야함
+        console.log(err);
+      })
     }
     else {
       console.log("add friend!!!");
+      console.log(my_id, my_nick, userNickname);
       await axios.post(`${process.env.NEXT_PUBLIC_API_URL}social/addFriend`,{
         user_id: my_id,
         user_nickname: my_nick,
-        friend_nick_name: userNickname
+        friend_nickname: userNickname
       },
       {
         headers: {
@@ -120,8 +120,14 @@ const ProfilePage = (props: any) => {
    }
  
   const handleBlock = () => {setIsBlock(true)}
-  const handleOTP = () => {setIsOTP(true)}
   const handleClose = () => {setIsOTP(false)}
+  const handleActivte = (value: boolean) => {setIsActivated(value)}
+  const handleOTP = () => {
+    if (isActivated)
+      //나중에 비활성화 로직 넣기 -> 2차인증 비활성화 api
+      setIsActivated(false)
+    setIsOTP(true)
+  }
 
   const imageLoader = ({ src }: any) => {
     return `${process.env.NEXT_PUBLIC_API_URL}user/getimg/nickname/${src}`
@@ -159,7 +165,7 @@ const ProfilePage = (props: any) => {
                   프로필 수정
                 </Button>
                 <Button variant="outlined" className={styles.roundButton} onClick={() => handleOTP()}>
-                  2차인증 활성화
+                  {isActivated? '2차인증 비활성화' : '2차인증 활성화'}
                 </Button>
                 <Button variant="outlined" className={styles.roundButton}>
                   로그아웃
@@ -167,11 +173,14 @@ const ProfilePage = (props: any) => {
               </div>
               <OtpModal
                 open={isOTP}
+                isActivated={isActivated}
+                setActive={handleActivte}
                 onClose={handleClose}
                 myId={my_id}
                 myNick={my_nick}
                 token={access_token}
                 />
+              {/* <TwoFAPass/> */}
             </div>
           )}
         </div>

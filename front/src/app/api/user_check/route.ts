@@ -70,6 +70,7 @@ export async function POST (request: NextRequest)
     const newResponse = NextResponse.json(
         {
             status: response?.data.token.status,
+            twoFAPass: response?.data.twoFAPass,
             access_token: response?.data.token.access_token,
             refresh_token: response?.data.token.refresh_token,
             nick_name: response?.data.userdata.nick_name,
