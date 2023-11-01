@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Post, Query, Req, Sse } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Query, Req, Sse } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Subject } from 'rxjs';
 import { EventService } from './event.service'
@@ -23,10 +23,16 @@ export class EventController {
         return this.EventService.FriendListSse(req, id);
     }
 
-    @ApiOperation({summary: `GETEvent API`, description: `최초 접속 시 이벤트를 받기 위한 API`})
-    @Get('getevents/:id')
-    getEvents(@Param('id', ParseIntPipe) id : number) {
-        return this.EventService.GetEvents(id);
+    @ApiOperation({summary: `GETAlarms API`, description: `최초 접속 시 쌓여있던 받기 위한 API`})
+    @Get('getalarms/:id')
+    GetAlarms(@Param('id', ParseIntPipe) id : number) {
+        return this.EventService.GetAlarms(id);
+    }
+
+    @ApiOperation({summary: `DeleteAlarms API`, description: `특정 ID 알람 삭제 API`})
+    @Delete('deletealarms/:id')
+    DeleteAlarms(@Param('id', ParseIntPipe) id : number) {
+        return this.EventService.DeleteAlarms(id);
     }
 
     @Post('test')

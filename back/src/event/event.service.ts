@@ -47,7 +47,7 @@ export class EventService {
         return {status:true, message: 'success'};
     }
 
-    async GetEvents(id: number) {
+    async GetAlarms(id: number) {
         if(this.AlarmSseMap.get(id) === undefined)
             return {status: false, message: 'no client'}
         const events = await this.pismaService.event.findMany({
@@ -60,7 +60,7 @@ export class EventService {
         console.log(events);
     }
 
-    async DeleteEvent(event_id: number) {
+    async DeleteAlarms(event_id: number) {
         this.pismaService.event.delete({
             where: {
                 id: event_id,
