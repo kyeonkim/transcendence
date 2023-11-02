@@ -7,8 +7,9 @@ import { GameModule } from './game/game.module';
 import { TestModule } from './test/test.module';
 import { SocialModule } from './social/social.module';
 import { EventModule } from './event/event.module';
+import { SocketModule } from './socket/socket.module';
 
 @Module({
-  imports: [HttpModule, PrismaModule, UserModule, AuthModule, GameModule, TestModule, SocialModule, EventModule]
+  imports: [HttpModule, PrismaModule, UserModule, AuthModule, GameModule, TestModule, SocialModule, EventModule, SocketModule]
 })
 export class AppModule {}

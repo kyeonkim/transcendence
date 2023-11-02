@@ -11,6 +11,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { authenticate } from 'passport';
 import { authenticator } from 'otplib';
+import { WsException } from '@nestjs/websockets';
 
 export type UserToken = {
 	twoFAPass: boolean;
@@ -284,6 +285,7 @@ export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'jwt-refresh'
 	  secretOrKey: process.env.JWT_SECRET,
 	  // request 값을 가져올 수 있도록 허용
 	  passReqToCallback: true,
+	  
 	});
   }
   /**
@@ -310,5 +312,32 @@ export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'jwt-refresh'
 			return { status: true };
 	}
 	throw new UnauthorizedException(); 
+  }
+}
+
+@Injectable()
+export class JwtWsStrategy extends PassportStrategy(Strategy, 'jwt-ws') {
+  constructor(
+	private prisma: PrismaService,
+	private jwtService: JwtService
+  ) {
+	super({
+	  //Request에서 JWT 토큰을 추출하는 방법을 설정 -> Authorization에서 Bearer Token에 JWT 토큰을 담아 전송해야한다.
+	  jwtFromRequest:ExtractJwt.fromAuthHeaderAsBearerToken(),
+	  //true로 설정하면 Passport에 토큰 검증을 위임하지 않고 직접 검증, false는 Passport에 검증 위임
+	  ignoreExpiration: false,
+	  //검증 비밀 값(유출 주의)
+	  secretOrKey: process.env.JWT_SECRET,
+	});
+  }
+  /**
+   * @description 클라이언트가 전송한 Jwt 토큰 정보
+   *
+   * @param payload 토큰 전송 내용
+   */
+  async validate(payload: UserToken): Promise<any> {
+	if (payload.twoFAPass === false)// 2차인증 필요
+		throw new WsException(`인증실패`);
+	return { status: true };
   }
 }
