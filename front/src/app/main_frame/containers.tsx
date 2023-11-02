@@ -1,5 +1,5 @@
 'use client';
-import React, { useState }from 'react';
+import React, { useState, createContext } from 'react';
 import { styled } from '@mui/system';
 import Box from '@mui/material/Box';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -9,6 +9,12 @@ import ChatRoomButton from '@/components/chat_room/chat_room_button';
 import SearchUser from '@/components/search_bar/search_user';
 import UserLists from '@/components/user_lists/user_lists';
 import Mainbox from '@/components/mainbox';
+
+import TestWebsocket from '@/components/test_chat_box/test_websocket';
+
+
+import { io } from "socket.io-client";
+
 
 // Top left Box
 const TLBox = styled(Box) ({
@@ -52,7 +58,7 @@ const MTBox = styled(Box) ({
 
 
 const Chatbox = styled(Box) ({
-  backgroundColor: 'black',
+  backgroundColor: 'yellow',
   top: 0,
   left: 2000,
   width: 560,
@@ -60,9 +66,11 @@ const Chatbox = styled(Box) ({
   position: 'absolute'
 })
 
+
 export default function Main() {
   const [clicked, setClick] = useState(0);
   const [id, setSearch] = useState('');
+
 
   const handleClick = (value: number, searchTarget?: string) => {
     setClick(value);
@@ -79,25 +87,30 @@ export default function Main() {
   }
 
   */
+
+  // 공용 웹소켓
+
   return (
         <React.Fragment>
           <CssBaseline />
           {/* <GuardLogin> */}
-            {/* <TLBox> */}
-              <MyProfile setMTbox={handleClick}/>
-            {/* </TLBox> */}
-            <MTBox>
-              <Mainbox mod={clicked} search={id}/>
-            </MTBox>
-            <MLBox>
-              <SearchUser setMTbox={handleClick}/>
-              <MatchingButton setMTbox={handleClick}/>
-              <ChatRoomButton setMTbox={handleClick}/>
-            </MLBox>
-            <BLBox>
-              <UserLists setMTbox={handleClick}/>
-            </BLBox>
-          <Chatbox></Chatbox>
+          {/* <TLBox> */}
+            <MyProfile setMTbox={handleClick}/>
+          {/* </TLBox> */}
+          <MTBox>
+            <Mainbox mod={clicked} search={id}/>
+          </MTBox>
+          <MLBox>
+            <SearchUser setMTbox={handleClick}/>
+            <MatchingButton setMTbox={handleClick}/>
+            <ChatRoomButton setMTbox={handleClick}/>
+          </MLBox>
+          <BLBox>
+            <UserLists setMTbox={handleClick}/>
+          </BLBox>
+          <Chatbox>
+              <TestWebsocket />
+          </Chatbox>
           {/* </GuardLogin> */}
         </React.Fragment>
     )
