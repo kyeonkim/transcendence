@@ -13,7 +13,7 @@ export class EventService {
     ) {}
 
     async AlarmSse(req, id: number) {
-        console.log('Alarm sse open', id);
+        // console.log('Alarm sse open', id);
         if (this.AlarmSseMap.get(id) !== undefined)
             return this.AlarmSseMap.get(id);
         const newEvent = new Subject<any>();
@@ -26,7 +26,7 @@ export class EventService {
     }
 
     async FriendListSse(req, id: number) {
-        console.log('FriendList sse open', id, this.FriendListSseMap.size);
+        // console.log('FriendList sse open', id, this.FriendListSseMap.size);
         if (this.FriendListSseMap.get(id) !== undefined)
             return this.FriendListSseMap.get(id);
         const newEvent = new Subject<any>();
@@ -57,7 +57,7 @@ export class EventService {
         });
         for(let i = 0; i < events.length; i++)
             this.AlarmSseMap.get(id).next({data: events[i]});
-        console.log(events);
+        // console.log(events);
     }
 
     async DeleteAlarms(event_id: number) {
