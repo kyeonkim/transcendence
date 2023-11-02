@@ -64,7 +64,7 @@ export class EventService {
         try {
             const rtn = await this.pismaService.event.delete({
                 where: {
-                    id: event_id,
+                    idx: event_id,
                 },
             });
             return rtn;

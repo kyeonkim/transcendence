@@ -30,10 +30,12 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
     // console.log('client', client, 'identity', data);
     return data;
   }
-  
+
   @SubscribeMessage('chat')
   handlechat(client: any, payload: any): string {
-    console.log('client', client.id, 'events', payload);
+    console.log('client', client.id, 'data', payload);
+    client.broadcast.emit('chat', payload);
+    // this.server.emit('chat', {from: client.id, message: payload}});
     return 'Hello world!';
   }
 

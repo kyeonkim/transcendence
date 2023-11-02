@@ -28,6 +28,9 @@
       socket.on('events', function(data) {
         console.log('event', data);
       });
+      socket.on('chat', function(data) {
+        console.log('event', data);
+      });
       socket.on('exception', function(data) {
         console.log('event', data);
       });
