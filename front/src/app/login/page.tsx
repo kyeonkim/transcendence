@@ -40,6 +40,7 @@ export default function Login ({searchParams}:any) {
         if (err.response)
         {
           console.log('Login - error response occured');
+          console.log(err);
           return (err.response);
         }
         else if (err.request)

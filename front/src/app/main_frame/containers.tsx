@@ -9,6 +9,8 @@ import ChatRoomButton from '@/components/chat_room/chat_room_button';
 import SearchUser from '@/components/search_bar/search_user';
 import UserLists from '@/components/user_lists/user_lists';
 import Mainbox from '@/components/mainbox';
+import ChatrommList from '@/components/chatbox/chatlist';
+
 
 // Top left Box
 const TLBox = styled(Box) ({
@@ -52,7 +54,7 @@ const MTBox = styled(Box) ({
 
 
 const Chatbox = styled(Box) ({
-  backgroundColor: 'black',
+  backgroundColor: 'yellow',
   top: 0,
   left: 2000,
   width: 560,
@@ -82,10 +84,7 @@ export default function Main() {
   return (
         <React.Fragment>
           <CssBaseline />
-          {/* <GuardLogin> */}
-            {/* <TLBox> */}
               <MyProfile setMTbox={handleClick}/>
-            {/* </TLBox> */}
             <MTBox>
               <Mainbox mod={clicked} search={id}/>
             </MTBox>
@@ -97,8 +96,9 @@ export default function Main() {
             <BLBox>
               <UserLists setMTbox={handleClick}/>
             </BLBox>
-          <Chatbox></Chatbox>
-          {/* </GuardLogin> */}
+          <Chatbox>
+            <ChatrommList/>
+          </Chatbox>
         </React.Fragment>
     )
   }
