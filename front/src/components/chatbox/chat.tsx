@@ -13,6 +13,8 @@ import Fab from "@mui/material/Fab";
 import SendIcon from "@mui/icons-material/Send";
 import Chip from '@mui/material/Chip';
 import React, { useState, useRef, useEffect } from 'react';
+import { useWebSocket } from "../../app/main_frame/socket_provider"
+import { useCookies } from 'next-client-cookies';
 
 const PREFIX = 'chat';
 const classes = {
@@ -46,25 +48,23 @@ const Root = styled('div') ({
 const Chat = () => {
 	const messageAreaRef = useRef(null);
 	const [message, setMessage] = useState('');
-	const [chatMessages, setChatMessages] = useState([
-				{ sender: "김도배", message: "  __   _\r\n /  \\_( )_\n|   / o o \\\n|  |   ^   |\n \\  \\_____/\n   |_____|" },
-				{ sender: "민", message: "아 차단마렵네" },
-				{ sender: "조커", message: "ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ" },
-				{ sender: "김도배", message: "도배 드가제 도배 드가제 도배 드가제 도배 드가제 도배 드가제 도배 드가제 도배 드가제 도배 드가제 도배 드가제 도배 드가제 도배 드가제 도배 드가제 도배 드가제 도배 드가제 도배 드가제 도배 드가제 도배 드가제 도배 드가제 도배 드가제 도배 드가제" }
-		]);
+	const [chatMessages, setChatMessages] = useState([]);
+	const socket = useWebSocket();
+	const cookies = useCookies();
 
+	const my_name = cookies.get('nick_name');
 	const handleSendMessage = () => {
 		if (message.trim() === '') {
 			return;
 		}
-		setChatMessages(prevChatMessages => [...prevChatMessages, { sender: 'You', message: message }]);
-
+		setChatMessages(prevChatMessages => [...prevChatMessages, { sender: my_name, message: message }]);
 		// const newMessage = {
-		// 	sender: 'You',
-		// 	message: message
-		// };
-
-		// Socket.send(newMessage);
+			// 	sender: 'You',
+			// 	message: message
+			// };
+			
+			// Socket.send(newMessage);
+		socket.emit("chat", {message: message});
 		setMessage('');
 	};
 
@@ -88,7 +88,7 @@ const Chat = () => {
 						{chatMessages.map((message) => (
 							<Grid container>
 									<ListItem key={message.sender} style={{padding: '5px', paddingBottom: '0px'}}>
-										<Chip avatar={<Avatar>M</Avatar>} label={`${message.sender}`}/>
+										<Chip avatar={<Avatar>M</Avatar>} label={my_name}/>
 									</ListItem>
 									<ListItem style={{paddingTop: '1px', marginLeft: '15px'}}>
 										<ListItemText primary={`${message.message}`}></ListItemText>

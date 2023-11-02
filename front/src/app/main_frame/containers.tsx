@@ -1,5 +1,5 @@
 'use client';
-import React, { useState }from 'react';
+import React, { useState, createContext } from 'react';
 import { styled } from '@mui/system';
 import Box from '@mui/material/Box';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -11,6 +11,11 @@ import UserLists from '@/components/user_lists/user_lists';
 import Mainbox from '@/components/mainbox';
 import ChatrommList from '@/components/chatbox/chatlist';
 
+
+import TestWebsocket from '@/components/test_chat_box/test_websocket';
+
+
+// import { io } from "socket.io-client";
 
 // Top left Box
 const TLBox = styled(Box) ({
@@ -62,9 +67,11 @@ const Chatbox = styled(Box) ({
   position: 'absolute'
 })
 
+
 export default function Main() {
   const [clicked, setClick] = useState(0);
   const [id, setSearch] = useState('');
+
 
   const handleClick = (value: number, searchTarget?: string) => {
     setClick(value);
@@ -81,24 +88,32 @@ export default function Main() {
   }
 
   */
+
+  // 공용 웹소켓
+
   return (
         <React.Fragment>
           <CssBaseline />
-              <MyProfile setMTbox={handleClick}/>
-            <MTBox>
-              <Mainbox mod={clicked} search={id}/>
-            </MTBox>
-            <MLBox>
-              <SearchUser setMTbox={handleClick}/>
-              <MatchingButton setMTbox={handleClick}/>
-              <ChatRoomButton setMTbox={handleClick}/>
-            </MLBox>
-            <BLBox>
-              <UserLists setMTbox={handleClick}/>
-            </BLBox>
+          {/* <GuardLogin> */}
+          {/* <TLBox> */}
+            <MyProfile setMTbox={handleClick}/>
+          {/* </TLBox> */}
+          <MTBox>
+            <Mainbox mod={clicked} search={id}/>
+          </MTBox>
+          <MLBox>
+            <SearchUser setMTbox={handleClick}/>
+            <MatchingButton setMTbox={handleClick}/>
+            <ChatRoomButton setMTbox={handleClick}/>
+          </MLBox>
+          <BLBox>
+            <UserLists setMTbox={handleClick}/>
+          </BLBox>
           <Chatbox>
-            <ChatrommList/>
+              {/* <TestWebsocket /> */}
+              <ChatrommList/>
           </Chatbox>
+          {/* </GuardLogin> */}
         </React.Fragment>
     )
   }

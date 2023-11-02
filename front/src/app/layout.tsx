@@ -1,5 +1,5 @@
 import { cookies } from 'next/headers';
-import { ClientCookiesProvider } from './provider'
+import { ClientCookiesProvider } from './provider';
 
 export default function RootLayout({ children }: any) {
   return (
