@@ -6,6 +6,7 @@ import Skeleton from '@mui/material/Skeleton';
 // styled component (컴포넌트 고정 style로 보임)
 import { styled } from '@mui/system';
 
+import  ChatRoomList  from './chat_room_list';
 
 const MainChatRoomButton = styled(Button) ({
   position: 'absolute',
@@ -30,6 +31,7 @@ export default function ChatRoomButton({ setMTbox }: MyProfileProps) {
     return (
         <MainChatRoomButton variant="outlined" onClick={handleMTbox(2)}>
             Chat Room List
+            <ChatRoomList />
         </MainChatRoomButton>
     );
 }

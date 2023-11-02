@@ -64,7 +64,9 @@ const Chatbox = styled(Box) ({
   left: 2000,
   width: 560,
   height: 1332,
-  position: 'absolute'
+  position: 'absolute',
+  display: 'flex',
+  flexDirection: 'column',
 })
 
 
@@ -111,7 +113,7 @@ export default function Main() {
           </BLBox>
           <Chatbox>
               {/* <TestWebsocket /> */}
-              <ChatrommList/>
+              <ChatrommList setMTbox={handleClick}/>
           </Chatbox>
           {/* </GuardLogin> */}
         </React.Fragment>
