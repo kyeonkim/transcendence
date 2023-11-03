@@ -1,7 +1,7 @@
 import React from 'react';
-import ProfilePage from './mainbox/profile';
-import ChatRoomPage from './mainbox/chatroom';
-import MatchingButton from './mainbox/match';
+import ProfilePage from './profile';
+import ChatRoomPage from './chatroom';
+import MatchingButton from './match';
 
 const MainBox = (props: any) => {
   const value = props.mod;

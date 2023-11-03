@@ -22,6 +22,7 @@ import ThreePIcon from '@mui/icons-material/ThreeP';
 import { useCookies } from 'next-client-cookies';
 
 import axios from 'axios';
+import Paper from '@mui/material/Paper';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -190,6 +191,7 @@ console.log('alarm list - ', AlarmList);
   return (
     <Box sx={{ width: '100%' }}>
       <Box sx={{ borderBottom: 1, borderColor: 'divider'}}>
+        <Paper elevation={6}>
         <Tabs value={value} onChange={handleChange} centered aria-label="basic tabs example">
           <Tab icon={<GroupIcon/>} {...a11yProps(0)} />
           <Tab icon={<ForumIcon/>} {...a11yProps(1)} />
@@ -200,6 +202,7 @@ console.log('alarm list - ', AlarmList);
             </Badge>
               } {...a11yProps(3)} />
         </Tabs>
+        </Paper>
       </Box>
       <CustomTabPanel value={value} index={0}>
         친구 목록

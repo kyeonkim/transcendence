@@ -5,14 +5,14 @@ import Box from '@mui/material/Box';
 import CssBaseline from '@mui/material/CssBaseline';
 import MyProfile from '@/components/profile/my_profile';
 import MatchingButton from '@/components/matching/matching';
-import ChatRoomButton from '@/components/chat_room/chat_room_button';
 import SearchUser from '@/components/search_bar/search_user';
 import UserLists from '@/components/user_lists/user_lists';
-import Mainbox from '@/components/mainbox';
+import Mainbox from '@/components/mainbox/mainbox';
 import ChatBlock from '@/components/chatbox/chat_block';
 
 
 import TestWebsocket from '@/components/test_chat_box/test_websocket';
+import Divider from '@mui/material/Divider';
 
 
 // import { io } from "socket.io-client";
@@ -40,7 +40,7 @@ const MLBox = styled(Box) ({
 // Bottom Left Box
 const BLBox = styled(Box) ({
   backgroundColor: 'green',
-  top: 655,
+  top: 650,
   left: 0,
   width: 400,
   height:0,
@@ -106,8 +106,9 @@ export default function Main() {
           <MLBox>
             <SearchUser setMTbox={handleClick}/>
             <MatchingButton setMTbox={handleClick}/>
-            <ChatRoomButton setMTbox={handleClick}/>
+            {/* <ChatRoomButton setMTbox={handleClick}/> */}
           </MLBox>
+          <Divider />
           <BLBox>
             <UserLists setMTbox={handleClick}/>
           </BLBox>

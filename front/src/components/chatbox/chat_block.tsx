@@ -23,7 +23,7 @@ import ChatRoomList from './chat_rooms';
 
 
 export default function ChatBlock(props: any) {
-	const [inRoom, setInRoom] = useState(false);
+	const [inRoom, setInRoom] = useState(true);
 	// const [roomId, ]
 
 	const nowInRoom = () => {

@@ -9,11 +9,12 @@ import { styled } from '@mui/system';
 
 const MainMatchingButton = styled(Button) ({
   position: 'absolute',
-  top: 155,
+  top: 105,
   left: 0,
   width: 400,
   height: 100,
-  color: "black"
+  color: "black",
+  borderRadius: '100px',
 });
 
 interface MyProfileProps {
@@ -29,7 +30,7 @@ export default function MatchingButton({ setMTbox }: MyProfileProps) {
 
     return (
         <MainMatchingButton variant="outlined" onClick={handleMTbox(3)}>
-            Matching
+            START
         </MainMatchingButton>
     );
 }
