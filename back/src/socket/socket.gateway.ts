@@ -47,8 +47,9 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 
   @SubscribeMessage('chat')
   async handlechat(client: Socket, payload: any): Promise<string> {
-    // console.log('client', client.id, 'data', payload);
-    client.broadcast.emit('chat', payload);
+    console.log('client', client.id, 'data', payload);
+    console.log('room: ', client.rooms);
+    client.broadcast.to(payload.room_id).emit('chat', {from: payload.user_name, message: payload.message});
     // this.server.emit('chat', {from: client.id, message: payload}});
     return 'Hello world!';
   }
@@ -64,14 +65,19 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 
     //토큰인증로직 
     //if 토큰인증 실패 >> disconnect
-    console.log(client.id, client.handshake.query.user_id);
-    if (client.handshake.query.user_id !== undefined)
+    if (client.handshake.query.user_id === undefined)
+      client.disconnect();
+    else
     {
-      const connect = await this.SocketService.Connect(client.handshake.query.user_id, client.id, this.server);
-      if (connect === null)
+      console.log(client.id, client.handshake.query.user_id);
+      const connect_user = await this.SocketService.Connect(client.handshake.query.user_id, client.id, this.server);
+      if (connect_user === null)
         client.disconnect();
-      else if (connect.chatroom_id !== null)
-        await this.JoinRoom(connect.user_id, connect.chatroom_id);
+      else if (connect_user.chatroom_id !== null)
+      {
+        console.log("join room: ", connect_user.user_id, connect_user.chatroom_id);
+        await this.JoinRoom(connect_user.user_id, connect_user.chatroom_id);
+      }
     }
   }
 

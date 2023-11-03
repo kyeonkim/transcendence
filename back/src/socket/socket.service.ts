@@ -28,6 +28,7 @@ export class SocketService {
             where: {
                 user_id: Number(user_id),
             },
+
         });
         return user;
     }
@@ -43,16 +44,12 @@ export class SocketService {
     async JoinRoom(user_id: any, room_idx: number, server: Server)
     {
         console.log("JoinRoom: ", this.sockets.get(String(user_id)));
-        // this.sockets.get(String(user_id)).forEach(element => {
-        //     server.sockets.sockets.get(element).join(String(room_idx));
-        // });
+        server.sockets.sockets.get(this.sockets.get(String(user_id))).join(String(room_idx));
     }
 
     async LeaveRoom(user_id: any, room_idx: number, server: Server)
     {
-        // if(this.sockets.get(String(user_id)) !== undefined)
-        //     this.sockets.get(String(user_id)).forEach(element => {
-        //         server.sockets.sockets.get(element).leave(String(room_idx));
-        //     });
+        if(this.sockets.get(String(user_id)) !== undefined)
+            server.sockets.sockets.get(this.sockets.get(String(user_id))).leave(String(room_idx));
     }
 }
