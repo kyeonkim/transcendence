@@ -37,7 +37,7 @@ export default function Chat(props: any) {
 	const [pop, setPop] = useState(false);
 	const [anchorEl, setAnchorEl] = useState(null);
 	const [arrowRef, setArrowRef] = useState<HTMLElement | null>(null);
-	const socket = useWebSocket();
+	// const socket = useWebSocket();
 	const { setMTbox } = props;
 
 
@@ -48,34 +48,35 @@ export default function Chat(props: any) {
 		if (message.trim() === '') {
 			return;
 		}
-		// setChatMessages(prevChatMessages => [...prevChatMessages, { sender: my_name, message: message }]);
+		setChatMessages(prevChatMessages => [...prevChatMessages, { from: my_name, message: message }]);
 
-		const newMassage = {
-			from: my_id,
-			to: /*채널이름 or nickname*/"chatroom1",
-			user_name: my_name,
-			message: message,
-		};
-		socket.emit("events", socket);
-		console.log('chat:==== ', socket);
+		// const newMassage = {
+		// 	from: my_id,
+		// 	user_name: my_name,
+		// 	room_id: /*채널이름 or nickname*/"3",
+		// 	message: message,
+		// };
+		// socket.emit("chat", newMassage);
+		// console.log('chat:==== ', socket);
 
 		setMessage('');
 	};
 
-	useEffect(() => {
-		socket.on("chat", (data) => {
-			console.log('chat:==== ', data.data);
-			setChatMessages(prevChatMessages => [...prevChatMessages, {sender: "ters", message: data}]);
-		});
-	}, []);
-
+	
+	// useEffect(() => {
+	// 	socket.on("chat", (data) => {
+	// 		console.log('chat:==== ', data);
+	// 		setChatMessages(prevChatMessages => [...prevChatMessages, data]);
+	// 	});
+	// }, []);
+	
 	useEffect(() => {
 		if (messageAreaRef.current) {
 			messageAreaRef.current.scrollTop = messageAreaRef.current.scrollHeight;
 		}
 	}, [chatMessages]);
 
-	const handleClick = (sender: string) => {setMTbox(1, sender)};
+	const handleClick = (from: string) => {setMTbox(1, from)};
 	const handleDrawer = () => {setDrawer(true)};
 	const handlePopup = (event: any) => {
 		if (anchorEl === event.currentTarget) {
@@ -211,18 +212,18 @@ export default function Chat(props: any) {
 					<List className={styles.messageArea} ref={messageAreaRef}>
 						{chatMessages.map((message) => (
 							<Grid container>
-									<ListItem key={message.sender} style={{padding: '5px', paddingBottom: '0px'}}>
+									<ListItem key={message.from} style={{padding: '5px', paddingBottom: '0px'}}>
 										<Stack direction="row" spacing={1}>
 										<Chip
-											avatar={<Avatar src={imageLoader({src: message.sender})}/>}
-											label={message.sender}
-											onClick={() => handleClick(message.sender)}
+											avatar={<Avatar src={imageLoader({src: message.from})}/>}
+											label={message.from}
+											onClick={() => handleClick(message.from)}
 											component='div'
 										/>
 										</Stack>
 									</ListItem>
 									<ListItem style={{paddingTop: '1px', marginLeft: '15px'}}>
-										<ListItemText primary={`${message.message}`}></ListItemText>
+										<Typography>{`${message.message}`}</Typography>
 									</ListItem>
 							</Grid>
 						))}
