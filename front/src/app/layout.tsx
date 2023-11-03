@@ -2,6 +2,9 @@ import { cookies } from 'next/headers';
 import { ClientCookiesProvider } from './provider';
 
 export default function RootLayout({ children }: any) {
+
+  console.log('rootlayout - cookie provider');
+
   return (
     <html>
       <body>

@@ -75,7 +75,7 @@ export default function AlarmListPanal (props: any) {
 
       await axios.post(`${process.env.NEXT_PUBLIC_API_URL}social/acceptfriend`,
       {
-        "event_id": alarm.id,
+        "event_id": alarm.idx,
         "user_id": alarm.to_id,
         "user_nickname": cookies.get('nick_name'),
         "friend_id": 0,

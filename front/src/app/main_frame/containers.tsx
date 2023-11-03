@@ -12,9 +12,6 @@ import Mainbox from '@/components/mainbox';
 import ChatBlock from '@/components/chatbox/chat_block';
 
 
-import TestWebsocket from '@/components/test_chat_box/test_websocket';
-
-
 // import { io } from "socket.io-client";
 
 // Top left Box
@@ -91,7 +88,7 @@ export default function Main() {
 
   */
 
-  // 공용 웹소켓
+  console.log('Main component');
 
   return (
         <React.Fragment>

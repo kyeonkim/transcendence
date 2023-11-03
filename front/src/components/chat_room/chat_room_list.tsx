@@ -12,10 +12,10 @@ import { styled } from '@mui/system';
 
 const MainChatRoomList = styled(Grid) ({
   position: 'absolute',
-  top: 0,
-  left: 400,
-  width: 1000,
-  height: 1000
+//   top: 0,
+//   left: 400,
+//   width: 1000,
+//   height: 1000
 });
 
 export default function ChatRoomList() {
