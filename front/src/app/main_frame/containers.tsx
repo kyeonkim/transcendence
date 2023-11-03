@@ -9,7 +9,7 @@ import ChatRoomButton from '@/components/chat_room/chat_room_button';
 import SearchUser from '@/components/search_bar/search_user';
 import UserLists from '@/components/user_lists/user_lists';
 import Mainbox from '@/components/mainbox';
-import ChatrommList from '@/components/chatbox/chatlist';
+import ChatBlock from '@/components/chatbox/chat_block';
 
 
 import TestWebsocket from '@/components/test_chat_box/test_websocket';
@@ -113,7 +113,7 @@ export default function Main() {
           </BLBox>
           <Chatbox>
               {/* <TestWebsocket /> */}
-              <ChatrommList setMTbox={handleClick}/>
+              <ChatBlock setMTbox={handleClick}/>
           </Chatbox>
           {/* </GuardLogin> */}
         </React.Fragment>

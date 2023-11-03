@@ -7,7 +7,7 @@ import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 
 import IconButton from '@mui/material/IconButton';
-import CommentIcon from '@mui/icons-material/Comment';
+import LockIcon from '@mui/icons-material/Lock';
 import MenuIcon from '@mui/icons-material/Menu';
 
 import Typography from '@mui/material/Typography';
@@ -35,8 +35,7 @@ const MainChatRoomList = styled(Grid) ({
 	backgroundColor: 'white'
   })
 
-export default function ChatList(props: any) {
-	const [inRoom, setInRoom] = useState(false);
+export default function ChatRoomList(props: any) {
 	const [roomList, setRoomList] = useState([
 		{
 			name: 'string',
@@ -44,25 +43,21 @@ export default function ChatList(props: any) {
 		}
 	]);
 
-	const nowInRoom = () => {
-		setInRoom(true);
-	}
 
 	useEffect(() => {
 
 		setRoomList([
-		{name: 'good', is_secret: false},
-		{name: 'great', is_secret: false},
-		{name: 'nice', is_secret: true},
-		{name: 'excellent', is_secret: true},
-		{name: 'brilliant', is_secret: false},
-		{name: 'mavelous', is_secret: false},
-		{name: 'tremendous', is_secret: true}
+            {name: 'good', is_secret: false},
+            {name: 'great', is_secret: false},
+            {name: 'nice', is_secret: true},
+            {name: 'excellent', is_secret: true},
+            {name: 'brilliant', is_secret: false},
+            {name: 'mavelous', is_secret: false},
+            {name: 'tremendous', is_secret: true}
 		]);
 
-		// 조건에 맞으면 nowInroom
-		nowInRoom();
-
+        // 방 목록 받아오는 함수
+            // 일단은 시작할 때만 받아옴
 	}, [])
 
 	const { setMTbox } = props;
@@ -73,10 +68,7 @@ export default function ChatList(props: any) {
 	
 	return (
 		<div>
-		{inRoom ? (
-			<Chat setMTbox={setMTbox}/>
-		) : (
-			<AppBar position="static">
+            <AppBar position="static">
 				<Toolbar>
 				<IconButton
 					size="large"
@@ -88,25 +80,22 @@ export default function ChatList(props: any) {
 				>
 				</IconButton>
 				<Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-					ChatRoom1
+					ChatRoomList
 				</Typography>
 					<Button color="inherit">나가기</Button>
 				</Toolbar>
 			</AppBar>
-		)}
-		{/* {roomList ? (
+            {roomList ? (
 			<MainChatRoomList container rowSpacing={5} columnSpacing={5}>
 			{roomList.map((room) => {
 				return (
-					<Grid item xs={4}>
+					<Grid item xs={12}>
 					<CardContent>
 						<ChatRoom elevation={8}>
 						<Typography variant='h4' gutterBottom>
 							{room.name}
 						</Typography>
-						<IconButton>
-							<CommentIcon />
-						</IconButton>
+                        <LockIcon sx={{textAlign: 'right'}} />
 						</ChatRoom>
 					</CardContent>
 					</Grid>
@@ -115,32 +104,7 @@ export default function ChatList(props: any) {
 			</MainChatRoomList>
 			) : (
 			<p> 방이 없습니다 </p>
-			)} */}
+            )}
 		</div>
 	);
 }
-
-{/* 			
-			{roomList ? (
-
-				<MainChatRoomList container rowSpacing={5} columnSpacing={5}>
-				{roomList.map((room) => {
-					return (
-						<Grid item xs={4}>
-						<CardContent>
-							<ChatRoom elevation={8}>
-							<Typography variant='h4' gutterBottom>
-								{room.name}
-							</Typography>
-							<IconButton>
-								<CommentIcon />
-							</IconButton>
-							</ChatRoom>
-						</CardContent>
-						</Grid>
-					);
-				})}
-				</MainChatRoomList>
-			) : (
-				<p> 방이 없습니다 </p>
-			)} */}
