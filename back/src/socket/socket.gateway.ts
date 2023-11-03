@@ -3,14 +3,17 @@ import { AuthGuard } from '@nestjs/passport';
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
+import { SocketService } from './socket.service';
 
 //cors origin * is for development only
 // @UseGuards(AuthGuard('jwt-ws'))
 // @UseGuards(AuthGuard('jwt-ws'))
 @WebSocketGateway({cors:{origin: '*'}})
 export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect{
+
   constructor(
     private readonly authService: AuthService,
+    private readonly SocketService: SocketService,
   ) {}
   @WebSocketServer() server: Server;
 
@@ -22,10 +25,18 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 
   @SubscribeMessage('events')
   async handleEvent(client: Socket, payload: any): Promise<string> {
-    console.log('client', client, 'events', payload);
-    await client.join(payload);
-    console.log(`room created`, client.rooms);
+    console.log(`client ===========\n` , client);
     return 'Hello world!';
+  }
+
+  async JoinRoom(user_id: any, room_id: number)
+  {
+    this.SocketService.JoinRoom(user_id, room_id, this.server);
+  }
+
+  async LeaveRoom(user_id: any, room_id: number)
+  {
+    this.SocketService.LeaveRoom(user_id, room_id, this.server);
   }
 
   @SubscribeMessage('identity')
@@ -50,11 +61,27 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
   async handleConnection(client: Socket, ...args: any[]) {
     // console.log('Client connected=============\n', client.id,
     // `\nclient handshake =====================\n`, client.handshake);
-    // console.log(client.rooms);
-    // console.log(args);
+
+    //토큰인증로직 
+    //if 토큰인증 실패 >> disconnect
+    console.log(client.id, client.handshake.query.user_id);
+    if (client.handshake.query.user_id !== undefined)
+    {
+      const connect = await this.SocketService.Connect(client.handshake.query.user_id, client.id, this.server);
+      if (connect === null)
+        client.disconnect();
+      else if (connect.chatroom_id !== null)
+        await this.JoinRoom(connect.user_id, connect.chatroom_id);
+    }
   }
 
   async handleDisconnect(client: Socket) {
+    if (client.handshake.query.user_id !== undefined)
+    {
+      console.log('\n\nClient disconnected=============\n', client.handshake.query.user_id ,client.id)
+      this.SocketService.Disconnect(client.handshake.query.user_id, client.id);
+      // console.log(this.server.sockets.sockets,"\n");
+    }
     // console.log('Client disconnected');
   }
 }
