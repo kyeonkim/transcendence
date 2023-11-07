@@ -1,32 +1,17 @@
-import Paper from "@mui/material/Paper";
-import Grid from "@mui/material/Grid";
-import Box from "@mui/material/Box";
-import Divider from "@mui/material/Divider";
-import TextField from "@mui/material/TextField";	
-import Typography from '@mui/material/Typography';
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemText from "@mui/material/ListItemText";
-import Avatar from "@mui/material/Avatar";
-import Fab from "@mui/material/Fab";
-import SendIcon from "@mui/icons-material/Send";
-import Chip from '@mui/material/Chip';
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useWebSocket } from "../../app/main_frame/socket_provider"
 import { useCookies } from 'next-client-cookies';
-import Stack from '@mui/material/Stack';
-import IconButton from '@mui/material/IconButton';
-import MenuIcon from '@mui/icons-material/Menu';
-import AppBar from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
+import {Paper, Grid, Box, Divider, TextField, Typography, List, ListItem, ListItemButton, Avatar, Fab,
+	Chip, Stack, IconButton, AppBar, Toolbar, Drawer, Popper} from "@mui/material";
+import ListItemText from "@mui/material/ListItemText";
 import Button from '@mui/material/Button';
-import Drawer from '@mui/material/Drawer';
+import SendIcon from "@mui/icons-material/Send";
+import MenuIcon from '@mui/icons-material/Menu';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import styles from './chat.module.css';
 import CloseIcon from '@mui/icons-material/Close';
-import ListItemButton from '@mui/material/ListItemButton';
-import Popper, { PopperPlacementType } from '@mui/material/Popper';
-import zIndex from "@mui/material/styles/zIndex";
+import TextSend from './text_send';
+
+import styles from './chat.module.css';
 
 export default function Chat(props: any) {
 	const messageAreaRef = useRef(null);
@@ -36,15 +21,14 @@ export default function Chat(props: any) {
 	const cookies = useCookies();
 	const [pop, setPop] = useState(false);
 	const [anchorEl, setAnchorEl] = useState(null);
-	const [arrowRef, setArrowRef] = useState<HTMLElement | null>(null);
 	const socket = useWebSocket();
 	const { setMTbox } = props;
-
+	// const [arrowRef, setArrowRef] = useState<HTMLElement | null>(null);
 
 	const my_name = cookies.get('nick_name');
 	const my_id = cookies.get('user_id');
 
-	const handleSendMessage = () => {
+	const handleSendMessage = useCallback(() => {
 		if (message.trim() === '') {
 			return;
 		}
@@ -59,41 +43,46 @@ export default function Chat(props: any) {
 
 		setChatMessages(prevChatMessages => [...prevChatMessages, { from: my_name, message: message }]);
 		setMessage('');
-	};
+		moveScoll();
+	}, []);
 
-	
 	useEffect(() => {
 		socket.on("chat", (data) => {
 			console.log('chat:==== ', data);
 			setChatMessages(prevChatMessages => [...prevChatMessages, data]);
+			moveScoll();
 		});
 	}, []);
 	
-	useEffect(() => {
+	//useCallback한이유 : 같은 동작의 함수가 계속 생성되는 것을 방지하기 위한건데 큰의미는 없을거같음
+	// -> 성능 최적화가되나 메모리사용량은 늘어남 
+	const moveScoll = useCallback(() => {
 		if (messageAreaRef.current) {
 			messageAreaRef.current.scrollTop = messageAreaRef.current.scrollHeight;
 		}
-	}, [chatMessages]);
+	}, []);
 
-	const handleClick = (from: string) => {setMTbox(1, from)};
-	const handleDrawer = () => {setDrawer(true)};
-	const handlePopup = (event: any) => {
-		if (anchorEl === event.currentTarget) {
-			setPop(!pop)
-		}
-		else {
-			setAnchorEl(event.currentTarget);
-			setPop(true)
-		}
-	}
-	const handleDrawerClose = () => {
-		setDrawer(false)
+	const handleDrawer = useCallback(() => {
+		setDrawer(true);
+	}, []);
+
+	const handleDrawerClose = useCallback(() => {
+		setDrawer(false);
 		setPop(false);
-	};
+	}, []);
 
-	const imageLoader = ({ src }: any) => {
+	const handlePopup = useCallback((event: any) => {
+		if (anchorEl === event.currentTarget) {
+			setPop(!pop);
+		} else {
+			setAnchorEl(event.currentTarget);
+			setPop(true);
+		}
+		}, [anchorEl, pop]);
+
+	const imageLoader = useCallback(({ src }: any) => {
 		return `${process.env.NEXT_PUBLIC_API_URL}user/getimg/nickname/${src}`
-	}
+	}, []);
 
 	const sampleList = [
 		{user_id: 1, nick_name: 'min22323223232323232323232323232323232223232232323232232'},
@@ -165,7 +154,7 @@ export default function Chat(props: any) {
 								</List>
 							) : null
 							}
-	  	</Popper>
+			</Popper>
 		</Box>
 	)
 
@@ -205,26 +194,17 @@ export default function Chat(props: any) {
 					<ChevronRightIcon />
 				</IconButton>
 				{userList()}
-      </Drawer>
+			</Drawer>
 			<Grid container component={Paper}>
 				<Grid item xs={12} className={styles.borderRight500}>
 					<List className={styles.messageArea} ref={messageAreaRef}>
 						{chatMessages.map((message, index) => (
-							<Grid container key={index}>
-									<ListItem key={message.from} style={{padding: '5px', paddingBottom: '0px', textAlign: message.from === my_name ? 'right' : 'left' }}>
-										<Stack direction="row" spacing={1}>
-										<Chip
-											avatar={<Avatar src={imageLoader({src: message.from})}/>}
-											label={message.from}
-											onClick={() => handleClick(message.from)}
-											component='div'
-										/>
-										</Stack>
-									</ListItem>
-									<ListItem style={{paddingTop: '1px', marginLeft: '15px', textAlign: message.from === my_name ? 'right' : 'left' }}>
-										<Typography>{`${message.message}`}</Typography>
-									</ListItem>
-							</Grid>
+							<TextSend
+								key={index}
+								message={message}
+								my_name={my_name}
+								setMTbox={setMTbox}
+							/>
 						))}
 					</List>
 					<Divider />
