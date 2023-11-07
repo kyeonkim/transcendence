@@ -37,7 +37,7 @@ export default function Chat(props: any) {
 	const [pop, setPop] = useState(false);
 	const [anchorEl, setAnchorEl] = useState(null);
 	const [arrowRef, setArrowRef] = useState<HTMLElement | null>(null);
-	// const socket = useWebSocket();
+	const socket = useWebSocket();
 	const { setMTbox } = props;
 
 
@@ -48,27 +48,26 @@ export default function Chat(props: any) {
 		if (message.trim() === '') {
 			return;
 		}
+		
+		const newMassage = {
+			from: my_id,
+			user_name: my_name,
+			room_id: /*채널이름 or nickname*/"3",
+			message: message,
+		};
+		socket.emit("chat", newMassage);
+
 		setChatMessages(prevChatMessages => [...prevChatMessages, { from: my_name, message: message }]);
-
-		// const newMassage = {
-		// 	from: my_id,
-		// 	user_name: my_name,
-		// 	room_id: /*채널이름 or nickname*/"3",
-		// 	message: message,
-		// };
-		// socket.emit("chat", newMassage);
-		// console.log('chat:==== ', socket);
-
 		setMessage('');
 	};
 
 	
-	// useEffect(() => {
-	// 	socket.on("chat", (data) => {
-	// 		console.log('chat:==== ', data);
-	// 		setChatMessages(prevChatMessages => [...prevChatMessages, data]);
-	// 	});
-	// }, []);
+	useEffect(() => {
+		socket.on("chat", (data) => {
+			console.log('chat:==== ', data);
+			setChatMessages(prevChatMessages => [...prevChatMessages, data]);
+		});
+	}, []);
 	
 	useEffect(() => {
 		if (messageAreaRef.current) {
@@ -210,9 +209,9 @@ export default function Chat(props: any) {
 			<Grid container component={Paper}>
 				<Grid item xs={12} className={styles.borderRight500}>
 					<List className={styles.messageArea} ref={messageAreaRef}>
-						{chatMessages.map((message) => (
-							<Grid container>
-									<ListItem key={message.from} style={{padding: '5px', paddingBottom: '0px'}}>
+						{chatMessages.map((message, index) => (
+							<Grid container key={index}>
+									<ListItem key={message.from} style={{padding: '5px', paddingBottom: '0px', textAlign: message.from === my_name ? 'right' : 'left' }}>
 										<Stack direction="row" spacing={1}>
 										<Chip
 											avatar={<Avatar src={imageLoader({src: message.from})}/>}
@@ -222,7 +221,7 @@ export default function Chat(props: any) {
 										/>
 										</Stack>
 									</ListItem>
-									<ListItem style={{paddingTop: '1px', marginLeft: '15px'}}>
+									<ListItem style={{paddingTop: '1px', marginLeft: '15px', textAlign: message.from === my_name ? 'right' : 'left' }}>
 										<Typography>{`${message.message}`}</Typography>
 									</ListItem>
 							</Grid>
