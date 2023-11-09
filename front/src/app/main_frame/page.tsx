@@ -25,8 +25,6 @@ export default async function MainFrame () {
 
   console.log('MainFrame: access_token getCookie:', access_cookie?.value);
   console.log('MainFrame: refresh_token getCookie:', refresh_cookie?.value);
-  //여기에 main컴포넌트에 자신의 nickname을 넣어주던지 해야될거같아요. 로그인단계에서 본인의 닉네임만 쿠키화?
-  // 하위 컴포넌트에서 자신이 누군지는 알아야될거같음 
 
   return (
       <Main />

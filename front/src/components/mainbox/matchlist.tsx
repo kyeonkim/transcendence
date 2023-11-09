@@ -57,6 +57,7 @@ export default function MatchList(props: any) {
     margin: '10px',
     borderRadius: '20px',
     border: '5px solid #000', // 테두리 스타일과 색상을 지정
+    opacity: '0.2', // 투명도 설정
   };
 
   return (

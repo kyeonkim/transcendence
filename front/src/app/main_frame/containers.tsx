@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, createContext } from 'react';
+import React, { useState, useCallback } from 'react';
 import { styled } from '@mui/system';
 import Box from '@mui/material/Box';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -9,17 +9,19 @@ import SearchUser from '@/components/search_bar/search_user';
 import UserLists from '@/components/user_lists/user_lists';
 import Mainbox from '@/components/mainbox/mainbox';
 import ChatBlock from '@/components/chatbox/chat_block';
+import particlesOptions from "../particles.json";
+import { loadFull } from "tsparticles";
+import Particles from "react-tsparticles";
+import { ISourceOptions } from "tsparticles-engine";
+import type { Engine } from "tsparticles-engine";
 
 
 import TestWebsocket from '@/components/test_chat_box/test_websocket';
 import Divider from '@mui/material/Divider';
 
-
-// import { io } from "socket.io-client";
-
 // Top left Box
 const TLBox = styled(Box) ({
-  backgroundColor: 'grey',
+  // backgroundColor: 'grey',
   top: 0,
   left: 0,
   width:400,
@@ -34,12 +36,13 @@ const MLBox = styled(Box) ({
   left: 0,
   width: 400,
   height:450,
-  position: 'absolute'
+  position: 'absolute',
+  // opacity: '0.7'
 });
 
 // Bottom Left Box
 const BLBox = styled(Box) ({
-  backgroundColor: 'green',
+  // backgroundColor: 'green',
   top: 650,
   left: 0,
   width: 400,
@@ -49,7 +52,6 @@ const BLBox = styled(Box) ({
 
 // Middle Top Box
 const MTBox = styled(Box) ({
-  backgroundColor: 'skyblue',
   top: 0,
   left: 400,
   width: 1600,
@@ -59,7 +61,6 @@ const MTBox = styled(Box) ({
 
 
 const Chatbox = styled(Box) ({
-  backgroundColor: 'yellow',
   top: 0,
   left: 2000,
   width: 560,
@@ -74,27 +75,18 @@ export default function Main() {
   const [clicked, setClick] = useState(0);
   const [id, setSearch] = useState('');
 
-
+  const particlesInit = useCallback(async (engine: Engine) => {
+    // console.log(engine);
+    await loadFull(engine);
+  }, []);
   const handleClick = (value: number, searchTarget?: string) => {
     setClick(value);
     setSearch(searchTarget || '');
   }
-  /*
-  랜더링 sse
-  
-  handler1{
-    data : 1
 
-    setClick(1);
-    setSearch();
-  }
-
-  */
-
-  // 공용 웹소켓
-
-  return (
-        <React.Fragment>
+ return (
+   <React.Fragment>
+          <Particles options={particlesOptions as ISourceOptions} init={particlesInit} />
           <CssBaseline />
           {/* <GuardLogin> */}
           {/* <TLBox> */}
@@ -106,17 +98,14 @@ export default function Main() {
           <MLBox>
             <SearchUser setMTbox={handleClick}/>
             <MatchingButton setMTbox={handleClick}/>
-            {/* <ChatRoomButton setMTbox={handleClick}/> */}
           </MLBox>
           <Divider />
           <BLBox>
             <UserLists setMTbox={handleClick}/>
           </BLBox>
           <Chatbox>
-              {/* <TestWebsocket /> */}
               <ChatBlock setMTbox={handleClick}/>
           </Chatbox>
-          {/* </GuardLogin> */}
         </React.Fragment>
     )
   }

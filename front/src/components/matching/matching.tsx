@@ -8,13 +8,14 @@ import { styled } from '@mui/system';
 
 
 const MainMatchingButton = styled(Button) ({
+  backgroundColor: '#4fca35',
   position: 'absolute',
-  top: 105,
-  left: 0,
-  width: 400,
-  height: 100,
+  top: 70,
+  left: 50,
+  width: 300,
+  height: 170,
   color: "black",
-  borderRadius: '100px',
+  borderRadius: '100%',
 });
 
 interface MyProfileProps {

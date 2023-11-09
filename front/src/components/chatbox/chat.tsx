@@ -21,16 +21,36 @@ export default function Chat(props: any) {
 	const cookies = useCookies();
 	const [pop, setPop] = useState(false);
 	const [anchorEl, setAnchorEl] = useState(null);
-	const socket = useWebSocket();
+	const [messageCount, setMessageCount] = useState(0);
+	const [chatRestricted, setChatRestricted] = useState(false);
+	// const socket = useWebSocket();
 	const { setMTbox } = props;
 	// const [arrowRef, setArrowRef] = useState<HTMLElement | null>(null);
 
 	const my_name = cookies.get('nick_name');
 	const my_id = cookies.get('user_id');
 
-	const handleSendMessage = useCallback(() => {
+	const handleSendMessage = () => {
+		if (chatRestricted) {
+			console.log('chat restricted, Please wait 5 seconds');
+			return;
+		}
+		setMessageCount((prevCount) => prevCount + 1);
+		if (messageCount >= 5) {
+			console.log('chat restricted, Please wait 5 seconds');
+			setChatRestricted(true);
+			setTimeout(() => {
+				setChatRestricted(false);
+				setMessageCount(0);
+			}, 5000);
+		}
+		console.log('send message:==== \n', message);
 		if (message.trim() === '') {
 			return;
+		} else {
+			setTimeout(() => {
+				setMessageCount((prevCount) => Math.max(0, prevCount - 1));	
+			}, 2000);
 		}
 		
 		const newMassage = {
@@ -39,20 +59,20 @@ export default function Chat(props: any) {
 			room_id: /*채널이름 or nickname*/"3",
 			message: message,
 		};
-		socket.emit("chat", newMassage);
+		// socket.emit("chat", newMassage);
 
 		setChatMessages(prevChatMessages => [...prevChatMessages, { from: my_name, message: message }]);
 		setMessage('');
 		moveScoll();
-	}, []);
+	};
 
-	useEffect(() => {
-		socket.on("chat", (data) => {
-			console.log('chat:==== ', data);
-			setChatMessages(prevChatMessages => [...prevChatMessages, data]);
-			moveScoll();
-		});
-	}, []);
+	// useEffect(() => {
+	// 	socket.on("chat", (data) => {
+	// 		console.log('chat:==== \n', data);
+	// 		setChatMessages(prevChatMessages => [...prevChatMessages, data]);
+	// 		moveScoll();
+	// 	});
+	// }, []);
 	
 	//useCallback한이유 : 같은 동작의 함수가 계속 생성되는 것을 방지하기 위한건데 큰의미는 없을거같음
 	// -> 성능 최적화가되나 메모리사용량은 늘어남 
@@ -204,6 +224,7 @@ export default function Chat(props: any) {
 								message={message}
 								my_name={my_name}
 								setMTbox={setMTbox}
+								image={imageLoader({src: message.from})}
 							/>
 						))}
 					</List>
