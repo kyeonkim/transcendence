@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/commo
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ChatService } from './chat.service';
 import { async } from 'rxjs';
-import { CreateRoomDto, JoinRoomDto, SetChatUserDto } from './dto/chat.dto';
+import { ChatRoomDto, JoinRoomDto, SetChatUserDto } from './dto/chat.dto';
 
 @ApiTags('Chat API')
 @Controller('chat')
@@ -27,9 +27,17 @@ export class ChatController {
 
     @ApiOperation({summary: `채팅 방 생성 API`, description: `채팅방을 만든다.`})
     @Post("createroom")
-    async CreateRoom(@Body() room: CreateRoomDto)
+    async CreateRoom(@Body() room: ChatRoomDto)
     {
         return await this.ChatService.CreateRoom(room);
+    }
+
+    @ApiOperation({summary: `채팅 방 수정 API`, description: `채팅방을 수정한다.`})
+    @Patch("changeroom")
+    async ChangeRoom(@Body() room: ChatRoomDto)
+    {
+        //권환 확인 필요
+        this.ChatService.ChangeRoom(room);
     }
 
     @ApiOperation({summary: `채팅 방 입장 API`, description: `채팅방에 입장한다.`})
@@ -83,6 +91,7 @@ export class ChatController {
     @Patch("banuser")
     async BanUser(@Body() data : SetChatUserDto)
     {
+        //권한 확인 필요
         this.ChatService.BanUser(data);
     }
 
@@ -90,6 +99,7 @@ export class ChatController {
     @Patch("unbanuser")
     async UnbanUser(@Body() data : SetChatUserDto)
     {
+        //권한 확인 필요
         this.ChatService.UnbanUser(data);
     }
 
@@ -97,6 +107,7 @@ export class ChatController {
     @Patch("kickuser")
     async KickUser(@Body() data : SetChatUserDto)
     {
+        //권한 확인 필요
         this.ChatService.KickUser(data);
     }
 }

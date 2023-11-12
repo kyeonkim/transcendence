@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateRoomDto, JoinRoomDto, SetChatUserDto } from './dto/chat.dto';
+import { ChatRoomDto, JoinRoomDto, SetChatUserDto } from './dto/chat.dto';
 import { SocketGateway } from 'src/socket/socket.gateway';
 import { async } from 'rxjs';
 
@@ -37,7 +37,7 @@ export class ChatService {
         );
         return {status: true, message: 'success', rooms: rooms};
     }
-
+    
     async RoomInfo(room_idx : number)
     {
         const roomInfo = await this.prismaService.chatroom.findUnique({
@@ -56,8 +56,8 @@ export class ChatService {
         });
         return {status: true, message: 'success', room: roomInfo}
     }
-
-    async CreateRoom(data: CreateRoomDto)
+    
+    async CreateRoom(data: ChatRoomDto)
     {
         const room = await this.prismaService.chatroom.create({
             data: {
@@ -68,7 +68,7 @@ export class ChatService {
             },
         });
         if (room === undefined)
-            return {status: false, message: 'fail to create room'};
+        return {status: false, message: 'fail to create room'};
         if (data.password !== undefined)
         {
             const password = await this.prismaService.chatroom_password.upsert({
@@ -84,7 +84,7 @@ export class ChatService {
                 },
             });
             if (password === undefined)
-                return {status: false, message: 'fail to create password'};
+            return {status: false, message: 'fail to create password'};
         }
         const user = await this.prismaService.user.update({
             where: {
@@ -100,6 +100,29 @@ export class ChatService {
         return {status: true, message: 'success', room: room};
     }
 
+    async ChangeRoom(room: ChatRoomDto)
+    {
+        const chatroom = await this.prismaService.chatroom.findUnique({
+            where: {
+                idx: room.room_idx,
+            },
+        });
+        if (chatroom === undefined)
+            return {status: false, message: 'fail to find room'};
+        const ChangeRoom = await this.prismaService.chatroom.update({
+            where: {
+                idx: room.room_idx,
+            },
+            data: {
+                name: room.chatroom_name,
+                is_private: room.private,
+            },
+        });
+        if (ChangeRoom === undefined)
+            return {status: false, message: 'fail to change room'};
+        return {status: true, message: 'success'};
+    }
+    
     async JoinRoom(data: JoinRoomDto)
     {
         await this.prismaService.chatroom.update({
