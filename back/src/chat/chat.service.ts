@@ -45,7 +45,12 @@ export class ChatService {
                 idx: room_idx,
             },
             include: {
-                users: true,
+                users: {
+                    select: {
+                        user_id: true,
+                        nick_name: true,
+                    },
+                },
             },
         });
         return {status: true, message: 'success', room: roomInfo}
