@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateRoomDto, JoinRoomDto, SetManagerDto } from './dto/chat.dto';
+import { CreateRoomDto, JoinRoomDto, SetChatUserDto } from './dto/chat.dto';
 import { SocketGateway } from 'src/socket/socket.gateway';
 import { async } from 'rxjs';
 
@@ -149,7 +149,7 @@ export class ChatService {
         }
     }
 
-    async SetManager(data: SetManagerDto)
+    async SetManager(data: SetChatUserDto)
     {
         const room = await this.prismaService.chatroom.findUnique({
             where: {
@@ -171,5 +171,142 @@ export class ChatService {
                 is_manager: true,
             },
         });
+        return {status: true, message: 'success'};
+    }
+
+    async UnsetManager(data: SetChatUserDto)
+    {
+        const room = await this.prismaService.chatroom.findUnique({
+            where: {
+                idx: data.room_id,
+                users : {
+                    some: {
+                        user_id: data.user_id,
+                    },
+                }
+            }
+        });
+        if (room === undefined)
+            return {status: false, message: 'fail to find room'};
+        await this.prismaService.user.update({
+            where: {
+                user_id: data.target_id,
+            },
+            data: {
+                is_manager: false,
+            },
+        });
+        return {status: true, message: 'success'};
+    }
+
+    async MuteUser(data: SetChatUserDto)
+    {
+        const room = await this.prismaService.chatroom.findUnique({
+            where: {
+                idx: data.room_id,
+                users : {
+                    some: {
+                        user_id: data.user_id,
+                    },
+                }
+            }
+        });
+        if (room === undefined)
+            return {status: false, message: 'fail to find room'};
+        await this.prismaService.mute.create({
+            data: {
+                user_id: data.target_id,
+                chatroom_id: data.room_id,
+            }
+        });
+        return {status: true, message: 'success'};
+    }
+
+    async UnmuteUser(data: SetChatUserDto)
+    {
+        const room = await this.prismaService.chatroom.findUnique({
+            where: {
+                idx: data.room_id,
+                users : {
+                    some: {
+                        user_id: data.user_id,
+                    },
+                }
+            }
+        });
+        if (room === undefined)
+            return {status: false, message: 'fail to find room'};
+        await this.prismaService.mute.deleteMany({
+            where: {
+                user_id: data.target_id,
+                chatroom_id: data.room_id,
+            }
+        });
+        return {status: true, message: 'success'};
+    }
+
+    async BanUser(data: SetChatUserDto)
+    {
+        const room = await this.prismaService.chatroom.findUnique({
+            where: {
+                idx: data.room_id,
+                users : {
+                    some: {
+                        user_id: data.user_id,
+                    },
+                }
+            }
+        });
+        if (room === undefined)
+            return {status: false, message: 'fail to find room'};
+        await this.prismaService.ban.create({
+            data: {
+                user_id: data.target_id,
+                chatroom_id: data.room_id,
+            }
+        });
+        this.LeaveRoom(data.target_id, data.room_id);
+        return {status: true, message: 'success'};
+    }
+
+    async UnbanUser(data: SetChatUserDto)
+    {
+        const room = await this.prismaService.chatroom.findUnique({
+            where: {
+                idx: data.room_id,
+                bans : {
+                    some: {
+                        user_id: data.user_id,
+                    },
+                }
+            }
+        });
+        if (room === undefined)
+            return {status: false, message: 'fail to find room'};
+        await this.prismaService.ban.deleteMany({
+            where: {
+                user_id: data.target_id,
+                chatroom_id: data.room_id,
+            }
+        });
+        return {status: true, message: 'success'};
+    }
+
+    async KickUser(data: SetChatUserDto)
+    {
+        const room = await this.prismaService.chatroom.findUnique({
+            where: {
+                idx: data.room_id,
+                users : {
+                    some: {
+                        user_id: data.user_id,
+                    },
+                }
+            }
+        });
+        if (room === undefined)
+            return {status: false, message: 'fail to find room'};
+        this.LeaveRoom(data.target_id, data.room_id);
+        return {status: true, message: 'success'};
     }
 }

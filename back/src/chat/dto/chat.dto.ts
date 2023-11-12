@@ -42,7 +42,7 @@ export class JoinRoomDto
     password?: string;
 }
 
-export class SetManagerDto
+export class SetChatUserDto
 {
     @ApiProperty()
     @IsInt()

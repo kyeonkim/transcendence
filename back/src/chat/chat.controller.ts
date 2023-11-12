@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/commo
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ChatService } from './chat.service';
 import { async } from 'rxjs';
-import { CreateRoomDto, JoinRoomDto, SetManagerDto } from './dto/chat.dto';
+import { CreateRoomDto, JoinRoomDto, SetChatUserDto } from './dto/chat.dto';
 
 @ApiTags('Chat API')
 @Controller('chat')
@@ -49,9 +49,54 @@ export class ChatController {
     //내가 방장인지 확인하는 방법이 있어야하지 않을까?
     @ApiOperation({summary: `관리자 임명 API`, description: `관리자를 임명한다.`})
     @Patch("setmanager")
-    async SetManager(@Body() data : SetManagerDto)
+    async SetManager(@Body() data : SetChatUserDto)
     {
         //토큰을 가져와서 유저아이디와 room_idx의 방장인지 확인해야할듯
         this.ChatService.SetManager(data);
+    }
+
+    @ApiOperation({summary: `관리자 해제 API`, description: `관리자를 해제한다.`})
+    @Patch("unsetmanager")
+    async UnsetManager(@Body() data : SetChatUserDto)
+    {
+        //토큰을 가져와서 유저아이디와 room_idx의 방장인지 확인해야할듯
+        this.ChatService.UnsetManager(data);
+    }
+
+    @ApiOperation({summary: `유저 mute API`, description: `유저를 mute한다.`})
+    @Patch("muteuser")
+    async MuteUser(@Body() data : SetChatUserDto)
+    {
+        //토큰을 가져와서 유저아이디와 room_idx의 매니저인지 확인해야할듯
+        this.ChatService.MuteUser(data);
+    }
+
+    @ApiOperation({summary: `유저 unmute API`, description: `유저를 unmute한다.`})
+    @Patch("unmuteuser")
+    async UnmuteUser(@Body() data : SetChatUserDto)
+    {
+        //토큰을 가져와서 유저아이디와 room_idx의 매니저인지 확인해야할듯
+        this.ChatService.UnmuteUser(data);
+    }
+
+    @ApiOperation({summary: `유저 ban API`, description: `유저를 ban한다.`})
+    @Patch("banuser")
+    async BanUser(@Body() data : SetChatUserDto)
+    {
+        this.ChatService.BanUser(data);
+    }
+
+    @ApiOperation({summary: `유저 unban API`, description: `유저를 unban한다.`})
+    @Patch("unbanuser")
+    async UnbanUser(@Body() data : SetChatUserDto)
+    {
+        this.ChatService.UnbanUser(data);
+    }
+
+    @ApiOperation({summary: `강제퇴장 API`, description: `유저를 강제퇴장시킨다.`})
+    @Patch("kickuser")
+    async KickUser(@Body() data : SetChatUserDto)
+    {
+        this.ChatService.KickUser(data);
     }
 }

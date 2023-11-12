@@ -36,7 +36,21 @@ services:
     networks:
       - transcendence_net
     restart: always
+  portainer:
+    image: portainer/portainer
+    container_name: portainer_container
+    restart: always
+    ports:
+      - "9000:9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    networks:
+      - transcendence_net
 
 networks:
   transcendence_net:
     driver: bridge
+
+volumes:
+  portainer_data:
