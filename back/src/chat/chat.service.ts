@@ -49,6 +49,7 @@ export class ChatService {
                     select: {
                         user_id: true,
                         nick_name: true,
+                        is_manager: true,
                     },
                 },
             },
