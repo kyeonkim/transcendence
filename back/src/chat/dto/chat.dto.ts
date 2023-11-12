@@ -10,6 +10,10 @@ export class CreateRoomDto
 
     @ApiProperty()
     @IsString()
+    user_nickname: string;
+
+    @ApiProperty()
+    @IsString()
     chatroom_name: string;
 
     @ApiProperty()

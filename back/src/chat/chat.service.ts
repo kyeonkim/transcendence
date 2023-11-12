@@ -11,9 +11,30 @@ export class ChatService {
         private readonly socketGateway: SocketGateway,
     ) {}
     
-    async GetRoomList()
+    async GetRoomList(id: number)
     {
-        const rooms = await this.prismaService.chatroom.findMany();
+        const rooms = await this.prismaService.chatroom.findMany(
+            {
+                //코드 작동여부 확인 필요
+                where :{
+                    is_private: false,
+                    NOT: {
+                        bans:{
+                            some: {
+                                user_id: id,
+                            },
+                        },
+                    }
+                },
+                select: {
+                    idx: true,
+                    name:true,
+                    is_password: true,
+                    is_private: true,
+                    owner_nickname: true
+                },
+            }
+        );
         return {status: true, message: 'success', rooms: rooms};
     }
 
@@ -35,14 +56,31 @@ export class ChatService {
         const room = await this.prismaService.chatroom.create({
             data: {
                 owner_id: data.user_id,
+                owner_nickname: data.user_nickname,
                 name: data.chatroom_name,
-                password: data.password ? data.password : null,
-                private: data.private,
+                is_private: data.private,
             },
         });
         if (room === undefined)
             return {status: false, message: 'fail to create room'};
-        await this.prismaService.user.update({
+        if (data.password !== undefined)
+        {
+            const password = await this.prismaService.chatroom_password.upsert({
+                where: {
+                    chatroom_idx: room.idx,
+                },
+                update: {
+                    password: data.password,
+                },
+                create: {
+                    chatroom_idx: room.idx,
+                    password: data.password,
+                },
+            });
+            if (password === undefined)
+                return {status: false, message: 'fail to create password'};
+        }
+        const user = await this.prismaService.user.update({
             where: {
                 user_id: data.user_id,
             },
@@ -50,6 +88,8 @@ export class ChatService {
                 chatroom_id: room.idx,
             },
         });
+        if (user === undefined)
+            return {status: false, message: 'fail to update user'};
         return {status: true, message: 'success', room: room};
     }
 

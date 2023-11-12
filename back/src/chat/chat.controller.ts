@@ -12,10 +12,10 @@ export class ChatController {
     ) {}
 
     @ApiOperation({summary: `채팅방 목록 API`, description: `채팅방 목록을 가져온다.`})
-    @Get("roomlist")
-    async RoomList()
+    @Get("roomlist:/id")
+    async RoomList(@Param('id') id: number)
     {
-        return await this.ChatService.GetRoomList();
+        return await this.ChatService.GetRoomList(id);
     }
 
     @ApiOperation({summary: `채팅방 정보 API`, description: `채팅방 정보를 가져온다.`})

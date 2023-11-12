@@ -112,10 +112,10 @@ export class AuthService {
 
 	async TwoFAPass(twofa: TwoFADTO)
 	{
-		const user = await this.prisma.user.findUnique({where: {user_id: twofa.user_id}});
+		const user = await this.prisma.user.findUnique({where: {user_id: twofa.user_id}, include: {twoFA_key: true}});
 		if (user === null)
 			return {status: false, message: "user not found"};
-		const isValid = authenticator.verify({ token: twofa.code , secret: user.twoFA_key});
+		const isValid = authenticator.verify({ token: twofa.code , secret: user.twoFA_key.twoFA_key});
 		if (isValid)
 		{
 			const tokenData = await this.CreateToken(twofa.user_id, twofa.user_nickname, true);
@@ -167,10 +167,23 @@ export class AuthService {
 				},
 				data: {
 					twoFA: true,
-					twoFA_key: twofa.secret,
 				}
 			});
 			if (res === null)
+				return {status: false, message: "fail"};
+			const token = this.prisma.twoFA_key.upsert({
+				where: {
+					user_id: twofa.user_id,
+				},
+				update: {
+					twoFA_key: twofa.secret,
+				},
+				create: {
+					user_id: twofa.user_id,
+					twoFA_key: twofa.secret,
+				}
+			});
+			if (token === null)
 				return {status: false, message: "fail"};
 			return {status: true, message: "success"};
 		}
@@ -187,7 +200,11 @@ export class AuthService {
 			},
 			data: {
 				twoFA: false,
-				twoFA_key: null,
+			}
+		});
+		await this.prisma.twoFA_key.delete({
+			where: {
+				user_id: id,
 			}
 		});
 		return {status: true, message: "success"};
@@ -199,10 +216,13 @@ export class AuthService {
 			where: {
 				user_id: twofa.user_id,
 			},
+			include: {
+				twoFA_key: true,
+			}
 		});
 		if (user === null)
 			return {status: false, message: "user not found"};
-		const isValid = authenticator.verify({ token: twofa.code , secret: user.twoFA_key});
+		const isValid = authenticator.verify({ token: twofa.code , secret: user.twoFA_key.twoFA_key});
 		if (!isValid)
 			return {status: false, message: "2fa auth fail"};
 		await this.prisma.user.update({
@@ -211,7 +231,11 @@ export class AuthService {
 			},
 			data: {
 				twoFA: false,
-				twoFA_key: null,
+			}
+		});
+		await this.prisma.twoFA_key.delete({
+			where: {
+				user_id: twofa.user_id,
 			}
 		});
 		return {status: true, message: "success"};
