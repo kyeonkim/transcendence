@@ -41,3 +41,18 @@ export class JoinRoomDto
     @IsOptional()
     password?: string;
 }
+
+export class SetManagerDto
+{
+    @ApiProperty()
+    @IsInt()
+    user_id: number;
+
+    @ApiProperty()
+    @IsInt()
+    room_id: number;
+
+    @ApiProperty()
+    @IsInt()
+    target_id: number;
+}

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateRoomDto, JoinRoomDto } from './dto/chat.dto';
+import { CreateRoomDto, JoinRoomDto, SetManagerDto } from './dto/chat.dto';
 import { SocketGateway } from 'src/socket/socket.gateway';
 import { async } from 'rxjs';
 
@@ -8,7 +8,7 @@ import { async } from 'rxjs';
 export class ChatService {
     constructor(
         private readonly prismaService: PrismaService,
-        private readonly socketGateway: SocketGateway,
+        private readonly socketService: SocketGateway,
     ) {}
     
     async GetRoomList(id: number)
@@ -92,6 +92,7 @@ export class ChatService {
             },
             data: {
                 chatroom_id: room.idx,
+                is_manager: true,
             },
         });
         if (user === undefined)
@@ -113,35 +114,62 @@ export class ChatService {
                 },
             },
         });
-        await this.socketGateway.JoinRoom(data.user_id, data.room_id);
+        await this.socketService.JoinRoom(data.user_id, data.room_id);
     }
 
     async LeaveRoom(user_id: number, room_id: number)
     {
-        await this.socketGateway.LeaveRoom(user_id, room_id);
-        await this.prismaService.user.update({
-            where: {
-                user_id: user_id,
-            },
-            data: {
-                chatroom_id: null,
-            },
+        await this.socketService.LeaveRoom(user_id, room_id);
+        await this.prismaService.user.update({ 
+            where: { user_id: user_id },
+            data: { chatroom_id: null, is_manager: false },
         });
         const room = await this.prismaService.chatroom.findUnique({
+            where: { idx: room_id }, include: { users: true, },
+        });
+        const users = room.users;
+        if (users.length === 0) // 남은 유저가 없을 경우 방을 삭제
+        {
+            await this.prismaService.chatroom.delete({ where: { idx: room_id } });
+            return {status: true, message: 'room deleted'};
+        }
+        const mannagers = users.filter((user) => user.is_manager === true);
+        if (mannagers.length !== 0) // 남은 매니저가 있을경우 그 매니저가 방장이됨
+        {
+            await this.prismaService.chatroom.update({ 
+                where: { idx: room_id }, 
+                data: { owner_id: mannagers[0].user_id, owner_nickname: mannagers[0].nick_name } 
+            });
+        } else { //남은 매니저가 없을경우 가장 먼저 들어온 유저가 방장과 매니저가 됨
+            await this.prismaService.chatroom.update({ 
+                where: { idx: room_id }, 
+                data: { owner_id: users[0].user_id, owner_nickname: users[0].nick_name } 
+            });
+            await this.prismaService.user.update({ where: { user_id: users[0].user_id }, data: { is_manager: true } });
+        }
+    }
+
+    async SetManager(data: SetManagerDto)
+    {
+        const room = await this.prismaService.chatroom.findUnique({
             where: {
-                idx: room_id,
+                idx: data.room_id,
+                users : {
+                    some: {
+                        user_id: data.user_id,
+                    },
+                }
+            }
+        });
+        if (room === undefined)
+            return {status: false, message: 'fail to find room'};
+        await this.prismaService.user.update({
+            where: {
+                user_id: data.target_id,
             },
-            include: {
-                users: true,
+            data: {
+                is_manager: true,
             },
         });
-        if (room.users.length === 0)
-        {
-            await this.prismaService.chatroom.delete({
-                where: {
-                    idx: room_id,
-                },
-            });
-        };
     }
 }
