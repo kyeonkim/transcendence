@@ -54,8 +54,8 @@ export default function ChatBlock(props: any) {
 		else
 		{
 			console.log("user is not in chat room");
-			setInRoom(false);
-			// setInRoom(true);
+			// setInRoom(false);
+			setInRoom(true);
 		}
 		})
 	}
