@@ -9,6 +9,7 @@ import  ChatSocket  from './socket_provider';
 
 export default function MainFrame () {
 
+  console.log("Main Frame");
 
   return (
         <ChatSocket>
