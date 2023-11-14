@@ -1,14 +1,9 @@
 'use client'
 import { useState, useEffect } from 'react';
 
-import Chat from './chat';
+import ChatRoomBar from './chat_room_bar'
 
-import AppBar from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
-
-import IconButton from '@mui/material/IconButton';
 import LockIcon from '@mui/icons-material/Lock';
-import MenuIcon from '@mui/icons-material/Menu';
 
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
@@ -24,6 +19,7 @@ import { styled } from '@mui/system';
 import { useCookies } from 'next-client-cookies';
 
 import axios from 'axios';
+
 
 const MainChatRoomList = styled(Grid) ({
 	position: 'absolute',
@@ -44,9 +40,11 @@ export default function ChatRoomList(props: any) {
 	const cookies = useCookies();
 	const [roomList, setRoomList] = useState([]);
 	const [render, setRender] = useState(false);
-	const [roomId, setRoomId] = useState(0);
 
 	const user_id = cookies.get("user_id")
+	const handleInRoom = props.handleInRoom;
+
+	console.log("ChatRoomList");
 
 	async function handleRoomList() {
 		await axios.get(`${process.env.NEXT_PUBLIC_API_URL}chat/roomlist/${user_id}`) 
@@ -66,27 +64,29 @@ export default function ChatRoomList(props: any) {
 		})
 	}
 
-	// async function handleJoin(idx :number) {
+	async function handleJoin(idx :number) {
 
-	// 	// password 입력 받아야함.
+		// password 입력 받아야함.
 	
-	// 	await axios.patch(`${process.env.NEXT_PUBLIC_API_URL}chat/joinroom/}`, 
-	// 	{
-	// 		user_id: user_id,
-	// 		room_id: idx,
-	// 		password: '',
-	// 	}) 
-	// 	.then((res) => {
-	// 	if ()
-	// 	{
-
-	// 	}
-	// 	else
-	// 	{
-	// 	}
-	// 	})
-	// 	setRender(true);
-	// }
+		await axios.patch(`${process.env.NEXT_PUBLIC_API_URL}chat/joinroom`, 
+		{
+			user_id: user_id,
+			room_id: idx,
+			password: '',
+		}) 
+		.then((res) => {
+		if (res.data)
+		{
+			// 방 들어가졌으니 방으로 이동하기
+			handleInRoom();
+		}
+		else
+		{
+			// joinroom 요청에 실패함
+		}
+		})
+		setRender(true);
+	}
 
 	useEffect(() => {
 
@@ -106,29 +106,10 @@ export default function ChatRoomList(props: any) {
 
 	const { setMTbox } = props;
 
-	// 채널 리스트
-	
-	// '특정 사건' 발생하면  Chat을 렌더링
 	
 	return (
 		<div>
-            <AppBar position="static">
-				<Toolbar>
-				<IconButton
-					size="large"
-					edge="start"
-					color="inherit"
-					aria-label="menu"
-					sx={{ mr: 2 }}
-					// onClick={handleDrawer}
-				>
-				</IconButton>
-				<Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-					ChatRoomList
-				</Typography>
-					<Button color="inherit">나가기</Button>
-				</Toolbar>
-			</AppBar>
+			<ChatRoomBar setMTbox={setMTbox}/>
             {roomList ? (
 			<MainChatRoomList container rowSpacing={5} columnSpacing={5}>
 			{roomList.map((room) => {
@@ -143,8 +124,8 @@ export default function ChatRoomList(props: any) {
 						</Typography>
                         <LockIcon sx={{textAlign: 'right'}} />
 						<CardActions>
-							<Button size="small" variant="contained">Join</Button>
-							{/* <Button size="small" variant="contained" onClick={() => handleJoin(room.idx)}>Join</Button> */}
+							{/* <Button size="small" variant="contained">Join</Button> */}
+							<Button size="small" variant="contained" onClick={() => handleJoin(room.idx)}>Join</Button>
 						</CardActions>
 						</ChatRoom>
 					</CardContent>
