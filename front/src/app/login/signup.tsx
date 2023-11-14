@@ -89,7 +89,7 @@ export default function Signup (props:any) {
               </div>
               <div style={{ marginTop: '20px' }}>
                   <button onClick={handleSetData}>
-                  저장
+                    저장
                   </button>
               </div>
         </div>
