@@ -83,6 +83,19 @@ export default function Main() {
     setClick(value);
     setSearch(searchTarget || '');
   }
+  /*
+  랜더링 sse
+  
+  handler1{
+    data : 1
+
+    setClick(1);
+    setSearch();
+  }
+
+  */
+
+  console.log('Main component');
 
  return (
    <React.Fragment>
