@@ -1,6 +1,8 @@
 'use client'
 import { useState, useEffect } from 'react';
 
+import ChatRoomCreate from './chat_room_create';
+
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 
@@ -22,13 +24,18 @@ export default function ChatRoomBar(props: any) {
 	// const cookies = useCookies();
 	// const user_id = cookies.get("user_id")
 
-    const {setMTbox} = props;
+    const { setMTbox, handleRenderMode } = props;
+
+    function handleNewChat() {
+        handleRenderMode(1);    
+    };
 
 	// useEffect(() => {
 
 	// }, [])
 
     // 새 채팅 핸들러
+
 
 	return (
 		<div>
@@ -46,7 +53,7 @@ export default function ChatRoomBar(props: any) {
                     <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                         채팅방 목록
                     </Typography>
-                    <Button color="inherit" variant='contained'>
+                    <Button color="inherit" variant='contained' onClick={handleNewChat}>
                         새 채팅
                     </Button>
 				</Toolbar>

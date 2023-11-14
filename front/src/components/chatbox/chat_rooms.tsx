@@ -41,10 +41,12 @@ export default function ChatRoomList(props: any) {
 	const [roomList, setRoomList] = useState([]);
 	const [render, setRender] = useState(false);
 
-	const user_id = cookies.get("user_id")
-	const handleInRoom = props.handleInRoom;
+	const user_id = Number(cookies.get("user_id"));
+	const user_nickname = cookies.get("nick_name");
 
 	console.log("ChatRoomList");
+	console.log("CHL - user_id - ", user_id);
+	console.log("CHL - nickname - ", user_nickname);
 
 	async function handleRoomList() {
 		await axios.get(`${process.env.NEXT_PUBLIC_API_URL}chat/roomlist/${user_id}`) 
@@ -67,18 +69,19 @@ export default function ChatRoomList(props: any) {
 	async function handleJoin(idx :number) {
 
 		// password 입력 받아야함.
-	
+		console.log("CHL - handleJoin - room_id - ", idx);
 		await axios.patch(`${process.env.NEXT_PUBLIC_API_URL}chat/joinroom`, 
 		{
-			user_id: user_id,
+			user_id : user_id,
+			user_nickname: user_nickname,
 			room_id: idx,
 			password: '',
 		}) 
 		.then((res) => {
-		if (res.data)
+		if (res.status === 200)
 		{
 			// 방 들어가졌으니 방으로 이동하기
-			handleInRoom();
+			handleRenderMode(2);
 		}
 		else
 		{
@@ -104,12 +107,12 @@ export default function ChatRoomList(props: any) {
         // 채팅 내역
 
 
-	const { setMTbox } = props;
-
+	const	setMTbox = props.setMTbox;
+	const	handleRenderMode = props.handleRenderMode;
 	
 	return (
 		<div>
-			<ChatRoomBar setMTbox={setMTbox}/>
+			<ChatRoomBar setMTbox={setMTbox} handleRenderMode={handleRenderMode} />
             {roomList ? (
 			<MainChatRoomList container rowSpacing={5} columnSpacing={5}>
 			{roomList.map((room) => {
