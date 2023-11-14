@@ -53,6 +53,7 @@ export default function ChatBlock(props: any) {
 		}
 		else
 		{
+			console.log("user is not in chat room");
 			// setInRoom(false);
 			setInRoom(true);
 		}
@@ -78,23 +79,6 @@ export default function ChatBlock(props: any) {
 		// 채팅방일 때, 채팅방 목록일 때의 동작 차이 이야기해보기
 	return (
 		<div>
-			{/* <AppBar position="static">
-				<Toolbar>
-				<IconButton
-					size="large"
-					edge="start"
-					color="inherit"
-					aria-label="menu"
-					sx={{ mr: 2 }}
-					// onClick={handleDrawer}
-				>
-				</IconButton>
-				<Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-					ChatRoom1
-				</Typography>
-					<Button color="inherit">나가기</Button>
-				</Toolbar>
-			</AppBar> */}
 		{inRoom ? (
 			<Chat setMTbox={setMTbox} />
 		) : (

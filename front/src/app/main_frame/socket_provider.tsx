@@ -23,6 +23,8 @@ export function ChatSocket ({ children }: any) {
 
   useEffect(() => {
 
+      console.log('user_id cookie - ', cookies.get('user_id'));
+
       const tmpSocket = io(`${process.env.NEXT_PUBLIC_WEBSOCKET_URL}`,
       {
         query: {
