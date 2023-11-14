@@ -34,6 +34,9 @@ export class UserService {
             where: {
               nick_name: nickName,
             },
+            include: {
+                roomuser: true
+            }
         });
         console.log(userData);
         if (userData === null)
@@ -48,6 +51,9 @@ export class UserService {
             where: {
               user_id: id,
             },
+            include: {
+                roomuser: true
+            }
         });
         console.log("====================User_data=====================\n\n",userData);
         if (userData == null)

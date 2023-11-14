@@ -12,25 +12,26 @@ datasource db {
 }
 
 model User {
-  user_id     Int         @id
-  nick_name   String      @unique
-  state       Int         @default(0)
-  img_name    String?     @default("default.png")
-  win         Int         @default(0)
-  lose        Int         @default(0)
-  ladder      Int         @default(1000)
-  created_at  DateTime    @default(now())
-  updated_at  DateTime    @updatedAt
-  twoFA       Boolean     @default(false)
-  twoFA_key   TwoFA_key?  @relation("twoFA_user")
-  chatroom_id Int?
-  chatroom    Chatroom?   @relation("chatroom_user", fields: [chatroom_id], references: [idx])
-  is_manager  Boolean     @default(false)
-  friends     Friends[]   @relation("following_user")
-  games       Game[]      @relation("game_user")
-  tokens      Tokens?     @relation("token_user")
-  events      Event[]     @relation("event_user")
-}
+  user_id     Int            @id
+  nick_name   String         @unique
+  state       Int            @default(0)
+  img_name    String?        @default("default.png")
+  win         Int            @default(0)
+  lose        Int            @default(0)
+  ladder      Int            @default(1000)
+  created_at  DateTime       @default(now())
+  updated_at  DateTime       @updatedAt
+  twoFA       Boolean        @default(false)
+  twoFA_key   TwoFA_key?     @relation("twoFA_user")
+  roomuser   Chatroom_user? @relation("chatroom_user_to_user")
+  friends     Friends[]      @relation("following_user")
+  games       Game[]         @relation("game_user")
+  tokens      Tokens?        @relation("token_user")
+  events      Event[]        @relation("event_user")
+//chatroom_id   Int?
+//chatroom      Chatroom?   @relation("chatroom_user", fields: [chatroom_id], references: [idx])
+//is_manager    Boolean     @default(false)
+}   
 
 model TwoFA_key {
   user_id     Int      @id
@@ -90,11 +91,11 @@ model Chatroom {
   owner_id          Int
   owner_nickname    String
   Chatroom_password Chatroom_password? @relation("chatroom_password")
-  users             User[]             @relation("chatroom_user")
-  // managers          Manager[]          @relation("chatroom_manager")
   bans              Ban[]              @relation("chatroom_ban")
-  mutes             Mute[]             @relation("chatroom_mute")
+  roomusers         Chatroom_user[]    @relation("chatroom_user_to_chatroom")
   created_at        DateTime           @default(now())
+//users           User[]             @relation("chatroom_user")
+//managers        Manager[]          @relation("chatroom_manager")
 }
 
 model Chatroom_password {
@@ -103,6 +104,27 @@ model Chatroom_password {
   password      String
   created_at    DateTime @default(now())
   updated_at    DateTime @updatedAt
+}
+
+model Ban {
+  idx         Int      @default(autoincrement()) @id
+  chatroom_id Int
+  chatroom    Chatroom @relation("chatroom_ban",fields: [chatroom_id], references: [idx])
+  user_id     Int
+  created_at  DateTime @default(now())
+}
+
+model Chatroom_user {
+  idx         Int      @default(autoincrement()) @id
+  chatroom_id Int
+  chatroom    Chatroom @relation("chatroom_user_to_chatroom",fields: [chatroom_id], references: [idx])
+  user_id     Int      @unique
+  user_nickname String
+  user        User     @relation("chatroom_user_to_user",fields: [user_id], references: [user_id])
+  is_manager  Boolean  @default(false)
+  is_mute     Boolean  @default(false)
+  mute_time   String?
+  created_at  DateTime @default(now())
 }
 
 // model Message {
@@ -122,19 +144,3 @@ model Chatroom_password {
 //   mannager_nickname String
 //   created_at        DateTime @default(now())
 // }
-
-model Ban {
-  idx         Int      @default(autoincrement()) @id
-  chatroom_id Int
-  chatroom    Chatroom @relation("chatroom_ban",fields: [chatroom_id], references: [idx])
-  user_id     Int
-  created_at  DateTime @default(now())
-}
-
-model Mute {
-  idx         Int      @default(autoincrement()) @id
-  chatroom_id Int
-  chatroom    Chatroom @relation("chatroom_mute",fields: [chatroom_id], references: [idx])
-  user_id     Int
-  created_at  DateTime @default(now())
-}

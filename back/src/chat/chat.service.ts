@@ -13,6 +13,7 @@ export class ChatService {
     
     async GetRoomList(id: number)
     {
+        console.log("GetRoomList: ", id);
         const rooms = await this.prismaService.chatroom.findMany(
             {
                 //코드 작동여부 확인 필요
@@ -35,6 +36,7 @@ export class ChatService {
                 },
             }
         );
+
         return {status: true, message: 'success', rooms: rooms};
     }
     
@@ -45,10 +47,10 @@ export class ChatService {
                 idx: room_idx,
             },
             include: {
-                users: {
+                roomusers: {
                     select: {
                         user_id: true,
-                        nick_name: true,
+                        user_nickname: true,
                         is_manager: true,
                     },
                 },
@@ -67,7 +69,7 @@ export class ChatService {
                 is_private: data.private,
             },
         });
-        if (room === undefined)
+        if (room === null)
         return {status: false, message: 'fail to create room'};
         if (data.password !== undefined)
         {
@@ -83,19 +85,18 @@ export class ChatService {
                     password: data.password,
                 },
             });
-            if (password === undefined)
-            return {status: false, message: 'fail to create password'};
+            if (password === null)
+                return {status: false, message: 'fail to create password'};
         }
-        const user = await this.prismaService.user.update({
-            where: {
-                user_id: data.user_id,
-            },
+        const user = await this.prismaService.chatroom_user.create({
             data: {
+                user_id: data.user_id,
+                user_nickname: data.user_nickname,
                 chatroom_id: room.idx,
                 is_manager: true,
-            },
+            }
         });
-        if (user === undefined)
+        if (user === null)
             return {status: false, message: 'fail to update user'};
         return {status: true, message: 'success', room: room};
     }
@@ -107,7 +108,7 @@ export class ChatService {
                 idx: room.room_idx,
             },
         });
-        if (chatroom === undefined)
+        if (chatroom === null)
             return {status: false, message: 'fail to find room'};
         const ChangeRoom = await this.prismaService.chatroom.update({
             where: {
@@ -118,23 +119,23 @@ export class ChatService {
                 is_private: room.private,
             },
         });
-        if (ChangeRoom === undefined)
+        if (ChangeRoom === null)
             return {status: false, message: 'fail to change room'};
         return {status: true, message: 'success'};
     }
     
     async JoinRoom(data: JoinRoomDto)
     {
-        await this.prismaService.chatroom.update({
-            where: {
-                idx: data.room_id,
-            },
+        const room = await this.prismaService.chatroom_user.findUnique({
+            where: { user_id: data.user_id, }
+        });
+        if (room !== null)
+            return {status: false, message: 'already joined room'};
+        await this.prismaService.chatroom_user.create({
             data: {
-                users: {
-                    connect: {
-                        user_id: data.user_id,
-                    },
-                },
+                chatroom_id: data.room_id,
+                user_id: data.user_id,
+                user_nickname: data.user_nickname,
             },
         });
         await this.socketService.JoinRoom(data.user_id, data.room_id);
@@ -143,16 +144,14 @@ export class ChatService {
     async LeaveRoom(user_id: number, room_id: number)
     {
         await this.socketService.LeaveRoom(user_id, room_id);
-        await this.prismaService.user.update({ 
-            where: { user_id: user_id },
-            data: { chatroom_id: null, is_manager: false },
-        });
+        await this.prismaService.chatroom_user.delete({ where: { user_id: user_id }});
         const room = await this.prismaService.chatroom.findUnique({
-            where: { idx: room_id }, include: { users: true, },
+            where: { idx: room_id }, include: { roomusers: true, },
         });
-        const users = room.users;
+        const users = room.roomusers;
         if (users.length === 0) // 남은 유저가 없을 경우 방을 삭제
         {
+            await this.prismaService.chatroom_password.delete({ where: { chatroom_idx: room_id } });
             await this.prismaService.chatroom.delete({ where: { idx: room_id } });
             return {status: true, message: 'room deleted'};
         }
@@ -161,14 +160,14 @@ export class ChatService {
         {
             await this.prismaService.chatroom.update({ 
                 where: { idx: room_id }, 
-                data: { owner_id: mannagers[0].user_id, owner_nickname: mannagers[0].nick_name } 
+                data: { owner_id: mannagers[0].user_id, owner_nickname: mannagers[0].user_nickname } 
             });
         } else { //남은 매니저가 없을경우 가장 먼저 들어온 유저가 방장과 매니저가 됨
             await this.prismaService.chatroom.update({ 
                 where: { idx: room_id }, 
-                data: { owner_id: users[0].user_id, owner_nickname: users[0].nick_name } 
+                data: { owner_id: users[0].user_id, owner_nickname: users[0].user_nickname } 
             });
-            await this.prismaService.user.update({ where: { user_id: users[0].user_id }, data: { is_manager: true } });
+            await this.prismaService.chatroom_user.update({ where: { user_id: users[0].user_id }, data: { is_manager: true } });
         }
     }
 
@@ -177,7 +176,7 @@ export class ChatService {
         const room = await this.prismaService.chatroom.findUnique({
             where: {
                 idx: data.room_id,
-                users : {
+                roomusers : {
                     some: {
                         user_id: data.user_id,
                     },
@@ -186,7 +185,7 @@ export class ChatService {
         });
         if (room === undefined)
             return {status: false, message: 'fail to find room'};
-        await this.prismaService.user.update({
+        await this.prismaService.chatroom_user.update({
             where: {
                 user_id: data.target_id,
             },
@@ -202,7 +201,7 @@ export class ChatService {
         const room = await this.prismaService.chatroom.findUnique({
             where: {
                 idx: data.room_id,
-                users : {
+                roomusers : {
                     some: {
                         user_id: data.user_id,
                     },
@@ -211,7 +210,7 @@ export class ChatService {
         });
         if (room === undefined)
             return {status: false, message: 'fail to find room'};
-        await this.prismaService.user.update({
+        await this.prismaService.chatroom_user.update({
             where: {
                 user_id: data.target_id,
             },
@@ -227,7 +226,7 @@ export class ChatService {
         const room = await this.prismaService.chatroom.findUnique({
             where: {
                 idx: data.room_id,
-                users : {
+                roomusers : {
                     some: {
                         user_id: data.user_id,
                     },
@@ -236,12 +235,16 @@ export class ChatService {
         });
         if (room === undefined)
             return {status: false, message: 'fail to find room'};
-        await this.prismaService.mute.create({
-            data: {
+        await this.prismaService.chatroom_user.update({
+            where: {
                 user_id: data.target_id,
-                chatroom_id: data.room_id,
+            },
+            data: {
+                is_mute: true,
+                mute_time: String(new Date().valueOf() + 30000),
             }
         });
+        await this.socketService.HandleNotice(data.room_id, `${data.target_nickname}님이 채팅을 금지당하셨습니다.`);
         return {status: true, message: 'success'};
     }
 
@@ -250,19 +253,22 @@ export class ChatService {
         const room = await this.prismaService.chatroom.findUnique({
             where: {
                 idx: data.room_id,
-                users : {
+                roomusers : {
                     some: {
                         user_id: data.user_id,
                     },
                 }
             }
         });
-        if (room === undefined)
+        if (room === null)
             return {status: false, message: 'fail to find room'};
-        await this.prismaService.mute.deleteMany({
+        await this.prismaService.chatroom_user.update({
             where: {
                 user_id: data.target_id,
-                chatroom_id: data.room_id,
+            },
+            data: {
+                is_mute: false,
+                mute_time: null,
             }
         });
         return {status: true, message: 'success'};
@@ -273,14 +279,14 @@ export class ChatService {
         const room = await this.prismaService.chatroom.findUnique({
             where: {
                 idx: data.room_id,
-                users : {
+                roomusers : {
                     some: {
                         user_id: data.user_id,
                     },
                 }
             }
         });
-        if (room === undefined)
+        if (room === null)
             return {status: false, message: 'fail to find room'};
         await this.prismaService.ban.create({
             data: {
@@ -304,7 +310,7 @@ export class ChatService {
                 }
             }
         });
-        if (room === undefined)
+        if (room === null)
             return {status: false, message: 'fail to find room'};
         await this.prismaService.ban.deleteMany({
             where: {
@@ -320,14 +326,14 @@ export class ChatService {
         const room = await this.prismaService.chatroom.findUnique({
             where: {
                 idx: data.room_id,
-                users : {
+                roomusers : {
                     some: {
                         user_id: data.user_id,
                     },
                 }
             }
         });
-        if (room === undefined)
+        if (room === null)
             return {status: false, message: 'fail to find room'};
         this.LeaveRoom(data.target_id, data.room_id);
         return {status: true, message: 'success'};

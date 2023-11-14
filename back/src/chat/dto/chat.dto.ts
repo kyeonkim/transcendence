@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsBoolean, IsInt, IsOptional, IsString } from "class-validator";
+import { IsBoolean, IsIn, IsInt, IsOptional, IsString } from "class-validator";
 import { Socket } from "dgram";
 
 export class ChatRoomDto
@@ -38,6 +38,11 @@ export class JoinRoomDto
     user_id: number;
 
     @ApiProperty()
+    @IsString()
+    user_nickname: string;
+    
+
+    @ApiProperty()
     @IsInt()
     room_id: number;
 
@@ -60,4 +65,8 @@ export class SetChatUserDto
     @ApiProperty()
     @IsInt()
     target_id: number;
+
+    @ApiProperty()
+    @IsString()
+    target_nickname: string;
 }

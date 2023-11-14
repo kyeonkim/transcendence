@@ -17,43 +17,6 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
   ) {}
   @WebSocketServer() server: Server;
 
-  @SubscribeMessage('message')
-  async handleMessage(client: Socket, payload: any): Promise<string> {
-    // console.log('client', client, 'message', payload);
-    return 'Hello world!';
-  }
-
-  @SubscribeMessage('events')
-  async handleEvent(client: Socket, payload: any): Promise<string> {
-    console.log(`client ===========\n` , client);
-    return 'Hello world!';
-  }
-
-  async JoinRoom(user_id: any, room_id: number)
-  {
-    this.SocketService.JoinRoom(user_id, room_id, this.server);
-  }
-
-  async LeaveRoom(user_id: any, room_id: number)
-  {
-    this.SocketService.LeaveRoom(user_id, room_id, this.server);
-  }
-
-  @SubscribeMessage('identity')
-  async identity(client: Socket, data: number): Promise<number> {
-    // console.log('client', client, 'identity', data);
-    return data;
-  }
-
-  @SubscribeMessage('chat')
-  async handlechat(client: Socket, payload: any): Promise<string> {
-    console.log('client', client.id, 'data', payload);
-    console.log('room: ', client.rooms);
-    client.broadcast.to(payload.room_id).emit('chat', {from: payload.user_name, message: payload.message});
-    // this.server.emit('chat', {from: client.id, message: payload}});
-    return 'Hello world!';
-  }
-
   async afterInit(server: Server) {
     // console.log('Init===========\n',server);
   }
@@ -65,18 +28,20 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 
     //토큰인증로직 
     //if 토큰인증 실패 >> disconnect
-    if (client.handshake.query.user_id === undefined)
+    console.log(client.id, client.handshake.query.user_id == 'undefined');
+    if (client.handshake.query.user_id == 'undefined')
       client.disconnect();
     else
     {
       console.log(client.id, client.handshake.query.user_id);
       const connect_user = await this.SocketService.Connect(client.handshake.query.user_id, client.id, this.server);
+      console.log(connect_user);
       if (connect_user === null)
         client.disconnect();
-      else if (connect_user.chatroom_id !== null)
+      else if (connect_user.roomuser !== null)
       {
-        console.log("join room: ", connect_user.user_id, connect_user.chatroom_id);
-        await this.JoinRoom(connect_user.user_id, connect_user.chatroom_id);
+        console.log("join room: ", connect_user.user_id, connect_user.roomuser.chatroom_id);
+        await this.JoinRoom(connect_user.user_id, connect_user.roomuser.chatroom_id);
       }
     }
   }
@@ -89,5 +54,27 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
       // console.log(this.server.sockets.sockets,"\n");
     }
     // console.log('Client disconnected');
+  }
+  
+  @SubscribeMessage('chat')
+  async handlechat(client: Socket, payload: any): Promise<any> {
+    const rtn = await this.SocketService.HandleChat(client, payload, this.server);
+    console.log(rtn);
+    return rtn;
+  }
+
+  async HandleNotice(chatroom_id: number, message: string)
+  {
+    this.SocketService.HandleNotice(chatroom_id, message, this.server);
+  }
+
+  async JoinRoom(user_id: any, room_id: number)
+  {
+    this.SocketService.JoinRoom(user_id, room_id, this.server);
+  }
+
+  async LeaveRoom(user_id: any, room_id: number)
+  {
+    this.SocketService.LeaveRoom(user_id, room_id, this.server);
   }
 }
