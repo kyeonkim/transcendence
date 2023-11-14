@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { useWebSocket } from "../../app/main_frame/socket_provider"
+import { useChatSocket } from "../../app/main_frame/socket_provider"
 import { useCookies } from 'next-client-cookies';
 import {Paper, Grid, Box, Divider, TextField, Typography, List, ListItem, ListItemButton, Avatar, Fab,
 	Chip, Stack, IconButton, AppBar, Toolbar, Drawer, Popper} from "@mui/material";
@@ -21,7 +21,7 @@ export default function Chat(props: any) {
 	const [anchorEl, setAnchorEl] = useState(null);
 	const { setMTbox } = props;
 	
-	const socket = useWebSocket();
+	const socket = useChatSocket();
 	const cookies = useCookies();
 
 	const my_name = cookies.get('nick_name');

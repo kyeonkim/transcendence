@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { useWebSocket } from "../../app/main_frame/socket_provider"
+import { useChatSocket } from "../../app/main_frame/socket_provider"
 import { Grid, ListItem, Stack, Chip, Typography, Avatar } from "@mui/material";
 
 const TextSend = (props:any) => {
 	const { setMTbox, imageLoader} = props;
 	const [message, setChatMessages] = useState([]);
-	const socket = useWebSocket();
+	const socket = useChatSocket();
 
 	const handleClick = useCallback((from: string) => {
 		setMTbox(1, from);

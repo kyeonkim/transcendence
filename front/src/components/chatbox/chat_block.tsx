@@ -53,7 +53,8 @@ export default function ChatBlock(props: any) {
 		}
 		else
 		{
-			setInRoom(false);
+			// setInRoom(false);
+			setInRoom(true);
 		}
 		})
 	}
