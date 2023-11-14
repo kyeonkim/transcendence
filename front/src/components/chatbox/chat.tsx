@@ -1,10 +1,8 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { useChatSocket } from "../../app/main_frame/socket_provider"
 import { useCookies } from 'next-client-cookies';
-import {Paper, Grid, Box, Divider, TextField, Typography, List, ListItem, ListItemButton, Avatar, Fab,
-	Chip, Stack, IconButton, AppBar, Toolbar, Drawer, Popper} from "@mui/material";
-import ListItemText from "@mui/material/ListItemText";
-import Button from '@mui/material/Button';
+import {Paper, Grid, Box, Divider, TextField, Typography, List, Fab,
+	IconButton, AppBar, Toolbar, Drawer} from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
@@ -109,33 +107,33 @@ export default function Chat(props: any) {
 				/>
 			</Drawer>
 			<Grid container component={Paper}>
-				<Grid item xs={12} className={styles.borderRight500}>
-					<List className={styles.messageArea} ref={messageAreaRef}>
-						<TextSend
-							setMTbox={setMTbox}
-							image={imageLoader}
+				<List className={styles.messageArea} ref={messageAreaRef}>
+					<TextSend
+						imageLoader={imageLoader}
+						my_name={my_name}
+						socket={socket}
+						setMTbox={setMTbox}
+					/>
+				</List>
+				<Divider />
+				<Grid container style={{ padding: "20px" }}>
+					<Grid item xs={11}>
+						<TextField
+							id="outlined-basic-email"
+							label="Input message"
+							fullWidth 
+							value={message}
+							onChange={(e) => setMessage(e.target.value)}
+							onKeyPress={(e) => {
+								if (e.key === 'Enter') {
+									handleSendMessage();
+								}}}
 						/>
-					</List>
-					<Divider />
-					<Grid container style={{ padding: "20px" }}>
-						<Grid item xs={11}>
-							<TextField
-								id="outlined-basic-email"
-								label="Input message"
-								fullWidth 
-								value={message}
-								onChange={(e) => setMessage(e.target.value)}
-								onKeyPress={(e) => {
-									if (e.key === 'Enter') {
-										handleSendMessage();
-									}}}
-							/>
-						</Grid>
-						<Grid item xs={1}>
-							<Fab color="primary" aria-label="add" onClick={handleSendMessage}>
-								<SendIcon />
-							</Fab>
-						</Grid>
+					</Grid>
+					<Grid item xs={1}>
+						<Fab color="primary" aria-label="add" onClick={handleSendMessage}>
+							<SendIcon />
+						</Fab>
 					</Grid>
 				</Grid>
 			</Grid>
