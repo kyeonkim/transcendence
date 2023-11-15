@@ -24,14 +24,23 @@ import { styled } from '@mui/system';
 
 import axios from 'axios';
 
+import { genSaltSync, hashSync } from "bcrypt-ts";
+
+const CreateRoomAppBar = styled(AppBar) ({
+	backgroundColor: "white",
+	opacity: 0.7,
+	borderRadius: '10px', // 옵션: 모서리를 둥글게 설정
+});
 
 const MainChatRoomCreate = styled(Box) ({
 	position: 'absolute',
-	top: 60,
+	top: 65,
 	left: 0,
 	width: 560,
-	height: 1332
-	
+	height: 1332,
+	backgroundColor: 'white',
+	opacity: 0.7,
+	borderRadius: '10px', // 옵션: 모서리를 둥글게 설정
   });
 
 export default function ChatRoomCreate(props: any) {
@@ -39,10 +48,8 @@ export default function ChatRoomCreate(props: any) {
 	const user_id = Number(cookies.get("user_id"));
 	const user_nickname = cookies.get("nick_name");
 
-	const	[ roomName, setRoomName ] = useState('');
-	// const	[ roomMode, setRoomMode ] = useState('');
+	const	[roomName, setRoomName] = useState('');
 	const	[roomPrivate, setRoomPrivate] = useState(false);
-	// const	[roomHidden, setRoomHidden] = useState(false);
 	const 	[roomPassword, setRoomPassword] = useState('');
 
 	const {handleRenderMode} = props;
@@ -51,9 +58,17 @@ export default function ChatRoomCreate(props: any) {
 
 	async function handleDone() {
 		
+		var hashRoomPassword;
+
 		if (roomName === '')
 		{
 			return ;
+		}
+
+		if (roomPassword !== '')
+		{
+			const salt = genSaltSync(10);
+			hashRoomPassword = hashSync(roomPassword, salt);
 		}
 
 		await axios.post(`${process.env.NEXT_PUBLIC_API_URL}chat/createroom`, 
@@ -61,13 +76,13 @@ export default function ChatRoomCreate(props: any) {
 			user_id : user_id,
 			user_nickname: user_nickname,
 			chatroom_name: roomName,
-			password: roomPassword,
+			password: hashRoomPassword,
 			private: roomPrivate,
 		}) 
 		.then((res) => {
 		if (res.data.status === true)
 		{
-			handleRenderMode(2);
+			handleRenderMode('chatRoom');
 		}
 		else
 		{
@@ -76,28 +91,19 @@ export default function ChatRoomCreate(props: any) {
 		})
 	};
 
-	function handleRoomnameChange(event) {
+	function handleRoomnameChange(event :any) {
 		setRoomName(event.target.value as string);
 	}
 
-	function handleRoomPasswordChange(event) {
+	function handleRoomPasswordChange(event :any) {
 		setRoomPassword(event.target.value as string);
 	}
 
-	// function handleChange(event: SelectChangeEvent) {
-	// 	setRoomMode(event.target.value as string);
-	// }
-
 	function handleCancel() {
-		handleRenderMode(0);
+		handleRenderMode('chatList');
 	};
 
-	// function handleHidden(event) {
-	// 	console.log(event);
-	// 	setRoomHidden(event.target.checked);
-	// }
-
-	function handleRoomPrivate(event) {
+	function handleRoomPrivate(event :any) {
 		setRoomPrivate(event.target.checked);
 	}
 
@@ -108,30 +114,17 @@ export default function ChatRoomCreate(props: any) {
 	// modal 형태 고려 - 우선순위 낮음
 	return (
 		<div>
-            <AppBar position="static">
+            <CreateRoomAppBar position="static">
 				<Toolbar>
-                    {/* <IconButton
-                        size="large"
-                        edge="start"
-                        color="inherit"
-                        aria-label="menu"
-                        sx={{ mr: 2 }}
-                        // onClick={handleDrawer}
-                    >
-                    </IconButton> */}
-                    <Button color="inherit" variant='contained' onClick={handleDone}>
-                        완료
-                    </Button>
-                    <Button color="inherit" variant='contained' onClick={handleCancel}>
+                    <Button sx={{ background: "white", color: "black"}} variant='contained' onClick={handleCancel}>
                         취소
                     </Button>
+					<Button sx={{ background: "white", color: "black", left: 375}} variant='contained' onClick={handleDone}>
+                        완료
+                	</Button>
 				</Toolbar>
-			</AppBar>
-			<MainChatRoomCreate
-				sx={{
-						bgcolor: 'white',
-          			}}
-			>
+			</CreateRoomAppBar>
+			<MainChatRoomCreate>
 				<TextField
 					sx={{
 						left:30,
@@ -161,48 +154,8 @@ export default function ChatRoomCreate(props: any) {
 					control={<Switch checked={roomPrivate} onChange={handleRoomPrivate}/>} label="Private" labelPlacement='end'
 					style={{ marginLeft: '20px', marginTop: '90px' }}
 					/>
-				{/* <FormControl
-					sx={{
-						left:30,
-						top:60,
-						width:400
-					}}>
-					<InputLabel id="visibility_mode_select_label">Visibility</InputLabel>
-					<Select
-						labelId="visibility_mode_select_label"
-						id="visibility_mode_select"
-						value={roomMode}
-						label="mode"
-						onChange={handleChange}
-					>
-						<MenuItem value={"public"}>Public</MenuItem>
-						<MenuItem value={"private"}>Private</MenuItem>
-					</Select>
-				</FormControl> */}
-				{/* <FormControlLabel
-					sx={{
-						left:100,
-						top:100,
-						width:400
-					}}
-					control={<Switch checked={roomHidden} onChange={handleHidden}/>} label="Private" labelPlacement='end'
-					style={{ marginLeft: '20px', marginTop: '90px' }}
-					/> */}
-				{/* {roomHidden ? (
-					<TextField
-					sx={{
-						left:30,
-						top:30,
-						width:400
-					}}
-					id="password_text_field"
-					label="password"
-					onChange={handleRoomPasswordChange}
-					/>
-				) : (
-				<div></div>
-				)} */}
 			</MainChatRoomCreate>
 		</div>
 	);
 }
+

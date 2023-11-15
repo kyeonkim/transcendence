@@ -12,7 +12,7 @@ import { useCookies } from 'next-client-cookies';
 import axios from 'axios';
 
 
-export default function FriendListPanel() {
+export default function FriendListPanel({ setMTbox }: any) {
   const [redering, setRendering] = useState('');
   const [hasFriend, setHasFriend] = useState(true);
   const [apiResponse, setApiResponse] = useState([]);
@@ -59,7 +59,7 @@ export default function FriendListPanel() {
   };
 
   const handleProfile = (id: any) => () => {
-    console.log('profile to ' + id);
+    setMTbox(1, id);
   }
   
   const imageLoader = ({ src }: any) => {

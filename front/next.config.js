@@ -3,7 +3,9 @@
 const nextConfig = {
 
   reactStrictMode: false,
-
+  // experimental: {
+  // serverComponentsExternalPackages: ['bcrypt'],
+  // },
 }
 
 module.exports = nextConfig

@@ -43,15 +43,15 @@ export default function Signup (props:any) {
     if (!response.ok) {
       console.log('signup login/api fail', response);
     }
-
-    const res_img = await axios.post(`${process.env.NEXT_PUBLIC_FRONT_URL}api/send_image`, formData)
-
-    if (res_img.data.success == true) {
-      router.replace('/main_frame');
-    } else {
-      console.log('Image upload failed', res_img);
-    }
-  
+    else
+    {
+      const res_img = await axios.post(`${process.env.NEXT_PUBLIC_FRONT_URL}api/send_image`, formData)
+      if (res_img.data.success == true) {
+        router.replace('/main_frame');
+      } else {
+        console.log('Image upload failed', res_img);
+      }
+    }  
   };
 
 

@@ -8,18 +8,25 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
+
 import IconButton from '@mui/material/IconButton';
 import Avatar from '@mui/material/Avatar';
 import CommentIcon from '@mui/icons-material/Comment';
+
+import HandshakeIcon from '@mui/icons-material/Handshake';
+import AddCommentIcon from '@mui/icons-material/AddComment';
+import SportsTennisIcon from '@mui/icons-material/SportsTennis';
 
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 
 import Button from '@mui/material/Button';
 
+import Modal from '@mui/material/Modal';
+import TextField from '@mui/material/TextField';
+
 import CheckCircleOutlineRoundedIcon from '@mui/icons-material/CheckCircleOutlineRounded';
 import ClearRoundedIcon from '@mui/icons-material/ClearRounded';
-
 
 
 // 로딩되기 전에 그림자 띄울 수 있음. 아직 적용하지 않았음. 
@@ -43,14 +50,31 @@ const MainAlarmPanal = styled(Box) ({
     backgroundColor: 'white'
   })
 
+const modalStyle = {
+  position: 'absolute' as 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 400,
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  boxShadow: 24,
+  p: 4,
+  opacity: 0.5
+  };
 
 export default function AlarmListPanal (props: any) {
   const cookies = useCookies();
-  
+
+
   const alarmList = props.alarmList;
   const alarmListRemover = props.alarmListRemover;
   const alarmCountHandler = props.alarmCountHandler;
   const setMTbox = props.setMTbox;
+
+
+
+
 
   const removeEventFromDatabase = async (alarm: any) => {
         
@@ -96,19 +120,73 @@ export default function AlarmListPanal (props: any) {
           console.log('accepFriendAddRequest - api request failed');
       });
   }
+  
+  const acceptChatAmIinChat = async (alarm :any) => {
+      await axios.get(`${process.env.NEXT_PUBLIC_API_URL}user/getdata/id/${alarm.to_id}`)
+      .then((response) => {
+          if (response.data.userData.roomuser === null)
+          {
+              // 방 들어가기
+              chatRequestJoinRoom(
+                  response.data.userData.roomuser.is_password,
+                  response.data.userData.roomuser.idx);              
+          }
+          else
+          {
+              // 이미 채팅방에 들어가있습니다!
+              // 예외 처리
+              // 일단 아무것도 안함
+          }
+      })
+  };
 
-  const acceptRequest = (alarm: any) => () => {
-    console.log("accept request of - " + alarm.from_nickname);
-    // removeEventFromDatabase(alarm);
-        // remove 대신  /social/acceptfriend에 보낸다. 그러면 안에서 이벤트 지워준다고 한다.
-    acceptFriendAddRequest(alarm);
-        // remove Alarm from List with alarmListHandler
-    // alarmCountHandler(false);
+  const chatRequestJoinRoom = (ispassword :boolean, idx :number) => {
+    // password 존재 여부
+    if (ispassword === true)
+    {
+        // 존재할 경우 - modal
+
+    }
+    else
+    {
+        // 존재하지 않을 경우 - join
+
+    }
+  };
+
+  const acceptFriendRequest = (alarm: any) => () => {
+      console.log("accept request of - " + alarm.from_nickname);
+
+      acceptFriendAddRequest(alarm);
+
+  };
+
+  const acceptChatRequest = (alarm :any) => () => {
+      acceptChatAmIinChat(alarm);
+  };
+
+  const acceptGameRequest = (alarm :any) => () => {
+
   };
 
   const denyRequest = (alarm: any) => () => {
-    console.log("deny request of - " + alarm.from_nickname);
-    removeEventFromDatabase(alarm);
+      console.log("deny request of - " + alarm.from_nickname);
+
+      // alarm이 어떤 종류인지
+        // 근데 remove할 때는 딱히 다른 동작 필요 없나?
+      if (alarm.type === 'friend')
+      {
+          removeEventFromDatabase(alarm);
+      }
+      else if (alarm.type === 'chat')
+      {
+          removeEventFromDatabase(alarm);
+      }
+      else if (alarm.type === 'game')
+      {
+          removeEventFromDatabase(alarm);
+      }
+
     // alarmCountHandler(false);
   };
 
@@ -125,33 +203,88 @@ export default function AlarmListPanal (props: any) {
     return `${process.env.NEXT_PUBLIC_API_URL}user/getimg/nickname/${src}`
   }
   
+
   return (
     <div>
       {alarmList ? (
         <List dense sx={{ width: '100%', maxWidth: 400, maxHeight: 580,bgcolor: 'background.paper', overflow: 'auto'}}>
           {alarmList.map((alarm :any) => {
             const labelId = `comment-list-secondary-label-${alarm.from_nickname}`
-            return (
-              <ListItem
-                key={alarm.from_nickname}
-                disablePadding
-              >
-                <ListItemButton onClick={handleProfile(alarm)}>
-                    <ListItemAvatar>
-                    <Avatar
-                      src={alarm.from_nickname ? imageLoader({src: alarm.from_nickname}) : null}
-                    />
-                    </ListItemAvatar>
-                    <ListItemText id={labelId} primary={`${alarm.from_nickname}`} />
-                </ListItemButton>
-                <IconButton onClick={acceptRequest(alarm)}>
-                    <CheckCircleOutlineRoundedIcon />
-                </IconButton>
-                <IconButton onClick={denyRequest(alarm)}>
-                    <ClearRoundedIcon />
-                </IconButton>
-              </ListItem>
-            );
+            if (alarm.type === 'friend')
+            {
+              return (
+                <ListItem
+                  key={alarm.from_nickname}
+                  disablePadding
+                >
+                  <HandshakeIcon />
+                  <ListItemButton onClick={handleProfile(alarm)}>
+                      <ListItemAvatar>
+                      <Avatar
+                        src={alarm.from_nickname ? imageLoader({src: alarm.from_nickname}) : null}
+                      />
+                      </ListItemAvatar>
+                      <ListItemText id={labelId} primary={`${alarm.from_nickname}`} />
+                  </ListItemButton>
+                  <IconButton onClick={acceptFriendRequest(alarm)}>
+                      <CheckCircleOutlineRoundedIcon />
+                  </IconButton>
+                  <IconButton onClick={denyRequest(alarm)}>
+                      <ClearRoundedIcon />
+                  </IconButton>
+                </ListItem>
+              );
+            }
+            else if (alarm.type === 'chat')
+            {
+              return (
+                <ListItem
+                  key={alarm.from_nickname}
+                  disablePadding
+                >
+                  <AddCommentIcon />
+                  <ListItemButton onClick={handleProfile(alarm)}>
+                      <ListItemAvatar>
+                      <Avatar
+                        src={alarm.from_nickname ? imageLoader({src: alarm.from_nickname}) : null}
+                      />
+                      </ListItemAvatar>
+                      <ListItemText id={labelId} primary={`${alarm.from_nickname}`} />
+                  </ListItemButton>
+                  <IconButton onClick={acceptChatRequest(alarm)}>
+                      <CheckCircleOutlineRoundedIcon />
+                  </IconButton>
+                  <IconButton onClick={denyRequest(alarm)}>
+                      <ClearRoundedIcon />
+                  </IconButton>
+                </ListItem>
+              );
+            }
+            else if (alarm.type === 'game')
+            {
+              return (
+                <ListItem
+                  key={alarm.from_nickname}
+                  disablePadding
+                >
+                <SportsTennisIcon />
+                  <ListItemButton onClick={handleProfile(alarm)}>
+                      <ListItemAvatar>
+                      <Avatar
+                        src={alarm.from_nickname ? imageLoader({src: alarm.from_nickname}) : null}
+                      />
+                      </ListItemAvatar>
+                      <ListItemText id={labelId} primary={`${alarm.from_nickname}`} />
+                  </ListItemButton>
+                  <IconButton onClick={acceptGameRequest(alarm)}>
+                      <CheckCircleOutlineRoundedIcon />
+                  </IconButton>
+                  <IconButton onClick={denyRequest(alarm)}>
+                      <ClearRoundedIcon />
+                  </IconButton>
+                </ListItem>
+              );
+            }
           })}
         </List>
       ) : (
@@ -160,41 +293,3 @@ export default function AlarmListPanal (props: any) {
     </div>
   );
 }
-
-// export default function AlarmListPanal (props: any) {
-
-//     // 1차 렌더링을 할 때, 남은 알람을 모두 가져와서 렌더링하고, state에 저장.
-//         // 백에서 저장할 필요 있음 + 백에서 받아오기 위한 GET API 필요함
-
-//     // event를 받아서 자체적으로 리스트를 추가 - back에서 따로 저장하고 넘겨줄 것으로 보임
-
-
-//     const cookies = useCookies();
-
-//     const alarmList = props.alarmList;
-//     const alarmListHandler = props.alarmListHandler;
-//     const countChange = props.alarmCountHandler;
-
-//     // eventHandler들을 줄 세우기 위한 state
-//         // 동기화 방법론 찾기
-
-//     console.log('alarm_list_rendering starts');
-
-//     useEffect(() => {
-//         // alarmList에 따라 그리기
-//         console.log('its AlarmList !!!!! - ', alarmList);
-
-//         //
-
-//     }, []);
-
-//     const {alarmCountHandler} = props;
-
-//     return (
-//     <div>
-//             <MainAlarmPanal sx={{ p: 2 }}>
-
-//             </MainAlarmPanal>
-//     </div>
-//     );
-// }

@@ -49,15 +49,19 @@ export default function MatchList(props: any) {
     width: '100%',
     height: '100%',
     maxWidth: 1600,
-    maxHeight: 932,
-    bgcolor: 'white',
-    overflow: 'auto',
+    maxHeight: 850,
+    bgcolor: 'rgba(135, 206, 235, 0.2)',
     alignItems: 'center',
-    p: 2,
-    margin: '10px',
+    marginLeft: '70px',
+    marginRight: '70px',
+    marginTop: '50px',
     borderRadius: '20px',
-    border: '5px solid #000', // 테두리 스타일과 색상을 지정
-    opacity: '0.2', // 투명도 설정
+    border: '5px solid #000',
+    overflowY: 'scroll',
+    scrollbarWidth: 'none',
+    '&::-webkit-scrollbar': {
+      display: 'none',
+    },
   };
 
   return (
@@ -71,8 +75,9 @@ export default function MatchList(props: any) {
           padding: '10px', // 옵션: 패딩 설정
           margin : '9px', // 옵션: 마진 설정
           width: '1200px', // 옵션: 너비 설정
-          marginLeft: '180px',
+          marginLeft: '120px',
           borderRadius: '10px', // 옵션: 모서리를 둥글게 설정
+          // opacity: '1'
         };
         
         const textPrimaryStyle = {
@@ -122,16 +127,3 @@ export default function MatchList(props: any) {
   );
   
 }
-
-/*
-        {
-            "idx": 16,
-            "rank": true,
-            "user_id": 0,
-            "enemy_id": 1,
-            "winner": true,
-            "my_score": 11,
-            "enemy_score": 0,
-            "created_at": "2023-10-26T08:36:23.362Z"
-        },
-*/

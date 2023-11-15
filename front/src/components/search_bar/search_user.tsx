@@ -63,7 +63,6 @@ export default function SearchUser({ setMTbox }: SearchUserProps) {
                 onChange={(e) => setSearchTarget(e.target.value)}
                 onKeyDown={handleEnterkey}
                 >
-                Matching
             </MainSearchUser>
             <MainSearchButton
                 variant='contained'

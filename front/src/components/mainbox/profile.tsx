@@ -23,29 +23,6 @@ const ProfilePage = (props: any) => {
   const my_nick = cookies.get('nick_name');
   const access_token = cookies.get('access_token');
 
-  console.log("my_id: " + my_id);
-  console.log("userNickname: " + userNickname);
-
-  // useEffect(() => {
-  //   const sseEvents = new EventSource(`${process.env.NEXT_PUBLIC_API_URL}event/friendlist/${cookies.get('user_id')}`);
-    
-  //   sseEvents.onopen = function() {
-  //   }
-    
-  //   sseEvents.onerror = function (error) {
-  //   }
-    
-    // sseEvents.onmessage = function (stream) {
-    //   if (stream.data.nick === userNickname) {
-    //     setRendering(stream.data);
-    //   }
-  //   }
-  //   return () => {
-  //     sseEvents.close();
-  //   };
-
-  // }, [])
-
   useEffect(() => {
     const fetchData = async () => {
       await axios.get(`${process.env.NEXT_PUBLIC_API_URL}user/getdata/nickname/${userNickname}`) 

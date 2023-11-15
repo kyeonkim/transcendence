@@ -1,15 +1,20 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useEffect ,useCallback} from 'react';
 import { useChatSocket } from "../../app/main_frame/socket_provider"
 import { useCookies } from 'next-client-cookies';
-import {Paper, Grid, Box, Divider, TextField, Typography, List, Fab,
-	IconButton, AppBar, Toolbar, Drawer} from "@mui/material";
+import {Paper, Grid, Box, Divider, TextField, Typography, List,	IconButton, 
+		AppBar, Toolbar, Drawer, Dialog, Button, DialogActions, DialogContent, DialogContentText, DialogTitle} from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import CloseIcon from '@mui/icons-material/Close';
+import axios from 'axios';
+import SpeedDial from '@mui/material/SpeedDial';
+import SpeedDialIcon from '@mui/material/SpeedDialIcon';
+import SpeedDialAction from '@mui/material/SpeedDialAction';
+
+import styles from './chat.module.css';
 import TextSend from './text_send';
 import UserList from './chat_user_list';
-import styles from './chat.module.css';
 
 export default function Chat(props: any) {
 	const messageAreaRef = useRef(null);
@@ -17,13 +22,23 @@ export default function Chat(props: any) {
 	const [drawer, setDrawer] = useState(false);
 	const [pop, setPop] = useState(false);
 	const [anchorEl, setAnchorEl] = useState(null);
-	const { setMTbox } = props;
-	
+	const [dialogOpen, setDialogOpen] = useState(false);
+	const [inviteTarget, setInviteTarget] = useState('');
+	const [open, setOpen] = useState(false);
+
+	const { setMTbox, handleRenderMode, roominfo } = props;
 	const socket = useChatSocket();
 	const cookies = useCookies();
-
+	
 	const my_name = cookies.get('nick_name');
-	const my_id = cookies.get('user_id');
+	const my_id = Number(cookies.get('user_id'));
+	
+	useEffect (() => {
+		const handleKick = (data :any) => {
+			handleRenderMode('chatList');
+		};
+		socket.on("kick", handleKick);
+	}, []);
 
 	const handleSendMessage = () => {
 		console.log('send message:==== \n', message);
@@ -34,19 +49,12 @@ export default function Chat(props: any) {
 		const newMassage = {
 			from: my_id,
 			user_name: my_name,
-			room_id: /*채널이름 or nickname*/"3",
+			room_id: roominfo.idx,
 			message: message,
 		};
 		socket.emit("chat", newMassage);
 		setMessage('');
-		moveScoll();
 	};
-
-	const moveScoll = useCallback(() => {
-		if (messageAreaRef.current) {
-			messageAreaRef.current.scrollTop = messageAreaRef.current.scrollHeight;
-		}
-	}, []);
 
 	const handleDrawer = useCallback(() => {
 		setDrawer(true);
@@ -57,10 +65,48 @@ export default function Chat(props: any) {
 		setPop(false);
 	}, []);
 
-	const imageLoader = useCallback(({ src }: any) => {
-		return `${process.env.NEXT_PUBLIC_API_URL}user/getimg/nickname/${src}`
-	}, []);
+	const handleOpen = () => setOpen(true);
+	const handleClose = () => setOpen(false);
+	const handleInvite = () => setDialogOpen(true);
+	const handledialogClose = () => setDialogOpen(false);
+	const handleInvitetarget = (e :any) => setInviteTarget(e.target.value);
 
+	const handleExit = async () => {
+		await axios.patch(`${process.env.NEXT_PUBLIC_API_URL}chat/leaveroom`, {
+			user_id: my_id,
+			user_nickname: my_name,
+			room_id: roominfo.idx,
+		})
+		.then((res) => {
+			handleRenderMode('chatList');
+		})	
+	};
+	
+	const handleSendInvite = async() => {
+		await axios.post(`${process.env.NEXT_PUBLIC_API_URL}chat/inviteuser`, {
+			type: 'chat',
+			to: inviteTarget,
+			from: my_name,
+			chatroom_id: roominfo.idx,
+			chatroom_name: roominfo.name,
+		})
+		.then((res) => {
+			console.log('invite success');
+			setDialogOpen(false);
+		})
+		.catch((err) => {
+			console.log('invite fail');
+		})
+	}
+
+
+	const imageLoader = (({ src }: any) => {
+		return `${process.env.NEXT_PUBLIC_API_URL}user/getimg/nickname/${src}`
+	});
+
+	const actions = [
+		{ icon: <SendIcon />, name: 'Invite' },
+	  ];
 	return (
 		<div>
 			<Box sx={{ flexGrow: 1 }}>
@@ -72,12 +118,12 @@ export default function Chat(props: any) {
 					color="inherit"
 					aria-label="close"
 					sx={{ mr: 2 }}
-					onClick={handleDrawer}
+					onClick={handleExit}
 				>
 					<CloseIcon />
 				</IconButton>
 				<Typography variant="h6" component="div" sx={{ flexGrow: 1 ,align: 'center' }}>
-					ChatRoom1
+					{roominfo.name}
 				</Typography>
 				<IconButton
 					size="large"
@@ -104,15 +150,19 @@ export default function Chat(props: any) {
 					styles={styles.userList}
 					pop={pop}
 					anchorEl={anchorEl}
+					roominfo={roominfo}
+					my_id={my_id}
+					socket={socket}
+					setMTbox={setMTbox}
 				/>
 			</Drawer>
 			<Grid container component={Paper}>
 				<List className={styles.messageArea} ref={messageAreaRef}>
 					<TextSend
-						imageLoader={imageLoader}
 						my_name={my_name}
 						socket={socket}
 						setMTbox={setMTbox}
+						scrollref={messageAreaRef}
 					/>
 				</List>
 				<Divider />
@@ -131,12 +181,57 @@ export default function Chat(props: any) {
 						/>
 					</Grid>
 					<Grid item xs={1}>
-						<Fab color="primary" aria-label="add" onClick={handleSendMessage}>
-							<SendIcon />
-						</Fab>
+						<SpeedDial
+							ariaLabel="SpeedDial controlled open example"
+							sx={{ position: 'absolute', bottom: 20, right: 5 }}
+							icon={<SpeedDialIcon />}
+							onClose={handleClose}
+							onOpen={handleOpen}
+							open={open}
+						>
+							{actions.map((action) => (
+							<SpeedDialAction
+								key={action.name}
+								icon={action.icon}
+								tooltipTitle={action.name}
+								onClick={handleInvite}
+							/>
+							))}
+						</SpeedDial>
 					</Grid>
 				</Grid>
 			</Grid>
+			<Dialog
+				open={dialogOpen}
+				BackdropProps={{
+					onClick: handledialogClose,
+				  }}
+				sx={{marginLeft: '2000px'}}>
+			<DialogTitle>Invite</DialogTitle>
+				<DialogContent>
+				<DialogContentText>
+					Invite user to this chatroom
+				</DialogContentText>
+				<TextField
+					autoFocus
+					margin="dense"
+					id="name"
+					label="User Name"
+					type="name"
+					fullWidth
+					variant="standard"
+					onChange={handleInvitetarget}
+					onKeyPress={(e) => {
+						if (e.key === 'Enter') {
+							handleSendInvite();
+						}}}
+				/>
+				</DialogContent>
+				<DialogActions>
+				<Button onClick={handledialogClose}>Cancel</Button>
+				<Button onClick={handleSendInvite}>Invite</Button>
+				</DialogActions>
+			</Dialog>
 		</div>
 	);
 };

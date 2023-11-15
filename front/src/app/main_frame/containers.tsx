@@ -15,8 +15,6 @@ import Particles from "react-tsparticles";
 import { ISourceOptions } from "tsparticles-engine";
 import type { Engine } from "tsparticles-engine";
 
-
-import TestWebsocket from '@/components/test_chat_box/test_websocket';
 import Divider from '@mui/material/Divider';
 
 // Top left Box
@@ -35,18 +33,18 @@ const MLBox = styled(Box) ({
   top: 400,
   left: 0,
   width: 400,
-  height:450,
+  height:250,
   position: 'absolute',
   // opacity: '0.7'
 });
 
 // Bottom Left Box
 const BLBox = styled(Box) ({
-  // backgroundColor: 'green',
+  backgroundColor: 'rgba(255, 255, 255, 1)',
   top: 650,
   left: 0,
   width: 400,
-  height:0,
+  height: 682,
   position: 'absolute',
 });
 
@@ -83,43 +81,27 @@ export default function Main() {
     setClick(value);
     setSearch(searchTarget || '');
   }
-  /*
-  랜더링 sse
-  
-  handler1{
-    data : 1
-
-    setClick(1);
-    setSearch();
-  }
-
-  */
-
-  console.log('Main component');
 
  return (
-   <React.Fragment>
-          <Particles options={particlesOptions as ISourceOptions} init={particlesInit} />
-          <CssBaseline />
-          {/* <GuardLogin> */}
-          {/* <TLBox> */}
-            <MyProfile setMTbox={handleClick}/>
-          {/* </TLBox> */}
-          <MTBox>
-            <Mainbox mod={clicked} search={id}/>
-          </MTBox>
-          <MLBox>
-            <SearchUser setMTbox={handleClick}/>
-            <MatchingButton setMTbox={handleClick}/>
-          </MLBox>
-          <Divider />
-          <BLBox>
-            <UserLists setMTbox={handleClick}/>
-          </BLBox>
-          <Chatbox>
-              <ChatBlock setMTbox={handleClick}/>
-          </Chatbox>
-        </React.Fragment>
+    <React.Fragment>
+      <Particles options={particlesOptions as ISourceOptions} init={particlesInit} />
+        <CssBaseline />
+        <MyProfile setMTbox={handleClick}/>
+        <MTBox>
+          <Mainbox mod={clicked} search={id}/>
+        </MTBox>
+        <MLBox>
+          <SearchUser setMTbox={handleClick}/>
+          <MatchingButton setMTbox={handleClick}/>
+        </MLBox>
+        <Divider />
+        <BLBox>
+          <UserLists setMTbox={handleClick}/>
+        </BLBox>
+        <Chatbox>
+          <ChatBlock setMTbox={handleClick}/>
+        </Chatbox>
+    </React.Fragment>
     )
   }
   

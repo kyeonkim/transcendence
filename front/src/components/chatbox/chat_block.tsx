@@ -15,32 +15,44 @@ import { useCookies } from 'next-client-cookies'
 
 export default function ChatBlock(props: any) {
 	const cookies = useCookies();
-	const [renderMode, setRenderMode] = useState(0);
+	const [renderMode, setRenderMode] = useState('chatList');
+	const [render, setRender] = useState(false);
+	const [roominfo, setRoominfo] = useState({});
 
-	const handleRenderMode = (mode :number) => {
-		// 요청을 보내서 방에 넣는다.
+	const handleRenderMode = (mode :string) => {
 
 		setRenderMode(mode);
-
+		setRender(true);
+		
 	}
 
 	async function getUserData() {
 		await axios.get(`${process.env.NEXT_PUBLIC_API_URL}user/getdata/nickname/${cookies.get("nick_name")}`) 
 		.then((res) => {
-		if (res.data.userData.roomuser !== null)
-		{
-			if (res.data.userData.roomuser.chatroom_id)
-			console.log("ChatBlock - user is in chatroom");
-			setRenderMode(2);
-		}
-		else
-		{
-			console.log("user is not in chat room");
-			setRenderMode(0);
-			// setInRoom(true);
-		}
+			console.log('userData in chat==',res);
+			if (res.data.userData.roomuser !== null)
+			{
+				if (res.data.userData.roomuser.chatroom)
+				{
+					console.log("ChatBlock - user is in chatroom");
+					setRoominfo(res.data.userData.roomuser.chatroom);
+					setRenderMode('chatRoom');
+				}
+			}
+			else
+			{
+				console.log("user is not in chat room");
+				setRenderMode('chatList');
+				// setInRoom(true);
+			}
 		})
 	}
+	
+	useEffect(() => {
+		getUserData();
+	}, [])
+
+
 
 	useEffect(() => {
 
@@ -48,33 +60,38 @@ export default function ChatBlock(props: any) {
 			// 나 자신이 채팅방에 들어가있는지 확인
 			// 로그인할 때 user_data 받는데, 그걸 넘겨주면 될 수도 있음.
 				// 근데 이렇게 넘겨주면, 나중에 자신이 소속된 방이 변경될 떄 어디서 받아서 어디서 저장하는가가 중요해짐
-		if (renderMode !== 1)
+		if (render === true && renderMode === 'chatRoom')
 			getUserData();
-	}, [])
+		setRender(false);
+	}, [render])
+
 
 	const { setMTbox } = props;
 
-	// 채널 리스트
-	
-	// AppBar 다루는 방법 고민해보기. 공용 컴포넌트로 만들고 동작 함수를 밑에 넣는다?
-		// 채팅방일 때, 채팅방 목록일 때의 동작 차이 이야기해보기
+	if (renderMode === 'chatList')
+	{
+		return (
+			<div>
+				<ChatRoomList handleRenderMode={handleRenderMode} />
+			</div>
 
-	if (renderMode === 0)
-	{
-		return (
-			<ChatRoomList handleRenderMode={handleRenderMode} />
 		);
 	}
-	else if (renderMode === 1)
+	else if (renderMode === 'newChat')
 	{
 		return (
-			<ChatRoomCreate handleRenderMode={handleRenderMode} />
+			<div>
+				<ChatRoomCreate handleRenderMode={handleRenderMode} />
+			</div>
 		);
 	}
-	else if (renderMode === 2)
+	else if (renderMode === 'chatRoom')
 	{
 		return (
-			<Chat setMTbox={setMTbox} />
+			<div>
+				<Chat setMTbox={setMTbox} handleRenderMode={handleRenderMode} roominfo={roominfo}/>
+			</div>
+		
 		);
 	}
 }

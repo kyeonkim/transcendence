@@ -22,22 +22,22 @@ export async function POST (request: NextRequest)
         const cookieBox = cookies();
         cookieBox.set('access_token', access_token, {
             path: '/',
-            maxAge: 60 * 60 * 3,
+            maxAge: 600 * 60 * 3,
             // httpOnly: true,
         });
         cookieBox.set('refresh_token', refresh_token, {
             path: '/',
-            maxAge: 60 * 60 * 3,
+            maxAge: 600 * 60 * 3,
             // httpOnly: true,
         });
         cookieBox.set('nick_name', nick_name, {
             path: '/',
-            maxAge: 60 * 60 * 3,
+            maxAge: 600 * 60 * 3,
             // httpOnly: true,
         });
         cookieBox.set('user_id', user_id, {
             path: '/',
-            maxAge: 60 * 60 * 3,
+            maxAge: 600 * 60 * 3,
             // httpOnly: true,
         });
 

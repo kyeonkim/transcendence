@@ -19,6 +19,11 @@ import { styled } from '@mui/system';
 
 import axios from 'axios';
 
+const ChatRoomAppBar = styled(AppBar) ({
+	backgroundColor: "white",
+	opacity: 0.7,
+	borderRadius: '10px', // 옵션: 모서리를 둥글게 설정
+});
 
 export default function ChatRoomBar(props: any) {
 	// const cookies = useCookies();
@@ -27,7 +32,7 @@ export default function ChatRoomBar(props: any) {
     const { setMTbox, handleRenderMode } = props;
 
     function handleNewChat() {
-        handleRenderMode(1);    
+        handleRenderMode('newChat');    
     };
 
 	// useEffect(() => {
@@ -39,25 +44,16 @@ export default function ChatRoomBar(props: any) {
 
 	return (
 		<div>
-            <AppBar position="static">
+            <ChatRoomAppBar position="static">
 				<Toolbar>
-                    {/* <IconButton
-                        size="large"
-                        edge="start"
-                        color="inherit"
-                        aria-label="menu"
-                        sx={{ mr: 2 }}
-                        // onClick={handleDrawer}
-                    >
-                    </IconButton> */}
-                    <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                    <Typography sx={{flexGrow: 1, color: 'black'}}variant="h6" component="div">
                         채팅방 목록
                     </Typography>
-                    <Button color="inherit" variant='contained' onClick={handleNewChat}>
+                    <Button sx={{ background: "white", color: "black"}} variant='contained' onClick={handleNewChat}>
                         새 채팅
                     </Button>
 				</Toolbar>
-			</AppBar>
+			</ChatRoomAppBar>
 		</div>
 	);
 }
