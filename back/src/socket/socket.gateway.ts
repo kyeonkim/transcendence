@@ -4,6 +4,7 @@ import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessa
 import { Server, Socket } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
 import { SocketService } from './socket.service';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 //cors origin * is for development only
 // @UseGuards(AuthGuard('jwt-ws'))
@@ -14,6 +15,7 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
   constructor(
     private readonly authService: AuthService,
     private readonly SocketService: SocketService,
+    private readonly prismaService: PrismaService,
   ) {}
   @WebSocketServer() server: Server;
 
@@ -33,18 +35,22 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
       client.disconnect();
     else
     {
-      console.log(client.id, client.handshake.query.user_id);
+      console.log("=============client.id, client.handshake.query.user_id=============\n",client.id, client.handshake.query.user_id);
       const connect_user = await this.SocketService.Connect(client.handshake.query.user_id, client.id, this.server);
-      console.log(connect_user);
+      console.log("=============connect_user=================\n", connect_user);
       if (connect_user === null)
         client.disconnect();
       else if (connect_user.roomuser !== null)
       {
         console.log("join room: ", connect_user.user_id, connect_user.roomuser.chatroom_id);
-        await this.JoinRoom(connect_user.user_id, connect_user.roomuser.chatroom_id);
+        await this.JoinRoom(connect_user.user_id, connect_user.nick_name, connect_user.roomuser.chatroom_id);
       }
+      client.join(connect_user.nick_name);
+      connect_user.friends.map((friend) => { this.SocketService.JoinRoom(friend.followed_user_id, connect_user.nick_name, this.server)})
+      client.join(String(client.handshake.query.user_id));
     }
   }
+
 
   async handleDisconnect(client: Socket) {
     if (client.handshake.query.user_id !== undefined)
@@ -65,16 +71,27 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 
   async HandleNotice(chatroom_id: number, message: string)
   {
-    this.SocketService.HandleNotice(chatroom_id, message, this.server);
+    return await this.SocketService.HandleNotice(chatroom_id, message, this.server);
   }
 
-  async JoinRoom(user_id: any, room_id: number)
+  async HandleKick(user_id: number, chatroom_id: number)
   {
-    this.SocketService.JoinRoom(user_id, room_id, this.server);
+    await this.SocketService.HandleKick(user_id, this.server);
   }
 
-  async LeaveRoom(user_id: any, room_id: number)
+  async DeleteRoom(chatroom_id: number)
   {
-    this.SocketService.LeaveRoom(user_id, room_id, this.server);
+    this.server.to(String(chatroom_id)).emit('kick', {message: "방이 삭제되었습니다."});
+    this.server.to(String(chatroom_id)).socketsLeave(String(chatroom_id));
+  }
+
+  async JoinRoom(user_id: any, user_nickname: string, room_id: number)
+  {
+    this.SocketService.JoinRoom(user_id, String(room_id), this.server);
+  }
+
+  async LeaveRoom(user_id: any, user_nickname: string, room_id: number)
+  {
+    this.SocketService.LeaveRoom(user_id, String(room_id), this.server);
   }
 }

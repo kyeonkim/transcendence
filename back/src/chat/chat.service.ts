@@ -2,13 +2,18 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ChatRoomDto, JoinRoomDto, SetChatUserDto } from './dto/chat.dto';
 import { SocketGateway } from 'src/socket/socket.gateway';
-import { async } from 'rxjs';
+import * as bcrypt from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
+import { EventService } from 'src/event/event.service';
+import { eventDto } from 'src/event/dto/event.dto';
 
 @Injectable()
 export class ChatService {
     constructor(
         private readonly prismaService: PrismaService,
         private readonly socketService: SocketGateway,
+        private readonly jwtService: JwtService,
+        private readonly eventService: EventService,
     ) {}
     
     async GetRoomList(id: number)
@@ -39,21 +44,27 @@ export class ChatService {
 
         return {status: true, message: 'success', rooms: rooms};
     }
-    
+
     async RoomInfo(room_idx : number)
     {
         const roomInfo = await this.prismaService.chatroom.findUnique({
             where: {
                 idx: room_idx,
             },
-            include: {
+            select: {
+                idx: true,
+                name: true,
+                is_password: true,
+                is_private: true,
+                owner_id: true,
+                owner_nickname: true,
                 roomusers: {
                     select: {
                         user_id: true,
                         user_nickname: true,
                         is_manager: true,
                     },
-                },
+                },    
             },
         });
         return {status: true, message: 'success', room: roomInfo}
@@ -73,16 +84,13 @@ export class ChatService {
         return {status: false, message: 'fail to create room'};
         if (data.password !== undefined)
         {
-            const password = await this.prismaService.chatroom_password.upsert({
+            const password = await this.prismaService.chatroom.update({
                 where: {
-                    chatroom_idx: room.idx,
+                    idx: room.idx,
                 },
-                update: {
-                    password: data.password,
-                },
-                create: {
-                    chatroom_idx: room.idx,
-                    password: data.password,
+                data: {
+                    is_password: true,
+                    room_password: data.password,
                 },
             });
             if (password === null)
@@ -98,6 +106,7 @@ export class ChatService {
         });
         if (user === null)
             return {status: false, message: 'fail to update user'};
+        await this.socketService.JoinRoom(data.user_id, data.user_nickname, room.idx);
         return {status: true, message: 'success', room: room};
     }
 
@@ -126,11 +135,21 @@ export class ChatService {
     
     async JoinRoom(data: JoinRoomDto)
     {
-        const room = await this.prismaService.chatroom_user.findUnique({
+        const chatuser = await this.prismaService.chatroom_user.findUnique({
             where: { user_id: data.user_id, }
         });
-        if (room !== null)
+        if (chatuser !== null)
             return {status: false, message: 'already joined room'};
+        const room = await this.prismaService.chatroom.findUnique({
+            where: { idx: data.room_id },
+        });
+        if (room === null)
+            return {status: false, message: 'fail to find room'};
+        if (room.is_password)
+        {
+            if (bcrypt.compareSync(data.password, room.room_password) !== true)
+                return {status: false, message: 'password is invaild'}
+        }
         await this.prismaService.chatroom_user.create({
             data: {
                 chatroom_id: data.room_id,
@@ -138,37 +157,48 @@ export class ChatService {
                 user_nickname: data.user_nickname,
             },
         });
-        await this.socketService.JoinRoom(data.user_id, data.room_id);
+        await this.socketService.JoinRoom(data.user_id, data.user_nickname, data.room_id);
+        return {status: true, message: 'success'};
     }
 
-    async LeaveRoom(user_id: number, room_id: number)
+    async LeaveRoom(data: JoinRoomDto)
     {
-        await this.socketService.LeaveRoom(user_id, room_id);
-        await this.prismaService.chatroom_user.delete({ where: { user_id: user_id }});
+        await this.socketService.LeaveRoom(data.user_id, data.user_nickname, data.room_id);
+        await this.prismaService.chatroom_user.delete({ where: { user_id: data.user_id }});
         const room = await this.prismaService.chatroom.findUnique({
-            where: { idx: room_id }, include: { roomusers: true, },
+            where: { idx: data.room_id }, include: { roomusers: true, },
         });
-        const users = room.roomusers;
-        if (users.length === 0) // 남은 유저가 없을 경우 방을 삭제
+        if (room.owner_id === data.user_id)
         {
-            await this.prismaService.chatroom_password.delete({ where: { chatroom_idx: room_id } });
-            await this.prismaService.chatroom.delete({ where: { idx: room_id } });
-            return {status: true, message: 'room deleted'};
-        }
-        const mannagers = users.filter((user) => user.is_manager === true);
-        if (mannagers.length !== 0) // 남은 매니저가 있을경우 그 매니저가 방장이됨
-        {
-            await this.prismaService.chatroom.update({ 
-                where: { idx: room_id }, 
-                data: { owner_id: mannagers[0].user_id, owner_nickname: mannagers[0].user_nickname } 
+            await this.socketService.DeleteRoom(data.room_id);
+            await this.prismaService.chatroom_user.deleteMany({
+                where : {
+                    chatroom_id: data.room_id,
+                },
             });
-        } else { //남은 매니저가 없을경우 가장 먼저 들어온 유저가 방장과 매니저가 됨
-            await this.prismaService.chatroom.update({ 
-                where: { idx: room_id }, 
-                data: { owner_id: users[0].user_id, owner_nickname: users[0].user_nickname } 
-            });
-            await this.prismaService.chatroom_user.update({ where: { user_id: users[0].user_id }, data: { is_manager: true } });
+            await this.prismaService.chatroom.delete({ where: { idx: data.room_id } });
         }
+        return {status: true, message: 'success'};
+        // const users = room.roomusers;
+        // if (users.length === 0) // 남은 유저가 없을 경우 방을 삭제
+        // {
+        //     await this.prismaService.chatroom.delete({ where: { idx: data.room_id } });
+        //     return {status: true, message: 'room deleted'};
+        // }
+        // const mannagers = users.filter((user) => user.is_manager === true);
+        // if (mannagers.length !== 0) // 남은 매니저가 있을경우 그 매니저가 방장이됨
+        // {
+        //     await this.prismaService.chatroom.update({ 
+        //         where: { idx: data.room_id }, 
+        //         data: { owner_id: mannagers[0].user_id, owner_nickname: mannagers[0].user_nickname } 
+        //     });
+        // } else { //남은 매니저가 없을경우 가장 먼저 들어온 유저가 방장과 매니저가 됨
+        //     await this.prismaService.chatroom.update({ 
+        //         where: { idx: data.room_id }, 
+        //         data: { owner_id: users[0].user_id, owner_nickname: users[0].user_nickname } 
+        //     });
+        //     await this.prismaService.chatroom_user.update({ where: { user_id: users[0].user_id }, data: { is_manager: true } });
+        // }
     }
 
     async SetManager(data: SetChatUserDto)
@@ -193,6 +223,7 @@ export class ChatService {
                 is_manager: true,
             },
         });
+        this.socketService.HandleNotice(data.room_id, `${data.target_nickname}님이 매니저가 되었습니다.`);
         return {status: true, message: 'success'};
     }
 
@@ -294,7 +325,8 @@ export class ChatService {
                 chatroom_id: data.room_id,
             }
         });
-        this.LeaveRoom(data.target_id, data.room_id);
+        await this.KickUser(data);
+        await this.socketService.HandleNotice(data.room_id, `${data.target_nickname}님이 영구퇴장 당하셨습니다.`);
         return {status: true, message: 'success'};
     }
 
@@ -321,6 +353,22 @@ export class ChatService {
         return {status: true, message: 'success'};
     }
 
+    async CheckPassword(data: JoinRoomDto)
+    {
+        const room = await this.prismaService.chatroom.findUnique({
+            where: {
+                idx: data.room_id,
+            },
+        });
+        if (room === null)
+            return {status: false, message: 'fail to find room'};
+        if (room.is_password === false)
+            return {status: true, message: 'no password'};
+        if (room.room_password !== data.password)
+            return {status: false, message: 'wrong password'};
+        return {status: true, message: 'success'};
+    }
+
     async KickUser(data: SetChatUserDto)
     {
         const room = await this.prismaService.chatroom.findUnique({
@@ -335,7 +383,50 @@ export class ChatService {
         });
         if (room === null)
             return {status: false, message: 'fail to find room'};
-        this.LeaveRoom(data.target_id, data.room_id);
+        await this.socketService.HandleNotice(data.room_id, `${data.target_nickname}님이 강제퇴장 당하셨습니다.`);
+        await this.socketService.HandleKick(data.target_id, data.room_id);
+        this.LeaveRoom({user_id: data.target_id, user_nickname: data.target_nickname, room_id: data.room_id});
         return {status: true, message: 'success'};
+    }
+
+    async GetMyRoomByHeader(headers: any)
+    {
+        const [type, token] = headers.authorization?.split(' ') ?? [];
+        console.log(`type : ${type}, token : ${token}`);
+        const payload = this.jwtService.decode(token);
+
+        const room = await this.prismaService.chatroom_user.findUnique({
+            where: {
+                user_id: payload['user_id']
+            },
+            include :{
+                chatroom: true,
+            }
+        });
+        return room;
+    }
+
+    async InviteUser(data: eventDto)
+    {
+        return await this.eventService.SendEvent(data)
+    }
+
+    async AcceptInvite(data: JoinRoomDto)
+    {
+        const event = await this.prismaService.event.findFirst({
+            where: {
+                to_id: data.user_id,
+                event_type: 'invite',
+                chatroom_id: data.room_id,
+            },
+        });
+        if (event === null || event.idx !== data.event_id)
+            return {status: false, message: 'fail to find event'};
+        await this.prismaService.event.delete({
+            where: {
+                idx: event.idx,
+            },
+        });
+        return await this.JoinRoom(data);
     }
 }

@@ -90,20 +90,12 @@ model Chatroom {
   is_private        Boolean            @default(false)
   owner_id          Int
   owner_nickname    String
-  Chatroom_password Chatroom_password? @relation("chatroom_password")
+  room_password     String?
   bans              Ban[]              @relation("chatroom_ban")
   roomusers         Chatroom_user[]    @relation("chatroom_user_to_chatroom")
   created_at        DateTime           @default(now())
 //users           User[]             @relation("chatroom_user")
 //managers        Manager[]          @relation("chatroom_manager")
-}
-
-model Chatroom_password {
-  chatroom_idx  Int      @id
-  chatroom      Chatroom @relation("chatroom_password", fields: [chatroom_idx], references: [idx])
-  password      String
-  created_at    DateTime @default(now())
-  updated_at    DateTime @updatedAt
 }
 
 model Ban {
@@ -126,6 +118,14 @@ model Chatroom_user {
   mute_time   String?
   created_at  DateTime @default(now())
 }
+
+//model Chatroom_password {
+//  chatroom_idx  Int      @id
+//  chatroom      Chatroom @relation("chatroom_password", fields: [chatroom_idx], references: [idx])
+//  password      String
+//  created_at    DateTime @default(now())
+//  updated_at    DateTime @updatedAt
+//}
 
 // model Message {
 //   idx         Int      @default(autoincrement()) @id

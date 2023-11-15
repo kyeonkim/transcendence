@@ -15,9 +15,14 @@ export class UserService {
         private readonly jwtService: JwtService,
         ) {}
 
-
     async CreateUser(id: number, nickName: string)
     {
+        const user = await this.prisma.user.findUnique({
+            where: {
+                nick_name: nickName,
+            }});
+        if (user !== null)
+            return null;
         const newUser = await this.prisma.user.create({
             data: {
                 user_id: id,
@@ -29,16 +34,27 @@ export class UserService {
     
     async GetUserDataByNickName(nickName: string)
     {
-        console.log("nick_name :", nickName);
+        // console.log("nick_name :", nickName);
         const userData = await this.prisma.user.findUnique({
             where: {
               nick_name: nickName,
             },
             include: {
-                roomuser: true
+                roomuser: {
+                    select: {
+                        chatroom: {
+                            select: {
+                                idx: true,
+                                name: true,
+                                is_private: true,
+                                is_password: true,
+                            }
+                        }
+                    }
+                },
             }
         });
-        console.log(userData);
+        // console.log(userData);
         if (userData === null)
             return {status: false, message: "유저 찾기 실패"}
         return {status: true, userData: userData};
@@ -52,10 +68,21 @@ export class UserService {
               user_id: id,
             },
             include: {
-                roomuser: true
+                roomuser: {
+                    select: {
+                        chatroom: {
+                            select: {
+                                idx: true,
+                                name: true,
+                                is_private: true,
+                                is_password: true,
+                            }
+                        }
+                    }
+                },
             }
         });
-        console.log("====================User_data=====================\n\n",userData);
+        // console.log("====================User_data=====================\n\n",userData);
         if (userData == null)
             return {status: false, message: "유저 찾기 실패"}
         else

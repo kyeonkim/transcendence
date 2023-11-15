@@ -50,6 +50,11 @@ export class JoinRoomDto
     @IsString()
     @IsOptional()
     password?: string;
+
+    @ApiProperty()
+    @IsInt()
+    @IsOptional()
+    event_id?: number;
 }
 
 export class SetChatUserDto

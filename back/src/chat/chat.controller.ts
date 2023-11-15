@@ -1,14 +1,18 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
+import { Headers, Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Req } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ChatService } from './chat.service';
 import { async } from 'rxjs';
 import { ChatRoomDto, JoinRoomDto, SetChatUserDto } from './dto/chat.dto';
+import { SocketGateway } from 'src/socket/socket.gateway';
+import { JwtService } from '@nestjs/jwt';
+import { eventDto } from 'src/event/dto/event.dto';
 
 @ApiTags('Chat API')
 @Controller('chat')
 export class ChatController {
     constructor(
         private readonly ChatService: ChatService,
+        private readonly socketService: SocketGateway,
     ) {}
 
     @ApiOperation({summary: `채팅방 목록 API`, description: `채팅방 목록을 가져온다.`})
@@ -44,14 +48,22 @@ export class ChatController {
     @Patch("joinroom")
     async JoinRoom(@Body() data : JoinRoomDto)
     {
-        return await this.ChatService.JoinRoom(data);
+        const rtn =  await this.ChatService.JoinRoom(data);
+        if (rtn.status === true)
+            await this.socketService.HandleNotice(data.room_id, `${data.user_nickname}님이 입장하셨습니다.`);
+        console.log(data, rtn);
+        return rtn;
     }
 
     @ApiOperation({summary: `채팅 방 퇴장 API`, description: `채팅방에서 퇴장한다.`})
     @Patch("leaveroom")
     async LeaveRoom(@Body() room : JoinRoomDto)
     {
-        return await this.ChatService.LeaveRoom(room.user_id, room.room_id);
+        const rtn = await this.ChatService.LeaveRoom(room);
+        console.log(rtn);
+        if (rtn.status === true)
+            this.socketService.HandleNotice(room.room_id, `유저 ${room.user_nickname}님이 퇴장하였습니다.`);
+        return rtn;
     }
 
     //내가 방장인지 확인하는 방법이 있어야하지 않을까?
@@ -65,18 +77,26 @@ export class ChatController {
 
     @ApiOperation({summary: `관리자 해제 API`, description: `관리자를 해제한다.`})
     @Patch("unsetmanager")
-    async UnsetManager(@Body() data : SetChatUserDto)
+    async UnsetManager(@Headers() headers, @Body() data : SetChatUserDto)
     {
         //토큰을 가져와서 유저아이디와 room_idx의 방장인지 확인해야할듯
+        const room =  await this.ChatService.GetMyRoomByHeader(headers);
+        if (room === null || room.chatroom_id !== data.room_id || room.is_manager !== true)
+            return {status: false, message: 'not manager'};
         return await this.ChatService.UnsetManager(data);
     }
 
     @ApiOperation({summary: `유저 mute API`, description: `유저를 mute한다.`})
     @Patch("muteuser")
-    async MuteUser(@Body() data : SetChatUserDto)
+    async MuteUser(@Headers() headers, @Body() data : SetChatUserDto)
     {
         //토큰을 가져와서 유저아이디와 room_idx의 매니저인지 확인해야할듯
-        return await this.ChatService.MuteUser(data);
+        const room =  await this.ChatService.GetMyRoomByHeader(headers);
+        // console.log(room);
+        if (room === null || room.chatroom_id !== data.room_id || room.is_manager !== true)
+            return {status: false, message: 'not manager'};
+        else
+            return await this.ChatService.MuteUser(data);
     }
 
     @ApiOperation({summary: `유저 unmute API`, description: `유저를 unmute한다.`})
@@ -113,6 +133,15 @@ export class ChatController {
 
     @ApiOperation({summary: `채팅방 초대 API`, description: `채팅방에 유저를 초대한다.`})
     @Post("inviteuser")
+    async InviteUser(@Body() data : eventDto)
+    {
+        return await this.ChatService.InviteUser(data);
+    }
 
     @ApiOperation({summary: `채팅방 초대 수락 API`, description: `채팅방 초대를 수락한다.`})
+    @Post("acceptinvite")
+    async AcceptInvite(@Body() data : JoinRoomDto)
+    {
+        return await this.ChatService.AcceptInvite(data);
+    }
 }
