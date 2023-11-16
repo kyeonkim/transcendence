@@ -2,12 +2,14 @@ import { Body, Injectable } from '@nestjs/common';
 import { EventService } from 'src/event/event.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { friendDto } from './dto/social.dto';
+import { SocketGateway } from 'src/socket/socket.gateway';
 
 @Injectable()
 export class SocialService {
     constructor(
         private readonly prismaService: PrismaService,
-        private readonly eventService: EventService
+        private readonly eventService: EventService,
+        private readonly socketGateway: SocketGateway
     ) {}
 
     async CheckFriend(user1_id: number, user2_name: string)
@@ -115,12 +117,14 @@ export class SocialService {
             console.log("AddFriend failed error: ", error);
             return {status: false, message: "AddFriend failed"}
         }
-        await this.eventService.SendFriendEvent(addFriend.user_id);
-        await this.eventService.SendFriendEvent(friend.user_id);
+        // await this.eventService.SendFriendEvent(addFriend.user_id);
+        // await this.eventService.SendFriendEvent(friend.user_id);
+        await this.socketGateway.SendRerender(addFriend.user_id, 'friend');
+        await this.socketGateway.SendRerender(friend.user_id, 'friend');
         return {status: true, message: "success"};
     }
     
-    async DeleteFriend(@Body() delFriend : friendDto)
+    async DeleteFriend(delFriend : friendDto)
     {
         const friend = await this.prismaService.user.findUnique({
             where: {
@@ -149,8 +153,10 @@ export class SocialService {
             console.log("DeleteFriend failed error: ", error);
             return {status: false, message: "DeleteFriend failed"}
         }
-        await this.eventService.SendFriendEvent(delFriend.user_id);
-        await this.eventService.SendFriendEvent(friend.user_id);
+        // await this.eventService.SendFriendEvent(delFriend.user_id);
+        // await this.eventService.SendFriendEvent(friend.user_id);
+        await this.socketGateway.SendRerender(delFriend.user_id, `friend`);
+        await this.socketGateway.SendRerender(friend.user_id, `friend`);
         return {status: true, message: "success"};
     }
 
@@ -168,5 +174,49 @@ export class SocialService {
         if (!frinedList.length)
             return {status: false, message: "친구목록 없음" };
         return {status: true, data: frinedList};
+    }
+
+    async GetBlockList(id : number)
+    {
+        const blockList = await this.prismaService.block.findMany({
+            where: {
+                user_id: id,
+            },
+            select: {
+                blocked_user_id: true,
+                blocked_user_nickname: true,
+            },
+        });
+        if (blockList !== null)
+            return {status: true, list: blockList};
+        else
+            return {status: false};
+    }
+    
+    async BlockUser(data: friendDto)
+    {
+        const block_check = await this.prismaService.block.findFirst({
+            where: {
+                user_id: data.user_id,
+                blocked_user_id: data.friend_id,
+            },
+        });
+        if (block_check !== null)
+            return {status: false, message: "already block user"};
+        const friend_check = await this.prismaService.friends.findFirst({
+            where: {
+                following_user_id: data.friend_id,
+                followed_user_id: data.user_id,
+            },
+        });
+        if (friend_check !== null)
+            await this.DeleteFriend(data);
+        this.prismaService.block.create({
+            data: {
+                user_id: data.user_id,
+                blocked_user_id: data.friend_id,
+                blocked_user_nickname: data.friend_nickname,
+            },
+        });
     }
 }

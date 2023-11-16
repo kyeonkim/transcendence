@@ -26,3 +26,14 @@ export class friendDto
     @IsString()
     friend_nickname: string;
 }
+
+// export class blockDto
+// {
+//     @ApiProperty()
+//     @IsInt()
+//     user_id: number;
+
+//     @ApiProperty()
+//     @IsInt()
+//     block_id: number;
+// }

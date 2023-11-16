@@ -106,7 +106,7 @@ export class ChatService {
         });
         if (user === null)
             return {status: false, message: 'fail to update user'};
-        await this.socketService.JoinRoom(data.user_id, data.user_nickname, room.idx);
+        await this.socketService.JoinRoom(data.user_id, room.idx);
         return {status: true, message: 'success', room: room};
     }
 
@@ -157,13 +157,13 @@ export class ChatService {
                 user_nickname: data.user_nickname,
             },
         });
-        await this.socketService.JoinRoom(data.user_id, data.user_nickname, data.room_id);
+        await this.socketService.JoinRoom(data.user_id, data.room_id);
         return {status: true, message: 'success'};
     }
 
     async LeaveRoom(data: JoinRoomDto)
     {
-        await this.socketService.LeaveRoom(data.user_id, data.user_nickname, data.room_id);
+        await this.socketService.LeaveRoom(data.user_id, data.room_id);
         await this.prismaService.chatroom_user.delete({ where: { user_id: data.user_id }});
         const room = await this.prismaService.chatroom.findUnique({
             where: { idx: data.room_id }, include: { roomusers: true, },
@@ -416,7 +416,7 @@ export class ChatService {
         const event = await this.prismaService.event.findFirst({
             where: {
                 to_id: data.user_id,
-                event_type: 'invite',
+                event_type: 'invite_chat',
                 chatroom_id: data.room_id,
             },
         });

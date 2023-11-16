@@ -6,11 +6,11 @@ export class SignUpDto
 {
     @ApiProperty()
     @IsString()
-    @Matches(/^[a-zA-Z0-9]$/, {message: `영문자와 숫자만 입력 가능합니다.`})
     access_token: string;
 
     @ApiProperty()
     @IsString()
+    @Matches(/^[a-zA-Z0-9_]*$/, {message: `영문자와 숫자만 입력 가능합니다.`})
     nick_name: string;
 }
 

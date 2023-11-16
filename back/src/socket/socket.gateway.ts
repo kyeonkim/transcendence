@@ -43,18 +43,19 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
       else if (connect_user.roomuser !== null)
       {
         console.log("join room: ", connect_user.user_id, connect_user.roomuser.chatroom_id);
-        await this.JoinRoom(connect_user.user_id, connect_user.nick_name, connect_user.roomuser.chatroom_id);
+        await this.JoinRoom(connect_user.user_id, connect_user.roomuser.chatroom_id);
       }
-      client.join(connect_user.nick_name);
       console.log("\n==========connect_user.friends.map==============\n");
-      connect_user.friends.map((friend) => { this.SocketService.JoinRoom(friend.followed_user_id, connect_user.nick_name, this.server)});
-      
-      client.join(String(client.handshake.query.user_id));
+      client.join(`status-${connect_user.user_id}`);
+      connect_user.friends.map((friend) => { this.SocketService.JoinRoom(friend.followed_user_id, `status-${connect_user.user_id}`, this.server)});
+      client.to(`status-${connect_user.user_id}`).emit(`status-${connect_user.user_id}`, {user_id: connect_user.user_id, status: "login"});
+      console.log("\n==========connect_user.blocks.map==============\n");
+      connect_user.blocks.map((block) => { this.SocketService.JoinRoom(connect_user.user_id, `block-${block.blocked_user_id}`, this.server)});
+      client.join(String(connect_user.user_id));
       //testcode
       this.SocketService.SendStatusTest(Number(client.handshake.query.user_id), "login", this.server);
     }
   }
-
 
   async handleDisconnect(client: Socket) {
     if (client.handshake.query.user_id !== undefined)
@@ -89,12 +90,13 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
     this.server.to(String(chatroom_id)).socketsLeave(String(chatroom_id));
   }
 
-  async JoinRoom(user_id: any, user_nickname: string, room_id: number)
+  async JoinRoom(user_id: any, room_id: number)
   {
+    console.log(room_id);
     this.SocketService.JoinRoom(user_id, String(room_id), this.server);
   }
 
-  async LeaveRoom(user_id: any, user_nickname: string, room_id: number)
+  async LeaveRoom(user_id: any, room_id: number)
   {
     this.SocketService.LeaveRoom(user_id, String(room_id), this.server);
   }
@@ -102,6 +104,11 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
   @SubscribeMessage('status')
   async SendStatus(Client: Socket, payload: any)
   {
-    // Client.to(String(payload.room_id)).emit('status', {message: payload.message, time: new Date().valueOf()});
+    Client.to(`status-${payload.user_id}`).emit(`status-${payload.user_id}`, {user_id: payload.user_id, status: payload.status});
+  }
+
+  async SendRerender(user_id: number, event: string)
+  {
+    this.server.to(String(user_id)).emit(`render-${event}`, {time: new Date().valueOf()});
   }
 }

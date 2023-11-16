@@ -50,4 +50,19 @@ export class SocialController {
     {
         return await this.SocialService.GetFriendList(user_id);
     }
+
+    @ApiOperation({summary: `차단목록 확인 API`, description: `유저의 차단 목록을 확인한다.`})
+    @Get("getBlockList/:id")
+	async GetBlockList(@Param('id', ParseIntPipe) user_id: number)
+	{
+        return await this.SocialService.GetBlockList(user_id);
+	}
+
+	@ApiOperation({summary: `차단 API`, description: `해당 유저가 다른 유저를 차단한다.`})
+	// @UseGuards(AuthGuard('jwt-access'))
+	@Post("addBlockedUser")
+	async BlockUser(@Body() data: friendDto)
+    {
+		return await this.SocialService.BlockUser(data);
+    }
 }  

@@ -32,7 +32,7 @@ export class SocketService {
             include: {
                 friends: true,
                 roomuser: true,
-                // blocks: true
+                blocks: true
             }
         });
         return user;
@@ -95,12 +95,13 @@ export class SocketService {
         console.log("HandleKick: ", user_id);
         return {status: true, message: "kick 명령 전송 완료."};
     }
+    
 
     async JoinRoom(user_id: any, room: string, server: Server)
     {
-        console.log("JoinRoom: ", this.sockets.get(user_id));
-        if(this.sockets.get(user_id) !== undefined)
-            server.sockets.sockets.get(this.sockets.get(user_id)).join(room);
+        console.log("JoinRoom: ", this.sockets.get(String(user_id)));
+        if(this.sockets.get(String(user_id)) !== undefined)
+            server.sockets.sockets.get(this.sockets.get(String(user_id))).join(room);
     }
 
     async LeaveRoom(user_id: any, room: string, server: Server)
