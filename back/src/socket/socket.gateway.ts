@@ -46,8 +46,12 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
         await this.JoinRoom(connect_user.user_id, connect_user.nick_name, connect_user.roomuser.chatroom_id);
       }
       client.join(connect_user.nick_name);
-      connect_user.friends.map((friend) => { this.SocketService.JoinRoom(friend.followed_user_id, connect_user.nick_name, this.server)})
+      console.log("\n==========connect_user.friends.map==============\n");
+      connect_user.friends.map((friend) => { this.SocketService.JoinRoom(friend.followed_user_id, connect_user.nick_name, this.server)});
+      
       client.join(String(client.handshake.query.user_id));
+      //testcode
+      this.SocketService.SendStatusTest(Number(client.handshake.query.user_id), "login", this.server);
     }
   }
 
@@ -93,5 +97,11 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
   async LeaveRoom(user_id: any, user_nickname: string, room_id: number)
   {
     this.SocketService.LeaveRoom(user_id, String(room_id), this.server);
+  }
+
+  @SubscribeMessage('status')
+  async SendStatus(Client: Socket, payload: any)
+  {
+    // Client.to(String(payload.room_id)).emit('status', {message: payload.message, time: new Date().valueOf()});
   }
 }

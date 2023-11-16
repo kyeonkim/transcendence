@@ -28,6 +28,7 @@ model User {
   games       Game[]         @relation("game_user")
   tokens      Tokens?        @relation("token_user")
   events      Event[]        @relation("event_user")
+  blocks      Block[]        @relation("block_user")
 //chatroom_id   Int?
 //chatroom      Chatroom?   @relation("chatroom_user", fields: [chatroom_id], references: [idx])
 //is_manager    Boolean     @default(false)
@@ -117,6 +118,15 @@ model Chatroom_user {
   is_mute     Boolean  @default(false)
   mute_time   String?
   created_at  DateTime @default(now())
+}
+
+model Block {
+    id                    Int      @default(autoincrement()) @id
+    user                  User     @relation("block_user", fields: [user_id], references: [user_id])
+    user_id               Int
+    blocked_user_id       Int
+    blocked_user_nickname String
+    created_at            DateTime @default(now())
 }
 
 //model Chatroom_password {

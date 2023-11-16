@@ -32,6 +32,7 @@ export class SocketService {
             include: {
                 friends: true,
                 roomuser: true,
+                // blocks: true
             }
         });
         return user;
@@ -98,12 +99,18 @@ export class SocketService {
     async JoinRoom(user_id: any, room: string, server: Server)
     {
         console.log("JoinRoom: ", this.sockets.get(user_id));
-        server.sockets.sockets.get(this.sockets.get(user_id)).join(room);
+        if(this.sockets.get(user_id) !== undefined)
+            server.sockets.sockets.get(this.sockets.get(user_id)).join(room);
     }
 
     async LeaveRoom(user_id: any, room: string, server: Server)
     {
         if(this.sockets.get(user_id) !== undefined)
             server.sockets.sockets.get(this.sockets.get(user_id)).leave(room);
+    }
+
+    async SendStatusTest(user_id: any, status: string, server: Server)
+    {
+        server.emit(`status-${user_id}`, {user_id: user_id, status: status});
     }
 }
