@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 
 import Chat from './chat';
@@ -8,7 +8,9 @@ import ChatRoomCreate from './chat_room_create';
 import { styled } from '@mui/system';
 import ChatRoomList from './chat_rooms';
 
-import { useCookies } from 'next-client-cookies'
+import { useCookies } from 'next-client-cookies';
+
+import { useChatBlockContext } from '../../app/main_frame/shared_state';
 
 // chatroomlist에서 요청의 결과로 받은 응답에 채팅방의 데이터가 들어있는가?
 // chat에서 한 번 더 요청하여 채팅방의 데이터를 받아오는가?
@@ -16,6 +18,9 @@ import { useCookies } from 'next-client-cookies'
 export default function ChatBlock(props: any) {
 	const cookies = useCookies();
 	const [renderMode, setRenderMode] = useState('chatList');
+
+	// const [renderMode, setRenderMode] = useChatBlockContext();
+
 	const [render, setRender] = useState(false);
 	const [roominfo, setRoominfo] = useState({});
 

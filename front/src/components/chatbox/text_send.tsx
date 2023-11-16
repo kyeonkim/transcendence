@@ -9,6 +9,7 @@ const TextSend = ({ my_name, socket, setMTbox, scrollref}: any) => {
 	useEffect(() => {
 		const handleChat = (data: any) => {
 			const newMessage = renderMessage(data);
+			console.log('chat on', newMessage);
 			setRenderedMessages(prevMessages => [...prevMessages, newMessage]);
 
 		};

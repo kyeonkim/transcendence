@@ -30,7 +30,6 @@ export async function POST (request: NextRequest)
         });
         // created 201
         console.log("===============tettettettettettettettettettettettet");
-        console.log(typeof response.data.userdata.user_id)
     }
     catch (err)
     {

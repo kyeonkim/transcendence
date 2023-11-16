@@ -42,6 +42,7 @@ export default function Signup (props:any) {
 
     if (!response.ok) {
       console.log('signup login/api fail', response);
+      window.alert('중복된 닉네임');
     }
     else
     {
@@ -50,6 +51,7 @@ export default function Signup (props:any) {
         router.replace('/main_frame');
       } else {
         console.log('Image upload failed', res_img);
+        window.alert('Image upload failed')
       }
     }  
   };

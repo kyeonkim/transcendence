@@ -46,13 +46,13 @@ export default function Chat(props: any) {
 			return;
 		}
 		
-		const newMassage = {
+		const newMessage = {
 			from: my_id,
 			user_name: my_name,
-			room_id: roominfo.idx,
+			room_id: Number(roominfo.idx),
 			message: message,
 		};
-		socket.emit("chat", newMassage);
+		socket.emit("chat", newMessage);
 		setMessage('');
 	};
 
@@ -75,7 +75,7 @@ export default function Chat(props: any) {
 		await axios.patch(`${process.env.NEXT_PUBLIC_API_URL}chat/leaveroom`, {
 			user_id: my_id,
 			user_nickname: my_name,
-			room_id: roominfo.idx,
+			room_id: Number(roominfo.idx),
 		})
 		.then((res) => {
 			handleRenderMode('chatList');
@@ -87,7 +87,7 @@ export default function Chat(props: any) {
 			type: 'chat',
 			to: inviteTarget,
 			from: my_name,
-			chatroom_id: roominfo.idx,
+			chatroom_id: Number(roominfo.idx),
 			chatroom_name: roominfo.name,
 		})
 		.then((res) => {
@@ -174,8 +174,10 @@ export default function Chat(props: any) {
 							fullWidth 
 							value={message}
 							onChange={(e) => setMessage(e.target.value)}
-							onKeyPress={(e) => {
+							inputProps={{ maxLength: 50 }}
+							onKeyDown={(e) => {
 								if (e.key === 'Enter') {
+									if (e.nativeEvent.isComposing) return;
 									handleSendMessage();
 								}}}
 						/>

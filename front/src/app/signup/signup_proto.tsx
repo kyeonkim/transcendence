@@ -1,96 +1,96 @@
 'use client'
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
+import { useRouter } from 'next/router';
+import { Button, Container, TextField, Typography, Grid, Avatar, FormControl,
+	InputLabel, Input, IconButton} from '@mui/material';
+import { PhotoCamera } from '@mui/icons-material';
 import axios from 'axios';
-import { setCookie } from 'cookies-next';
 
-const ProfilePage: React.FC = () => {
-  const router = useRouter();
+export default function Signup(props: any) {
+	const [profileImage, setFile] = useState<File | null>(null);
+	const [nickname, setNickname] = useState('');
+	const [imageUrl, setImageUrl] = useState<string | null>(null);
+	
+	const router = useRouter();
+	const formData = new FormData();
 
-  const { oauth_token } = router.query;
-  const [profileImage, setProfileImage] = useState<string | null>(null);
-  const [nickname, setNickname] = useState('');
-  const [filename, setFilename] = useState('');
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        if (e.target) {
-          setProfileImage(e.target.result as string);
-          setFilename(file.name);
-        }
-      };
-      reader.readAsDataURL(file);
-      console.log('file: ', file.name)
-    }
-  };
+	const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const file = e.target.files?.[0];
+		if (file) {
+			setFile(file);
+			const imageURL = URL.createObjectURL(file);
+			setImageUrl(imageURL);
+		}
+	};
 
-  const handleNicknameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setNickname(event.target.value);
-  };
+	const handleNicknameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setNickname(e.target.value);
+	};
 
-  const handleSetData = async () => {
-
-    const data = {
-      access_token: oauth_token,
-      nick_name: nickname,
-      img_name: filename,
-      // img_data: profileImage,
-    };
-   console.log('data: ', data);
-   const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/user/create`, data);
-   console.log("sign UP: ", response) 
-   if (response.data.status)
-    {
-      setCookie('access_token', response.data.token.access_token);
-      setCookie('refresh_token', response.data.token.refresh_token);
-      router.push('/main');
-    }
-    else
-    {
-      window.alert('중복된 닉네임');
-    }
-  }
-
-  return (
-    <div style={{ textAlign: 'center', marginTop: '50px' }}>
-      <h1>Set User</h1>
-      <div style={{ marginBottom: '20px' }}>
-        <label htmlFor="profileImage">Image: </label>
-        <input
-          type="file"
-          id="profileImage"
-          accept="image/*"
-          onChange={handleImageUpload}
-        />
-      </div>
-      {profileImage && (
-        <div>
-          <img
-            src={profileImage}
-            alt="프로필 사진"
-            style={{ width: '150px', height: '150px', borderRadius: '50%' }}
-          />
-        </div>
-      )}
-      <div style={{ marginTop: '20px' }}>
-        <label htmlFor="nickname">Nickname: </label>
-        <input
-          type="text"
-          id="nickname"
-          value={nickname}
-          onChange={handleNicknameChange}
-        />
-      </div>
-      <div style={{ marginTop: '20px' }}>
-        <button onClick={handleSetData}>
-          저장
-        </button>
-      </div>
-    </div>
-  );
-};
-
-export default ProfilePage;
+	const handleSetData = async () => {
+		formData.append('nick_name', nickname);
+		if (profileImage) {
+			formData.append('file', profileImage);
+		}
+		await axios.post(`${process.env.NEXT_PUBLIC_API_URL}user/create`, {
+			access_token: props.access_token,
+			nick_name: nickname,
+		})
+		.then((res) => {
+			await axios.post(`${process.env.NEXT_PUBLIC_API_URL}user/send_image`, formData)
+			.then((res) => {
+				if (res.data.success == true)
+					router.replace('/main_frame');
+			})
+		.catch((err) => {
+			window.alert('Image upload failed');
+		})
+	};
+	return (
+		<Container maxWidth="md">
+			<Typography variant="h4" align="center" gutterBottom>
+				Set User
+			</Typography>
+			<Grid container spacing={3} justifyContent="center">
+				<Grid item xs={12} sm={6}>
+					<FormControl fullWidth>
+						<InputLabel htmlFor="profile-image-input">Image</InputLabel>
+						<Input
+							id="profile-image-input"
+							type="file"
+							accept="image/*"
+							onChange={handleImageUpload}
+							sx={{ display: 'none' }}
+						/>
+						<label htmlFor="profile-image-input">
+							<IconButton color="primary" aria-label="upload picture" component="span">
+								<PhotoCamera />
+							</IconButton>
+						</label>
+					</FormControl>
+					{profileImage && (
+						<Avatar
+							src={imageUrl || ''}
+							alt="프로필 사진"
+							sx={{ width: 150, height: 150, borderRadius: '50%', margin: '20px auto', display: 'block' }}
+						/>
+					)}
+				</Grid>
+				<Grid item xs={12} sm={6}>
+					<TextField
+						fullWidth
+						id="nickname"
+						label="Nickname"
+						value={nickname}
+						onChange={handleNicknameChange}
+						variant="outlined"
+						sx={{ marginBottom: 3 }}
+					/>
+					<Button variant="contained" onClick={handleSetData} fullWidth>
+						저장
+					</Button>
+				</Grid>
+			</Grid>
+		</Container>
+	);
+}
