@@ -112,7 +112,6 @@ const ProfilePage = (props: any) => {
       })
       .then((res) => {
         console.log(res.data)
-        setIsFriend(true);
       })
     }
    }

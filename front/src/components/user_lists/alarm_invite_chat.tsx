@@ -50,7 +50,7 @@ const modalStyle = {
 
 export default function AlarmInviteChat (
     {
-        alarm, removeEventFromDatabase, handleProfile, imageLoader, denyRequest,
+        alarm, alarmReducer, handleProfile, imageLoader, denyRequest,
         openModal, setOpenModal, selectedAlarm, setSelectedAlarm
     } :any
     ) {
@@ -145,7 +145,7 @@ export default function AlarmInviteChat (
             {
 			    // 방 들어가졌으니 방으로 이동하기
 			    console.log('success to join !!! === data', res);
-                removeEventFromDatabase(alarm);
+                alarmReducer(alarm);
                 setChatBlockRenderMode('chatRoom');
                 setChatBlockTriggerRender(true);
                 // handleRenderChatBlock('chatRoom');

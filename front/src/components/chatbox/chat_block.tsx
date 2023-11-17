@@ -17,33 +17,22 @@ import  { useChatBlockContext } from '../../app/main_frame/shared_state';
 
 export default function ChatBlock(props: any) {
 	const cookies = useCookies();
-	// const [renderMode, setRenderMode] = useState('chatList');
 
 	const { handleRenderChatBlock } = useChatBlockContext();
 
 	const { chatBlockRenderMode, setChatBlockRenderMode,
 			chatBlockTriggerRender, setChatBlockTriggerRender } = useChatBlockContext();
-	
-	// const { chatBlockRenderMode, setChatBlockRenderMode } = useChatBlockContext();
-
 
 	const setRenderMode = setChatBlockRenderMode;
 	const renderMode = chatBlockRenderMode;
 	const render = chatBlockTriggerRender;
 	const setRender = setChatBlockTriggerRender;
 
-	// const [render, setRender] = useState(false);
+
 	const [roominfo, setRoominfo] = useState({});
 
-	// const handleRenderMode = handleRenderChatBlock;
+	const handleRenderMode = handleRenderChatBlock;
 
-	const handleRenderMode = (mode :string) => {
-
-		// setChatBlockRenderMode(mode);
-		setRenderMode(mode);
-		setRender(true);
-		
-	}
 
 	async function getUserData() {
 		await axios.get(`${process.env.NEXT_PUBLIC_API_URL}user/getdata/nickname/${cookies.get("nick_name")}`) 
@@ -56,15 +45,13 @@ export default function ChatBlock(props: any) {
 					console.log("ChatBlock - user is in chatroom");
 					setRoominfo(res.data.userData.roomuser.chatroom);
 					console.log("roominfo - ", roominfo);
-					setRenderMode('chatRoom');
+					setRenderMode('chatRoom');;
 				}
 			}
 			else
 			{
 				console.log("user is not in chat room");
 				setRenderMode('chatList');
-				// handleRenderMode('chatList');
-				// setInRoom(true);
 			}
 		})
 	}
@@ -74,15 +61,23 @@ export default function ChatBlock(props: any) {
 	}, [])
 
 	useEffect(() => {
+		
+		console.log('useEffect - render');
 
-		// 조건에 맞으면 handleinRoom
-			// 나 자신이 채팅방에 들어가있는지 확인
-			// 로그인할 때 user_data 받는데, 그걸 넘겨주면 될 수도 있음.
-				// 근데 이렇게 넘겨주면, 나중에 자신이 소속된 방이 변경될 떄 어디서 받아서 어디서 저장하는가가 중요해짐
-		if (render === true && renderMode === 'chatRoom')
+		if (renderMode !== 'newChat')
+		{
+			console.log('rerendered');
 			getUserData();
-		setRender(false);
+		}
 	}, [render])
+
+	// useEffect(() => {
+	// 	socket.on(`render-chat`, (data) => {
+	// 		console.log('render-chat', data);
+	// 		handleRenderMode(chatBlockRenderMode);
+
+	// 	})
+	// }, [socket])
 
 
 	const { setMTbox } = props;
@@ -91,7 +86,9 @@ export default function ChatBlock(props: any) {
 	{
 		return (
 			<div>
-				<ChatRoomList handleRenderMode={handleRenderMode} />
+				<ChatRoomList
+					handleRenderMode={handleRenderMode}
+				/>
 			</div>
 
 		);

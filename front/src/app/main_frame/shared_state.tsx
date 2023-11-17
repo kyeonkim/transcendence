@@ -18,7 +18,14 @@ export const ChatBlockProvider = ({ children } :any) => {
 
     const handleRenderChatBlock = (mode :string) => {
         setChatBlockRenderMode(mode);
-        setChatBlockTriggerRender(true);
+        if (chatBlockTriggerRender === true)
+        {
+            setChatBlockTriggerRender(false);
+        }
+        else
+        {
+            setChatBlockTriggerRender(true);
+        }
     }
 
     const value :ChatBlockState = useMemo(() => ({

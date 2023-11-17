@@ -83,20 +83,19 @@ export default function ChatRoomBlock({room, openModal, setOpenModal, selectedId
     return (
         <Grid key={room.idx} item xs={12}>
         <CardContent>
-            <ChatRoom elevation={8}>
-            <Typography sx={{marginLeft: 2, marginTop: 2}} variant='h4' gutterBottom>
-                {room.name}
-            </Typography>
-            <Typography sx={{marginLeft: 2}} gutterBottom>
-                {room.owner_nickname}의 방
-            </Typography>
-            <Box style={{width: 450, height: 30, textAlign:'right'}}>
-                {room.ispassword ? ( <LockIcon style={{fontSize: 40}}/>) : ( <p></p> )}		
-            </Box>
-            <CardActions>
-                {/* <Button sx={{left: 10} }size="small" variant="contained" onClick={() => handleJoin(room.is_password, room.idx)}>Join</Button> */}
-                <Button sx={{left: 10} }size="small" variant="contained" onClick={() => handlePasswordModal(room.is_password, room.idx)}>Join</Button>
-            </CardActions>
+            <ChatRoom>
+                <Typography sx={{marginLeft: 2, marginTop: 2}} variant='h4' gutterBottom>
+                    {room.name}
+                </Typography>
+                <Typography sx={{marginLeft: 2}} gutterBottom>
+                    {room.owner_nickname}의 방
+                </Typography>
+                <Box style={{width: 450, height: 30, textAlign:'right'}}>
+                    {room.ispassword ? ( <LockIcon style={{fontSize: 40}}/>) : ( <p></p> )}		
+                </Box>
+                <CardActions>
+                    <Button sx={{left: 10} }size="small" variant="contained" onClick={() => handlePasswordModal(room.is_password, room.idx)}>Join</Button>
+                </CardActions>
             </ChatRoom>
         </CardContent>
         <Modal

@@ -35,12 +35,8 @@ export default function ChatRoomBar(props: any) {
         handleRenderMode('newChat');    
     };
 
-	// useEffect(() => {
-
-	// }, [])
-
-    // 새 채팅 핸들러
-
+	//  < 1,2,3,4,5 >
+	//  일단 보류 - 렌더링 이슈, 구현 복잡도 굳이?
 
 	return (
 		<div>

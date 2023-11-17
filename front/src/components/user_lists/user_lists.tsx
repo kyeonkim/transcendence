@@ -162,7 +162,6 @@ export default function BasicTabs({ setMTbox }: SearchUserProps) {
 				User list
 			</CustomTabPanel> */}
 			<CustomTabPanel value={value} index={1}>
-							AL
 				<AlarmListPanal
 					alarmList={AlarmList}
 					alarmListRemover={setAlarmListRemover}

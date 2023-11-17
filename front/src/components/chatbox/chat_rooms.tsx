@@ -14,13 +14,16 @@ import { useCookies } from 'next-client-cookies';
 
 import axios from 'axios';
 
+import { useChatSocket } from "../../app/main_frame/socket_provider"
 
 const MainChatRoomList = styled(Grid) ({
 	position: 'absolute',
 	top: 100,
 	left: 0,
 	width: 560,
-	height: 1332,
+	overflowY: "scroll",
+	maxHeight: "1200px" 
+	// height: 1332,
 	// backgroundColor: 'white',
 	// borderRadius: '10px',
   });
@@ -34,7 +37,8 @@ const MainChatRoomList = styled(Grid) ({
   })
 
 
-  export default function ChatRoomList(props: any) {
+  export default function ChatRoomList({setMTbox, handleRenderMode }: any) {
+	const socket = useChatSocket();
 	const cookies = useCookies();
 	const [roomList, setRoomList] = useState([]);
 	const [render, setRender] = useState(false);
@@ -48,20 +52,30 @@ const MainChatRoomList = styled(Grid) ({
 	console.log("CHL - user_id - ", user_id);
 	console.log("CHL - nickname - ", user_nickname);
 
+	const handleRender = () => {
+		if (render === true)
+			setRender(false);
+		else 
+			setRender(true);
+	}
+
 	async function handleRoomList() {
+		setRoomList([]);
 		await axios.get(`${process.env.NEXT_PUBLIC_API_URL}chat/roomlist/${user_id}`) 
 		.then((res) => {
-		if (res.data.rooms)
+			console.log(res.data);
+		if (res.data.rooms.length !== 0)
 		{
 			// 방 목록 배열, 순차 저장
 			res.data.rooms.map((room :any) => {
 				setRoomList(prevRoomList => [...prevRoomList, room]);
 			})
-			console.log(roomList);
+			console.log('room list for chat_rooms - ', roomList);
 		}
 		else
 		{
 			// 방이 없음 메시지
+			console.log('no rooms for chat_rooms');
 		}
 		})
 	}
@@ -90,7 +104,7 @@ const MainChatRoomList = styled(Grid) ({
 			// !!!!! 방 인원이 가득 찬 경우 - 방에 들어가지 못하고, 목록 다시 렌더링
 				// 에러로 뺄 수도 있을 것 같은데, 협의 필요.
 			console.log('trying to render');
-			setRender(true);
+			handleRender();
 		}
 		})
 		.catch ((error) => {
@@ -100,41 +114,57 @@ const MainChatRoomList = styled(Grid) ({
 			// internal error
 				// 종류 따라 다를 듯
 			console.log('trying to render');
-			setRender(true);
+			handleRender();
 		});
 
 	}
 
 	useEffect(() => {
+		socket.on(`render-chat`, (data) => {
+			console.log('render-chat', data);
+			handleRender();
+
+		})
+	}, [socket]);
+
+	useEffect(() => {
 
 		handleRoomList();
 		// 다시 가져오는 신호는?
-		setRender(false);
+		// handleRenderList(false);
 	}, [render])
 
-	const	setMTbox = props.setMTbox;
-	const	handleRenderMode = props.handleRenderMode;
-	
+	// useEffect(() => {
+
+	// 	handleRoomList();
+	// 	// 다시 가져오는 신호는?
+	// 	// handleRenderList(false);
+	// }, [renderChild])
+
+	// const	setMTbox = props.setMTbox;
+
 	return (
 		<div>
 			<ChatRoomBar setMTbox={setMTbox} handleRenderMode={handleRenderMode} />
             {roomList ? (
-			<MainChatRoomList container rowSpacing={1} columnSpacing={5}>
-			{roomList.map((room) => {
-				console.log('room data - ', room);
-				return (
-					<ChatRoomBlock
-						key={room.idx}
-						room={room}
-						openModal={openModal}
-						setOpenModal={setOpenModal}
-						selectedIdx={selectedIdx}
-						setSelectedIdx={setSelectedIdx}
-						handleJoin={handleJoin}
-						/>
-				);
-			})}
-			</MainChatRoomList>
+			<div>
+				<MainChatRoomList container spacing={2}>
+				{roomList.map((room) => {
+					console.log('room data - ', room);
+					return (
+						<ChatRoomBlock
+							key={room.idx}
+							room={room}
+							openModal={openModal}
+							setOpenModal={setOpenModal}
+							selectedIdx={selectedIdx}
+							setSelectedIdx={setSelectedIdx}
+							handleJoin={handleJoin}
+							/>
+					);
+				})}
+				</MainChatRoomList>
+			</div>
 			) : (
 				<></>
 		   )}

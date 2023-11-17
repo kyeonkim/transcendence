@@ -144,7 +144,7 @@ export default function AlarmListPanal (props: any) {
                   <AlarmAddFriend
                     key={idx}
                     alarm={alarm}
-                    removeEventFromDatabase={removeEventFromDatabase}
+                    alarmReducer={alarmReducer}
                     handleProfile={handleProfile}
                     imageLoader={imageLoader}
                     denyRequest={denyRequest}
@@ -159,7 +159,7 @@ export default function AlarmListPanal (props: any) {
                   <AlarmInviteChat
                     key={idx}
                     alarm={alarm}
-                    removeEventFromDatabase={removeEventFromDatabase}
+                    alarmReducer={alarmReducer}
                     handleProfile={handleProfile}
                     imageLoader={imageLoader}
                     denyRequest={denyRequest}
