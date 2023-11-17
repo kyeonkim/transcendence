@@ -52,8 +52,6 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
       // console.log("\n==========connect_user.blocks.map==============\n");
       connect_user.blocks.map((block) => { this.SocketService.JoinRoom(connect_user.user_id, `block-${block.blocked_user_id}`, this.server)});
       client.join(String(connect_user.user_id));
-      // All_room_user - kyeonkim : 접속된 유저들의 채팅방 리스트를 렌더링 하기 위해
-      client.join("connect_all_room");
       //testcode
       this.SocketService.SendStatusTest(Number(client.handshake.query.user_id), "login", this.server);
     }
@@ -106,7 +104,10 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
   @SubscribeMessage('status')
   async SendStatus(Client: Socket, payload: any)
   {
-    Client.to(`status-${payload.user_id}`).emit(`status-${payload.user_id}`, {user_id: payload.user_id, status: payload.status});
+    if(payload.target !== undefined)
+      Client.to(`${payload.target}`).emit(`status-${payload.user_id}`, {user_id: payload.user_id, status: payload.status});
+    else
+      Client.to(`status-${payload.user_id}`).emit(`status-${payload.user_id}`, {user_id: payload.user_id, status: payload.status});
   }
 
   async SendRerender(user_id: number, event: string, payload?: any)
@@ -114,8 +115,8 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
     const rtn = this.server.to(String(user_id)).emit(`render-${event}`, { data: payload ? payload : new Date().valueOf() });
   }
 
-  async SendRerenderTemp(room_name: string, event: string, payload?: any)
+  async SendRerenderAll(event: string, payload?: any)
   {
-    const rtn = this.server.to(room_name).emit(`render-${event}`, { data: payload ? payload : new Date().valueOf() });
+    const rtn = this.server.emit(`render-${event}`, { data: payload ? payload : new Date().valueOf() });
   }
 }

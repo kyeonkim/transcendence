@@ -107,7 +107,7 @@ export class ChatService {
         if (user === null)
             return {status: false, message: 'fail to update user'};
         await this.socketService.JoinRoom(data.user_id, `chat-${room.idx}`);
-        await this.socketService.SendRerenderTemp("connect_all_room", "chat");
+        await this.socketService.SendRerenderAll("chat");
         return {status: true, message: 'success', room: room};
     }
 
