@@ -82,7 +82,7 @@ export class SocketService {
 
     async HandleNotice(chatroom_id: number, message: string, server: Server)
     {
-        const result = server.to(String(chatroom_id)).emit('notice', {message: message, time: new Date().valueOf()});
+        const result = server.to(`chat-${chatroom_id}`).emit('notice', {message: message, time: new Date().valueOf()});
         if (result === false)
             return {status: false, message: "공지를 할 수 없습니다."}
         console.log("HandleNotice: ", message);
