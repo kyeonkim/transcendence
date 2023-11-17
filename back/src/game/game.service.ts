@@ -59,7 +59,7 @@ export class GameService {
                 },
             },
         });
-        if (user.games.length == 0)
+        if (user === null || user.games.length == 0)
             return {status: false, message: "게임 데이터 찾기 실패"};
         return {status: true, data: user.games};
     }
