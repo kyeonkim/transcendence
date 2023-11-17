@@ -9,7 +9,7 @@ export class SocialService {
     constructor(
         private readonly prismaService: PrismaService,
         private readonly eventService: EventService,
-        private readonly socketGateway: SocketGateway
+        private readonly socketGateway: SocketGateway,
     ) {}
 
     async CheckFriend(user1_id: number, user2_name: string)
@@ -187,13 +187,14 @@ export class SocialService {
                 blocked_user_nickname: true,
             },
         });
+        console.log("blockList : ", blockList);
         if (blockList !== null)
             return {status: true, list: blockList};
         else
             return {status: false};
     }
     
-    async BlockUser(data: friendDto)
+    async AddBlockUser(data: friendDto)
     {
         const block_check = await this.prismaService.block.findFirst({
             where: {
@@ -205,18 +206,52 @@ export class SocialService {
             return {status: false, message: "already block user"};
         const friend_check = await this.prismaService.friends.findFirst({
             where: {
-                following_user_id: data.friend_id,
-                followed_user_id: data.user_id,
+                following_user_id: data.user_id,
+                followed_user_id: data.friend_id,
             },
         });
         if (friend_check !== null)
             await this.DeleteFriend(data);
-        this.prismaService.block.create({
+        await this.prismaService.block.create({
             data: {
                 user_id: data.user_id,
                 blocked_user_id: data.friend_id,
                 blocked_user_nickname: data.friend_nickname,
             },
         });
+        await this.socketGateway.SendRerender(data.user_id, `friend`);
+        await this.socketGateway.SendRerender(data.friend_id, `friend`);
+        return {status: true, message: "Add block success"};
+    }
+
+    async DeleteBlockUser(data: friendDto)
+    {
+        const check = await this.prismaService.block.findFirst({
+            where: {
+                user_id: data.user_id,
+                blocked_user_id: data.friend_id,
+                blocked_user_nickname: data.friend_nickname
+            },
+        });
+        if (check === null)
+            return {status: false, message: "not block user"};
+        try
+        {
+            await this.prismaService.block.deleteMany({
+                where: { 
+                    user_id: data.user_id,
+                    blocked_user_id: data.friend_id, 
+                    blocked_user_nickname: data.friend_nickname,
+                },
+            });
+        }
+        catch(error) {
+            console.log("DeleteblockUser failed error: ", error);
+            return {status: false, message: "DeleteblockUser failed"}
+        }
+        await this.socketGateway.LeaveRoom(data.user_id, `block-${data.friend_id}`);
+        // await this.socketGateway.SendRerender(data.user_id, `friend`);
+        // await this.socketGateway.SendRerender(data.friend_id, `friend`);
+        return {status: true, message: "success"};
     }
 }

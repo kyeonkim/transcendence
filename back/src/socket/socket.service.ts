@@ -74,8 +74,8 @@ export class SocketService {
         }
         if (user.chatroom_id != payload.room_id || user.is_mute === true)
             return {status: false, message: "채팅을 할 수 없습니다."};
-        server.to(String(payload.room_id)).except(`block-${user.user_id}`).emit('chat', {from: payload.user_name, message: payload.message, time: new Date().valueOf()});
-        return {status: true, message: "채팅을 전송하였습니다."};
+        server.to(`chat-${payload.room_id}`).except(`block-${user.user_id}`).emit('chat', {from: payload.user_name, message: payload.message, time: new Date().valueOf()});
+        return {status: true, message: "["+payload.message + "] 채팅을 전송하였습니다."};
     }
 
     async HandleNotice(chatroom_id: number, message: string, server: Server)

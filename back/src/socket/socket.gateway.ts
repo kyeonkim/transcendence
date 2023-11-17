@@ -35,21 +35,21 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
       client.disconnect();
     else
     {
-      console.log("=============client.id, client.handshake.query.user_id=============\n",client.id, client.handshake.query.user_id);
+      // console.log("=============client.id, client.handshake.query.user_id=============\n",client.id, client.handshake.query.user_id);
       const connect_user = await this.SocketService.Connect(client.handshake.query.user_id, client.id, this.server);
-      console.log("=============connect_user=================\n", connect_user);
+      // console.log("=============connect_user=================\n", connect_user);
       if (connect_user === null)
         client.disconnect();
       else if (connect_user.roomuser !== null)
       {
-        console.log("join room: ", connect_user.user_id, connect_user.roomuser.chatroom_id);
-        await this.JoinRoom(connect_user.user_id, connect_user.roomuser.chatroom_id);
+        // console.log("join room: ", connect_user.user_id, connect_user.roomuser.chatroom_id);
+        await this.JoinRoom(connect_user.user_id, `chat-${connect_user.roomuser.chatroom_id}`);
       }
-      console.log("\n==========connect_user.friends.map==============\n");
+      // console.log("\n==========connect_user.friends.map==============\n");
       client.join(`status-${connect_user.user_id}`);
       connect_user.friends.map((friend) => { this.SocketService.JoinRoom(friend.followed_user_id, `status-${connect_user.user_id}`, this.server)});
       client.to(`status-${connect_user.user_id}`).emit(`status-${connect_user.user_id}`, {user_id: connect_user.user_id, status: "login"});
-      console.log("\n==========connect_user.blocks.map==============\n");
+      // console.log("\n==========connect_user.blocks.map==============\n");
       connect_user.blocks.map((block) => { this.SocketService.JoinRoom(connect_user.user_id, `block-${block.blocked_user_id}`, this.server)});
       client.join(String(connect_user.user_id));
       //testcode
@@ -90,13 +90,13 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
     this.server.to(String(chatroom_id)).socketsLeave(String(chatroom_id));
   }
 
-  async JoinRoom(user_id: any, room_id: number)
+  async JoinRoom(user_id: any, room_id: string)
   {
     console.log(room_id);
     this.SocketService.JoinRoom(user_id, String(room_id), this.server);
   }
 
-  async LeaveRoom(user_id: any, room_id: number)
+  async LeaveRoom(user_id: any, room_id: string)
   {
     this.SocketService.LeaveRoom(user_id, String(room_id), this.server);
   }
@@ -109,6 +109,6 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 
   async SendRerender(user_id: number, event: string)
   {
-    this.server.to(String(user_id)).emit(`render-${event}`, {time: new Date().valueOf()});
+    const rtn = this.server.to(String(user_id)).emit(`render-${event}`, {time: new Date().valueOf()});
   }
 }

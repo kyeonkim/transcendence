@@ -61,8 +61,18 @@ export class SocialController {
 	@ApiOperation({summary: `차단 API`, description: `해당 유저가 다른 유저를 차단한다.`})
 	// @UseGuards(AuthGuard('jwt-access'))
 	@Post("addBlockedUser")
-	async BlockUser(@Body() data: friendDto)
+	async AddBlockUser(@Body() data: friendDto)
     {
-		return await this.SocialService.BlockUser(data);
+		console.log("AddBlockUser :", data);
+		return await this.SocialService.AddBlockUser(data);
+    }
+
+	@ApiOperation({summary: `차단 해제 API`, description: `해당 유저가 다른 유저 차단 해제한다.`})
+	// @UseGuards(AuthGuard('jwt-access'))
+	@Delete("deleteBlockedUser")
+	async DeleteBlockUser(@Body() data: friendDto)
+    {
+		console.log("DeleteBlockUser :", data);
+		return await this.SocialService.DeleteBlockUser(data);
     }
 }  
