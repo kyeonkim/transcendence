@@ -1,4 +1,4 @@
-'use client'
+// 'use client'
 import { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 
@@ -10,22 +10,36 @@ import ChatRoomList from './chat_rooms';
 
 import { useCookies } from 'next-client-cookies';
 
-import { useChatBlockContext } from '../../app/main_frame/shared_state';
+import  { useChatBlockContext } from '../../app/main_frame/shared_state';
 
 // chatroomlist에서 요청의 결과로 받은 응답에 채팅방의 데이터가 들어있는가?
 // chat에서 한 번 더 요청하여 채팅방의 데이터를 받아오는가?
 
 export default function ChatBlock(props: any) {
 	const cookies = useCookies();
-	const [renderMode, setRenderMode] = useState('chatList');
+	// const [renderMode, setRenderMode] = useState('chatList');
 
-	// const [renderMode, setRenderMode] = useChatBlockContext();
+	const { handleRenderChatBlock } = useChatBlockContext();
 
-	const [render, setRender] = useState(false);
+	const { chatBlockRenderMode, setChatBlockRenderMode,
+			chatBlockTriggerRender, setChatBlockTriggerRender } = useChatBlockContext();
+	
+	// const { chatBlockRenderMode, setChatBlockRenderMode } = useChatBlockContext();
+
+
+	const setRenderMode = setChatBlockRenderMode;
+	const renderMode = chatBlockRenderMode;
+	const render = chatBlockTriggerRender;
+	const setRender = setChatBlockTriggerRender;
+
+	// const [render, setRender] = useState(false);
 	const [roominfo, setRoominfo] = useState({});
+
+	// const handleRenderMode = handleRenderChatBlock;
 
 	const handleRenderMode = (mode :string) => {
 
+		// setChatBlockRenderMode(mode);
 		setRenderMode(mode);
 		setRender(true);
 		
@@ -41,6 +55,7 @@ export default function ChatBlock(props: any) {
 				{
 					console.log("ChatBlock - user is in chatroom");
 					setRoominfo(res.data.userData.roomuser.chatroom);
+					console.log("roominfo - ", roominfo);
 					setRenderMode('chatRoom');
 				}
 			}
@@ -48,16 +63,15 @@ export default function ChatBlock(props: any) {
 			{
 				console.log("user is not in chat room");
 				setRenderMode('chatList');
+				// handleRenderMode('chatList');
 				// setInRoom(true);
 			}
 		})
 	}
-	
+
 	useEffect(() => {
 		getUserData();
 	}, [])
-
-
 
 	useEffect(() => {
 

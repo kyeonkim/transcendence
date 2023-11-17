@@ -1,5 +1,5 @@
 'use client';
-import React from 'react';
+import React, { use } from 'react';
 import styles from './mainbox.module.css';
 import Button from '@mui/material/Button';
 import Matchlist from './matchlist';
@@ -9,15 +9,19 @@ import axios from 'axios';
 import { useCookies } from 'next-client-cookies';
 import OtpModal from '../profile/otp';
 import TwoFAPass from '@/app/login/twoFAPass';
-
+import { Unstable_Grid2 } from '@mui/material';
+import { useChatSocket } from "../../app/main_frame/socket_provider"
 
 const ProfilePage = (props: any) => {
   const [isFriend, setIsFriend] = useState(false);
   const [isBlock, setIsBlock] = useState(false);
   const [isOTP, setIsOTP] = useState(false);
   const [isActivated, setIsActivated] = useState(false);
+  const [userId, setUserId] = useState(0);
+  const [rendering, setRendering] = useState('');
   const cookies = useCookies();
-  
+  const socket = useChatSocket();
+
   const userNickname = props.nickname;
   const my_id = Number(cookies.get('user_id'));
   const my_nick = cookies.get('nick_name');
@@ -27,11 +31,14 @@ const ProfilePage = (props: any) => {
     const fetchData = async () => {
       await axios.get(`${process.env.NEXT_PUBLIC_API_URL}user/getdata/nickname/${userNickname}`) 
         .then((res) => {
-        if (res.data.userData.twoFA)
-          setIsActivated(true);
-        else
-          setIsActivated(false);
-        })
+        if (res.data.userData)
+        {
+          setUserId(res.data.userData.user_id);
+          if (res.data.userData.nick_name === my_nick && res.data.userData.twoFA)
+            setIsActivated(true);
+          else
+            setIsActivated(false);
+        }})
       }
 
     const fetchFriendData = async () => {
@@ -50,7 +57,21 @@ const ProfilePage = (props: any) => {
     fetchData();
     if (userNickname !== my_nick)
       fetchFriendData();
-  }, [userNickname, isFriend, isOTP]);
+  }, [userNickname, isFriend, isOTP, rendering]);
+
+	useEffect(() => {
+		socket.on(`render-profile`, (data) => {
+			console.log('render-profile',data);
+      if (data === 'false')
+        setIsFriend(false)
+      else
+        setIsFriend(true)
+		});
+	
+		return () => {
+			socket.off("render-profile");
+		};
+	}, [socket]) 
 
   const handleFriend = async () => {
     if (isFriend) {
@@ -96,7 +117,48 @@ const ProfilePage = (props: any) => {
     }
    }
  
-  const handleBlock = () => {setIsBlock(true)}
+  const handleBlock = async() => {
+    if (isBlock)
+    {
+      console.log("disalbe block!!!");
+      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}social/deleteBlockedUser`,{
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${access_token}`,
+        },
+        data: {
+          user_id: my_id,
+          user_nickname: my_nick,
+          friend_id: Number(userId),
+          friend_nickname: userNickname
+        }})
+      .then((res) => {
+        console.log(res.data)
+        setIsBlock(false);
+      })
+    }
+    else {
+      console.log("block to ", userNickname, userId);
+      await axios.post(`${process.env.NEXT_PUBLIC_API_URL}social/addBlockedUser`,{
+        user_id: my_id,
+        user_nickname: my_nick,
+        friend_id: Number(userId),
+        friend_nickname: userNickname
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${access_token}`,
+        },
+      })
+      .then((res) => {
+        console.log(res.data)
+        setIsBlock(true);
+      })
+      .catch((err) => {
+      })
+    }
+  }
   const handleClose = () => {setIsOTP(false)}
   const handleActivte = (value: boolean) => {setIsActivated(value)}
   const handleOTP = () => {
@@ -130,9 +192,15 @@ const ProfilePage = (props: any) => {
                     친구추가
                   </Button>
                   )}
-                <Button variant="outlined" className={styles.roundButton} onClick={() => handleBlock()}>
-                  차단
-                </Button>
+                {isBlock? (
+                  <Button variant="outlined" className={styles.roundButton} onClick={() => handleBlock()}>
+                    차단해제
+                  </Button>
+                  ) : (
+                  <Button variant="outlined" className={styles.roundButton} onClick={() => handleBlock()}>
+                    차단
+                  </Button>
+                  )}
               </div>
             </div>
           ) : (

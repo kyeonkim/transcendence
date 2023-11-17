@@ -38,11 +38,12 @@ const modalStyle = {
     opacity: 0.5
 };
 
-export default function ChatRoomBlock({room, openModal, setOpenModal, handleJoin} :any) {
+export default function ChatRoomBlock({room, openModal, setOpenModal, selectedIdx, setSelectedIdx, handleJoin} :any) {
 
 	const [inPassword, setInPassword] = useState('');
 
-	function handleModalOpen() {
+	function handleModalOpen(idx :number) {
+        setSelectedIdx(idx);
 		setOpenModal(true);
 	}
 	
@@ -54,12 +55,12 @@ export default function ChatRoomBlock({room, openModal, setOpenModal, handleJoin
 		setInPassword(event.target.value as string);
 	}
 
-    async function handleCheckPassword(idx :number)
+    async function handleCheckPassword()
 	{
 		// 백 서버에 패스워드 체크 보내는 부분 필요
 		console.log('check ispassword and idx before handleJoin form Modal');
-		console.log('idx - ', idx);
-		handleJoin(idx, inPassword);
+		console.log('idx - ', selectedIdx);
+		handleJoin(selectedIdx, inPassword);
         setInPassword('');
 	}
 
@@ -67,7 +68,8 @@ export default function ChatRoomBlock({room, openModal, setOpenModal, handleJoin
         if (ispassword === true)
         {
             console.log('!!!!! open modal plesae');
-            handleModalOpen();
+            console.log('idx is - ', idx);
+            handleModalOpen(idx);
             // modal 자체가 async할 가능성
         }
         else
@@ -116,7 +118,7 @@ export default function ChatRoomBlock({room, openModal, setOpenModal, handleJoin
                     label="password"
                     onChange={handleInPassword}
                     />
-            <Button sx={{top: 20}} size="small" variant="contained" onClick={() => handleCheckPassword(room.idx)}>Join</Button>
+            <Button sx={{top: 20}} size="small" variant="contained" onClick={() => handleCheckPassword()}>Join</Button>
             </Box>
         </Modal>
         </Grid>

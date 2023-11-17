@@ -26,7 +26,7 @@ import { useCookies } from 'next-client-cookies';
 import axios from 'axios';
 
 
-export default function AlarmAddFriend ( {alarm, alarmReducer, handleProfile, imageLoader, denyRequest} :any) {
+export default function AlarmAddFriend ( {alarm, removeEventFromDatabase, handleProfile, imageLoader, denyRequest} :any) {
     const cookies = useCookies();
 
     const acceptFriendRequest = (alarm: any) => async () => {
@@ -45,7 +45,7 @@ export default function AlarmAddFriend ( {alarm, alarmReducer, handleProfile, im
             if (response.status)
             {
                 console.log('trying to remove event from alarmList');
-                alarmReducer(alarm);
+                removeEventFromDatabase(alarm);
                 console.log('remove success');
             }
         })
@@ -60,7 +60,7 @@ export default function AlarmAddFriend ( {alarm, alarmReducer, handleProfile, im
     return (
       <div>
                 <ListItem
-                    key={alarm.from_nickname}
+                    // key={alarm.from_nickname}
                     disablePadding
                 >
                 <HandshakeIcon />

@@ -39,6 +39,7 @@ const MainChatRoomList = styled(Grid) ({
 	const [roomList, setRoomList] = useState([]);
 	const [render, setRender] = useState(false);
 	const [openModal, setOpenModal] = useState(false);
+	const [selectedIdx, setSelectedIdx] = useState(-1);
 
 	const user_id = Number(cookies.get("user_id"));
 	const user_nickname = cookies.get("nick_name");
@@ -66,10 +67,8 @@ const MainChatRoomList = styled(Grid) ({
 	}
 
 	// 분리 성공하면 ispassword 제거할 것
-	async function handleJoin(idx :number, inPassword :number) {
+	async function handleJoin(idx :number, inPassword :string) {
 
-		console.log("CHL - handleJoin - room_id - ", idx);
-		console.log("CHL - password - ", inPassword);
 		await axios.patch(`${process.env.NEXT_PUBLIC_API_URL}chat/joinroom`, 
 		{
 			user_id : user_id,
@@ -129,6 +128,8 @@ const MainChatRoomList = styled(Grid) ({
 						room={room}
 						openModal={openModal}
 						setOpenModal={setOpenModal}
+						selectedIdx={selectedIdx}
+						setSelectedIdx={setSelectedIdx}
 						handleJoin={handleJoin}
 						/>
 				);

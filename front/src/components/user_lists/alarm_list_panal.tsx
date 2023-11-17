@@ -39,7 +39,7 @@ import { useCookies } from 'next-client-cookies';
 import axios from 'axios';
 
 import AlarmAddFriend from './alarm_add_friend';
-
+import AlarmInviteChat from './alarm_invite_chat'
 
 const MainAlarmPanal = styled(Box) ({
     position: 'absolute',
@@ -61,8 +61,10 @@ const modalStyle = {
   };
 
 export default function AlarmListPanal (props: any) {
-  const cookies = useCookies();
+	const [openModal, setOpenModal] = useState(false);
+	const [selectedAlarm, setSelectedAlarm] = useState(-1);
 
+  const cookies = useCookies();
 
   const alarmList = props.alarmList;
   const alarmListRemover = props.alarmListRemover;
@@ -77,7 +79,7 @@ export default function AlarmListPanal (props: any) {
   const removeEventFromDatabase = async (alarm: any) => {
         
         
-      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}event/deletealarms/${alarm.id}`)
+      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}event/deletealarms/${alarm.idx}`)
       .then((response) => {
           if (response.status)
           {
@@ -93,39 +95,21 @@ export default function AlarmListPanal (props: any) {
 
   };
   
-  // const acceptChatAmIinChat = async (alarm :any) => {
-  //     await axios.get(`${process.env.NEXT_PUBLIC_API_URL}user/getdata/id/${alarm.to_id}`)
-  //     .then((response) => {
-  //         if (response.data.userData.roomuser === null)
-  //         {
-  //             // 방 들어가기
-  //             chatRequestJoinRoom(
-  //                 response.data.userData.roomuser.is_password,
-  //                 response.data.userData.roomuser.idx);              
-  //         }
-  //         else
-  //         {
-  //             // 이미 채팅방에 들어가있습니다!
-  //             // 예외 처리
-  //             // 일단 아무것도 안함
-  //         }
-  //     })
-  // };
-
 
   const denyRequest = (alarm: any) => () => {
       console.log("deny request of - " + alarm.from_nickname);
-
+      console.log('deny - type - ', alarm);
       // alarm이 어떤 종류인지
         // 근데 remove할 때는 딱히 다른 동작 필요 없나?
       if (alarm.type === 'add_friend')
       {
           removeEventFromDatabase(alarm);
       }
-      // else if (alarm.type === 'invite_chat')
-      // {
-      //     removeEventFromDatabase(alarm);
-      // }
+      else if (alarm.event_type === 'invite_chat')
+      {
+          console.log('invite_chat deny request');
+          removeEventFromDatabase(alarm);
+      }
       // else if (alarm.type === 'game')
       // {
       //     removeEventFromDatabase(alarm);
@@ -146,51 +130,47 @@ export default function AlarmListPanal (props: any) {
   const imageLoader = ({ src }: any) => {
     return `${process.env.NEXT_PUBLIC_API_URL}user/getimg/nickname/${src}`
   }
-  
+
+
   return (
     <div>
       {alarmList ? (
         <List dense sx={{ width: '100%', maxWidth: 400, maxHeight: 580,bgcolor: 'background.paper', overflow: 'auto'}}>
-          {alarmList.map((alarm :any) => {
+          {alarmList.map((alarm :any, idx :number) => {
             if (alarm.event_type === 'add_friend')
             {
+              console.log('alarm data - ', alarm);
               return (
                   <AlarmAddFriend
+                    key={idx}
                     alarm={alarm}
-                    alarmReducer={alarmReducer}
+                    removeEventFromDatabase={removeEventFromDatabase}
                     handleProfile={handleProfile}
                     imageLoader={imageLoader}
                     denyRequest={denyRequest}
                     >
-
                   </AlarmAddFriend>
               );
             }
-            // else if (alarm.event_type === 'invite_chat')
-            // {
-            //   return (
-            //     <ListItem
-            //       key={alarm.from_nickname}
-            //       disablePadding
-            //     >
-            //       <AddCommentIcon />
-            //       <ListItemButton onClick={handleProfile(alarm)}>
-            //           <ListItemAvatar>
-            //           <Avatar
-            //             src={alarm.from_nickname ? imageLoader({src: alarm.from_nickname}) : null}
-            //           />
-            //           </ListItemAvatar>
-            //           <ListItemText id={labelId} primary={`${alarm.from_nickname}`} />
-            //       </ListItemButton>
-            //       <IconButton onClick={acceptChatRequest(alarm)}>
-            //           <CheckCircleOutlineRoundedIcon />
-            //       </IconButton>
-            //       <IconButton onClick={denyRequest(alarm)}>
-            //           <ClearRoundedIcon />
-            //       </IconButton>
-            //     </ListItem>
-            //   );
-            // }
+            else if (alarm.event_type === 'invite_chat')
+            {
+              console.log('alarm data - ', alarm);
+              return (
+                  <AlarmInviteChat
+                    key={idx}
+                    alarm={alarm}
+                    removeEventFromDatabase={removeEventFromDatabase}
+                    handleProfile={handleProfile}
+                    imageLoader={imageLoader}
+                    denyRequest={denyRequest}
+                    openModal={openModal}
+                    setOpenModal={setOpenModal}
+                    selectedAlarm={selectedAlarm}
+                    setSelectedAlarm={setSelectedAlarm}
+                  >
+                  </AlarmInviteChat>
+              );
+            }
             // else if (alarm.event_type === 'game')
             // {
             //   return (

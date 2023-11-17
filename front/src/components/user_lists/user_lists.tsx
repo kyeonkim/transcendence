@@ -93,7 +93,7 @@ export default function BasicTabs({ setMTbox }: SearchUserProps) {
 
 	const setAlarmListRemover = (alarm :any) => {
 		const newAlarmList = AlarmList.filter(
-			(listAlarm :any) => listAlarm.id != alarm.id);
+			(listAlarm :any) => listAlarm.idx != alarm.idx);
 
 		setAlarmList(newAlarmList);
 	}; 
@@ -142,26 +142,26 @@ export default function BasicTabs({ setMTbox }: SearchUserProps) {
 				<Paper elevation={6}>
 				<Tabs value={value} onChange={handleChange} centered aria-label="basic tabs example">
 					<Tab icon={<GroupIcon/>} {...a11yProps(0)} />
-					<Tab icon={<ForumIcon/>} {...a11yProps(1)} />
-					<Tab icon={<ThreePIcon/>} {...a11yProps(2)} />
-						<Tab icon={
-						<Badge color="secondary" badgeContent={alarmCount}>
-							<NotificationsRoundedIcon/>
-						</Badge>
-							} {...a11yProps(3)} />
+					{/* <Tab icon={<ForumIcon/>} {...a11yProps(1)} />
+					<Tab icon={<ThreePIcon/>} {...a11yProps(2)} /> */}
+					<Tab icon={
+					<Badge color="secondary" badgeContent={alarmCount}>
+						<NotificationsRoundedIcon/>
+					</Badge>
+						} {...a11yProps(1)} />
 				</Tabs>
 				</Paper>
 			</Box>
 			<CustomTabPanel value={value} index={0}>
 				<FriendListPanel setMTbox={setMTbox}/>
 			</CustomTabPanel>
-			<CustomTabPanel value={value} index={1}>
+			{/* <CustomTabPanel value={value} index={1}>
 				Channel list
 			</CustomTabPanel>
 			<CustomTabPanel value={value} index={2}>
 				User list
-			</CustomTabPanel>
-			<CustomTabPanel value={value} index={3}>
+			</CustomTabPanel> */}
+			<CustomTabPanel value={value} index={1}>
 							AL
 				<AlarmListPanal
 					alarmList={AlarmList}

@@ -18,19 +18,19 @@ export default function FriendListPanel({ setMTbox }: any) {
 	const cookies = useCookies();
 	const socket = useChatSocket();
 
-	// useEffect(() => {
-	// 	console.log('socket', socket);
-	// 	socket.on(`render-friend`, (data) => {
-	// 		setRendering(data);
-	// 	});
+	useEffect(() => {
+		socket.on(`render-friend`, (data) => {
+			console.log('render-friend',data);
+			setRendering(data);
+		});
 	
-	// 	return () => {
-	// 		socket.off("render-friend");
-	// 	};
-	// }, [socket]) 
-	// socket is undefined 왜!!!!
+		// return () => {
+		// 	socket.off("render-friend");
+		// };
+	}, [socket]) 
 
 	useEffect(() => {
+		console.log('friend list')
 		const fetchData = async () => {
 			await axios.get(`${process.env.NEXT_PUBLIC_API_URL}social/getFriendList/${cookies.get('user_id')}`)
 				.then((response) => {
@@ -42,7 +42,7 @@ export default function FriendListPanel({ setMTbox }: any) {
 			})
 		}
 		fetchData();
-		// socket.emit(`status`, { user_id: cookies.get('user_id'), status: `login`});
+		socket.emit(`status`, { user_id: cookies.get('user_id'), status: `login`});
 	}, [redering]);
 
 	useEffect(() => {
@@ -57,11 +57,11 @@ export default function FriendListPanel({ setMTbox }: any) {
 				});
 			});
 
-	return () => {
-		apiResponse.forEach(user => {
-		socket.off(`status-${user.followed_user_id}`);
-		});
-	};
+	// return () => {
+	// 	apiResponse.forEach(user => {
+	// 	socket.off(`status-${user.followed_user_id}`);
+	// 	});
+	// };
 	}, [apiResponse]);
 
 	const updateStatus = (userId: any, status: any) => {

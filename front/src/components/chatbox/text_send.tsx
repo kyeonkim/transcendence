@@ -16,6 +16,7 @@ const TextSend = ({ my_name, socket, setMTbox, scrollref}: any) => {
 
 		const handleNotice = (data: any) => {
 			const newMessage = rednerNotice(data);
+			console.log('notice on', newMessage);
 			setRenderedMessages(prevMessages => [...prevMessages, newMessage]);
 		};
 

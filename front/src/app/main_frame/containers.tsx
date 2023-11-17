@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { styled } from '@mui/system';
 import Box from '@mui/material/Box';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -14,6 +14,7 @@ import { loadFull } from "tsparticles";
 import Particles from "react-tsparticles";
 import { ISourceOptions } from "tsparticles-engine";
 import type { Engine } from "tsparticles-engine";
+import { useChatSocket } from "../../app/main_frame/socket_provider"
 
 import Divider from '@mui/material/Divider';
 
@@ -72,6 +73,8 @@ const Chatbox = styled(Box) ({
 export default function Main() {
   const [clicked, setClick] = useState(0);
   const [id, setSearch] = useState('');
+  const [socketReady, setSocketReady] = useState(false);
+  const socket = useChatSocket();
 
   const particlesInit = useCallback(async (engine: Engine) => {
     // console.log(engine);
@@ -80,6 +83,21 @@ export default function Main() {
   const handleClick = (value: number, searchTarget?: string) => {
     setClick(value);
     setSearch(searchTarget || '');
+  }
+
+  useEffect(() => {
+    if (socket) {
+      setSocketReady(true);
+    }
+    return () => {
+      
+    };
+  }, [socket]);
+
+  if (!socketReady) {
+    console.log('socket not ready');
+  
+    return <div>loading...</div>;
   }
 
  return (

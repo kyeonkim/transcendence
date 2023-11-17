@@ -1,31 +1,57 @@
+
 'use client'
 import { memo, useMemo, createContext, useState, useContext } from 'react';
 
-export const ChatBlockContext = createContext();
+interface ChatBlockState {
+    chatBlockRenderMode: string;
+    setChatBlockRenderMode: React.Dispatch<React.SetStateAction<string>>;
+    chatBlockTriggerRender: boolean;
+    setChatBlockTriggerRender: React.Dispatch<React.SetStateAction<boolean>>;
+    handleRenderChatBlock: (mode :string) => void;
+  }
+
+export const chatBlockContext = createContext<ChatBlockState | undefined>(undefined);
 
 export const ChatBlockProvider = ({ children } :any) => {
+    const [chatBlockTriggerRender, setChatBlockTriggerRender] = useState(false);
     const [chatBlockRenderMode, setChatBlockRenderMode] = useState('chatList');
 
-    const value = useMemo(() => ({
-        chatBlockRenderMode,
-        setChatBlockRenderMode
-    }), [chatBlockRenderMode])
+    const handleRenderChatBlock = (mode :string) => {
+        setChatBlockRenderMode(mode);
+        setChatBlockTriggerRender(true);
+    }
 
-//     return (
-//         <ChatBlockContext.Provider value={value}>
-//             {children}
-//         </ChatBlockContext.Provider>
-//   );
+    const value :ChatBlockState = useMemo(() => ({
+        chatBlockRenderMode,
+        setChatBlockRenderMode,
+        chatBlockTriggerRender,
+        setChatBlockTriggerRender,
+        handleRenderChatBlock
+    }), [chatBlockRenderMode, setChatBlockRenderMode,
+        chatBlockTriggerRender, setChatBlockTriggerRender,
+        handleRenderChatBlock])
+
+
+    // const value = useMemo(() => ({
+    //     chatBlockRenderMode,
+    //     setChatBlockRenderMode,
+    // }), [chatBlockRenderMode, setChatBlockRenderMode])
 
     return (
-         <ChatBlockContext.Provider value={{chatBlockRenderMode, setChatBlockRenderMode}}>
+        <chatBlockContext.Provider value={value}>
             {children}
-         </ChatBlockContext.Provider>
+        </chatBlockContext.Provider>
     );
+
+    // return (
+    //      <chatBlockContext.Provider value={{chatBlockRenderMode, setChatBlockRenderMode}}>
+    //         {children}
+    //      </chatBlockContext.Provider>
+    // );
 };
 
 export const useChatBlockContext = () => {
-  return useContext(ChatBlockContext);
+  return useContext(chatBlockContext);
 };
 
 export default ChatBlockProvider;

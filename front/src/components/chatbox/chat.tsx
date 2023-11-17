@@ -84,7 +84,7 @@ export default function Chat(props: any) {
 	
 	const handleSendInvite = async() => {
 		await axios.post(`${process.env.NEXT_PUBLIC_API_URL}chat/inviteuser`, {
-			type: 'chat',
+			type: 'invite_chat',
 			to: inviteTarget,
 			from: my_name,
 			chatroom_id: Number(roominfo.idx),
@@ -96,6 +96,7 @@ export default function Chat(props: any) {
 		})
 		.catch((err) => {
 			console.log('invite fail');
+			console.log(err);
 		})
 	}
 
