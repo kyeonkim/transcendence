@@ -6,6 +6,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { SocialService } from 'src/social/social.service';
 import * as fs from 'fs';
 import { join } from 'path';
+import { ChatService } from 'src/chat/chat.service';
 
 @Injectable()
 export class TestService {
@@ -14,6 +15,7 @@ export class TestService {
         private readonly GameService: GameService,
         private readonly prisma: PrismaService,
         private readonly SocialService: SocialService,
+        private readonly chatService: ChatService,
     ) {}
 
     async DeleteUserByNickName(nickName: string)
@@ -74,17 +76,17 @@ export class TestService {
 
     async CreateDummyUser()
     {
-        for(let i = 0; i < 10; i++)
+        for(let i = 0; i < 50; i++)
         {
             const user = await this.UserService.GetUserDataById(i);
             if (user.status)
                 return {status: false, message: "이미 유저가 존재합니다."};
             await this.UserService.CreateUser(i, `dummy${i}`);
         }
-        for(let i = 0; i < 10; i++)
+        for(let i = 0; i < 50; i++)
         {
             await this.SocialService.AcceptFriend({user_id: i,user_nickname: `dummy${i}`, friend_nickname: `min`});
-            for(let j = 0; j < 10; j++)
+            for(let j = 0; j < 50; j++)
             {
                 if (i != j)
                     await this.SocialService.AcceptFriend({user_id: i,user_nickname: `dummy${i}`, friend_nickname: `dummy${j}`});
@@ -95,7 +97,7 @@ export class TestService {
     async DeleteDummyUser()
     {
 
-        for(let i = 0; i < 10; i++)
+        for(let i = 0; i < 50; i++)
             await this.DeleteUserByNickName(`dummy${i}`);
     }
 
@@ -125,4 +127,24 @@ export class TestService {
         }
         return {status: true, message: "success"};
     }
+
+    async CreateDummyChat()
+    {
+        for (let i = 0; i < 50; i++)
+            await this.chatService.CreateRoom({user_id: i, user_nickname: `dummy${i}`, chatroom_name: `dummy${i} room`, private: false});
+    }
+
+    async DeleteDummyChat()
+    {
+        for(let i = 0; i < 50; i++)
+        {
+            await this.prisma.chatroom.deleteMany({
+                where: {
+                    owner_id: i,
+                },
+            });
+        }
+        
+    }
+    
 }

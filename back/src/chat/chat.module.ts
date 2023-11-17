@@ -10,5 +10,6 @@ import { EventModule } from 'src/event/event.module';
   controllers: [ChatController],
   providers: [ChatService],
   imports: [PrismaModule, SocketModule, JwtModule, EventModule],
+  exports: [ChatService],
 })
 export class ChatModule {}

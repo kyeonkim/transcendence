@@ -6,10 +6,11 @@ import { UserModule } from 'src/user/user.module';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { AuthModule } from 'src/auth/auth.module';
 import { SocialModule } from 'src/social/social.module';
+import { ChatModule } from 'src/chat/chat.module';
 
 @Module({
   controllers: [TestController],
   providers: [TestService],
-  imports: [UserModule, GameModule, PrismaModule, AuthModule, SocialModule]
+  imports: [UserModule, GameModule, PrismaModule, AuthModule, SocialModule, ChatModule]
 })
 export class TestModule {}

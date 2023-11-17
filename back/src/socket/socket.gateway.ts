@@ -20,7 +20,7 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
   @WebSocketServer() server: Server;
 
   async afterInit(server: Server) {
-    // console.log('Init===========\n',server);
+    // console.log('Init============\n',server);
   }
 
 
@@ -31,7 +31,7 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
     //토큰인증로직 
     //if 토큰인증 실패 >> disconnect
     console.log(client.id, client.handshake.query.user_id == 'undefined');
-    if (client.handshake.query.user_id == 'undefined')
+    if (client.handshake.query.user_id == 'undefined' || client.handshake.query.user_id == undefined)
       client.disconnect();
     else
     {
@@ -40,20 +40,23 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
       // console.log("=============connect_user=================\n", connect_user);
       if (connect_user === null)
         client.disconnect();
-      else if (connect_user.roomuser !== null)
+      else
       {
-        // console.log("join room: ", connect_user.user_id, connect_user.roomuser.chatroom_id);
-        await this.JoinRoom(connect_user.user_id, `chat-${connect_user.roomuser.chatroom_id}`);
+          if (connect_user.roomuser !== null)
+          {
+            // console.log("join room: ", connect_user.user_id, connect_user.roomuser.chatroom_id);
+            await this.JoinRoom(connect_user.user_id, `chat-${connect_user.roomuser.chatroom_id}`);
+          }
+          // console.log("\n==========connect_user.friends.map==============\n");
+          client.join(`status-${connect_user.user_id}`);
+          connect_user.friends.map((friend) => { this.SocketService.JoinRoom(friend.followed_user_id, `status-${connect_user.user_id}`, this.server)});
+          client.to(`status-${connect_user.user_id}`).emit(`status-${connect_user.user_id}`, {user_id: connect_user.user_id, status: "login"});
+          // console.log("\n==========connect_user.blocks.map==============\n");
+          connect_user.blocks.map((block) => { this.SocketService.JoinRoom(connect_user.user_id, `block-${block.blocked_user_id}`, this.server)});
+          client.join(String(connect_user.user_id));
+          //testcode
+          this.SocketService.SendStatusTest(Number(client.handshake.query.user_id), "login", this.server);
       }
-      // console.log("\n==========connect_user.friends.map==============\n");
-      client.join(`status-${connect_user.user_id}`);
-      connect_user.friends.map((friend) => { this.SocketService.JoinRoom(friend.followed_user_id, `status-${connect_user.user_id}`, this.server)});
-      client.to(`status-${connect_user.user_id}`).emit(`status-${connect_user.user_id}`, {user_id: connect_user.user_id, status: "login"});
-      // console.log("\n==========connect_user.blocks.map==============\n");
-      connect_user.blocks.map((block) => { this.SocketService.JoinRoom(connect_user.user_id, `block-${block.blocked_user_id}`, this.server)});
-      client.join(String(connect_user.user_id));
-      //testcode
-      this.SocketService.SendStatusTest(Number(client.handshake.query.user_id), "login", this.server);
     }
   }
 
@@ -104,10 +107,19 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
   @SubscribeMessage('status')
   async SendStatus(Client: Socket, payload: any)
   {
+    console.log("=====SendStatus======", payload);
     if(payload.target !== undefined)
-      Client.to(`${payload.target}`).emit(`status-${payload.user_id}`, {user_id: payload.user_id, status: payload.status});
+      Client.to(`status-${payload.target}`).emit(`status-${payload.user_id}`, {user_id: payload.user_id, status: payload.status});
     else
       Client.to(`status-${payload.user_id}`).emit(`status-${payload.user_id}`, {user_id: payload.user_id, status: payload.status});
+
+  }
+
+  @SubscribeMessage('login')
+  async SendLogin(Client: Socket, payload: any)
+  {
+    console.log("=====SendLogin======", payload);
+    Client.to(`status-${payload.user_id}`).emit(`status-${payload.user_id}`, {user_id: payload.user_id, status: "login"});
   }
 
   async SendRerender(user_id: number, event: string, payload?: any)

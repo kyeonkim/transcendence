@@ -49,6 +49,20 @@ export class TestController {
 		return this.TestService.DeleteDummyGame();
 	}
 
+	@ApiOperation({summary: `더미 채팅방생성 API`, description: `더미데이터를 생성한다.`})
+	@Post("createchatdummy")
+	CreateDummyChat()
+	{
+		return this.TestService.CreateDummyChat();
+	}
+
+	@ApiOperation({summary: `더미 채팅방 삭제 API`, description: `더미데이터를 삭제한다.`})
+	@Delete("deletechatdummy")
+	DeleteDummyChat()
+	{
+		return this.TestService.DeleteDummyChat();
+	}
+
 	@ApiOperation({summary: `강제친구 추가 API`, description: `강제로 친구를 추가한다.`})
 	@Get("addfriend")
 	async AddFriend(@Query('user1') user1_id: number, @Query('user2') user2_id: number)
