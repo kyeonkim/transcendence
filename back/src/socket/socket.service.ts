@@ -72,6 +72,8 @@ export class SocketService {
                 }
             });
         }
+        console.log("HandleChat: ", user);
+        console.log("HandleChat2: ", payload);
         if (user.chatroom_id != payload.room_id || user.is_mute === true)
             return {status: false, message: "채팅을 할 수 없습니다."};
         server.to(`chat-${payload.room_id}`).except(`block-${user.user_id}`).emit('chat', {from: payload.user_name, message: payload.message, time: new Date().valueOf()});
@@ -99,13 +101,14 @@ export class SocketService {
 
     async JoinRoom(user_id: any, room: string, server: Server)
     {
-        console.log("JoinRoom: ", this.sockets.get(String(user_id)));
+        console.log("JoinRoom user_id: ", user_id, " | JoinRoom: ", this.sockets.get(String(user_id)));
         if(this.sockets.get(String(user_id)) !== undefined)
             server.sockets.sockets.get(this.sockets.get(String(user_id))).join(room);
     }
 
     async LeaveRoom(user_id: any, room: string, server: Server)
     {
+        console.log("LeaveRoom user_id: ", user_id, " | LeaveRoom: ", this.sockets.get(String(user_id)));
         if(this.sockets.get(user_id) !== undefined)
             server.sockets.sockets.get(this.sockets.get(user_id)).leave(room);
     }

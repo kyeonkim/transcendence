@@ -86,8 +86,8 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 
   async DeleteRoom(chatroom_id: number)
   {
-    this.server.to(String(chatroom_id)).emit('kick', {message: "방이 삭제되었습니다."});
-    this.server.to(String(chatroom_id)).socketsLeave(String(chatroom_id));
+    this.server.to(`chat-${chatroom_id}`).emit('kick', {message: "방이 삭제되었습니다."});
+    this.server.to(`chat-${chatroom_id}`).socketsLeave(String(chatroom_id));
   }
 
   async JoinRoom(user_id: any, room_id: string)
@@ -107,8 +107,8 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
     Client.to(`status-${payload.user_id}`).emit(`status-${payload.user_id}`, {user_id: payload.user_id, status: payload.status});
   }
 
-  async SendRerender(user_id: number, event: string)
+  async SendRerender(user_id: number, event: string, payload?: any)
   {
-    const rtn = this.server.to(String(user_id)).emit(`render-${event}`, {time: new Date().valueOf()});
+    const rtn = this.server.to(String(user_id)).emit(`render-${event}`, { data: payload ? payload : new Date().valueOf() });
   }
 }

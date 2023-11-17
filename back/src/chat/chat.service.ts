@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { ChatRoomDto, JoinRoomDto, SetChatUserDto } from './dto/chat.dto';
+import { ChatRoomDto, InviteChatDto, JoinRoomDto, SetChatUserDto } from './dto/chat.dto';
 import { SocketGateway } from 'src/socket/socket.gateway';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
@@ -406,9 +406,20 @@ export class ChatService {
         return room;
     }
 
-    async InviteUser(data: eventDto)
+    async InviteUser(data: InviteChatDto)
     {
-        return await this.eventService.SendEvent(data)
+        const user = await this.prismaService.user.findUnique({ where: { nick_name: data.to } });
+        if (user === null)
+            return {status: false, message: "Can't friend"};
+        const eventData: eventDto = 
+        {
+            to: user.user_id,
+            type: data.type,
+            from: data.from,
+            chatroom_id: data.chatroom_id,
+            chatroom_name: data.chatroom_name
+        };
+        return await this.eventService.SendEvent(eventData)
     }
 
     async AcceptInvite(data: JoinRoomDto)

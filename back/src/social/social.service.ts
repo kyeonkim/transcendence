@@ -121,6 +121,7 @@ export class SocialService {
         // await this.eventService.SendFriendEvent(friend.user_id);
         await this.socketGateway.SendRerender(addFriend.user_id, 'friend');
         await this.socketGateway.SendRerender(friend.user_id, 'friend');
+        await this.socketGateway.SendRerender(friend.user_id, 'profile', 'false');
         return {status: true, message: "success"};
     }
     

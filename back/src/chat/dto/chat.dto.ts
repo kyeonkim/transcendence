@@ -75,3 +75,26 @@ export class SetChatUserDto
     @IsString()
     target_nickname: string;
 }
+
+export class InviteChatDto
+{
+    @ApiProperty()
+    @IsString()
+    to: string;
+
+    @ApiProperty()
+    @IsString()
+    type: string;// 'add_friend' | 'invite_game' | 'invite_chat'
+
+    @ApiProperty()
+    @IsString()
+    from: string;
+
+    @ApiProperty()
+    @IsInt()
+    chatroom_id?: number;
+
+    @ApiProperty()
+    @IsString()
+    chatroom_name?: string;
+}

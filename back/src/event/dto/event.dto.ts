@@ -9,7 +9,7 @@ export class eventDto
 
     @ApiProperty()
     @IsString()
-    type: string;
+    type: string;// 'add_friend' | 'invite_game' | 'invite_chat'
 
     @ApiProperty()
     @IsString()

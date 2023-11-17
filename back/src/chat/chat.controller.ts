@@ -2,7 +2,7 @@ import { Headers, Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Pos
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ChatService } from './chat.service';
 import { async } from 'rxjs';
-import { ChatRoomDto, JoinRoomDto, SetChatUserDto } from './dto/chat.dto';
+import { ChatRoomDto, InviteChatDto, JoinRoomDto, SetChatUserDto } from './dto/chat.dto';
 import { SocketGateway } from 'src/socket/socket.gateway';
 import { JwtService } from '@nestjs/jwt';
 import { eventDto } from 'src/event/dto/event.dto';
@@ -51,7 +51,7 @@ export class ChatController {
         const rtn =  await this.ChatService.JoinRoom(data);
         if (rtn.status === true)
             await this.socketService.HandleNotice(data.room_id, `${data.user_nickname}님이 입장하셨습니다.`);
-        console.log(data, rtn);
+        console.log("JoinRoom: ", data, rtn);
         return rtn;
     }
 
@@ -133,7 +133,7 @@ export class ChatController {
 
     @ApiOperation({summary: `채팅방 초대 API`, description: `채팅방에 유저를 초대한다.`})
     @Post("inviteuser")
-    async InviteUser(@Body() data : eventDto)
+    async InviteUser(@Body() data : InviteChatDto)
     {
         return await this.ChatService.InviteUser(data);
     }
