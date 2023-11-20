@@ -12,19 +12,6 @@ export class SocketService {
 
     async Connect(user_id: any, socket_id: string, server: Server)
     {
-        // if (this.sockets.get(user_id) === undefined)
-        //     this.sockets.set(user_id, [socket_id]);
-        // else
-        //     this.sockets.get(user_id).push(socket_id);
-        if (this.sockets.get(String(user_id)) !== undefined)
-        {
-            server.sockets.sockets.get(this.sockets.get(String(user_id))).disconnect();
-            console.log("disconnected ?: ", server.sockets.sockets.get(String(user_id)));
-            this.sockets.delete(String(user_id));
-        }
-        this.sockets.set(String(user_id), socket_id);
-        
-        // console.log("Connect: ", this.sockets.get(String(user_id)));
         const user = await this.prismaService.user.findUnique({
             where: {
                 user_id: Number(user_id),
@@ -35,6 +22,16 @@ export class SocketService {
                 blocks: true
             }
         });
+        if (user === null)
+            throw new Error("user is not exist");
+        if (this.sockets.get(String(user_id)) !== undefined)
+        {
+            server.sockets.sockets.get(this.sockets.get(String(user_id))).disconnect();
+            console.log("disconnected ?: ", server.sockets.sockets.get(String(user_id)));
+            this.sockets.delete(String(user_id));
+        }
+        this.sockets.set(String(user_id), socket_id);
+        
         return user;
     }
 

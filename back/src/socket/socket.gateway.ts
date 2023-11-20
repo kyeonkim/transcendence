@@ -1,6 +1,6 @@
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer, WsException } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
 import { SocketService } from './socket.service';
@@ -23,40 +23,25 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
     // console.log('Init============\n',server);
   }
 
-
   async handleConnection(client: Socket, ...args: any[]) {
-    // console.log('Client connected=============\n', client.id,
-    // `\nclient handshake =====================\n`, client.handshake);
-
     //토큰인증로직 
     //if 토큰인증 실패 >> disconnect
     console.log(client.id, client.handshake.query.user_id == 'undefined');
-    if (client.handshake.query.user_id == 'undefined' || client.handshake.query.user_id == undefined)
-      client.disconnect();
-    else
-    {
-      // console.log("=============client.id, client.handshake.query.user_id=============\n",client.id, client.handshake.query.user_id);
+    try {
+      if (client.handshake.query.user_id == 'undefined' || client.handshake.query.user_id == undefined)
+          throw new Error("user_id is undefined");
+      
       const connect_user = await this.SocketService.Connect(client.handshake.query.user_id, client.id, this.server);
-      // console.log("=============connect_user=================\n", connect_user);
-      if (connect_user === null)
-        client.disconnect();
-      else
-      {
-          if (connect_user.roomuser !== null)
-          {
-            // console.log("join room: ", connect_user.user_id, connect_user.roomuser.chatroom_id);
-            await this.JoinRoom(connect_user.user_id, `chat-${connect_user.roomuser.chatroom_id}`);
-          }
-          // console.log("\n==========connect_user.friends.map==============\n");
-          client.join(`status-${connect_user.user_id}`);
-          connect_user.friends.map((friend) => { this.SocketService.JoinRoom(friend.followed_user_id, `status-${connect_user.user_id}`, this.server)});
-          client.to(`status-${connect_user.user_id}`).emit(`status-${connect_user.user_id}`, {user_id: connect_user.user_id, status: "login"});
-          // console.log("\n==========connect_user.blocks.map==============\n");
-          connect_user.blocks.map((block) => { this.SocketService.JoinRoom(connect_user.user_id, `block-${block.blocked_user_id}`, this.server)});
-          client.join(String(connect_user.user_id));
-          //testcode
-          this.SocketService.SendStatusTest(Number(client.handshake.query.user_id), "login", this.server);
-      }
+      
+      connect_user.roomuser ? await this.JoinRoom(connect_user.user_id, `chat-${connect_user.roomuser.chatroom_id}`) : null;
+      client.join(String(connect_user.user_id));
+      client.join(`status-${connect_user.user_id}`);
+      connect_user.friends.map((friend) => { this.SocketService.JoinRoom(friend.followed_user_id, `status-${connect_user.user_id}`, this.server)});
+      connect_user.blocks.map((block) => { this.SocketService.JoinRoom(connect_user.user_id, `block-${block.blocked_user_id}`, this.server)});
+      client.to(`status-${connect_user.user_id}`).emit(`status-${connect_user.user_id}`, {user_id: connect_user.user_id, status: "login"});
+    } catch (error) {
+      console.log(error);
+      client.disconnect();
     }
   }
 
