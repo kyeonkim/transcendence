@@ -23,15 +23,14 @@ model User {
   updated_at  DateTime       @updatedAt
   twoFA       Boolean        @default(false)
   twoFA_key   TwoFA_key?     @relation("twoFA_user")
-  roomuser   Chatroom_user? @relation("chatroom_user_to_user")
+  roomuser    Chatroom_user? @relation("chatroom_user_to_user")
   friends     Friends[]      @relation("following_user")
   games       Game[]         @relation("game_user")
   tokens      Tokens?        @relation("token_user")
   events      Event[]        @relation("event_user")
   blocks      Block[]        @relation("block_user")
-//chatroom_id   Int?
-//chatroom      Chatroom?   @relation("chatroom_user", fields: [chatroom_id], references: [idx])
-//is_manager    Boolean     @default(false)
+  recv_messages Message[]    @relation("message_to_user")
+  send_messages Message[]    @relation("message_from_user")
 }   
 
 model TwoFA_key {
@@ -95,8 +94,6 @@ model Chatroom {
   bans              Ban[]              @relation("chatroom_ban")
   roomusers         Chatroom_user[]    @relation("chatroom_user_to_chatroom")
   created_at        DateTime           @default(now())
-//users           User[]             @relation("chatroom_user")
-//managers        Manager[]          @relation("chatroom_manager")
 }
 
 model Ban {
@@ -129,28 +126,12 @@ model Block {
     created_at            DateTime @default(now())
 }
 
-//model Chatroom_password {
-//  chatroom_idx  Int      @id
-//  chatroom      Chatroom @relation("chatroom_password", fields: [chatroom_idx], references: [idx])
-//  password      String
-//  created_at    DateTime @default(now())
-//  updated_at    DateTime @updatedAt
-//}
-
-// model Message {
-//   idx         Int      @default(autoincrement()) @id
-//   chatroom_id Int
-//   user_id     Int
-//   chatroom    Chatroom @relation("chatroom_message", fields: [chatroom_id], references: [idx])
-//   content     String
-//   created_at  DateTime @default(now())
-// }
-
-// model Manager {
-//   idx               Int      @default(autoincrement()) @id
-//   chatroom_id       Int
-//   chatroom          Chatroom @relation("chatroom_manager", fields: [chatroom_id], references: [idx])
-//   mannager_id       Int
-//   mannager_nickname String
-//   created_at        DateTime @default(now())
-// }
+model Message {
+  idx         Int      @default(autoincrement()) @id
+  from_id     Int
+  to_id       Int
+  from_user   User     @relation("message_from_user",fields: [from_id], references: [user_id])
+  to_user     User     @relation("message_to_user",fields: [to_id], references: [user_id])
+  content     String
+  created_at  DateTime @default(now())
+}

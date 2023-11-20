@@ -70,18 +70,11 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
     // console.log('Client disconnected');
   }
   
-  @SubscribeMessage('chat')
-  async handlechat(client: Socket, payload: any): Promise<any> {
-    const rtn = await this.SocketService.HandleChat(client, payload, this.server);
-    console.log(rtn);
-    return rtn;
-  }
-
   async HandleNotice(chatroom_id: number, message: string)
   {
     return await this.SocketService.HandleNotice(chatroom_id, message, this.server);
   }
-
+  
   async HandleKick(user_id: number, chatroom_id: number)
   {
     await this.SocketService.HandleKick(user_id, this.server);
@@ -92,16 +85,33 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
     this.server.to(`chat-${chatroom_id}`).emit('kick', {message: "방이 삭제되었습니다."});
     this.server.to(`chat-${chatroom_id}`).socketsLeave(String(chatroom_id));
   }
-
+  
   async JoinRoom(user_id: any, room_id: string)
   {
     console.log(room_id);
     this.SocketService.JoinRoom(user_id, String(room_id), this.server);
   }
-
+  
   async LeaveRoom(user_id: any, room_id: string)
   {
     this.SocketService.LeaveRoom(user_id, String(room_id), this.server);
+  }
+  
+  async SendRerender(user_id: number, event: string, payload?: any)
+  {
+    const rtn = this.server.to(String(user_id)).emit(`render-${event}`, { data: payload ? payload : new Date().valueOf() });
+  }
+  
+  async SendRerenderAll(event: string, payload?: any)
+  {
+    const rtn = this.server.emit(`render-${event}`, { data: payload ? payload : new Date().valueOf() });
+  }
+  
+  @SubscribeMessage('chat')
+  async handlechat(client: Socket, payload: any): Promise<any> {
+    const rtn = await this.SocketService.HandleChat(client, payload, this.server);
+    console.log(rtn);
+    return rtn;
   }
 
   @SubscribeMessage('status')
@@ -122,13 +132,9 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
     Client.to(`status-${payload.user_id}`).emit(`status-${payload.user_id}`, {user_id: payload.user_id, status: "login"});
   }
 
-  async SendRerender(user_id: number, event: string, payload?: any)
+  @SubscribeMessage(`dm`)
+  async SendDM(Client: Socket, payload: any)
   {
-    const rtn = this.server.to(String(user_id)).emit(`render-${event}`, { data: payload ? payload : new Date().valueOf() });
-  }
-
-  async SendRerenderAll(event: string, payload?: any)
-  {
-    const rtn = this.server.emit(`render-${event}`, { data: payload ? payload : new Date().valueOf() });
+    this.SocketService.SendDm(payload.user_id, payload.target_id, payload.message, this.server);
   }
 }
