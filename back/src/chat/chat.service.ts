@@ -441,4 +441,27 @@ export class ChatService {
         });
         return await this.JoinRoom(data);
     }
+
+    async GetDm(idx: number, user_id: number, from_id: number)
+    {
+        const dm = await this.prismaService.user.findUnique({
+            where: {
+                user_id: user_id,
+                recv_messages: {
+                    some: {
+                        from_id: from_id,
+                    },                    
+                },
+            },
+            include: {
+                recv_messages: {
+                    cursor: idx ? { idx: idx } : undefined,
+                    take: 10,
+                    skip: 0,
+                    orderBy: { idx: 'desc'},
+                }
+            }
+        });
+        return {status: true, message: 'success', dm: dm};
+    }
 }

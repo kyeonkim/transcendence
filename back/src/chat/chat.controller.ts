@@ -1,4 +1,4 @@
-import { Headers, Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Req } from '@nestjs/common';
+import { Headers, Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Req, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ChatService } from './chat.service';
 import { async } from 'rxjs';
@@ -143,5 +143,12 @@ export class ChatController {
     async AcceptInvite(@Body() data : JoinRoomDto)
     {
         return await this.ChatService.AcceptInvite(data);
+    }
+
+    @ApiOperation({summary: `dm 가져오기 API`, description: `dm 을 가져온다.`})
+    @Get("dm")
+    async GetDm(@Query('id', ParseIntPipe) id: number, @Param('from_id', ParseIntPipe) from_id: number, @Param(`idx`, ParseIntPipe) idx: number)
+    {
+        return await this.ChatService.GetDm(id, from_id, idx);
     }
 }
