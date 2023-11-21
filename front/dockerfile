@@ -1,0 +1,9 @@
+FROM node:latest
+
+WORKDIR /app/front_server
+
+COPY . /app/front_server/
+
+RUN npm install
+
+CMD ["npm", "run", "dev"]
