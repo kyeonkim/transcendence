@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Headers, Param, Post, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SignUpDto, TokenDto, TwoFADTO } from './dto/token.dto';
@@ -29,17 +29,19 @@ export class AuthController {
 	}
 
 	@ApiOperation({summary: `토큰 재발급 API`, description: `리프래시 토큰을 통해 새로운 토큰을 발급한다.`})
+	@UseGuards(AuthGuard('jwt-refresh'))
 	@ApiBearerAuth('JWT-refresh')// swagger code
 	@Post("token/refresh")
-	@UseGuards(AuthGuard('jwt-refresh'))
-	async RecreateToken(@Body() token : TokenDto)
+	async RecreateToken(@Headers() header, @Body() token : TokenDto)
 	{
+		// console.log("token header: ", header);
+		console.log("token refresh", token);
 		return await this.AuthService.ReCreateToken(token);
 	}
 
 	@ApiBearerAuth('JWT-auth')
-	@Get("token/varify")
 	@UseGuards(AuthGuard('jwt-access'))
+	@Get("token/varify")
 	async VarifyToken()
 	{
 		console.log("token varify");
@@ -73,7 +75,7 @@ export class AuthController {
 	}
 
 	@ApiOperation({summary: '2차인증 비활성화 API', description: '2차인증을 비활성화 한다.'})
-	// @UseGuards(AuthGuard('jwt-access'))
+	@UseGuards(AuthGuard('jwt-access'))
 	@Delete("2fa/deactive")
 	async Deactive2FA(@Body() twofa: TwoFADTO)
 	{

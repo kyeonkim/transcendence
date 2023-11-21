@@ -13,7 +13,7 @@ export class SocialController {
     ) {}
 
 	@ApiOperation({summary: `친구 추가 요청 API`, description: `해당 유저끼리 친구를 요청한다.`})
-	// @UseGuards(AuthGuard('jwt-access'))
+	@UseGuards(AuthGuard('jwt-access'))
 	@Post("addfriend")
 	async AddFriend(@Req() req, @Body() friend : friendDto)
     {
@@ -22,6 +22,7 @@ export class SocialController {
     }
 
 	@ApiOperation({summary: `친구 추가 수락 API`, description: `해당 유저끼리 친구를 수락한다.`})
+	@UseGuards(AuthGuard('jwt-access'))
 	@Post("acceptfriend")
 	async AcceptFriend(@Body() friend : friendDto)
 	{
@@ -29,6 +30,7 @@ export class SocialController {
 	}
 
     @ApiOperation({summary: `친구 확인 API`, description: `두 유저의 친구여부를 확인한다.`})
+	@UseGuards(AuthGuard('jwt-access'))
 	@Get("checkFriend")
 	async CheckFriend(@Query('user1', ParseIntPipe) user1_id: number, @Query('user2') user2_name: string)
 	{
@@ -36,7 +38,7 @@ export class SocialController {
 	}
 
     @ApiOperation({summary: `친구 삭제 API`, description: `두 유저의 친구 관계를 삭제한다.`})
-	// @UseGuards(AuthGuard('jwt-access'))
+	@UseGuards(AuthGuard('jwt-access'))
 	@Delete("DeleteFriend")
 	async DeleteFriend(@Body() friend: friendDto)
 	{
@@ -45,6 +47,7 @@ export class SocialController {
 	}
 
     @ApiOperation({summary: `친구목록 확인 API`, description: `유저의 친구 목록을 확인한다.`})
+	// @UseGuards(AuthGuard('jwt-access'))
     @Get("getFriendList/:id")
     async GetFriendList(@Param('id', ParseIntPipe) user_id: number)
     {
@@ -52,6 +55,7 @@ export class SocialController {
     }
 
     @ApiOperation({summary: `차단목록 확인 API`, description: `유저의 차단 목록을 확인한다.`})
+	@UseGuards(AuthGuard('jwt-access'))
     @Get("getBlockList/:id")
 	async GetBlockList(@Param('id', ParseIntPipe) user_id: number)
 	{
@@ -59,7 +63,7 @@ export class SocialController {
 	}
 
 	@ApiOperation({summary: `차단 API`, description: `해당 유저가 다른 유저를 차단한다.`})
-	// @UseGuards(AuthGuard('jwt-access'))
+	@UseGuards(AuthGuard('jwt-access'))
 	@Post("addBlockedUser")
 	async AddBlockUser(@Body() data: friendDto)
     {
@@ -68,7 +72,7 @@ export class SocialController {
     }
 
 	@ApiOperation({summary: `차단 해제 API`, description: `해당 유저가 다른 유저 차단 해제한다.`})
-	// @UseGuards(AuthGuard('jwt-access'))
+	@UseGuards(AuthGuard('jwt-access'))
 	@Delete("deleteBlockedUser")
 	async DeleteBlockUser(@Body() data: friendDto)
     {
