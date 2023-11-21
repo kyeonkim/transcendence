@@ -112,19 +112,20 @@ export class SocketService {
 
     async SendStatusTest(user_id: any, status: string, server: Server)
     {
-        server.emit(`status-${user_id}`, {user_id: user_id, status: status});
+        server.emit(`status`, {user_id: user_id, status: status});
     }
 
-    async SendDm(from: number,to_id: number, message: string, server: Server)
+    async SendDm(from_id: number,to_id: number, message: string, server: Server)
     {
         const msg = await this.prismaService.message.create({
             data: {
-                from_id: from,
-                to_id: to_id,
+                from_id,
+                to_id,
                 content: message,
             }
         });
         server.to(String(to_id)).emit('dm', msg);
+        server.to(String(from_id)).emit('dm', msg);
     }
 
     async ReadDm(idx: number)

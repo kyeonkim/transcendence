@@ -444,23 +444,23 @@ export class ChatService {
 
     async GetDm(idx: number, user_id: number, from_id: number)
     {
-        const dm = await this.prismaService.user.findUnique({
+        const dm = await this.prismaService.message.findMany({
             where: {
-                user_id: user_id,
-                recv_messages: {
-                    some: {
+                OR: [
+                    {
+                        from_id: user_id,
+                        to_id: from_id,
+                    },
+                    {
                         from_id: from_id,
-                    },                    
-                },
+                        to_id: user_id,
+                    }
+                ]
             },
-            include: {
-                recv_messages: {
-                    cursor: idx ? { idx: idx } : undefined,
-                    take: 30,
-                    skip: 0,
-                    orderBy: { idx: 'desc'},
-                }
-            }
+            cursor: idx ? { idx: idx } : undefined,
+            take: 30,
+            skip: 0,     
+            orderBy: { idx: 'desc'},
         });
         if (dm === null)
             return {status: false, message: 'fail to find dm'}

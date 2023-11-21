@@ -125,7 +125,8 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
   @SubscribeMessage(`dm`)
   async SendDM(Client: Socket, payload: any)
   {
-    await this.SocketService.SendDm(payload.user_id, payload.target_id, payload.message, this.server);
+    console.log("=====SendDM======", payload);
+    await this.SocketService.SendDm(payload.from_id, payload.to_id, payload.message, this.server);
   }
 
   @SubscribeMessage(`dmread`)
