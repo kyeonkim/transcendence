@@ -130,8 +130,9 @@ model Message {
   idx         Int      @default(autoincrement()) @id
   from_id     Int
   to_id       Int
+  is_read     Boolean  @default(false)
+  content     String
   from_user   User     @relation("message_from_user",fields: [from_id], references: [user_id])
   to_user     User     @relation("message_to_user",fields: [to_id], references: [user_id])
-  content     String
   created_at  DateTime @default(now())
 }

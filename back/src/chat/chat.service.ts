@@ -456,12 +456,44 @@ export class ChatService {
             include: {
                 recv_messages: {
                     cursor: idx ? { idx: idx } : undefined,
-                    take: 10,
+                    take: 30,
                     skip: 0,
                     orderBy: { idx: 'desc'},
                 }
             }
         });
+        if (dm === null)
+            return {status: false, message: 'fail to find dm'}
         return {status: true, message: 'success', dm: dm};
+    }
+
+    async GetUnreadDm(user_id: number, from_id: number)
+    {
+        try {
+            const unreaddm = await this.prismaService.message.findMany({
+                where: {
+                    from_id: from_id,
+                    to_id: user_id,
+                    is_read: false,
+                },
+                orderBy: { idx: 'desc' } 
+            });
+            if (unreaddm === null)
+                return {status: true, dm: []};
+            const dm = await this.prismaService.message.updateMany({
+                where: {
+                    from_id: from_id,
+                    to_id: user_id,
+                    is_read: false,
+                },
+                data: {
+                    is_read: true,
+                },
+            });
+            return {status: true, dm: unreaddm};
+        } catch (error) {
+            console.log(error);
+            return {status: false, message: 'fail to update dm'};
+        }
     }
 }

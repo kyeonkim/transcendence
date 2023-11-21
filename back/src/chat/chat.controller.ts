@@ -147,8 +147,15 @@ export class ChatController {
 
     @ApiOperation({summary: `dm 가져오기 API`, description: `dm 을 가져온다.`})
     @Get("dm")
-    async GetDm(@Query('id', ParseIntPipe) id: number, @Param('from_id', ParseIntPipe) from_id: number, @Param(`idx`, ParseIntPipe) idx: number)
+    async GetDm(@Query('id', ParseIntPipe) id: number, @Query('from_id', ParseIntPipe) from_id: number, @Query(`idx`, ParseIntPipe) idx: number)
     {
-        return await this.ChatService.GetDm(id, from_id, idx);
+        return await this.ChatService.GetDm(idx, id, from_id);
+    }
+
+    @ApiOperation({summary: `안읽은 dm 가져오기 API`, description: `안읽은 dm 을 가져온다.`})
+    @Get("unreaddm")
+    async GetUnreadDm(@Query('user_id', ParseIntPipe) user_id: number, @Query('from_id', ParseIntPipe) from_id: number)
+    {
+        return await this.ChatService.GetUnreadDm(user_id, from_id);
     }
 }

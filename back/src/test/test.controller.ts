@@ -81,4 +81,11 @@ export class TestController {
 			return {status: false, message: "유저 찾기 실패"}
 		return await this.SocialService.AcceptFriend({user_id: user1.user_id, user_nickname: user1.nick_name, friend_nickname: user2.nick_name});
 	}
+
+	@ApiOperation({summary: `dummy message 생성 API`, description: `dummy message를 생성한다.`})
+	@Post("createmessagedummy")
+	async CreateDummyMessage()
+	{
+		return await this.TestService.CreateDummyMessage();
+	}
 }

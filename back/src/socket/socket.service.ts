@@ -126,4 +126,29 @@ export class SocketService {
         });
         server.to(String(to_id)).emit('dm', msg);
     }
+
+    async ReadDm(idx: number)
+    {
+        await this.prismaService.message.update({
+            where: {
+                idx: idx,
+            },
+            data: {
+                is_read: true,
+            }
+        });
+    }
+
+    async GetDm(user_id: number, server: Server)
+    {
+        const dm = await this.prismaService.message.findMany({
+            where: {
+                to_id: user_id,
+                is_read: false,
+            },
+        });
+        dm.forEach((element) => {
+            server.to(String(user_id)).emit('dm', element);
+        });
+    }
 }

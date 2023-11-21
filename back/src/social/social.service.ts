@@ -119,6 +119,8 @@ export class SocialService {
         }
         // await this.eventService.SendFriendEvent(addFriend.user_id);
         // await this.eventService.SendFriendEvent(friend.user_id);
+        await this.socketGateway.JoinRoom(addFriend.user_id, `status-${friend.user_id}`);
+        await this.socketGateway.JoinRoom(friend.user_id, `status-${addFriend.user_id}`);
         await this.socketGateway.SendRerender(addFriend.user_id, 'friend');
         await this.socketGateway.SendRerender(friend.user_id, 'friend');
         await this.socketGateway.SendRerender(friend.user_id, 'profile', 'false');

@@ -5,6 +5,7 @@ import { Server, Socket } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
 import { SocketService } from './socket.service';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { instrument } from "@socket.io/admin-ui";
 
 //cors origin * is for development only
 // @UseGuards(AuthGuard('jwt-ws'))
@@ -20,7 +21,15 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
   @WebSocketServer() server: Server;
 
   async afterInit(server: Server) {
-    // console.log('Init============\n',server);
+      instrument(this.server, {
+        // auth: {
+        //   type: "basic",
+        //   username: "admin",
+        //   password: "$2a$10$mR.33xR3G4dDzDgQGhJ5T.Sb8uENPDO48K8An8wVxo4DLL5VaREiS" // "changeit" encrypted with bcrypt
+        // },
+        auth: false,
+        mode: "development",
+    });
   }
 
   async handleConnection(client: Socket, ...args: any[]) {
@@ -38,7 +47,6 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
       client.join(`status-${connect_user.user_id}`);
       connect_user.friends.map((friend) => { this.SocketService.JoinRoom(friend.followed_user_id, `status-${connect_user.user_id}`, this.server)});
       connect_user.blocks.map((block) => { this.SocketService.JoinRoom(connect_user.user_id, `block-${block.blocked_user_id}`, this.server)});
-      client.to(`status-${connect_user.user_id}`).emit(`status-${connect_user.user_id}`, {user_id: connect_user.user_id, status: "login"});
     } catch (error) {
       console.log(error);
       client.disconnect();
@@ -103,23 +111,32 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
   async SendStatus(Client: Socket, payload: any)
   {
     console.log("=====SendStatus======", payload);
-    if(payload.target !== undefined)
-      Client.to(`status-${payload.target}`).emit(`status-${payload.user_id}`, {user_id: payload.user_id, status: payload.status});
+    console.log("=====SendStatusTarget======", payload.target);
+    if(payload.target === undefined)
+    {
+      Client.to(`status-${payload.user_id}`).emit(`status`, {user_id: payload.user_id, status: payload.status});
+      console.log("here");
+    } 
     else
-      Client.to(`status-${payload.user_id}`).emit(`status-${payload.user_id}`, {user_id: payload.user_id, status: payload.status});
+      Client.to(`${payload.target}`).emit(`status`, {user_id: payload.user_id, status: payload.status});
 
-  }
-
-  @SubscribeMessage('login')
-  async SendLogin(Client: Socket, payload: any)
-  {
-    console.log("=====SendLogin======", payload);
-    Client.to(`status-${payload.user_id}`).emit(`status-${payload.user_id}`, {user_id: payload.user_id, status: "login"});
   }
 
   @SubscribeMessage(`dm`)
   async SendDM(Client: Socket, payload: any)
   {
-    this.SocketService.SendDm(payload.user_id, payload.target_id, payload.message, this.server);
+    await this.SocketService.SendDm(payload.user_id, payload.target_id, payload.message, this.server);
+  }
+
+  @SubscribeMessage(`dmread`)
+  async ReadDM(Client: Socket, payload: any)
+  {
+    await this.SocketService.ReadDm(payload.idx);
+  }
+
+  @SubscribeMessage(`getdm`)
+  async GetDM(Client: Socket, payload: any)
+  {
+    await this.SocketService.GetDm(payload.user_id, this.server);
   }
 }

@@ -146,5 +146,19 @@ export class TestService {
         }
         
     }
+
+    async CreateDummyMessage()
+    {
+        for (let i = 0 ; i < 50; ++i)
+        {
+            await this.prisma.message.create({
+                data: {
+                    from_id: 1,
+                    to_id: 2,
+                    content: `dummy${i} message`,
+                }
+            })
+        }
+    }
     
 }
