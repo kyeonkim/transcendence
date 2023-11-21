@@ -90,7 +90,7 @@ export default function FriendListPanel(props: any) {
 					<div>친구없음</div>
 				)}
 			</List>
-			{/* {(dmOpenId > -1) ? (
+			{(dmOpenId > -1) ? (
 					<DirectMessage
 						dmAlarmCount={dmAlarmCount}
 						dmAlarmMessageList={dmAlarmMessageList}
@@ -103,7 +103,7 @@ export default function FriendListPanel(props: any) {
 					</DirectMessage>
 			) : (
 				<div></div>
-			)} */}
+			)}
 		</div>
 	);
 }
