@@ -68,6 +68,7 @@ export default function BasicTabs({ setMTbox }: SearchUserProps) {
 	const [alarmCount, setAlarmCount] = useState(0);
 	const [AlarmList, setAlarmList] = useState<any>([]);
 	const [dmOpenId, setDmOpenId] = useState(-1);
+	const [dmOpenNickname, setDmOpenNickname] = useState('');
 	const [dmAlarmCount, setDmAlarmCount] = useState(false);
 	const [dmAlarmMessageList, setDmAlarmMessageList] = useState<any>([]);
 	const [dmText, setDmText] = useState('');
@@ -167,19 +168,21 @@ export default function BasicTabs({ setMTbox }: SearchUserProps) {
 
 	}
 
-	const handleChatTarget = (user_id: any) => () => {
+	const handleChatTarget = (from_id :any, from_nickname: any) => () => {
 
 		// state 변경해서 DM rendering하게 만들기
-		if (dmOpenId === user_id)
+		if (dmOpenId === from_id)
 		{
 			console.log('dm closed');
 			setDmOpenId(-1);
+			setDmOpenNickname('');
 		}
 
 		else
 		{
-			console.log("dm to " + user_id);
-			setDmOpenId(user_id);
+			console.log("dm to - ", from_id);
+			setDmOpenId(from_id);
+			setDmOpenNickname(from_nickname);
 		}
 
 	};
@@ -199,13 +202,17 @@ export default function BasicTabs({ setMTbox }: SearchUserProps) {
 			else
 			{
 				console.log('dm to alarm');
-				setDmAlarmMessageList((prevDmAlarmMessageList :any) => 
-					[...prevDmAlarmMessageList, data]);
+				// setDmAlarmMessageList((prevDmAlarmMessageList :any) => 
+				// 	[...prevDmAlarmMessageList, data]);
+				
+				// 알람 갯수만 관리하는게 나을지도?
+					// 전체 검색 - 아이디, 갯수 묶음(배열 혹은 클래스)의 배열로 저장
+					// 각 친구를 렌더할 때 자신의 것을 찾아서 렌더하기.
 			}
 
 		});
 
-		socket.emit('new-dm-list', { user_id: cookies.get('user_id') });
+		socket.emit('getdm', { user_id: Number(cookies.get('user_id')) });
 
 		return () => {
 			socket.off('dm');
@@ -237,6 +244,7 @@ export default function BasicTabs({ setMTbox }: SearchUserProps) {
 					dmAlarmMessageList={dmAlarmMessageList}
 					dmAlarmRemover={dmAlarmRemover}
 					dmOpenId={dmOpenId}
+					dmOpenNickname={dmOpenNickname}
 					dmText={dmText}
 					handleChatTarget={handleChatTarget}
 					setMTbox={setMTbox}

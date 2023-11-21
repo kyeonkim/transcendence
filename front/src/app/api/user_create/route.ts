@@ -28,8 +28,6 @@ export async function POST (request: NextRequest)
             nick_name: data.nick_name,
             // img_name: data.img_name
         });
-        // created 201
-        console.log("===============tettettettettettettettettettettettet");
     }
     catch (err)
     {

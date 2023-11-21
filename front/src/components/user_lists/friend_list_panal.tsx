@@ -79,7 +79,7 @@ export default function FriendListPanel(props: any) {
 									<div>{user.status === 'online' || user.status === 'login' ? 'ON' : 'OFF'}</div>
 								</div>
 							</ListItemButton>
-							<IconButton edge="end" aria-label="comments" onClick={handleChatTarget(user.followed_user_id)}>
+							<IconButton edge="end" aria-label="comments" onClick={handleChatTarget(user.followed_user_id, user.followed_user_nickname)}>
 								<Badge color="secondary" badgeContent={1}>
 									<CommentIcon />
 								</Badge>

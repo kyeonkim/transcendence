@@ -62,6 +62,7 @@ const TextSend = ({ my_name, socket, setMTbox, scrollref}: any) => {
 		)
 	}
 
+	// dm의 형식에 따라 또 달라질 수 있음. 일단 받아보기.
 	const renderMessage = (message: any) => {
 		return (
 			<Grid container key={message.time}>

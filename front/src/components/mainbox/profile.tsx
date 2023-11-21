@@ -11,6 +11,7 @@ import OtpModal from '../profile/otp';
 import TwoFAPass from '@/app/login/twoFAPass';
 import { Unstable_Grid2 } from '@mui/material';
 import { useChatSocket } from "../../app/main_frame/socket_provider"
+import axiosToken from '@/app/api/token/token';
 
 const ProfilePage = (props: any) => {
   const [isFriend, setIsFriend] = useState(false);
@@ -99,7 +100,7 @@ const ProfilePage = (props: any) => {
     else {
       console.log("add friend!!!");
       console.log(my_id, my_nick, userNickname);
-      await axios.post(`${process.env.NEXT_PUBLIC_API_URL}social/addFriend`,{
+      await axiosToken.post(`${process.env.NEXT_PUBLIC_API_URL}social/addFriend`,{
         user_id: my_id,
         user_nickname: my_nick,
         friend_nickname: userNickname
