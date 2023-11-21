@@ -36,12 +36,14 @@ export default function MatchList(props: any) {
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}game/data`, {
-        params: { id: 0, index: res.length ? res[res.length - 1].idx - 1 : 0 },
-      });
-      setRes([...res, ...response.data.data]);
+    await axios.get(`${process.env.NEXT_PUBLIC_API_URL}game/data`, {
+      params: { id: 0, index: res.length ? res[res.length - 1].idx - 1 : 0 },
+    })
+    .then((response) => {
+      if (response.data.status)
+        setRes([...res, ...response.data.data]);
+    });
     };
-  
     fetchData();
   }, [page]);
   
@@ -64,9 +66,23 @@ export default function MatchList(props: any) {
     },
   };
 
+  const emptyStyle = {
+    width: '100%',
+    height: '100%',
+    maxWidth: 1300,
+    maxHeight: 250,
+    bgcolor: 'rgba(135, 206, 235, 0.2)',
+    alignItems: 'center',
+    marginLeft: '70px',
+    marginRight: '70px',
+    marginTop: '50px',
+    borderRadius: '20px',
+    border: '5px solid #000',
+  };
   return (
     <List ref={listRef} sx={listStyle}>
-      {res.map((match: any, index: any) => {
+      {res.length > 0 ? (
+        res.map((match: any, index: any) => {
         
         const listItemStyle = {
           border: '5px solid ' + (match.winner ? 'rgba(0, 0, 255, 0.4)' : 'rgba(255, 0, 0, 0.4)'), // 테두리 색상 설정
@@ -122,8 +138,14 @@ export default function MatchList(props: any) {
             {/* <Divider variant="inset" component="li" /> */}
           </React.Fragment>
         );
-      })}
+        })
+      ) : (
+        <ListItem alignItems="center" sx={emptyStyle}>
+          <Typography variant="h6" sx={{ fontSize: '50px' }}>
+            매치 기록이 없습니다.
+          </Typography>
+        </ListItem>
+      )}
     </List>
   );
-  
 }

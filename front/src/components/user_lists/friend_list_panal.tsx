@@ -7,93 +7,39 @@ import ListItemAvatar from '@mui/material/ListItemAvatar';
 import IconButton from '@mui/material/IconButton';
 import Avatar from '@mui/material/Avatar';
 import CommentIcon from '@mui/icons-material/Comment';
+import Badge from '@mui/material/Badge';  
 import { useEffect, useState } from 'react';
 import { useCookies } from 'next-client-cookies';
 import axios from 'axios';
 import { useChatSocket } from "../../app/main_frame/socket_provider"
+import { Skeleton } from '@mui/material';
+import { send } from 'process';
+import Divider from '@mui/material/Divider';
+import DirectMessage from './direct_message';
 
-export default function FriendListPanel({ setMTbox }: any) {
-	const [rendering, setRendering] = useState('');
+export default function FriendListPanel(props: any) {
 	const [apiResponse, setApiResponse] = useState([]);
-	const cookies = useCookies();
+	const [loading, setloading] = useState(true);
 	const socket = useChatSocket();
+	const { setMTbox, dmAlarmCount, dmAlarmMessageList, dmAlarmRemover, dmOpenId, handleChatTarget, list, myId, tapref} = props;
 
 	useEffect(() => {
-		socket.on(`render-friend`, (data) => {
-			console.log('render-friend',data);
-			setRendering(data);
-		});
-	
-		return () => {
-			socket.off("render-friend");
-		};
-	}, [socket]) 
+		if (list && JSON.stringify(list) === JSON.stringify(apiResponse)) {
+			return;
+		  }
+		if (list) {	
+			console.log('friend list panel===========', list);
+			socket.emit('status', { user_id: myId, status: 'login' });
+			setApiResponse(list);
+		}
+		else
+			setloading(true);
+	}, [list]);
 
 	useEffect(() => {
-		console.log('friend list')
-		fetchData();
-	}, [rendering]);
+		setloading(false);
+	}, [apiResponse]);
 
-	const fetchData = async () => {
-		await axios.get(`${process.env.NEXT_PUBLIC_API_URL}social/getFriendList/${cookies.get('user_id')}`)
-			.then((response) => {
-				console.log('friend list=======', response);
-				if (response.data.status) {
-					response.data.data.forEach((user: any) => {
-						socket.on(`status-${user.followed_user_id}`, (data) => {
-							console.log('status update==', data);
-							if (data.status === `login`) {
-								socket.emit(`status`, { user_id: cookies.get('user_id'), status: `online`, target: user.followed_user_id });
-							}
-							updateStatus(user.followed_user_id, data.status);
-						});
-					});
-					setApiResponse(response.data.data);
-				} else if (response.data.status === false) {
-					setApiResponse([]);
-				}
-				sendLogin();
-			})
-		.catch((error) => {
-			console.log('friend list error ', error);
-		})
-	}
-
-	function sendLogin() {
-		socket.emit(`login`, { user_id: cookies.get('user_id'), status: `login` });
-	}
-
-
-	// useEffect(() => {
-	// 	apiResponse.forEach(user => {
-	// 		socket.on(`status-${user.followed_user_id}`, (data) => {
-	// 			console.log('status update==', data);
-	// 			if (data.status === `login`)
-	// 			{
-	// 				socket.emit(`status`, { user_id: cookies.get('user_id'), status: `online`, target: user.followed_user_id});
-	// 			}
-	// 			updateStatus(user.followed_user_id, data.status);
-	// 			});
-	// 		});
-	// 		// socket.emit(`login`, { user_id: cookies.get('user_id'), status: `login`});
-	// return () => {
-	// 	apiResponse.forEach(user => {
-	// 		socket.off(`status-${user.followed_user_id}`);
-	// 	});
-	// };
-	// }, [apiResponse]);
-
-	const updateStatus = (userId: any, status: any) => {
-		setApiResponse(prevState =>
-			prevState.map(user =>
-			user.followed_user_id === userId ? { ...user, status } : user
-			)
-		);
-	};
-
-	const handleChat = (id: any) => () => {
-		console.log("chat to " + id);
-	}
 
 	const handleProfile = (id: any) => () => {
 		console.log("profile to " + id);
@@ -101,31 +47,63 @@ export default function FriendListPanel({ setMTbox }: any) {
 	}
 
 	const getStatusColor = (status: string) => {
-		return status === 'online' || status === 'login' ? 'yellow' : 'grey';
+		if (status === 'ingame')
+			return 'red';
+		else
+			return status === 'online' || status === 'login' ? 'green' : 'grey';
 		};
+	
+	// 조건부로 DM 알람 렌더링하게 될 예정임
 
 	return (
 		<div>
-			{apiResponse.length > 0 ? (
-				<List dense sx={{ width: '100%', maxWidth: 400, maxHeight: 580, bgcolor: 'background.paper', overflow: 'auto'}}>
-					{apiResponse.map((user: any) => (
-						<ListItem key={user.followed_user_id} disablePadding>
-							<ListItemButton onClick={handleProfile(user.followed_user_nickname)}>
+			<List dense sx={{ width: '100%', maxWidth: 400, maxHeight: 580, bgcolor: 'background.paper', overflow: 'auto'}}>
+				{apiResponse?.length > 0 ? (
+					apiResponse.map((user: any) => (
+						<ListItem key={user.followed_user_id}>
+							<ListItemButton onClick={handleProfile(user.followed_user_nickname)} sx={{width: "10px"}}>
 								<ListItemAvatar>
 									<Avatar src={`${process.env.NEXT_PUBLIC_API_URL}user/getimg/nickname/${user.followed_user_nickname}`} />
 								</ListItemAvatar>
-								<ListItemText primary={user.followed_user_nickname} />
-								<div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: getStatusColor(user.status), marginRight: '5px' }}></div>
+								<ListItemText primary={user.followed_user_nickname}/>
+								<div style={{ display: 'flex', alignItems: 'center' }}>
+									<div style={{
+										width: '10px',
+										height: '10px',
+										borderRadius: '50%',
+										border: '1px solid #000',
+										backgroundColor: getStatusColor(user.status),
+										marginRight: '8px'
+										}}>
+									</div>
+									<div>{user.status === 'online' || user.status === 'login' ? 'ON' : 'OFF'}</div>
+								</div>
 							</ListItemButton>
-								<IconButton edge="end" aria-label="comments" onClick={handleChat(user.followed_user_nickname)}>
+							<IconButton edge="end" aria-label="comments" onClick={handleChatTarget(user.followed_user_id)}>
+								<Badge color="secondary" badgeContent={1}>
 									<CommentIcon />
-								</IconButton>
+								</Badge>
+							</IconButton>
 						</ListItem>
-					))}
-				</List>
+					))
+				) : (
+					<div>친구없음</div>
+				)}
+			</List>
+			{/* {(dmOpenId > -1) ? (
+					<DirectMessage
+						dmAlarmCount={dmAlarmCount}
+						dmAlarmMessageList={dmAlarmMessageList}
+						dmAlarmRemover={dmAlarmRemover}
+						dmOpenId={dmOpenId}
+						handleChatTarget={handleChatTarget}
+						setMTbox={setMTbox}
+						tapref={tapref}
+						>
+					</DirectMessage>
 			) : (
-				<p>친구가 없습니다.</p>
-			)}
-	</div>
+				<div></div>
+			)} */}
+		</div>
 	);
 }

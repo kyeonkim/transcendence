@@ -42,7 +42,7 @@ export default function Signup (props:any) {
 
     if (!response.ok) {
       console.log('signup login/api fail', response);
-      window.alert('중복된 닉네임');
+      window.alert('중복된 닉네임이거나 특수문자가 포함되어있습니다! 다시 입력해주세요.');
     }
     else
     {
