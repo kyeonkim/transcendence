@@ -1,0 +1,138 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  user_id     Int            @id
+  nick_name   String         @unique
+  state       Int            @default(0)
+  img_name    String?        @default("default.png")
+  win         Int            @default(0)
+  lose        Int            @default(0)
+  ladder      Int            @default(1000)
+  created_at  DateTime       @default(now())
+  updated_at  DateTime       @updatedAt
+  twoFA       Boolean        @default(false)
+  twoFA_key   TwoFA_key?     @relation("twoFA_user")
+  roomuser    Chatroom_user? @relation("chatroom_user_to_user")
+  friends     Friends[]      @relation("following_user")
+  games       Game[]         @relation("game_user")
+  tokens      Tokens?        @relation("token_user")
+  events      Event[]        @relation("event_user")
+  blocks      Block[]        @relation("block_user")
+  recv_messages Message[]    @relation("message_to_user")
+  send_messages Message[]    @relation("message_from_user")
+}   
+
+model TwoFA_key {
+  user_id     Int      @id
+  user        User     @relation("twoFA_user", fields: [user_id], references: [user_id])
+  twoFA_key   String
+  created_at  DateTime @default(now())
+}
+
+model Friends {
+    id                      Int      @default(autoincrement()) @id
+    following_user          User     @relation("following_user", fields: [following_user_id], references: [user_id])
+    following_user_id       Int
+    following_user_nickname String
+    followed_user_id        Int
+    followed_user_nickname  String
+    created_at              DateTime @default(now())
+}
+
+model Tokens {
+    user_id        Int      @id
+    user           User     @relation("token_user", fields: [user_id], references: [user_id])
+    nick_name      String   @unique
+    twoFAPass      Boolean
+    access_token   String?
+    refresh_token  String?
+    created_at     DateTime @default(now())
+}
+
+model Game {
+    idx         Int      @default(autoincrement()) @id
+    rank        Boolean
+    user_id     Int
+    enemy_id    Int
+    enemy_name  String   @default("enemy")
+    winner      Boolean
+    user        User     @relation("game_user", fields: [user_id], references: [user_id])
+    my_score    Int      @default(0)
+    enemy_score Int      @default(0)
+    created_at  DateTime @default(now())
+}
+
+model Event {
+  idx           Int      @default(autoincrement()) @id
+  to_id         Int
+  user          User     @relation("event_user",fields: [to_id], references: [user_id])
+  event_type    String
+  from_nickname String
+  chatroom_id   Int?
+  chatroom_name String?
+}
+
+model Chatroom {
+  idx               Int                @default(autoincrement()) @id
+  name              String
+  is_password       Boolean            @default(false)
+  is_private        Boolean            @default(false)
+  owner_id          Int
+  owner_nickname    String
+  room_password     String?
+  bans              Ban[]              @relation("chatroom_ban")
+  roomusers         Chatroom_user[]    @relation("chatroom_user_to_chatroom")
+  created_at        DateTime           @default(now())
+}
+
+model Ban {
+  idx         Int      @default(autoincrement()) @id
+  chatroom_id Int
+  chatroom    Chatroom @relation("chatroom_ban",fields: [chatroom_id], references: [idx])
+  user_id     Int
+  created_at  DateTime @default(now())
+}
+
+model Chatroom_user {
+  idx         Int      @default(autoincrement()) @id
+  chatroom_id Int
+  chatroom    Chatroom @relation("chatroom_user_to_chatroom",fields: [chatroom_id], references: [idx])
+  user_id     Int      @unique
+  user_nickname String
+  user        User     @relation("chatroom_user_to_user",fields: [user_id], references: [user_id])
+  is_manager  Boolean  @default(false)
+  is_mute     Boolean  @default(false)
+  mute_time   String?
+  created_at  DateTime @default(now())
+}
+
+model Block {
+    id                    Int      @default(autoincrement()) @id
+    user                  User     @relation("block_user", fields: [user_id], references: [user_id])
+    user_id               Int
+    blocked_user_id       Int
+    blocked_user_nickname String
+    created_at            DateTime @default(now())
+}
+
+model Message {
+  idx         Int      @default(autoincrement()) @id
+  from_id     Int
+  to_id       Int
+  is_read     Boolean  @default(false)
+  content     String
+  from_user   User     @relation("message_from_user",fields: [from_id], references: [user_id])
+  to_user     User     @relation("message_to_user",fields: [to_id], references: [user_id])
+  created_at  DateTime @default(now())
+}

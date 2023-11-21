@@ -3,9 +3,11 @@ COMPOSE 	= ./docker-compose.yml
 all: up
 
 up:
+	mkdir -p ./db
 	docker compose -f $(COMPOSE) up -d --build
 
 down:
+	rm -rf ./db/*
 	docker compose -f $(COMPOSE) down
 
 clean: down
@@ -26,4 +28,11 @@ re: fclean all
 
 # docker 옵션
 # $(docker ps -a -q) : 모든 컨테이너 삭제
-# system prune : 사용하지 않는 모든 이미지, 컨테이너, 볼륨, 네트워크 삭제
+# system prune : 사용하지 않는 모든 이미지, 컨테이너, 볼륨, 네트워크 삭제all:
+
+log:
+	docker compose logs -f
+in-db:
+	docker exec -it postgre_container bash
+server:
+	docker exec -it nest_container bash

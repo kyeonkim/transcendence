@@ -16,7 +16,59 @@ services:
 
 
 
+services:
+  postgresql:
+    image: postgres:latest
+    container_name: postgre_container
+    restart: always
+    healthcheck:
+      test: pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}
+      interval: 10s
+      timeout: 60s
+      retries: 5
+      start_period: 80s
+    env_file:
+      - .env
+    volumes:
+      - ./db:/var/lib/postgresql/data
+    expose:
+      - 5432
+    networks:
+      - transcendence_net
+  nestjs:
+    build: ./back
+    image: back_server
+    container_name: nest_container
+    env_file:
+      - .env
+    depends_on:
+      postgresql:
+        condition: service_healthy
+    volumes:
+      - ./back/prisma:/app/transcendence_nest_server/prisma
+      - ./back/src:/app/transcendence_nest_server/src
+      - ./back/storage:/app/transcendence_nest_server/storage
+      # - ./back/node_modules:/app/transcendence_nest_server/node_modules - kyeonkim : npm install 로 설치한 파일들이 삭제되는 문제 발견
+    ports:
+      - "4242:4242"
+    networks:
+      - transcendence_net
+    restart: always
+  portainer:
+    image: portainer/portainer
+    container_name: portainer_container
+    restart: always
+    ports:
+      - "9000:9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    networks:
+      - transcendence_net
 
 networks:
   transcendence_net:
     driver: bridge
+
+volumes:
+  portainer_data:
