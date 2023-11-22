@@ -5,7 +5,6 @@ import { axiosToken } from '@/util/token';
 import * as React from 'react';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
-import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 
 import Paper from '@mui/material/Paper';
@@ -16,14 +15,10 @@ import AlarmListPanal from './alarm_list_panal';
 import Badge from '@mui/material/Badge';  
 import NotificationsRoundedIcon from '@mui/icons-material/NotificationsRounded';
 import GroupIcon from '@mui/icons-material/Group';
-import ForumIcon from '@mui/icons-material/Forum';
-import ThreePIcon from '@mui/icons-material/ThreeP';
 
 import { useCookies } from 'next-client-cookies';
 
-import axios from 'axios';
 import { useChatSocket } from "../../app/main_frame/socket_provider"
-import { get } from 'http';
 import { useFriendList } from './friend_status';
 import { useChatBlockContext } from '@/app/main_frame/shared_state';
 
@@ -75,10 +70,10 @@ export default function BasicTabs({ setMTbox }: SearchUserProps) {
 	const [dmText, setDmText] = useState('');
 	const cookies = useCookies();
 	const socket = useChatSocket();
-	const friendlist = useFriendList(cookies.get('user_id'));
 	const tabsRef = useRef(null);
 	const { handleRenderDmBlock } = useChatBlockContext();
-
+	const friendList = useFriendList(cookies.get('user_id'));
+	
 	const handleChange = (event: React.SyntheticEvent, newValue: number) => {
 		setValue(newValue);
 	};
@@ -123,8 +118,6 @@ export default function BasicTabs({ setMTbox }: SearchUserProps) {
 		setDmAlarmCountList(newDmAlarmList);
 	}
 
-
-		// 초기 알람 목록 설정하기 (api)
 	const fetchAlarms = async () => {
 		await axiosToken.get(`${process.env.NEXT_PUBLIC_API_URL}event/getalarms/${cookies.get('user_id')}`,{
 			headers: {
@@ -132,16 +125,6 @@ export default function BasicTabs({ setMTbox }: SearchUserProps) {
 				'Authorization': `Bearer ${cookies.get('access_token')}`
 			  },
 		})
-		.then((response) => {
-			if (response.data.status)
-				console.log('alarmList success - ', response.data);
-			else
-				console.log('alarmList fail - ', response.data);
-		})
-		.catch((err) => {
-			console.log('getalarm error');
-		})
-
 	}
 
 	useEffect(() => {
@@ -169,15 +152,9 @@ export default function BasicTabs({ setMTbox }: SearchUserProps) {
 		};
 	}, []);
 
+	const handleChatTarget = (from_id :any, from_nickname: any) => {
 
-	if (friendlist)
-	{
-
-	}
-
-	const handleChatTarget = (from_id :any, from_nickname: any) => () => {
-
-		// state 변경해서 DM rendering하게 만들기
+		console.log('in handleChatTarget', dmOpenId, from_id);
 		if (dmOpenId === from_id)
 		{
 			console.log('dm closed');
@@ -194,51 +171,18 @@ export default function BasicTabs({ setMTbox }: SearchUserProps) {
 
 	};
 
-
-	useEffect(() => {
-
-		// dm 읽는 걸 열고, emit으로 준비 되었다고 신호 줌.
-		socket.on('dm', (data :any) => {
-			console.log('dm listened - ', data);
-			if (data.from_id === dmOpenId)
-			{
-				// 이미 dm 있으니 아무것도 하지 않는다.
-				console.log('dm to dmOpenId');
-			}
-			else
-			{
-				// console.log('dm to alarm', data);
-
-				// setDmAlarmCountList((prevDmAlarmCountList :any) => 
-				// 	[...prevDmAlarmCountList, ]);
-				
-				// 알람 갯수만 관리하는게 나을지도?
-					// 전체 검색 - 아이디, 갯수 묶음(배열 혹은 클래스)의 배열로 저장
-					// 각 친구를 렌더할 때 자신의 것을 찾아서 렌더하기.
-			}
-
-		});
-
-		socket.emit('getdm', { user_id: Number(cookies.get('user_id')) });
-
-		return () => {
-			socket.off('dm');
-		};
-	}, [socket]);
-
-
-
-
 	return (
 		<Box sx={{ width: '100%'}}>
 			<Box sx={{ borderBottom: 1, borderColor: 'divider'}}>
 				<Paper elevation={6}>
 				<Tabs value={value} ref={tabsRef} onChange={handleChange} centered aria-label="basic tabs example">
-					<Tab icon={<GroupIcon/>} {...a11yProps(0)} />
-					{/* <Tab icon={<ForumIcon/>} {...a11yProps(1)} />
-					<Tab icon={<ThreePIcon/>} {...a11yProps(2)} /> */}
 					<Tab icon={
-					<Badge color="secondary" badgeContent={alarmCount}>
+						<Badge color="error" badgeContent={dmAlarmCount ? '!' : 0}>
+						<GroupIcon/>
+						</Badge>
+						} {...a11yProps(0)} />
+					<Tab icon={
+					<Badge color="error" badgeContent={alarmCount}>
 						<NotificationsRoundedIcon/>
 					</Badge>
 						} {...a11yProps(1)} />
@@ -255,7 +199,7 @@ export default function BasicTabs({ setMTbox }: SearchUserProps) {
 					dmText={dmText}
 					handleChatTarget={handleChatTarget}
 					setMTbox={setMTbox}
-					list={friendlist}
+					list={friendList}
 					myId={cookies.get('user_id')}
 					tapref={tabsRef}
 				/>

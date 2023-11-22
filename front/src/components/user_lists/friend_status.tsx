@@ -17,7 +17,7 @@ export function useFriendList(myId: any) {
           },
         })
         .then((response) => {
-          console.log('friend list response ', response.data);
+          // console.log('friend list response ', response.data);
           if (response.data.status) {
             const newResponse = response.data.data.map((user: any) => {
               user.status = 'offline';
@@ -61,7 +61,7 @@ export function useFriendList(myId: any) {
     setApiResponse((prevState) =>
       prevState.map((user: any) => {
         if (user.followed_user_id == Number(userId)) {
-          console.log('update status ', user, status);
+          // console.log('update status ', user, status);
           return { ...user, status };
         }
         return user;

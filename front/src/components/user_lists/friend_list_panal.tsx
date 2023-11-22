@@ -40,6 +40,28 @@ export default function FriendListPanel(props: any) {
 		setloading(false);
 	}, [apiResponse]);
 
+	useEffect(() => {
+		socket.on('dm', (data: any) => {
+			console.log('dm event!!===', data);
+			setApiResponse((prevState) =>
+				prevState.map((user: any) => {
+			  		if (user.followed_user_id == Number(data.from_id)) {
+						console.log('dm event from===', user);
+						return { ...user, count: (user.count || 0 ) + 1 };
+			  		}
+			  		return user;
+				})
+		  	);
+		});
+		return () => {
+			console.log('friend list socket dm unmounted');
+			socket.off('dm');
+		}
+	}, [socket]);
+
+	useEffect(() => {
+		console.log('apiResponse===', apiResponse);
+	}, [apiResponse]);
 
 	const handleProfile = (id: any) => () => {
 		console.log("profile to " + id);
@@ -52,9 +74,20 @@ export default function FriendListPanel(props: any) {
 		else
 			return status === 'online' || status === 'login' ? 'green' : 'grey';
 		};
-	
-	// 조건부로 DM 알람 렌더링하게 될 예정임
 
+	const handlerClear = (from: any, name: any) => {
+		const newList = apiResponse.map((user: any) => {
+			if (user.followed_user_id === Number(from)) {
+				return { ...user, count: 0 };
+			}
+			return user;
+		});
+		setApiResponse(newList);
+		console.log('handlerClear', from, name);
+		handleChatTarget(from, name);
+		console.log("after handlerClear", apiResponse);
+	}
+	
 	return (
 		<div>
 			<List dense sx={{ width: '100%', maxWidth: 400, maxHeight: 580, bgcolor: 'background.paper', overflow: 'auto'}}>
@@ -79,9 +112,10 @@ export default function FriendListPanel(props: any) {
 									<div>{user.status === 'online' || user.status === 'login' ? 'ON' : 'OFF'}</div>
 								</div>
 							</ListItemButton>
-							<IconButton edge="end" aria-label="comments" onClick={handleChatTarget(user.followed_user_id, user.followed_user_nickname)}>
-								<Badge color="secondary" badgeContent={1}>
-									<CommentIcon />
+							<IconButton edge="end" aria-label="comments" onClick={() => {handlerClear(user.followed_user_id, user.followed_user_nickname)}}>
+							{/* <IconButton edge="end" aria-label="comments" onClick={handleChatTarget(user.followed_user_id, user.followed_user_nickname)}> */}
+								<Badge color="error" badgeContent={user.count ? user.count : 0}>
+									<CommentIcon/>
 								</Badge>
 							</IconButton>
 						</ListItem>

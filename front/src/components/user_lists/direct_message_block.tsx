@@ -7,13 +7,17 @@ import { useChatBlockContext } from '@/app/main_frame/shared_state';
 
 import { axiosToken } from '@/util/token';
 
-export default function DmMessageBlock({dmOpenId, dmOpenNickname, scrollref, setMTbox} :any) {
+export default function DmMessageBlock({dmOpenId, dmOpenNickname, messageAreaRef, scrollref, setMTbox} :any) {
     const [tmpNewDm, setTmpNewDm] = useState([]);
     const [tmpOldDm, setTmpOldDm] = useState([]);
 	const [dmList, setDmList] = useState([]);
     const [lastIdx, setLastIdx] = useState(-1);
     const [page, setPage] = useState(0);
-    const dmListRef = useRef<HTMLUListElement>(null);
+
+    const [renderAppend, setRenderAppend] = useState(false);
+    const [appendLength, setAppendLength] = useState(0);
+    const [scrollTop, setScrollTop] = useState(false);
+
     const socket = useChatSocket();
     const cookies = useCookies();
 
@@ -21,7 +25,18 @@ export default function DmMessageBlock({dmOpenId, dmOpenNickname, scrollref, set
     const user_id = Number(cookies.get('user_id'));
     const nick_name = cookies.get('nick_name');
 
-    const { dmBlockTriggerRender, setDmBlockTriggerRender } = useChatBlockContext();
+    const { dmBlockTriggerRender, handleRenderDmBlock } = useChatBlockContext();
+
+    // console.log('nick_name - ', nick_name);
+    // console.log('dmOpenNickName - ', dmOpenNickname);
+
+
+    const handleRenderAppend = () => {
+        if (renderAppend === true)
+            setRenderAppend(false);
+        else
+            setRenderAppend(true);
+    }
 
 
     const getNewDm = async (dmOpenId :number) => {
@@ -53,12 +68,14 @@ export default function DmMessageBlock({dmOpenId, dmOpenNickname, scrollref, set
                 // idx -1부터 시작하지 않나?
                 var idx = 0;
                 console.log('unread dms - ', res.data.dm);
+                
+                setTmpNewDm([]);
                 if (res.data.dm.length !== 0)
                 {
                     idx = res.data.dm[res.data.dm.length - 1].idx - 1;
                     setLastIdx(idx + 1);
 
-                    setTmpNewDm([]);
+
                     res.data.dm.map((data :any) => {
                         const newMessage = renderMessage(data);
 
@@ -84,11 +101,11 @@ export default function DmMessageBlock({dmOpenId, dmOpenNickname, scrollref, set
                     if (res.data.status === true)
                     {
                         console.log('old dms - ', res.data.dm);
-                        if (res.data.dm.lenth !== 0)
+                        setTmpOldDm([]);
+                        if (res.data.dm.length !== 0)
                         {
                             setLastIdx(res.data.dm[res.data.dm.length - 1].idx);
 
-                            setTmpOldDm([]);
                             res.data.dm.map((data :any) => {
                                 const newMessage = renderMessage(data);
     
@@ -98,6 +115,8 @@ export default function DmMessageBlock({dmOpenId, dmOpenNickname, scrollref, set
                         }
                     }
 
+                    console.log('getDm done')
+            
                 }).catch((err) => {
                     console.log('is it err in dm get?');
                 });
@@ -106,10 +125,14 @@ export default function DmMessageBlock({dmOpenId, dmOpenNickname, scrollref, set
             {
                 // res는 존재하지만 백 서버에서 실패로 판단한 경우
             }
+            
+
+
         }).catch((err) => {
 
         });
 
+        console.log('getUnreadDm done');
 
     };
 
@@ -123,8 +146,11 @@ export default function DmMessageBlock({dmOpenId, dmOpenNickname, scrollref, set
                 if (data.from_id === dmOpenId || data.from_id === user_id)
                 {
                     const newMessage = renderMessage(data);
-
+                    
                     setDmList(prevMessages => [...prevMessages, newMessage]);
+                    
+                    setScrollTop(false);
+                    handleRenderDmBlock();
                 }
                 else
                 {
@@ -164,7 +190,9 @@ export default function DmMessageBlock({dmOpenId, dmOpenNickname, scrollref, set
             // 역순으로 넣기
             setTmpNewDm(tmpNewDm.reverse());
             tmpNewDm.map((data :any) => { setDmList((prevDmList :any) => [...prevDmList, data])})
+            
         }
+        setScrollTop(false);
 
     }, [tmpOldDm]);
 
@@ -177,19 +205,22 @@ export default function DmMessageBlock({dmOpenId, dmOpenNickname, scrollref, set
 
 
     useEffect(() => {
-        const handleScroll = () => {
-          if (dmListRef.current && dmListRef.current.scrollTop === dmListRef.current.scrollHeight) {
+        const handleScroll = (e:any) => {
+          if (messageAreaRef.current && e.currentTarget.scrollTop === 0)
+          {
+            console.log('top reached')
             setPage((prevPage) => prevPage + 1);
+            setScrollTop(true);
           }
         };
       
-        if (dmListRef.current) {
-          dmListRef.current.addEventListener('scroll', handleScroll);
+        if (messageAreaRef.current) {
+          messageAreaRef.current.addEventListener('scroll', handleScroll);
         }
       
         return () => {
-          if (dmListRef.current) {
-            dmListRef.current.removeEventListener('scroll', handleScroll);
+          if (messageAreaRef.current) {
+            messageAreaRef.current.removeEventListener('scroll', handleScroll);
           }
         };
       }, [page]);
@@ -213,6 +244,8 @@ export default function DmMessageBlock({dmOpenId, dmOpenNickname, scrollref, set
     
                 if (res.data.status === true)
                 {
+                    console.log('getOoooooold dm data - ', res.data.dm);
+
                     if (res.data.dm.lenth !== 0)
                     {   
                         // 가져온 리스트 임시 저장
@@ -221,8 +254,13 @@ export default function DmMessageBlock({dmOpenId, dmOpenNickname, scrollref, set
                         // 보관된 리스트를 현재 리스트에 추가
                         setLastIdx(res.data.dm[res.data.dm.length - 1].idx);
                         
-                        const tmpResDm = res.data.dm.reverse;
+                        const tmpResDm = res.data.dm.reverse();
                         const tmpNowDm = dmList;
+
+                        setAppendLength(tmpResDm.length);
+
+                        console.log('tmpResDm - ', tmpResDm);
+                        console.log('tmpNowDm - ', tmpNowDm);
 
                         setDmList([]);
 
@@ -232,10 +270,9 @@ export default function DmMessageBlock({dmOpenId, dmOpenNickname, scrollref, set
                             setDmList((prevDmList :any) => [...prevDmList, newMessage]);
                         });
                         
-                        tmpNowDm.map((data :any) => {
-                            const newMessage = renderMessage(data);
-
-                            setDmList((prevDmList :any) => [...prevDmList, newMessage]);
+                        tmpNowDm.map((data :any) => 
+                        {
+                            setDmList((prevDmList :any) => [...prevDmList, data]);
                         });
 
                     }
@@ -246,16 +283,38 @@ export default function DmMessageBlock({dmOpenId, dmOpenNickname, scrollref, set
             });
         }
 
+        getMoreDm().then((res) => {
+            
+            console.log('getOOOLDdm done');
+        });
+
+        // handleRenderAppend();
+
     }, [page]);
 
 
 	useLayoutEffect(() => {
-		moveScroll();
+        if (scrollTop === true)
+		    moveScrollTop(true);
+        else
+		    moveScrollTop(false);
 	}, [dmList]);
 
-	const moveScroll = () => {
-		if (scrollref.current) {
-			scrollref.current.scrollTop = scrollref.current.scrollHeight;
+
+	const moveScrollTop = (top :boolean) => {
+		if (scrollref.current)
+        {
+            console.log('scrollTop - ', top);
+            if (top === true)
+            {
+                // 최대 높이에서 적당한 높이 빼서 배치 (가져온 갯수만큼)
+                scrollref.current.scrollTop = appendLength * 77;
+            }
+            else
+            {
+                scrollref.current.scrollTop = scrollref.current.scrollHeight;
+            }
+
 		}
 	};
 
@@ -263,28 +322,36 @@ export default function DmMessageBlock({dmOpenId, dmOpenNickname, scrollref, set
 		return `${process.env.NEXT_PUBLIC_API_URL}user/getimg/nickname/${src}`
 	}, []);
 
-	const handleClick = (name: any) => {
+	const handleClick = (name: string) => {
 		setMTbox(1, name);
 	};
 
 	const renderMessage = (message: any) => {
+        
+        var target_name :string;
+
+        if (message.from_id === dmOpenId)
+            target_name = dmOpenNickname;
+        else
+            target_name = nick_name;
+
 		return (
 			<Grid container key={message.created_at}>
-				<ListItem style={{ padding: '5px', paddingBottom: '0px', marginLeft: dmOpenNickname === nick_name? '380px' : '0px'}}>
+				<ListItem style={{ padding: '5px', paddingBottom: '0px', marginLeft: target_name === nick_name? '380px' : '0px'}}>
 					<Stack direction="row" spacing={1}>
-						<Chip
-							avatar={<Avatar src={imageLoader({src: dmOpenNickname})} />}
-							label={dmOpenNickname}
-							component='div'
-							onClick={() => handleClick(dmOpenNickname)}
-						/>
+                        <Chip
+                            avatar={<Avatar src={imageLoader({src: target_name})} />}
+                            label={target_name}
+                            component='div'
+                            onClick={() => handleClick(target_name)}
+                        />
 					</Stack>
 				</ListItem>
 				<ListItem
 					style={{
 						display: 'flex',
-						justifyContent: dmOpenNickname === nick_name ? 'flex-end' : 'flex-start',
-						paddingRight: dmOpenNickname === nick_name ? '25px' : '0px',
+						justifyContent: target_name === nick_name ? 'flex-end' : 'flex-start',
+						paddingRight: target_name === nick_name ? '25px' : '0px',
 						wordBreak: 'break-word',
 					}}
 				>
@@ -298,9 +365,7 @@ export default function DmMessageBlock({dmOpenId, dmOpenNickname, scrollref, set
 
 	return (
 		<div style={{ overflowX: 'hidden' }}>
-            <List ref={dmListRef}>
 			    {dmList}
-            </List>
 		</div>
 	);
 };
