@@ -7,6 +7,8 @@ import Typography from '@mui/material/Typography';
 import { useEffect, useState } from 'react';
 import CookieControl from './cookie_control';
 import { useRouter } from 'next/navigation';
+import { axiosToken } from '@/util/token';
+import { useCookies } from 'next-client-cookies';
 
 const style: React.CSSProperties = {
   position: 'absolute',
@@ -14,10 +16,8 @@ const style: React.CSSProperties = {
   left: '50%',
   transform: 'translate(-50%, -50%)',
   width: 400,
-  bgcolor: 'background.paper',
   border: '2px solid #000',
-  boxShadow: 24,
-  p: 4,
+  boxShadow: '24',
 };
 
 const closeButtonStyle: React.CSSProperties = {
@@ -41,10 +41,12 @@ export default function TwoFAPass ({res}: {res: any}) {
   const [render, setRender] = useState(false);
 
   const router = useRouter();
+  const cookies = useCookies();
 
   useEffect(() => {
+
     const fetchData = async () => {
-        await axios.post(`${process.env.NEXT_PUBLIC_API_URL}auth/2fa/pass`, {
+        await axiosToken.post(`${process.env.NEXT_PUBLIC_API_URL}auth/2fa/pass`, {
           user_id: user_id,
           user_nickname: nick_name,
           code: code,
@@ -52,7 +54,7 @@ export default function TwoFAPass ({res}: {res: any}) {
         {
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${access_token}`,
+            'Authorization': `Bearer ${cookies.get('access_token')}`,
         },
         })
         .then((res) => { 

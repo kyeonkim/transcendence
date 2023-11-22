@@ -11,7 +11,8 @@ import Skeleton from '@mui/material/Skeleton';
 
 // styled component (컴포넌트 고정 style로 보임)
 import { styled } from '@mui/system';
-
+import { axiosToken } from '@/util/token';
+import { useCookies } from 'next-client-cookies';
 
 const MainSearchUser = styled(TextField) ({
   position: 'absolute',
@@ -37,10 +38,16 @@ interface SearchUserProps {
 
 export default function SearchUser({ setMTbox }: SearchUserProps) {
     const [searchTarget, setSearchTarget] = useState('');
+    const cookies = useCookies();
 
     const handleMTbox =  async (num: number, searchTarget: string) => {
         if (searchTarget) {
-            await axios.get(`${process.env.NEXT_PUBLIC_API_URL}user/getdata/nickname/${searchTarget}`)
+            await axiosToken.get(`${process.env.NEXT_PUBLIC_API_URL}user/getdata/nickname/${searchTarget}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${cookies.get('access_token')}`
+                  },
+            })
                 .then((res) => {
                     // console.log(typeof res.data.userData.user_id)
                     if (res.data.status === true)

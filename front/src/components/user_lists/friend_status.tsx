@@ -1,14 +1,21 @@
 import { useState, useEffect } from "react";
 import { useChatSocket } from "@/app/main_frame/socket_provider";
 import axios from "axios";
-
+import { useCookies } from "next-client-cookies";
+import { axiosToken } from '@/util/token';
 export function useFriendList(myId: any) {
   const [apiResponse, setApiResponse] = useState([]);
   const socket = useChatSocket();
+  const cookies = useCookies();
 
   useEffect(() => {
     const fetchData = async () => {
-        await axios.get(`${process.env.NEXT_PUBLIC_API_URL}social/getFriendList/${myId}`)
+        await axiosToken.get(`${process.env.NEXT_PUBLIC_API_URL}social/getFriendList/${myId}`, {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${cookies.get('access_token')}`
+          },
+        })
         .then((response) => {
           console.log('friend list response ', response.data);
           if (response.data.status) {

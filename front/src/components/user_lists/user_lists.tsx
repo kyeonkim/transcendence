@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from 'react';
-
+import { axiosToken } from '@/util/token';
 import * as React from 'react';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
@@ -25,6 +25,7 @@ import axios from 'axios';
 import { useChatSocket } from "../../app/main_frame/socket_provider"
 import { get } from 'http';
 import { useFriendList } from './friend_status';
+import { useChatBlockContext } from '@/app/main_frame/shared_state';
 
 interface TabPanelProps {
 	children?: React.ReactNode;
@@ -70,12 +71,13 @@ export default function BasicTabs({ setMTbox }: SearchUserProps) {
 	const [dmOpenId, setDmOpenId] = useState(-1);
 	const [dmOpenNickname, setDmOpenNickname] = useState('');
 	const [dmAlarmCount, setDmAlarmCount] = useState(false);
-	const [dmAlarmMessageList, setDmAlarmMessageList] = useState<any>([]);
+	const [dmAlarmCountList, setDmAlarmCountList] = useState<any>([]);
 	const [dmText, setDmText] = useState('');
 	const cookies = useCookies();
 	const socket = useChatSocket();
 	const friendlist = useFriendList(cookies.get('user_id'));
 	const tabsRef = useRef(null);
+	const { handleRenderDmBlock } = useChatBlockContext();
 
 	const handleChange = (event: React.SyntheticEvent, newValue: number) => {
 		setValue(newValue);
@@ -114,17 +116,22 @@ export default function BasicTabs({ setMTbox }: SearchUserProps) {
 	// alarm안에 idx 있을 것.
 	const dmAlarmRemover = (alarm :any) => {
 
-		const newDmAlarmList = dmAlarmMessageList.filter(
+		const newDmAlarmList = dmAlarmCountList.filter(
 			(dmAlarmList :any) => dmAlarmList.idx != alarm.idx
 		);
 
-		setDmAlarmMessageList(newDmAlarmList);
+		setDmAlarmCountList(newDmAlarmList);
 	}
 
 
 		// 초기 알람 목록 설정하기 (api)
 	const fetchAlarms = async () => {
-		await axios.get(`${process.env.NEXT_PUBLIC_API_URL}event/getalarms/${cookies.get('user_id')}`)
+		await axiosToken.get(`${process.env.NEXT_PUBLIC_API_URL}event/getalarms/${cookies.get('user_id')}`,{
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${cookies.get('access_token')}`
+			  },
+		})
 		.then((response) => {
 			if (response.data.status)
 				console.log('alarmList success - ', response.data);
@@ -177,18 +184,17 @@ export default function BasicTabs({ setMTbox }: SearchUserProps) {
 			setDmOpenId(-1);
 			setDmOpenNickname('');
 		}
-
 		else
 		{
-			console.log("dm to - ", from_id);
+			console.log("dm to - ", from_id, from_nickname);
 			setDmOpenId(from_id);
 			setDmOpenNickname(from_nickname);
+			handleRenderDmBlock();
 		}
 
 	};
 
 
-	// !!!!! listener 복수 열기 테스트
 	useEffect(() => {
 
 		// dm 읽는 걸 열고, emit으로 준비 되었다고 신호 줌.
@@ -201,9 +207,10 @@ export default function BasicTabs({ setMTbox }: SearchUserProps) {
 			}
 			else
 			{
-				console.log('dm to alarm');
-				// setDmAlarmMessageList((prevDmAlarmMessageList :any) => 
-				// 	[...prevDmAlarmMessageList, data]);
+				// console.log('dm to alarm', data);
+
+				// setDmAlarmCountList((prevDmAlarmCountList :any) => 
+				// 	[...prevDmAlarmCountList, ]);
 				
 				// 알람 갯수만 관리하는게 나을지도?
 					// 전체 검색 - 아이디, 갯수 묶음(배열 혹은 클래스)의 배열로 저장
@@ -241,7 +248,7 @@ export default function BasicTabs({ setMTbox }: SearchUserProps) {
 			<CustomTabPanel value={value} index={0}>
 				<FriendListPanel
 					dmAlarmCount={dmAlarmCount}
-					dmAlarmMessageList={dmAlarmMessageList}
+					dmAlarmCountList={dmAlarmCountList}
 					dmAlarmRemover={dmAlarmRemover}
 					dmOpenId={dmOpenId}
 					dmOpenNickname={dmOpenNickname}

@@ -10,7 +10,7 @@ export default function Signup (props:any) {
 
   const router = useRouter();
   const formData = new FormData()
-  
+
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -29,34 +29,26 @@ export default function Signup (props:any) {
     if (profileImage) {
       formData.append('file', profileImage);
     }
-    const response = await fetch( `${process.env.NEXT_PUBLIC_FRONT_URL}api/user_create`, {
-      method: 'POST',
-      body: JSON.stringify({
+    await axios.post( `${process.env.NEXT_PUBLIC_FRONT_URL}api/user_create`, {
         access_token: props.access_token,
         nick_name: nickname,
-      }),
-      // headers: {
-      //   Authorization: `Bearer ${props.access_token}`,
-      // },
-    });
-
-    if (!response.ok) {
-      console.log('signup login/api fail', response);
+      })
+    .then(async (response) => {
+      console.log('sign up response - ', response);
+      formData.append('access_token', response.data.access_token);
+      await axios.post(`${process.env.NEXT_PUBLIC_FRONT_URL}api/send_image`, formData,)
+      .then((res) => {
+        if(res.data.success)
+          router.replace('/main_frame');
+        else
+          window.alert('Image upload failed')
+      })
+    })
+    .catch((error) => {
+      console.log ('sign up error =',error.response.data)
       window.alert('중복된 닉네임이거나 특수문자가 포함되어있습니다! 다시 입력해주세요.');
-    }
-    else
-    {
-      const res_img = await axios.post(`${process.env.NEXT_PUBLIC_FRONT_URL}api/send_image`, formData)
-      if (res_img.data.success == true) {
-        router.replace('/main_frame');
-      } else {
-        console.log('Image upload failed', res_img);
-        window.alert('Image upload failed')
-      }
-    }  
-  };
-
-
+    })
+  }
   return (
       <div>
           <div>this is server component - SendImage.</div>
@@ -96,6 +88,5 @@ export default function Signup (props:any) {
               </div>
         </div>
     </div>
-  );
-  
+  ); 
 }

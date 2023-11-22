@@ -40,6 +40,7 @@ export function ChatSocket ({ children }: any) {
     
       tmpSocket.on("disconnect", () => {
         console.log('socket diconnected - ', tmpSocket.id); // undefined
+        // 홈으로 보내기
       });
 
       setSocket(tmpSocket);

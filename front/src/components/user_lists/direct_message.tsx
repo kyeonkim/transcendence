@@ -24,7 +24,7 @@ import { useChatSocket } from "../../app/main_frame/socket_provider"
 
 import DmMessageBlock from './direct_message_block';
 
-export default function DirectMessage( {dmAlarmCount, dmAlarmMessageList, dmAlarmRemover, dmOpenId, dmOpenNickname, handleChatTarget, setMTbox, tapref} :any) {
+export default function DirectMessage( {dmAlarmCount, dmAlarmCountList, dmAlarmRemover, dmOpenId, dmOpenNickname, handleChatTarget, setMTbox, tapref} :any) {
     
     const [message, setMessage] = useState('');
     
@@ -33,7 +33,7 @@ export default function DirectMessage( {dmAlarmCount, dmAlarmMessageList, dmAlar
     const socket = useChatSocket();
     
     // direct message 목록 받아오기
-    
+
     const user_id = Number(cookies.get('user_id'));
 
 	const handleSendMessage = () => {
@@ -63,8 +63,8 @@ export default function DirectMessage( {dmAlarmCount, dmAlarmMessageList, dmAlar
         <div>
                 <Popper open={handleOpen()} anchorEl={tapref.current} placement="right-start" style={{width: '500px'}}>
                     <AppBar position="static">
-                        <Typography variant="h6" sx={{ flexGrow: 1 ,align: 'center' }}>
-                            {dmOpenId}
+                        <Typography variant="h5" sx={{ flexGrow: 1, align: 'center', padding: '10px' }}>
+                            {dmOpenNickname}
                         </Typography>
                     </AppBar>
                     <Grid container component={Paper}>

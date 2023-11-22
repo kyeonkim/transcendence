@@ -15,6 +15,7 @@ import SpeedDialAction from '@mui/material/SpeedDialAction';
 import styles from './chat.module.css';
 import TextSend from './text_send';
 import UserList from './chat_user_list';
+import { axiosToken } from '@/util/token';
 
 export default function Chat(props: any) {
 	const messageAreaRef = useRef(null);
@@ -72,10 +73,15 @@ export default function Chat(props: any) {
 	const handleInvitetarget = (e :any) => setInviteTarget(e.target.value);
 
 	const handleExit = async () => {
-		await axios.patch(`${process.env.NEXT_PUBLIC_API_URL}chat/leaveroom`, {
+		await axiosToken.patch(`${process.env.NEXT_PUBLIC_API_URL}chat/leaveroom`, {
 			user_id: my_id,
 			user_nickname: my_name,
 			room_id: Number(roominfo.idx),
+		},
+		{
+			headers: {
+				Authorization: `Bearer ${cookies.get('access_token')}`,
+				},
 		})
 		.then((res) => {
 			handleRenderMode('chatList');
@@ -83,12 +89,18 @@ export default function Chat(props: any) {
 	};
 	
 	const handleSendInvite = async() => {
-		await axios.post(`${process.env.NEXT_PUBLIC_API_URL}chat/inviteuser`, {
+		await axiosToken.post(`${process.env.NEXT_PUBLIC_API_URL}chat/inviteuser`, {
 			type: 'invite_chat',
 			to: inviteTarget,
 			from: my_name,
 			chatroom_id: Number(roominfo.idx),
 			chatroom_name: roominfo.name,
+		},
+		{
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${cookies.get('access_token')}`
+			  },
 		})
 		.then((res) => {
 			console.log('invite success');

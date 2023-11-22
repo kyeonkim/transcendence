@@ -30,16 +30,18 @@ export async function POST (request: NextRequest)
             maxAge: 600 * 60 * 3,
             // httpOnly: true,
         });
-        cookieBox.set('nick_name', nick_name, {
-            path: '/',
-            maxAge: 600 * 60 * 3,
-            // httpOnly: true,
-        });
-        cookieBox.set('user_id', user_id, {
-            path: '/',
-            maxAge: 600 * 60 * 3,
-            // httpOnly: true,
-        });
+        if (nick_name && user_id) {
+            cookieBox.set('nick_name', nick_name, {
+                path: '/',
+                maxAge: 600 * 60 * 3,
+                // httpOnly: true,
+            });
+            cookieBox.set('user_id', user_id, {
+                path: '/',
+                maxAge: 600 * 60 * 3,
+                // httpOnly: true,
+            });
+        }
 
         return (NextResponse.json(
             {

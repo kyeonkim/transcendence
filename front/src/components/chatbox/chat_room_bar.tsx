@@ -15,8 +15,6 @@ import Button from '@mui/material/Button';
 
 import { styled } from '@mui/system';
 
-// import { useCookies } from 'next-client-cookies';
-
 import axios from 'axios';
 
 const ChatRoomAppBar = styled(AppBar) ({

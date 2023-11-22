@@ -8,6 +8,10 @@ interface ChatBlockState {
     chatBlockTriggerRender: boolean;
     setChatBlockTriggerRender: React.Dispatch<React.SetStateAction<boolean>>;
     handleRenderChatBlock: (mode :string) => void;
+
+    dmBlockTriggerRender: boolean;
+    setDmBlockTriggerRender: React.Dispatch<React.SetStateAction<boolean>>;
+    handleRenderDmBlock: () => void;
   }
 
 export const chatBlockContext = createContext<ChatBlockState | undefined>(undefined);
@@ -15,6 +19,7 @@ export const chatBlockContext = createContext<ChatBlockState | undefined>(undefi
 export const ChatBlockProvider = ({ children } :any) => {
     const [chatBlockTriggerRender, setChatBlockTriggerRender] = useState(false);
     const [chatBlockRenderMode, setChatBlockRenderMode] = useState('chatList');
+    const [dmBlockTriggerRender, setDmBlockTriggerRender] = useState(false);
 
     const handleRenderChatBlock = (mode :string) => {
         setChatBlockRenderMode(mode);
@@ -28,15 +33,30 @@ export const ChatBlockProvider = ({ children } :any) => {
         }
     }
 
+    const handleRenderDmBlock = () => {
+
+        if (dmBlockTriggerRender === true)
+        {
+            setDmBlockTriggerRender(false);
+        }
+        else
+        {
+            setDmBlockTriggerRender(true);
+        }
+    }
+
+
     const value :ChatBlockState = useMemo(() => ({
-        chatBlockRenderMode,
-        setChatBlockRenderMode,
-        chatBlockTriggerRender,
-        setChatBlockTriggerRender,
-        handleRenderChatBlock
+        chatBlockRenderMode, setChatBlockRenderMode,
+        chatBlockTriggerRender,setChatBlockTriggerRender,
+        handleRenderChatBlock,
+        dmBlockTriggerRender, setDmBlockTriggerRender,
+        handleRenderDmBlock
     }), [chatBlockRenderMode, setChatBlockRenderMode,
         chatBlockTriggerRender, setChatBlockTriggerRender,
-        handleRenderChatBlock])
+        handleRenderChatBlock,
+        dmBlockTriggerRender, setDmBlockTriggerRender,
+        handleRenderDmBlock])
 
 
     // const value = useMemo(() => ({

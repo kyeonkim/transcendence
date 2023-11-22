@@ -22,7 +22,7 @@ import { useCookies } from 'next-client-cookies';
 
 import { styled } from '@mui/system';
 
-import axios from 'axios';
+import { axiosToken } from '@/util/token';
 
 import { genSaltSync, hashSync } from "bcrypt-ts";
 
@@ -71,13 +71,18 @@ export default function ChatRoomCreate(props: any) {
 			hashRoomPassword = hashSync(roomPassword, salt);
 		}
 
-		await axios.post(`${process.env.NEXT_PUBLIC_API_URL}chat/createroom`, 
+		await axiosToken.post(`${process.env.NEXT_PUBLIC_API_URL}chat/createroom`, 
 		{
 			user_id : user_id,
 			user_nickname: user_nickname,
 			chatroom_name: roomName,
 			password: hashRoomPassword,
 			private: roomPrivate,
+		},{
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${cookies.get('access_token')}`,
+			},
 		}) 
 		.then((res) => {
 		if (res.data.status === true)

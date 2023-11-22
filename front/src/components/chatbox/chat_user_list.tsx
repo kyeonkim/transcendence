@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Avatar, Box, Divider, List, ListItem, ListItemButton, Paper, Popper, Typography } from "@mui/material";
-import axios from "axios";
 import { useCookies } from "next-client-cookies"
-
+import { axiosToken } from '@/util/token';
 export default function UserList(props: any) {
 	const { handleDrawerClose, imageLoader, style, pop, setPop, setAnchorEl,
 		anchorEl , roominfo, socket, setMTbox} = props;
@@ -13,10 +12,14 @@ export default function UserList(props: any) {
 	const token = cookies.get("access_token");
 	const my_id = cookies.get("user_id");
 
-	
 	useEffect(() => {
 		const fetchUserList = async () => {
-			await axios.get(`${process.env.NEXT_PUBLIC_API_URL}chat/roominfo/${roominfo.idx}`)
+			await axiosToken.get(`${process.env.NEXT_PUBLIC_API_URL}chat/roominfo/${roominfo.idx}`, {
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${cookies.get('access_token')}`
+				  },
+			})
 			.then((res) => {
 				const userList = res.data.room.roomusers || [];
 				setList(userList);
@@ -42,7 +45,7 @@ export default function UserList(props: any) {
 	};
 
 	const handleMute = async () => {
-	await axios.patch(`${process.env.NEXT_PUBLIC_API_URL}chat/muteuser`, {
+	await axiosToken.patch(`${process.env.NEXT_PUBLIC_API_URL}chat/muteuser`, {
 		user_id: Number(my_id),
 		room_id: Number(roominfo.idx),
 		target_id: Number(targetData.user_id),
@@ -50,14 +53,14 @@ export default function UserList(props: any) {
 	},
 	{
 		headers: {
-			Authorization: `Bearer ${token}`,
+			Authorization: `Bearer ${cookies.get('access_token')}`,
 		},
 	}
 	)
 	}
 
 	const handleOP = async () => {
-	await axios.patch(`${process.env.NEXT_PUBLIC_API_URL}chat/setmanager`, {
+	await axiosToken.patch(`${process.env.NEXT_PUBLIC_API_URL}chat/setmanager`, {
 		user_id: Number(my_id),
 		room_id: Number(roominfo.idx),
 		target_id: Number(targetData.user_id),
@@ -65,14 +68,14 @@ export default function UserList(props: any) {
 		},
 		{
 			headers: {
-			Authorization: `Bearer ${token}`,
+			Authorization: `Bearer ${cookies.get('access_token')}`,
 			},
 		}
 		)
 	}
 
 	const handleKick = async () => {
-	await axios.patch(`${process.env.NEXT_PUBLIC_API_URL}chat/kickuser`, {
+	await axiosToken.patch(`${process.env.NEXT_PUBLIC_API_URL}chat/kickuser`, {
 		user_id: Number(my_id),
 		room_id: Number(roominfo.idx),
 		target_id: Number(targetData.user_id),
@@ -80,7 +83,7 @@ export default function UserList(props: any) {
 		},
 		{
 			headers: {
-			Authorization: `Bearer ${token}`,
+			Authorization: `Bearer ${cookies.get('access_token')}`,
 			},
 		}
 		)

@@ -21,7 +21,7 @@ export default function FriendListPanel(props: any) {
 	const [apiResponse, setApiResponse] = useState([]);
 	const [loading, setloading] = useState(true);
 	const socket = useChatSocket();
-	const { setMTbox, dmAlarmCount, dmAlarmMessageList, dmAlarmRemover, dmOpenId, handleChatTarget, list, myId, tapref} = props;
+	const { setMTbox, dmAlarmCount, dmAlarmCountList, dmAlarmRemover, dmOpenId, dmOpenNickname, handleChatTarget, list, myId, tapref} = props;
 
 	useEffect(() => {
 		if (list && JSON.stringify(list) === JSON.stringify(apiResponse)) {
@@ -93,9 +93,10 @@ export default function FriendListPanel(props: any) {
 			{(dmOpenId > -1) ? (
 					<DirectMessage
 						dmAlarmCount={dmAlarmCount}
-						dmAlarmMessageList={dmAlarmMessageList}
+						dmAlarmCountList={dmAlarmCountList}
 						dmAlarmRemover={dmAlarmRemover}
 						dmOpenId={dmOpenId}
+						dmOpenNickname={dmOpenNickname}
 						handleChatTarget={handleChatTarget}
 						setMTbox={setMTbox}
 						tapref={tapref}

@@ -6,6 +6,9 @@ import Modal from '@mui/material/Modal';
 import QRCode from 'qrcode.react';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import { axiosToken } from '@/util/token';
+import { useCookies } from 'next-client-cookies';
+import { cookies } from 'next/headers';
 
 const style: React.CSSProperties = {
   position: 'absolute',
@@ -47,12 +50,14 @@ export default function OtpModal({ open, isActivated, setActive, onClose, myId, 
   const [code, setCode] = useState('');
   const [key, setKey] = useState('');
 
+  const cookies = useCookies();
+
   useEffect(() => {
     console.log('in otp page');
     const fetchData = async () => {
 
       try {
-        const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}auth/2fa/activeqr`,
+        const response = await axiosToken.post(`${process.env.NEXT_PUBLIC_API_URL}auth/2fa/activeqr`,
           {
             user_id: myId,
             user_nickname: myNick,
@@ -60,7 +65,7 @@ export default function OtpModal({ open, isActivated, setActive, onClose, myId, 
           {
             headers: {
               'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`,
+              'Authorization': `Bearer ${cookies.get('access_token')}`,
             },
           }
         );
@@ -82,7 +87,7 @@ export default function OtpModal({ open, isActivated, setActive, onClose, myId, 
 
   const handleActivate2FA = async () => {
 
-    await axios.post(`${process.env.NEXT_PUBLIC_API_URL}auth/2fa/active`,
+    await axiosToken.post(`${process.env.NEXT_PUBLIC_API_URL}auth/2fa/active`,
       {
         user_id: myId,
         user_nickname: myNick,
@@ -92,7 +97,7 @@ export default function OtpModal({ open, isActivated, setActive, onClose, myId, 
         {
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
+            'Authorization': `Bearer ${cookies.get('access_token')}`,
           },
         })
         .then((res) => {
@@ -114,11 +119,11 @@ export default function OtpModal({ open, isActivated, setActive, onClose, myId, 
 
   const handleRmove2FA = async () => {
 
-    await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}auth/2fa/deactive`,
+    await axiosToken.delete(`${process.env.NEXT_PUBLIC_API_URL}auth/2fa/deactive`,
         {
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
+            'Authorization': `Bearer ${cookies.get('access_token')}`,
           },
           data: {
             user_id: myId,

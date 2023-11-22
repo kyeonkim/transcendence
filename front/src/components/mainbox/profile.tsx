@@ -5,13 +5,12 @@ import Button from '@mui/material/Button';
 import Matchlist from './matchlist';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useCookies } from 'next-client-cookies';
 import OtpModal from '../profile/otp';
 import TwoFAPass from '@/app/login/twoFAPass';
 import { Unstable_Grid2 } from '@mui/material';
 import { useChatSocket } from "../../app/main_frame/socket_provider"
-import axiosToken from '@/app/api/token/token';
+import { axiosToken } from '@/util/token';
 
 const ProfilePage = (props: any) => {
   const [isFriend, setIsFriend] = useState(false);
@@ -26,11 +25,15 @@ const ProfilePage = (props: any) => {
   const userNickname = props.nickname;
   const my_id = Number(cookies.get('user_id'));
   const my_nick = cookies.get('nick_name');
-  const access_token = cookies.get('access_token');
 
   useEffect(() => {
     const fetchData = async () => {
-      await axios.get(`${process.env.NEXT_PUBLIC_API_URL}user/getdata/nickname/${userNickname}`) 
+      await axiosToken.get(`${process.env.NEXT_PUBLIC_API_URL}user/getdata/nickname/${userNickname}`,{
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${cookies.get('access_token')}`
+          },        
+      }) 
         .then((res) => {
         if (res.data.userData)
         {
@@ -43,7 +46,11 @@ const ProfilePage = (props: any) => {
       }
 
     const fetchFriendData = async () => {
-      await axios.get(`${process.env.NEXT_PUBLIC_API_URL}social/checkFriend`,{
+      await axiosToken.get(`${process.env.NEXT_PUBLIC_API_URL}social/checkFriend`,{
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${cookies.get('access_token')}`
+          },
         params: { user1: my_id , user2: userNickname},
       })
       .then((res) => {
@@ -77,10 +84,10 @@ const ProfilePage = (props: any) => {
   const handleFriend = async () => {
     if (isFriend) {
       console.log("delete friend!!!");
-      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}social/DeleteFriend`,{
+      await axiosToken.delete(`${process.env.NEXT_PUBLIC_API_URL}social/DeleteFriend`,{
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${access_token}`,
+          'Authorization': `Bearer ${cookies.get('access_token')}`,
         },
         data: {
           user_id: my_id,
@@ -108,7 +115,7 @@ const ProfilePage = (props: any) => {
       {
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${access_token}`,
+          'Authorization': `Bearer ${cookies.get('access_token')}`,
         },
       })
       .then((res) => {
@@ -121,10 +128,10 @@ const ProfilePage = (props: any) => {
     if (isBlock)
     {
       console.log("disalbe block!!!");
-      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}social/deleteBlockedUser`,{
+      await axiosToken.delete(`${process.env.NEXT_PUBLIC_API_URL}social/deleteBlockedUser`,{
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${access_token}`,
+          'Authorization': `Bearer ${cookies.get('access_token')}`,
         },
         data: {
           user_id: my_id,
@@ -139,7 +146,7 @@ const ProfilePage = (props: any) => {
     }
     else {
       console.log("block to ", userNickname, userId);
-      await axios.post(`${process.env.NEXT_PUBLIC_API_URL}social/addBlockedUser`,{
+      await axiosToken.post(`${process.env.NEXT_PUBLIC_API_URL}social/addBlockedUser`,{
         user_id: my_id,
         user_nickname: my_nick,
         friend_id: Number(userId),
@@ -148,7 +155,7 @@ const ProfilePage = (props: any) => {
       {
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${access_token}`,
+          'Authorization': `Bearer ${cookies.get('access_token')}`,
         },
       })
       .then((res) => {
@@ -223,7 +230,7 @@ const ProfilePage = (props: any) => {
                 onClose={handleClose}
                 myId={my_id}
                 myNick={my_nick}
-                token={access_token}
+                token={cookies.get('access_token')}
                 />
               {/* <TwoFAPass/> */}
             </div>

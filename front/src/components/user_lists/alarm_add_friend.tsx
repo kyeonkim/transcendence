@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react';
 import React from 'react';
-
+import { axiosToken } from '@/util/token';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
@@ -32,14 +32,20 @@ export default function AlarmAddFriend ( {alarm, alarmReducer, handleProfile, im
     const acceptFriendRequest = (alarm: any) => async () => {
 
         console.log ('acceptFriendAddRequest - ', alarm)
-        await axios.post(`${process.env.NEXT_PUBLIC_API_URL}social/acceptfriend`,
+        await axiosToken.post(`${process.env.NEXT_PUBLIC_API_URL}social/acceptfriend`,
         {
           "event_id": alarm.idx,
           "user_id": alarm.to_id,
           "user_nickname": cookies.get('nick_name'),
           "friend_id": 0,
           "friend_nickname": alarm.from_nickname
-        })
+        },
+        {
+            headers: {
+                'Authorization': `Bearer ${cookies.get('access_token')}`,
+            }
+        }
+        )
         .then((response) => {
           console.log('accept event res=====',response)
             if (response.status)

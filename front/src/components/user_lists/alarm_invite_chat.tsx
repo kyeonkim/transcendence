@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react';
+import { useState, useEffect, use } from 'react';
 import React from 'react';
 
 import ListItem from '@mui/material/ListItem';
@@ -24,7 +24,7 @@ import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 
-
+import { axiosToken } from '@/util/token';
 // styled component (컴포넌트 고정 style로 보임)
 import { styled } from '@mui/system';
 
@@ -123,7 +123,7 @@ export default function AlarmInviteChat (
 
     async function handleJoin(alarm :any, inPassword :string) {
 
-		await axios.patch(`${process.env.NEXT_PUBLIC_API_URL}chat/joinroom`, 
+		await axiosToken.patch(`${process.env.NEXT_PUBLIC_API_URL}chat/joinroom`, 
 		{
 			user_id : user_id,
 			user_nickname: user_nickname,
@@ -172,7 +172,11 @@ export default function AlarmInviteChat (
 	}
 
     const checkUserInChat = async (alarm :any) => {
-        return (await axios.get(`${process.env.NEXT_PUBLIC_API_URL}user/getdata/id/${alarm.to_id}`));
+        return (await axiosToken.get(`${process.env.NEXT_PUBLIC_API_URL}user/getdata/id/${alarm.to_id}`, {
+            headers: {
+                Authorization: `Bearer ${cookies.get("access_token")}`,
+            },
+        }));
     };
 
     const labelId = `comment-list-secondary-label-${alarm.from_nickname}`;

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-
+import { cookies } from 'next/headers';
 
 import axios from 'axios';
 import { headers } from "next/headers";
@@ -18,29 +18,19 @@ export async function POST (request: NextRequest)
         console.log ('setdata - request.formData - ', formData);
         const name = formData.get('nick_name');
         const file = formData.get('file');
-
+        const cookieBox = cookies();
         console.log ('name - ', name);
         console.log ('file - ', file);
-        // for (let key of request.body.keys()) {
-        //     console.log(key);
-        //   }  
-      
-        //   for (let value of request.body.values()) {
-        //   console.log(value);
-        //   }
 
         console.log('----------check for formdata dereference---------');
-
-        // data = await request.json();
-
-        // response = await fetch(process.env.NEXT_PUBLIC_API_URL + 'user/upload', {
-        //     method: "POST",
-        //     body: data.Formdata,
-        //   })
 
         response = await axios.post( `${process.env.NEXT_PUBLIC_API_URL}user/upload`,
                 formData,
                 {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                        'Authorization': `Bearer ${formData.get('access_token')}`
+                    },
                     params: {
                         nickname: name
                     }

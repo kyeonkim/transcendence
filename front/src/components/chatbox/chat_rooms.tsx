@@ -15,6 +15,7 @@ import { useCookies } from 'next-client-cookies';
 import axios from 'axios';
 
 import { useChatSocket } from "../../app/main_frame/socket_provider"
+import { axiosToken } from '@/util/token';
 
 const MainChatRoomList = styled(Grid) ({
 	position: 'absolute',
@@ -51,7 +52,7 @@ const MainChatRoomList = styled(Grid) ({
 	console.log("ChatRoomList");
 	console.log("CHL - user_id - ", user_id);
 	console.log("CHL - nickname - ", user_nickname);
-
+	
 	const handleRender = () => {
 		if (render === true)
 			setRender(false);
@@ -61,7 +62,12 @@ const MainChatRoomList = styled(Grid) ({
 
 	async function handleRoomList() {
 		setRoomList([]);
-		await axios.get(`${process.env.NEXT_PUBLIC_API_URL}chat/roomlist/${user_id}`) 
+		await axiosToken.get(`${process.env.NEXT_PUBLIC_API_URL}chat/roomlist/${user_id}`, {
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${cookies.get('access_token')}`
+			  },
+		}) 
 		.then((res) => {
 			console.log(res.data);
 		if (res.data.rooms.length !== 0)
@@ -83,13 +89,19 @@ const MainChatRoomList = styled(Grid) ({
 	// 분리 성공하면 ispassword 제거할 것
 	async function handleJoin(idx :number, inPassword :string) {
 
-		await axios.patch(`${process.env.NEXT_PUBLIC_API_URL}chat/joinroom`, 
+		await axiosToken.patch(`${process.env.NEXT_PUBLIC_API_URL}chat/joinroom`, 
 		{
 			user_id : user_id,
 			user_nickname: user_nickname,
 			room_id: idx,
 			password: inPassword,
-		}) 
+		},
+		{
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${cookies.get('access_token')}`
+			  },
+		})
 		.then((res) => {
 		if (res.status === 200)
 		{

@@ -9,12 +9,15 @@ import ListItemText from '@mui/material/ListItemText';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography';
+import { useCookies } from 'next-client-cookies';
+import { axiosToken } from '@/util/token';
 
 export default function MatchList(props: any) {
   const [page, setPage] = useState(0);
   const [res, setRes] = useState<any>([]);
   const listRef = useRef<HTMLUListElement>(null);
   const userNickname = props.id;
+  const cookies = useCookies();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -36,7 +39,11 @@ export default function MatchList(props: any) {
 
   useEffect(() => {
     const fetchData = async () => {
-    await axios.get(`${process.env.NEXT_PUBLIC_API_URL}game/data`, {
+    await axiosToken.get(`${process.env.NEXT_PUBLIC_API_URL}game/data`, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${cookies.get('access_token')}`
+      },
       params: { id: 0, index: res.length ? res[res.length - 1].idx - 1 : 0 },
     })
     .then((response) => {

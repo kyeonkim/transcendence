@@ -11,7 +11,7 @@ import ChatRoomList from './chat_rooms';
 import { useCookies } from 'next-client-cookies';
 
 import  { useChatBlockContext } from '../../app/main_frame/shared_state';
-
+import { axiosToken } from '@/util/token';
 // chatroomlist에서 요청의 결과로 받은 응답에 채팅방의 데이터가 들어있는가?
 // chat에서 한 번 더 요청하여 채팅방의 데이터를 받아오는가?
 
@@ -33,9 +33,13 @@ export default function ChatBlock(props: any) {
 
 	const handleRenderMode = handleRenderChatBlock;
 
-
 	async function getUserData() {
-		await axios.get(`${process.env.NEXT_PUBLIC_API_URL}user/getdata/nickname/${cookies.get("nick_name")}`) 
+		await axiosToken.get(`${process.env.NEXT_PUBLIC_API_URL}user/getdata/nickname/${cookies.get("nick_name")}`, {
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${cookies.get('access_token')}`
+			  },
+		}) 
 		.then((res) => {
 			console.log('userData in chat==',res);
 			if (res.data.userData.roomuser !== null)

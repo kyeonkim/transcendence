@@ -40,6 +40,7 @@ import axios from 'axios';
 
 import AlarmAddFriend from './alarm_add_friend';
 import AlarmInviteChat from './alarm_invite_chat'
+import { axiosToken } from '@/util/token';
 
 const MainAlarmPanal = styled(Box) ({
     position: 'absolute',
@@ -78,8 +79,14 @@ export default function AlarmListPanal (props: any) {
 
   const removeEventFromDatabase = async (alarm: any) => {
         
-        
-      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}event/deletealarms/${alarm.idx}`)
+      console.log('in removeEnventfromDatabase - ', alarm);
+      await axiosToken.delete(`${process.env.NEXT_PUBLIC_API_URL}event/deletealarms/${alarm.idx}`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${cookies.get('access_token')}`
+          },
+      })
       .then((response) => {
           if (response.status)
           {
@@ -91,6 +98,7 @@ export default function AlarmListPanal (props: any) {
       })
       .catch((err) => {
           console.log('removeEventFromDatabase - api request failed');
+          console.log('err is ', err);
       });
 
   };
@@ -98,19 +106,20 @@ export default function AlarmListPanal (props: any) {
 
   const denyRequest = (alarm: any) => () => {
       console.log("deny request of - " + alarm.from_nickname);
-      console.log('deny - type - ', alarm);
+      console.log('deny - event_type - ', alarm);
       // alarm이 어떤 종류인지
         // 근데 remove할 때는 딱히 다른 동작 필요 없나?
-      if (alarm.type === 'add_friend')
+      if (alarm.event_type === 'add_friend')
       {
+          console.log('add_friend deny request');
           removeEventFromDatabase(alarm);
       }
-      else if (alarm.event_type === 'invite_chat')
+      else if (alarm.event_event_type === 'invite_chat')
       {
           console.log('invite_chat deny request');
           removeEventFromDatabase(alarm);
       }
-      // else if (alarm.type === 'game')
+      // else if (alarm.event_type === 'game')
       // {
       //     removeEventFromDatabase(alarm);
       // }
