@@ -47,7 +47,7 @@ export class SocialController {
 	}
 
     @ApiOperation({summary: `친구목록 확인 API`, description: `유저의 친구 목록을 확인한다.`})
-	// @UseGuards(AuthGuard('jwt-access'))
+	@UseGuards(AuthGuard('jwt-access'))
     @Get("getFriendList/:id")
     async GetFriendList(@Param('id', ParseIntPipe) user_id: number)
     {

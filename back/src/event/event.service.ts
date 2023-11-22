@@ -25,18 +25,18 @@ export class EventService {
         return this.AlarmSseMap.get(id);
     }
 
-    async FriendListSse(req, id: number) {
-        // console.log('FriendList sse open', id, this.FriendListSseMap.size);
-        if (this.FriendListSseMap.get(id) !== undefined)
-            return this.FriendListSseMap.get(id);
-        const newEvent = new Subject<any>();
-        this.FriendListSseMap.set(id, newEvent);
-        req.on('close', (_) => {
-            this.FriendListSseMap.delete(id);
-            console.log('FriendList sse close', id);
-        });
-        return this.FriendListSseMap.get(id);
-    }
+    // async FriendListSse(req, id: number) {
+    //     // console.log('FriendList sse open', id, this.FriendListSseMap.size);
+    //     if (this.FriendListSseMap.get(id) !== undefined)
+    //         return this.FriendListSseMap.get(id);
+    //     const newEvent = new Subject<any>();
+    //     this.FriendListSseMap.set(id, newEvent);
+    //     req.on('close', (_) => {
+    //         this.FriendListSseMap.delete(id);
+    //         console.log('FriendList sse close', id);
+    //     });
+    //     return this.FriendListSseMap.get(id);
+    // }
 
     async SendFriendEvent(id: number)
     {
@@ -74,21 +74,21 @@ export class EventService {
         }
     }
 
-    async DeletAllAlarmsByNick(nick_name: string) {
-        const user = await this.pismaService.user.findUnique({
-            where: {
-                nick_name: nick_name,
-            },
-        });
-        if (user === null)
-            return {status: false, message: 'no user'};
-        await this.pismaService.event.deleteMany({
-            where: {
-                to_id: user.user_id,
-            },
-        });
-        return {status: true, message: 'success'};
-    }
+    // async DeletAllAlarmsByNick(nick_name: string) {
+    //     const user = await this.pismaService.user.findUnique({
+    //         where: {
+    //             nick_name: nick_name,
+    //         },
+    //     });
+    //     if (user === null)
+    //         return {status: false, message: 'no user'};
+    //     await this.pismaService.event.deleteMany({
+    //         where: {
+    //             to_id: user.user_id,
+    //         },
+    //     });
+    //     return {status: true, message: 'success'};
+    // }
 
     async SendEvent(event: eventDto) {
         const before_event = await this.pismaService.event.findFirst({

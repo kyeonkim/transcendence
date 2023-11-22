@@ -24,45 +24,86 @@ export class TestService {
             where: {
               nick_name: nickName,
             },
+            include:{
+                twoFA_key: true,
+                roomuser: true,
+                friends: true,
+                games: true,
+                tokens: true,
+                events: true,
+                blocks: true,
+                recv_messages: true,
+                send_messages: true,
+            }
         });
         if (user === null)
             return {status: false, message: "유저 찾기 실패"}
         const id = user.user_id;
-
-        await this.prisma.friends.deleteMany({
-            where: {
-                OR: [
-                    {
-                        following_user_id: id,
-                    },
-                    {
-                        followed_user_id: id,
-                    },
-                ],
-            },
-        });
-        await this.prisma.tokens.deleteMany({
-            where: {
-                nick_name: nickName,
-            },
-        });
-        await this.prisma.game.deleteMany({
-            where: {
-                OR: [
-                    {
-                        user_id: id,
-                    },
-                    {
-                        enemy_id: id,
-                    },
-                ],
-            },
-        });
-        await this.prisma.event.deleteMany({
-            where: {
-                to_id: id,
-            },
-        });
+        if (user.friends.length > 0)
+        {
+            await this.prisma.friends.deleteMany({
+                where: {
+                    OR: [
+                        {
+                            following_user_id: id,
+                        },
+                        {
+                            followed_user_id: id,
+                        },
+                    ],
+                },
+            });
+        }
+        if (user.tokens !== null)
+        {
+            await this.prisma.tokens.deleteMany({
+                where: {
+                    nick_name: nickName,
+                },
+            });
+        }
+        if (user.games.length > 0)
+        {
+            await this.prisma.game.deleteMany({
+                where: {
+                    OR: [
+                        {
+                            user_id: id,
+                        },
+                        {
+                            enemy_id: id,
+                        },
+                    ],
+                },
+            });
+        }
+        if (user.events.length > 0)
+        {
+            await this.prisma.event.deleteMany({
+                where: {
+                    to_id: id,
+                },
+            });
+        }
+        if (user.send_messages.length > 0 || user.recv_messages.length > 0)
+        {
+            await this.prisma.message.deleteMany({
+                where: {
+                    OR: [
+                        {
+                            from_id: id,
+                        },
+                        {
+                            to_id: id,
+                        },
+                    ],
+                },
+            });
+        }
+        if (user.roomuser !== null)
+            await this.chatService.LeaveRoom({user_id: id, user_nickname: nickName, room_id: 0});
+        if (user.blocks.length > 0)
+            await this.prisma.block.deleteMany({ where: { user_id: id } });
         await this.prisma.user.delete({
             where: {
                 user_id: id,
