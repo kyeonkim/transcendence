@@ -1,9 +1,10 @@
-import { Body, Controller, Delete, Get, Headers, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Headers, Param, Post, Res, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SignUpDto, TokenDto, TwoFADTO } from './dto/token.dto';
 import { AuthService } from './auth.service';
 import { UserService } from 'src/user/user.service';
+import { Response } from 'express';
 
 @ApiTags('Auth API')
 @Controller('auth')
@@ -32,15 +33,20 @@ export class AuthController {
 	@UseGuards(AuthGuard('jwt-refresh'))
 	@ApiBearerAuth('JWT-refresh')// swagger code
 	@Post("token/refresh")
-	async RecreateToken(@Headers() header, @Body() token : TokenDto)
+	async RecreateToken(@Headers() header, @Body() token : TokenDto, @Res({passthrough: true}) res: Response)
 	{
 		// console.log("token header: ", header);
-		console.log("token refresh", token);
-		return await this.AuthService.ReCreateToken(token);
+		// console.log("token refresh", token);
+		const newToken = await this.AuthService.ReCreateToken(token);
+		// res.cookie('access_token', newToken.access_token);		
+		// res.cookie('refresh_token', newToken.refresh_token);			
+		res.cookie('test', "testtesttest", {sameSite: 'none', maxAge: 1000 * 60 * 60 * 24 * 7, secure: true});
+		return newToken;
 	}
 
 	@ApiBearerAuth('JWT-auth')
 	@UseGuards(AuthGuard('jwt-access'))
+	@ApiBearerAuth('JWT-acces')
 	@Get("token/varify")
 	async VarifyToken()
 	{
@@ -51,6 +57,7 @@ export class AuthController {
 
 	@ApiOperation({summary: `2차인증 통과 API`, description: `2차인증 통과여부를 토큰에 넣는다.`})
 	@UseGuards(AuthGuard('jwt-twoFA'))
+	@ApiBearerAuth('JWT-twoFA')
 	@Post("2fa/pass")
 	async TwoFAPass(@Body() twofa: TwoFADTO)
 	{
@@ -60,6 +67,7 @@ export class AuthController {
 
 	@ApiOperation({summary: `2차인증 활성 qr API`, description: `2차인증을 활성화 하기위한 QR코드를 받는다.`})
 	@UseGuards(AuthGuard('jwt-access'))
+	@ApiBearerAuth('JWT-acces')
 	@Post("2fa/activeqr")
 	async Active2FAQRCode(@Body() twofa: TwoFADTO)
 	{
@@ -68,6 +76,7 @@ export class AuthController {
 
 	@ApiOperation({summary: `2차인증 활성화 API`, description: `2차인증을 활성화 한다.`})
 	@UseGuards(AuthGuard('jwt-twoFA'))
+	@ApiBearerAuth('JWT-twoFA')
 	@Post("2fa/active")
 	async Active2FA(@Body() twofa: TwoFADTO)
 	{
@@ -76,6 +85,7 @@ export class AuthController {
 
 	@ApiOperation({summary: '2차인증 비활성화 API', description: '2차인증을 비활성화 한다.'})
 	@UseGuards(AuthGuard('jwt-access'))
+	@ApiBearerAuth('JWT-acces')
 	@Delete("2fa/deactive")
 	async Deactive2FA(@Body() twofa: TwoFADTO)
 	{

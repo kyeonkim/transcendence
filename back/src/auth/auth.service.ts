@@ -318,7 +318,7 @@ export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'jwt-refresh'
    * @param payload 토큰 전송 내용
    */
   async validate(req: any, payload: UserToken): Promise<any> {
-	console.log("JwtRefreshStrategy body: ", req.body);
+	// console.log("JwtRefreshStrategy body: ", req.body);
 	if (payload.twoFAPass === false)// 2차인증 필요
 		throw new UnauthorizedException();
 	const storedToken = await this.prisma.tokens.findUnique({
@@ -329,7 +329,7 @@ export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'jwt-refresh'
 	// console.log("JwtRefreshStrategy storedToken: ", storedToken);
 	if (storedToken === null)
 	{
-		console.log("JwtRefreshStrategy storedToken null: ", storedToken);
+		// console.log("JwtRefreshStrategy storedToken null: ", storedToken);
 		throw new UnauthorizedException();
 	}
 	if (storedToken.access_token !== req.body.access_token)

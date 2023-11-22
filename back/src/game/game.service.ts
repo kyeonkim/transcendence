@@ -2,6 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { gameDataDto } from './dto/game.dto';
 
+export class gameRoom {
+    user_id: number;
+    enemy_id: number;
+}
+
 @Injectable()
 export class GameService {
     constructor(

@@ -115,7 +115,7 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
     if(payload.target === undefined)
     {
       Client.to(`status-${payload.user_id}`).emit(`status`, {user_id: payload.user_id, status: payload.status});
-      console.log("here");
+      // console.log("here");
     } 
     else
       Client.to(`${payload.target}`).emit(`status`, {user_id: payload.user_id, status: payload.status});

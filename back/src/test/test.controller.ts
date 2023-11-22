@@ -1,8 +1,9 @@
-import { Controller, Delete, Get, Param, Post, Query } from '@nestjs/common';
+import { Controller, Delete, Get, Param, Post, Query, Res } from '@nestjs/common';
 import { TestService } from './test.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SocialService } from 'src/social/social.service';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { Response } from 'express';
 
 
 @ApiTags('Test API')
@@ -87,5 +88,15 @@ export class TestController {
 	async CreateDummyMessage()
 	{
 		return await this.TestService.CreateDummyMessage();
+	}
+
+	@ApiOperation({summary: `cookie set API`, description: `cookie를 설정한다.`})
+	@Get("setcookie")
+	async SetCookie(@Res() res: Response)
+	{
+		console.log("here!!!!");
+		res.cookie('test', 'test', {httpOnly: true});
+		res.end();
+		return "hello";
 	}
 }

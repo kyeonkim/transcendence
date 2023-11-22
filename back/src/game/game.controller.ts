@@ -1,5 +1,5 @@
 import { Body, Controller, Get, UseGuards, ParseIntPipe, Post, Query } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { gameDataDto } from './dto/game.dto';
 import { GameService } from './game.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -20,6 +20,7 @@ export class GameController {
 
     @ApiOperation({summary: `전적 데이터 API`, description: `전적 db를 가져온다`})
 	@UseGuards(AuthGuard('jwt-access'))
+	@ApiBearerAuth('JWT-acces')
     @Get("data")
     async GetGameDataById(@Query('id', ParseIntPipe) id: number, @Query('index', ParseIntPipe) index: number)
     {

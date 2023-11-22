@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Query, Req, Sse, UseGuards } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Subject } from 'rxjs';
 import { EventService } from './event.service'
 import { eventDto } from './dto/event.dto';
@@ -26,6 +26,7 @@ export class EventController {
 
     @ApiOperation({summary: `GETAlarms API`, description: `최초 접속 시 쌓여있던 받기 위한 API`})
 	@UseGuards(AuthGuard('jwt-access'))
+	@ApiBearerAuth('JWT-acces')
     @Get('getalarms/:id')
     async GetAlarms(@Param('id', ParseIntPipe) id : number) {
         return await this.EventService.GetAlarms(id);
@@ -33,6 +34,7 @@ export class EventController {
 
     @ApiOperation({summary: `DeleteAlarms API`, description: `특정 ID 알람 삭제 API`})
 	@UseGuards(AuthGuard('jwt-access'))
+	@ApiBearerAuth('JWT-acces')
     @Delete('deletealarms/:idx')
     async DeleteAlarms(@Param('idx', ParseIntPipe) idx : number) {
         return await this.EventService.DeleteAlarms(idx);
