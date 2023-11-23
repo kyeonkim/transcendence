@@ -3,6 +3,7 @@ import { useChatSocket } from "@/app/main_frame/socket_provider";
 import axios from "axios";
 import { useCookies } from "next-client-cookies";
 import { axiosToken } from '@/util/token';
+
 export function useFriendList(myId: any) {
   const [apiResponse, setApiResponse] = useState([]);
   const socket = useChatSocket();
@@ -33,7 +34,7 @@ export function useFriendList(myId: any) {
         });
     };
 
-    const handleRenderFriend = () => {
+    const handleRenderFriend = (data :any) => {
       fetchData();
     };
 

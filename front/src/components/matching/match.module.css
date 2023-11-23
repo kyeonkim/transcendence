@@ -1,0 +1,41 @@
+.matchroom {
+	width: 1470px;
+	height: 1200px;
+	max-width: 1470px;
+	background-color: rgba(135, 206, 235, 0.2);
+	align-items: center;
+	margin-left: 65px;
+	margin-top: 70px;
+	border-radius: 20px;
+	border: 5px solid rgba(135, 207, 235, 0.2);
+}
+
+.homeButton {
+	width: 300px;
+	height: 100px;
+	border-radius: 30px;
+}
+
+.gameButton {
+	width: 300px;
+	height: 100px;
+	border-radius: 30px;
+}
+
+.player1 {
+	width: 400px;
+	height: 900px;
+	background-color: rgba(135, 206, 235, 0.2);
+    border-radius: 20px;
+    border: '5px solid #000';
+	margin-left: 100px;
+}
+
+.player2 {
+	width: 400px;
+	height: 900px;
+	background-color: rgba(135, 206, 235, 0.2);
+	border-radius: 20px;
+	border: '5px solid #000';
+	margin-right: 100px;
+}

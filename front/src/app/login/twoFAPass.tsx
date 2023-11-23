@@ -42,6 +42,7 @@ export default function TwoFAPass ({res}: {res: any}) {
 
   const router = useRouter();
   const cookies = useCookies();
+ 
 
   useEffect(() => {
 

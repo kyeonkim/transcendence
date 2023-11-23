@@ -3,6 +3,14 @@
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
+// tsparticles
+import type { Engine } from "tsparticles-engine";
+import { ISourceOptions } from "tsparticles-engine";
+import { useCallback } from 'react';
+import particlesOptions from "../particles.json";
+import { loadFull } from "tsparticles";
+import Particles from "react-tsparticles";
+
 import axios from 'axios';
 
 
@@ -17,6 +25,13 @@ export default function CookieControl ({res}: {res: any}) {
     //     //do modal for otp
     //     //input 6 digit number and send to server
     // }
+
+    const particlesInit = useCallback(async (engine: Engine) => {
+        // console.log(engine);
+        await loadFull(engine);
+      }, []);
+    
+
     console.log('cookie_control - res - ', res);
     async function CookieSetter (access_token:any, refresh_token:any, nick_name:any, user_id:any)
     {
@@ -76,7 +91,8 @@ export default function CookieControl ({res}: {res: any}) {
 
     return (
         <div>
-            <div>Cookie Control</div>
+            <Particles options={particlesOptions as ISourceOptions} init={particlesInit} />
+            <div></div>
             {/* {otp && <otpModal />} */}
         </div>
       );

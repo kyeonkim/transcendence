@@ -68,16 +68,19 @@ const ProfilePage = (props: any) => {
   }, [userNickname, isFriend, isOTP, rendering]);
 
 	useEffect(() => {
-		socket.on(`render-profile`, (data) => {
-			console.log('render-profile',data);
-      if (data === 'false')
-        setIsFriend(false)
-      else
-        setIsFriend(true)
-		});
+
+    const renderProfile = (data :any) => {
+        console.log('render-profile',data);
+        if (data === 'false')
+          setIsFriend(false)
+        else
+          setIsFriend(true)
+    }
+
+		socket.on(`render-profile`, renderProfile);
 	
 		return () => {
-			socket.off("render-profile");
+			socket.off("render-profile", renderProfile);
 		};
 	}, [socket]) 
 

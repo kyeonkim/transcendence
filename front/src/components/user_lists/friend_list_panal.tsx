@@ -8,7 +8,7 @@ import IconButton from '@mui/material/IconButton';
 import Avatar from '@mui/material/Avatar';
 import CommentIcon from '@mui/icons-material/Comment';
 import Badge from '@mui/material/Badge';  
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useCookies } from 'next-client-cookies';
 import axios from 'axios';
 import { useChatSocket } from "../../app/main_frame/socket_provider"
@@ -18,19 +18,36 @@ import Divider from '@mui/material/Divider';
 import DirectMessage from './direct_message';
 
 export default function FriendListPanel(props: any) {
+	
 	const [apiResponse, setApiResponse] = useState([]);
+
+	const [dmCountList, setDmCountList] = useState([]);
+
 	const [loading, setloading] = useState(true);
 	const socket = useChatSocket();
-	const { setMTbox, dmAlarmCount, dmAlarmCountList, dmAlarmRemover, dmOpenId, dmOpenNickname, handleChatTarget, list, myId, tapref} = props;
+	const { setMTbox, dmOpenId, dmOpenNickname, handleDmAlarmCount, handleChatTarget, list, myId, tapref} = props;
+
+	const dmOpenIdRef = useRef(dmOpenId);
 
 	useEffect(() => {
 		if (list && JSON.stringify(list) === JSON.stringify(apiResponse)) {
 			return;
-		  }
+		}
 		if (list) {	
-			console.log('friend list panel===========', list);
+			console.log('friend list panel===========', list, apiResponse);
 			socket.emit('status', { user_id: myId, status: 'login' });
+			
+			// const newList = list.map((user: any) => {
+			// 	const findUser = apiResponse.find((item: any) => item.followed_user_id === user.followed_user_id);
+			// 	return findUser ? {...user, count: findUser.count} : user;
+			// });
+
+			
+			// List를 순회해서 인원을 복사해서 넣는다. 현재 count를 설정한다.
+			
+
 			setApiResponse(list);
+
 		}
 		else
 			setloading(true);
@@ -41,27 +58,83 @@ export default function FriendListPanel(props: any) {
 	}, [apiResponse]);
 
 	useEffect(() => {
-		socket.on('dm', (data: any) => {
+
+		const dmAlarmListener = (data :any) => {
 			console.log('dm event!!===', data);
+			
+
+			console.log('dmAlarm dmOpenId - ', dmOpenIdRef.current);
+			console.log('dmAlarm data.from_id - ', data.from_id);
+
+			if (dmOpenIdRef.current === Number(data.from_id))
+			{
+				console.log('pass count');
+				return ;
+			}
+
 			setApiResponse((prevState) =>
 				prevState.map((user: any) => {
 			  		if (user.followed_user_id == Number(data.from_id)) {
 						console.log('dm event from===', user);
+						handleDmAlarmCount(data.from_id, true);
 						return { ...user, count: (user.count || 0 ) + 1 };
 			  		}
 			  		return user;
 				})
 		  	);
-		});
+			
+
+			// array search
+
+			// const resUser = dmCountList.find((element) => (element.id === data.from_id));
+				
+
+			// if (resUser === undefined)
+			// {
+			// 	// 없으면 user를 추가하고 count를 추가
+			// 	setDmCountList((prevDmCountList) => [...prevDmCountList, { id: data.from_id, count: 1 }]);
+			// }
+			// else
+			// {
+			// 	// 있으면 count를 추가
+			// 	// resUser.id
+			// 	setDmCountList((prevState) =>
+			// 			prevState.map((user: any) => {
+			// 				if (user.id == resUser.id) {
+			// 					console.log('dm event from===', user);
+			// 					handleDmAlarmCount(data.from_id, true);
+			// 					return { ...user, count: (user.count || 0 ) + 1 };
+			// 				}
+			// 				return user;
+			// 			})
+			// 		);
+			// }
+
+		}
+
+		socket.on('dm', dmAlarmListener);
+
+		socket.emit('getdm', { user_id: Number(myId) });
+
 		return () => {
 			console.log('friend list socket dm unmounted');
-			socket.off('dm');
+			socket.off('dm', dmAlarmListener);
 		}
 	}, [socket]);
 
 	useEffect(() => {
+		dmOpenIdRef.current = dmOpenId;
+	}, [dmOpenId])
+
+	// useEffect(() => {
+	// 	console.log('apiResponse===', apiResponse);
+	// }, [apiResponse]);
+
+
+	useEffect(() => {
 		console.log('apiResponse===', apiResponse);
-	}, [apiResponse]);
+	}, [apiResponse, dmCountList]);
+
 
 	const handleProfile = (id: any) => () => {
 		console.log("profile to " + id);
@@ -76,18 +149,37 @@ export default function FriendListPanel(props: any) {
 		};
 
 	const handlerClear = (from: any, name: any) => {
+		// 열 때도 실행함
+
+		console.log('handlerCLear - ', from, name);
+
+		if (dmOpenIdRef.current === from)
+		{
+			// 끄는 동작임
+			console.log('off');
+			handleChatTarget(from, name);
+			return ;
+		}
+		
+		console.log('on');
+
 		const newList = apiResponse.map((user: any) => {
 			if (user.followed_user_id === Number(from)) {
 				return { ...user, count: 0 };
 			}
 			return user;
 		});
+
 		setApiResponse(newList);
-		console.log('handlerClear', from, name);
 		handleChatTarget(from, name);
-		console.log("after handlerClear", apiResponse);
+		console.log('call handleDmAlarmCount in handlerClear - ', from, name);
+		handleDmAlarmCount(from, false);
 	}
 	
+	const handleBadgeCount = (id :number) => {
+		
+	}
+
 	return (
 		<div>
 			<List dense sx={{ width: '100%', maxWidth: 400, maxHeight: 580, bgcolor: 'background.paper', overflow: 'auto'}}>
@@ -113,7 +205,6 @@ export default function FriendListPanel(props: any) {
 								</div>
 							</ListItemButton>
 							<IconButton edge="end" aria-label="comments" onClick={() => {handlerClear(user.followed_user_id, user.followed_user_nickname)}}>
-							{/* <IconButton edge="end" aria-label="comments" onClick={handleChatTarget(user.followed_user_id, user.followed_user_nickname)}> */}
 								<Badge color="error" badgeContent={user.count ? user.count : 0}>
 									<CommentIcon/>
 								</Badge>
@@ -126,9 +217,6 @@ export default function FriendListPanel(props: any) {
 			</List>
 			{(dmOpenId > -1) ? (
 					<DirectMessage
-						dmAlarmCount={dmAlarmCount}
-						dmAlarmCountList={dmAlarmCountList}
-						dmAlarmRemover={dmAlarmRemover}
 						dmOpenId={dmOpenId}
 						dmOpenNickname={dmOpenNickname}
 						handleChatTarget={handleChatTarget}

@@ -3,6 +3,15 @@ import axios from 'axios';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation'
 
+// tsparticles
+import type { Engine } from "tsparticles-engine";
+import { ISourceOptions } from "tsparticles-engine";
+import { useCallback } from 'react';
+import particlesOptions from "../particles.json";
+import { loadFull } from "tsparticles";
+import Particles from "react-tsparticles";
+
+
 export default function Signup (props:any) {
   const [profileImage, setFile] = useState<File>();
   const [nickname, setNickname] = useState('');
@@ -10,6 +19,12 @@ export default function Signup (props:any) {
 
   const router = useRouter();
   const formData = new FormData()
+
+
+  const particlesInit = useCallback(async (engine: Engine) => {
+    // console.log(engine);
+    await loadFull(engine);
+  }, []);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -21,6 +36,7 @@ export default function Signup (props:any) {
   };
 
   const handleNicknameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+
     setNickname(e.target.value);
   };
 
@@ -51,7 +67,7 @@ export default function Signup (props:any) {
   }
   return (
       <div>
-          <div>this is server component - SendImage.</div>
+          <Particles options={particlesOptions as ISourceOptions} init={particlesInit} />
           <div style={{ textAlign: 'center', marginTop: '50px' }}>
               <h1>Set User</h1>
               <div style={{ marginBottom: '20px' }}>
@@ -75,10 +91,10 @@ export default function Signup (props:any) {
               <div style={{ marginTop: '20px' }}>
                   <label htmlFor="nickname">Nickname: </label>
                   <input
-                  type="text"
-                  id="nickname"
-                  value={nickname}
-                  onChange={handleNicknameChange}
+                    type="text"
+                    id="nickname"
+                    value={nickname}
+                    onChange={handleNicknameChange}
                   />
               </div>
               <div style={{ marginTop: '20px' }}>

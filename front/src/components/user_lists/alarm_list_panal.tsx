@@ -40,6 +40,7 @@ import axios from 'axios';
 
 import AlarmAddFriend from './alarm_add_friend';
 import AlarmInviteChat from './alarm_invite_chat'
+import AlarmInviteGame from './alarm_invite_game'
 import { axiosToken } from '@/util/token';
 
 const MainAlarmPanal = styled(Box) ({
@@ -119,10 +120,11 @@ export default function AlarmListPanal (props: any) {
           console.log('invite_chat deny request');
           removeEventFromDatabase(alarm);
       }
-      // else if (alarm.event_type === 'game')
-      // {
-      //     removeEventFromDatabase(alarm);
-      // }
+      else if (alarm.event_type === 'game')
+      {
+        console.log('invite_game deny request');
+          removeEventFromDatabase(alarm);
+      }
 
     // alarmCountHandler(false);
   };
@@ -180,31 +182,20 @@ export default function AlarmListPanal (props: any) {
                   </AlarmInviteChat>
               );
             }
-            // else if (alarm.event_type === 'game')
-            // {
-            //   return (
-            //     <ListItem
-            //       key={alarm.from_nickname}
-            //       disablePadding
-            //     >
-            //     <SportsTennisIcon />
-            //       <ListItemButton onClick={handleProfile(alarm)}>
-            //           <ListItemAvatar>
-            //           <Avatar
-            //             src={alarm.from_nickname ? imageLoader({src: alarm.from_nickname}) : null}
-            //           />
-            //           </ListItemAvatar>
-            //           <ListItemText id={labelId} primary={`${alarm.from_nickname}`} />
-            //       </ListItemButton>
-            //       <IconButton onClick={acceptGameRequest(alarm)}>
-            //           <CheckCircleOutlineRoundedIcon />
-            //       </IconButton>
-            //       <IconButton onClick={denyRequest(alarm)}>
-            //           <ClearRoundedIcon />
-            //       </IconButton>
-            //     </ListItem>
-            //   );
-            // }
+            else if (alarm.event_type === 'game')
+            {
+              return (
+                <AlarmInviteGame
+                  ket={idx}
+                  alarm={alarm}
+                  alarmReducer={alarmReducer}
+                  handleProfile={handleProfile}
+                  imageLoader={imageLoader}
+                  denyRequest={denyRequest}
+                  cookies={cookies}
+                />
+              );
+            }
           })}
         </List>
       ) : (

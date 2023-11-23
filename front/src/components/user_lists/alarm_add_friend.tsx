@@ -1,5 +1,4 @@
 'use client'
-import { useState, useEffect } from 'react';
 import React from 'react';
 import { axiosToken } from '@/util/token';
 import ListItem from '@mui/material/ListItem';
@@ -15,15 +14,12 @@ import HandshakeIcon from '@mui/icons-material/Handshake';
 import CheckCircleOutlineRoundedIcon from '@mui/icons-material/CheckCircleOutlineRounded';
 import ClearRoundedIcon from '@mui/icons-material/ClearRounded';
 
-import Skeleton from '@mui/material/Skeleton';
 
 // styled component (컴포넌트 고정 style로 보임)
-import { styled } from '@mui/system';
 
 // get cookie
 import { useCookies } from 'next-client-cookies';
 
-import axios from 'axios';
 
 
 export default function AlarmAddFriend ( {alarm, alarmReducer, handleProfile, imageLoader, denyRequest} :any) {
@@ -34,11 +30,11 @@ export default function AlarmAddFriend ( {alarm, alarmReducer, handleProfile, im
         console.log ('acceptFriendAddRequest - ', alarm)
         await axiosToken.post(`${process.env.NEXT_PUBLIC_API_URL}social/acceptfriend`,
         {
-          "event_id": alarm.idx,
-          "user_id": alarm.to_id,
-          "user_nickname": cookies.get('nick_name'),
-          "friend_id": 0,
-          "friend_nickname": alarm.from_nickname
+          event_id: alarm.idx,
+          user_id: alarm.to_id,
+          user_nickname: cookies.get('nick_name'),
+          friend_id: 0,
+          friend_nickname: alarm.from_nickname
         },
         {
             headers: {

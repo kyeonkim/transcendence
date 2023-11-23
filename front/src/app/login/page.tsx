@@ -96,7 +96,7 @@ export default function Login ({searchParams}:any) {
         {
           const response = await Auth42(code);
 
-          responseData = response.data;
+          responseData = response?.data;
           console.log('2차 인증 필요?====', responseData);
 
           if (responseData?.refresh_token != undefined

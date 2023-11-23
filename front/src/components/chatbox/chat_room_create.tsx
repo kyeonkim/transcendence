@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
@@ -9,6 +9,8 @@ import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 
 import TextField from '@mui/material/TextField';
+
+import Alert from '@mui/material/Alert';
 
 // import FormControl from '@mui/material/FormControl';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -48,9 +50,11 @@ export default function ChatRoomCreate(props: any) {
 	const user_id = Number(cookies.get("user_id"));
 	const user_nickname = cookies.get("nick_name");
 
-	const	[roomName, setRoomName] = useState('');
-	const	[roomPrivate, setRoomPrivate] = useState(false);
-	const 	[roomPassword, setRoomPassword] = useState('');
+	const [roomName, setRoomName] = useState('');
+	const [roomPrivate, setRoomPrivate] = useState(false);
+	const [roomPassword, setRoomPassword] = useState('');
+
+	const [nameError, setNameError] = useState(false);
 
 	const {handleRenderMode} = props;
 
@@ -62,6 +66,7 @@ export default function ChatRoomCreate(props: any) {
 
 		if (roomName === '')
 		{
+			setNameError(true);
 			return ;
 		}
 
@@ -112,10 +117,6 @@ export default function ChatRoomCreate(props: any) {
 		setRoomPrivate(event.target.checked);
 	}
 
-	// useEffect(() => {
-
-	// }, [])
-
 	// modal 형태 고려 - 우선순위 낮음
 	return (
 		<div>
@@ -138,7 +139,13 @@ export default function ChatRoomCreate(props: any) {
 					}}
 					id="chatroom_name_text_field"
 					label="Chatroom Name"
+					inputProps={{ maxLength: 20}}
 					onChange={handleRoomnameChange}
+					onKeyDown={(e) => {
+						if (e.key === 'Enter') {
+							if (e.nativeEvent.isComposing) return;
+							handleDone();
+						}}}
 				/>
 				<TextField
 					sx={{
@@ -148,7 +155,13 @@ export default function ChatRoomCreate(props: any) {
 					}}
 					id="password_text_field"
 					label="password"
+					inputProps={{ maxLength: 20}}
 					onChange={handleRoomPasswordChange}
+					onKeyDown={(e) => {
+						if (e.key === 'Enter') {
+							if (e.nativeEvent.isComposing) return;
+							handleDone();
+						}}}
 					/>
 				<FormControlLabel
 					sx={{
@@ -159,7 +172,13 @@ export default function ChatRoomCreate(props: any) {
 					control={<Switch checked={roomPrivate} onChange={handleRoomPrivate}/>} label="Private" labelPlacement='end'
 					style={{ marginLeft: '20px', marginTop: '90px' }}
 					/>
-			</MainChatRoomCreate>
+				{nameError ? (
+						<Alert severity="error">채팅방 이름이 없습니다. 입력해주세요! </Alert>
+					) : (
+						<div></div>
+					)}
+				</MainChatRoomCreate>		
+	
 		</div>
 	);
 }

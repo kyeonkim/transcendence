@@ -30,6 +30,8 @@ export default function DirectMessage( {dmAlarmCount, dmAlarmCountList, dmAlarmR
 	// direct message 목록 받아오기
 
 	const user_id = Number(cookies.get('user_id'));
+	
+	console.log('direct_message dmOpenId - ', dmOpenId);
 
 	const handleSendMessage = () => {
 		console.log('send message:==== \n', message);
@@ -82,7 +84,7 @@ export default function DirectMessage( {dmAlarmCount, dmAlarmCountList, dmAlarmR
 									fullWidth 
 									value={message}
 									onChange={(e) => setMessage(e.target.value)}
-									inputProps={{ maxLength: 50 }}
+									inputProps={{ maxLength: 100 }}
 									onKeyDown={(e) => {
 										if (e.key === 'Enter') {
 											if (e.nativeEvent.isComposing) return;

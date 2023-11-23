@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Avatar, Box, Divider, List, ListItem, ListItemButton, Paper, Popper, Typography } from "@mui/material";
 import { useCookies } from "next-client-cookies"
 import { axiosToken } from '@/util/token';
+
 export default function UserList(props: any) {
 	const { handleDrawerClose, imageLoader, style, pop, setPop, setAnchorEl,
 		anchorEl , roominfo, socket, setMTbox} = props;
@@ -34,56 +35,56 @@ export default function UserList(props: any) {
 	}, []);
 
 	const handlePopup = (event: any, userData: any) => {
-	console.log("in pop<", userData);
-	if (anchorEl === event.currentTarget) {
-		setPop(!pop);
-	} else {
-		setAnchorEl(event.currentTarget);
-		setPop(true);
-	}
-	setTargetData(userData);
+		console.log("in pop<", userData);
+		if (anchorEl === event.currentTarget) {
+			setPop(!pop);
+		} else {
+			setAnchorEl(event.currentTarget);
+			setPop(true);
+		}
+		setTargetData(userData);
 	};
 
 	const handleMute = async () => {
-	await axiosToken.patch(`${process.env.NEXT_PUBLIC_API_URL}chat/muteuser`, {
-		user_id: Number(my_id),
-		room_id: Number(roominfo.idx),
-		target_id: Number(targetData.user_id),
-		target_nickname: targetData.user_nickname,
-	},
-	{
-		headers: {
-			Authorization: `Bearer ${cookies.get('access_token')}`,
-		},
-	}
-	)
-	}
-
-	const handleOP = async () => {
-	await axiosToken.patch(`${process.env.NEXT_PUBLIC_API_URL}chat/setmanager`, {
-		user_id: Number(my_id),
-		room_id: Number(roominfo.idx),
-		target_id: Number(targetData.user_id),
-		target_nickname: targetData.user_nickname,
+		await axiosToken.patch(`${process.env.NEXT_PUBLIC_API_URL}chat/muteuser`, {
+			user_id: Number(my_id),
+			room_id: Number(roominfo.idx),
+			target_id: Number(targetData.user_id),
+			target_nickname: targetData.user_nickname,
 		},
 		{
 			headers: {
-			Authorization: `Bearer ${cookies.get('access_token')}`,
+				Authorization: `Bearer ${cookies.get('access_token')}`,
+			},
+		}
+		)
+	}
+
+	const handleOP = async () => {
+		await axiosToken.patch(`${process.env.NEXT_PUBLIC_API_URL}chat/setmanager`, {
+			user_id: Number(my_id),
+			room_id: Number(roominfo.idx),
+			target_id: Number(targetData.user_id),
+			target_nickname: targetData.user_nickname,
+		},
+		{
+			headers: {
+				Authorization: `Bearer ${cookies.get('access_token')}`,
 			},
 		}
 		)
 	}
 
 	const handleKick = async () => {
-	await axiosToken.patch(`${process.env.NEXT_PUBLIC_API_URL}chat/kickuser`, {
-		user_id: Number(my_id),
-		room_id: Number(roominfo.idx),
-		target_id: Number(targetData.user_id),
-		target_nickname: targetData.user_nickname,
+		await axiosToken.patch(`${process.env.NEXT_PUBLIC_API_URL}chat/kickuser`, {
+			user_id: Number(my_id),
+			room_id: Number(roominfo.idx),
+			target_id: Number(targetData.user_id),
+			target_nickname: targetData.user_nickname,
 		},
 		{
 			headers: {
-			Authorization: `Bearer ${cookies.get('access_token')}`,
+				Authorization: `Bearer ${cookies.get('access_token')}`,
 			},
 		}
 		)
@@ -91,6 +92,24 @@ export default function UserList(props: any) {
 
 	const handleProfile = () => {	
 		setMTbox(1, targetData.user_nickname);
+	}
+
+	const handleInviteGame = async () => {
+		console.log("invite game ", my_id, " to ", targetData.user_id)
+		await axiosToken.post(`${process.env.NEXT_PUBLIC_API_URL}game/inviteroom`, {
+			user1_id: Number(my_id),
+			user1_nickname: cookies.get("nick_name"),
+			user2_id: Number(targetData.user_id),
+			user2_nickname: targetData.user_nickname,
+		},
+		{
+			headers: {
+				Authorization: `Bearer ${cookies.get('access_token')}`,
+			},
+		})
+		.then((res) => {
+			console.log("invite game response===", res);
+		})
 	}
 
 	console.log("userlist", list);
@@ -120,7 +139,7 @@ export default function UserList(props: any) {
 					<Avatar src={imageLoader({ src: user.user_nickname })} />
 					<ListItem style={{ paddingTop: '1px', marginLeft: '1px', width: '200px' }}>
 						<Typography variant="inherit" noWrap>
-						{user.user_nickname}
+							{user.user_nickname}
 						</Typography>
 					</ListItem>
 					</ListItemButton>
@@ -145,7 +164,7 @@ export default function UserList(props: any) {
 						<Typography variant="inherit">프로필</Typography>
 					</ListItemButton>
 					<Divider />
-					<ListItemButton>
+					<ListItemButton onClick={handleInviteGame}>
 						<Typography variant="inherit">게임초대</Typography>
 					</ListItemButton>
 					<Divider />

@@ -21,6 +21,7 @@ export default function DmMessageBlock({dmOpenId, dmOpenNickname, messageAreaRef
     const socket = useChatSocket();
     const cookies = useCookies();
 
+    const dmOpenIdRef = useRef(dmOpenId);
 
     const user_id = Number(cookies.get('user_id'));
     const nick_name = cookies.get('nick_name');
@@ -49,11 +50,11 @@ export default function DmMessageBlock({dmOpenId, dmOpenNickname, messageAreaRef
         
             // 메시지가 아예 없으면 idx -1로 보내야하는거 아닌가? 0으로 관리하는 이유는?
 
-        console.log(dmOpenId);
+        console.log(dmOpenIdRef.current);
         await axiosToken.get(`${process.env.NEXT_PUBLIC_API_URL}chat/unreaddm`,{
             params: {
                 user_id: user_id,
-                from_id: dmOpenId
+                from_id: dmOpenIdRef.current
             },
             headers: {
 				'Content-Type': 'application/json',
@@ -88,7 +89,7 @@ export default function DmMessageBlock({dmOpenId, dmOpenNickname, messageAreaRef
                 await axiosToken.get(`${process.env.NEXT_PUBLIC_API_URL}chat/dm`, {
                     params: {
                         id: user_id,
-                        from_id: dmOpenId,
+                        from_id: dmOpenIdRef.current,
                         idx: idx
                     },
                     headers: {
@@ -118,7 +119,7 @@ export default function DmMessageBlock({dmOpenId, dmOpenNickname, messageAreaRef
                     console.log('getDm done')
             
                 }).catch((err) => {
-                    console.log('is it err in dm get?');
+                    console.log('chat/dm Error catched - ', err);
                 });
             }
             else
@@ -129,7 +130,7 @@ export default function DmMessageBlock({dmOpenId, dmOpenNickname, messageAreaRef
 
 
         }).catch((err) => {
-
+            console.log('chat/unreaddm Error catched - ', err)
         });
 
         console.log('getUnreadDm done');
@@ -137,28 +138,31 @@ export default function DmMessageBlock({dmOpenId, dmOpenNickname, messageAreaRef
     };
 
 
+
     useEffect(() => {
 
-        getNewDm(dmOpenId
+        const dmListener = (data :any) => {
+            // dmOpenId 이슈가 존재한다.
+            if (data.from_id === dmOpenIdRef.current || data.from_id === user_id)
+            {
+                const newMessage = renderMessage(data);
+                
+                setDmList(prevMessages => [...prevMessages, newMessage]);
+                
+                setScrollTop(false);
+                handleRenderDmBlock();
+            }
+            else
+            {
+                console.log('dm message to different id');
+                // 아무 것도 안하기
+            }
+        }
+
+        getNewDm(dmOpenIdRef.current
         ).then((res) => {
 
-            socket.on('dm', (data:any) => {
-                if (data.from_id === dmOpenId || data.from_id === user_id)
-                {
-                    const newMessage = renderMessage(data);
-                    
-                    setDmList(prevMessages => [...prevMessages, newMessage]);
-                    
-                    setScrollTop(false);
-                    handleRenderDmBlock();
-                }
-                else
-                {
-                    console.log('dm message to different id');
-                    // 아무 것도 안하기
-                }
-            });
-
+            socket.on('dm', dmListener);
 
         }).catch((err) => {
 
@@ -166,11 +170,15 @@ export default function DmMessageBlock({dmOpenId, dmOpenNickname, messageAreaRef
 
         return () => {
             console.log('dm block unmounted');
-            socket.off("dm");
+            socket.off('dm', dmListener);
         }
 
     }, [socket]);
 
+    // dmOpenId 의존성 필요해짐
+    useEffect(() => {
+        dmOpenIdRef.current = dmOpenId;
+    }, [dmOpenId]);
 
 
     useEffect(() => {
@@ -200,7 +208,7 @@ export default function DmMessageBlock({dmOpenId, dmOpenNickname, messageAreaRef
 
     useEffect(() => {
         console.log('get dms for new target');
-        getNewDm(dmOpenId);
+        getNewDm(dmOpenIdRef.current);
     }, [dmBlockTriggerRender])
 
 
@@ -232,7 +240,7 @@ export default function DmMessageBlock({dmOpenId, dmOpenNickname, messageAreaRef
             await axiosToken.get(`${process.env.NEXT_PUBLIC_API_URL}chat/dm`, {
                 params: {
                     id: user_id,
-                    from_id: dmOpenId,
+                    from_id: dmOpenIdRef.current,
                     idx: lastIdx - 1
                 },
                 headers: {
@@ -279,13 +287,13 @@ export default function DmMessageBlock({dmOpenId, dmOpenNickname, messageAreaRef
                 }
     
             }).catch((err) => {
-                console.log('is it err in dm get?');
+                console.log('getMoreDm error catched - ', err);
             });
         }
 
         getMoreDm().then((res) => {
             
-            console.log('getOOOLDdm done');
+            console.log('getMoreDm done');
         });
 
         // handleRenderAppend();
@@ -330,7 +338,7 @@ export default function DmMessageBlock({dmOpenId, dmOpenNickname, messageAreaRef
         
         var target_name :string;
 
-        if (message.from_id === dmOpenId)
+        if (message.from_id === dmOpenIdRef.current)
             target_name = dmOpenNickname;
         else
             target_name = nick_name;

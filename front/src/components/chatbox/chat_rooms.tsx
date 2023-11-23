@@ -70,20 +70,22 @@ const MainChatRoomList = styled(Grid) ({
 		}) 
 		.then((res) => {
 			console.log(res.data);
-		if (res.data.rooms.length !== 0)
-		{
-			// 방 목록 배열, 순차 저장
-			res.data.rooms.map((room :any) => {
-				setRoomList(prevRoomList => [...prevRoomList, room]);
-			})
-			console.log('room list for chat_rooms - ', roomList);
-		}
-		else
-		{
-			// 방이 없음 메시지
-			console.log('no rooms for chat_rooms');
-		}
-		})
+			if (res.data.rooms.length !== 0)
+			{
+				// 방 목록 배열, 순차 저장
+				res.data.rooms.map((room :any) => {
+					setRoomList(prevRoomList => [...prevRoomList, room]);
+				})
+				console.log('room list for chat_rooms - ', roomList);
+			}
+			else
+			{
+				// 방이 없음 메시지
+				console.log('no rooms for chat_rooms');
+			}
+		}).catch((err) => {
+			console.log('handle room list error');
+		});
 	}
 
 	// 분리 성공하면 ispassword 제거할 것
@@ -132,15 +134,22 @@ const MainChatRoomList = styled(Grid) ({
 	}
 
 	useEffect(() => {
-		socket.on(`render-chat`, (data) => {
-			console.log('render-chat', data);
-			handleRender();
 
-		})
+		const doRenderChatRooms = (data :any) => {
+			handleRender();
+		}
+
+		socket.on('render-chat', doRenderChatRooms)
+
+		return () => {
+			socket.off('render-chat', doRenderChatRooms);
+		}
+
 	}, [socket]);
 
 	useEffect(() => {
 
+		console.log('do handleRoomList');
 		handleRoomList();
 		// 다시 가져오는 신호는?
 		// handleRenderList(false);

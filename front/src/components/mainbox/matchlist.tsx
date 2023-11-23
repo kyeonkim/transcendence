@@ -65,7 +65,7 @@ export default function MatchList(props: any) {
     marginRight: '70px',
     marginTop: '50px',
     borderRadius: '20px',
-    border: '5px solid #000',
+    border: '5px solid rgba(135, 207, 235, 0.2);',
     overflowY: 'scroll',
     scrollbarWidth: 'none',
     '&::-webkit-scrollbar': {

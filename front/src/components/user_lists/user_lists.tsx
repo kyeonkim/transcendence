@@ -65,9 +65,8 @@ export default function BasicTabs({ setMTbox }: SearchUserProps) {
 	const [AlarmList, setAlarmList] = useState<any>([]);
 	const [dmOpenId, setDmOpenId] = useState(-1);
 	const [dmOpenNickname, setDmOpenNickname] = useState('');
-	const [dmAlarmCount, setDmAlarmCount] = useState(false);
-	const [dmAlarmCountList, setDmAlarmCountList] = useState<any>([]);
-	const [dmText, setDmText] = useState('');
+	const [dmAlarmCount, setDmAlarmCount] = useState(0);
+	const [dmAlarmList, setDmAlarmList] = useState([]);
 	const cookies = useCookies();
 	const socket = useChatSocket();
 	const tabsRef = useRef(null);
@@ -77,6 +76,42 @@ export default function BasicTabs({ setMTbox }: SearchUserProps) {
 	const handleChange = (event: React.SyntheticEvent, newValue: number) => {
 		setValue(newValue);
 	};
+
+	const handleDmAlarmCount = (user_id :number, is_add :boolean) => {
+
+		if (is_add === true)
+		{
+			console.log('handleDmAlarmCount - add to list', user_id, is_add);
+			dmAlarmList.map((user :any) => {
+				if (user === user_id)
+				{
+					return ;
+				}
+			})
+
+			setDmAlarmList((prevDmAlarmList :any) => [...prevDmAlarmList, user_id]);
+		}
+		else
+		{
+			console.log('handleDmAlarmCount - delete from list', user_id, is_add);
+			var tmp_list :any = [];
+
+			dmAlarmList.map((user :any) => {
+				if (user !== user_id)
+				{
+					tmp_list.push(user_id);
+				}
+			})
+
+			setDmAlarmList(tmp_list);
+		}
+
+	}
+
+	useEffect(() => {
+		console.log('dmAlarmList - ', dmAlarmList);
+	}, [dmAlarmList]);
+	
 
 	const setAlarmCountHandler = (increment :boolean) => {
 		if (increment === true)
@@ -108,15 +143,6 @@ export default function BasicTabs({ setMTbox }: SearchUserProps) {
 		setAlarmList(newAlarmList);
 	}; 
 
-	// alarm안에 idx 있을 것.
-	const dmAlarmRemover = (alarm :any) => {
-
-		const newDmAlarmList = dmAlarmCountList.filter(
-			(dmAlarmList :any) => dmAlarmList.idx != alarm.idx
-		);
-
-		setDmAlarmCountList(newDmAlarmList);
-	}
 
 	const fetchAlarms = async () => {
 		await axiosToken.get(`${process.env.NEXT_PUBLIC_API_URL}event/getalarms/${cookies.get('user_id')}`,{
@@ -140,12 +166,14 @@ export default function BasicTabs({ setMTbox }: SearchUserProps) {
 
 		sseEvents.onmessage = function (stream) {
 			const parsedData = JSON.parse(stream.data);
+			
+			console.log('sseEvents occured!! - ', parsedData );
 
 			setAlarmCountHandler(true);
 			setAlarmListAdd(parsedData);
 		}
 
-		socket.emit('status', { user_id: cookies.get('user_id'), status: 'online' });
+		socket.emit('status', { user_id: Number(cookies.get('user_id')), status: 'online' });
 
 		return () => {
 			sseEvents.close();
@@ -177,7 +205,7 @@ export default function BasicTabs({ setMTbox }: SearchUserProps) {
 				<Paper elevation={6}>
 				<Tabs value={value} ref={tabsRef} onChange={handleChange} centered aria-label="basic tabs example">
 					<Tab icon={
-						<Badge color="error" badgeContent={dmAlarmCount ? '!' : 0}>
+						<Badge color="error" badgeContent={dmAlarmList.length ? "!" : 0}>
 						<GroupIcon/>
 						</Badge>
 						} {...a11yProps(0)} />
@@ -191,12 +219,9 @@ export default function BasicTabs({ setMTbox }: SearchUserProps) {
 			</Box>
 			<CustomTabPanel value={value} index={0}>
 				<FriendListPanel
-					dmAlarmCount={dmAlarmCount}
-					dmAlarmCountList={dmAlarmCountList}
-					dmAlarmRemover={dmAlarmRemover}
 					dmOpenId={dmOpenId}
 					dmOpenNickname={dmOpenNickname}
-					dmText={dmText}
+					handleDmAlarmCount={handleDmAlarmCount}
 					handleChatTarget={handleChatTarget}
 					setMTbox={setMTbox}
 					list={friendList}

@@ -1,26 +1,26 @@
 .mainContainer {
-	margin: 400 800px;
-	height: 100vh;
-	display: flex;
-	flex-direction: column;
-  }
+  margin: 400 800px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
 
-  .bottomHalfContainer {
-	display: flex;
-	flex: 1;
-  }
-  
-  .leftHalfComponent {
-	flex: 0.4;
-	/* background-color: #6495ed; */
-  }
-  
-  .rightHalfComponent {
-	flex: 1;
-	/* background-color: #32cd32; */
-  }
-  
-  .topComponent {
+.bottomHalfContainer {
+  display: flex;
+  flex: 1;
+}
+
+.leftHalfComponent {
+  flex: 0.4;
+  /* background-color: #6495ed; */
+}
+
+.rightHalfComponent {
+  flex: 1;
+  /* background-color: #32cd32; */
+}
+
+.topComponent {
   height: 30%;
   max-height: 350px;
   margin-top: 25px;
@@ -30,8 +30,9 @@
   flex-direction: column;
   justify-content: space-around;
   padding: 10px;
-  background-color:rgba(135, 206, 235, 0.2);
-  border-radius: 20px; /* 모서리 둥글기 설정 */
+  background-color: rgba(135, 206, 235, 0.2);
+  border: 5px solid rgba(135, 207, 235, 0.2);
+  border-radius: 20px;
 }
 
 .imageContainer {
