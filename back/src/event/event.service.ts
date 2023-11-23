@@ -114,6 +114,7 @@ export class EventService {
         if (this.AlarmSseMap.get(event.to) === undefined)
             return {status: true, message: 'no client'};
         this.AlarmSseMap.get(event.to).next({data: alarm});
+        console.log('SendEvent: ', alarm);
         return {status: true, message: 'success'};
     }
 }

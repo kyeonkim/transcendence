@@ -144,10 +144,11 @@ export class SocketService {
     {
         const dm = await this.prismaService.message.findMany({
             where: {
-                to_id: user_id,
+                to_id: Number(user_id),
                 is_read: false,
             },
         });
+        console.log("GetDm: ", dm);
         dm.forEach((element) => {
             server.to(String(user_id)).emit('dm', element);
         });

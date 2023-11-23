@@ -6,6 +6,8 @@ import { AuthService } from 'src/auth/auth.service';
 import { SocketService } from './socket.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { instrument } from "@socket.io/admin-ui";
+import { GameRoom } from 'src/game/game.service';
+import { SocketGameService } from 'src/socket/socket.gameservice';
 
 //cors origin * is for development only
 // @UseGuards(AuthGuard('jwt-ws'))
@@ -17,6 +19,7 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
     private readonly authService: AuthService,
     private readonly SocketService: SocketService,
     private readonly prismaService: PrismaService,
+    private readonly SocketGameService: SocketGameService,
   ) {}
   @WebSocketServer() server: Server;
 
@@ -30,6 +33,8 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
         auth: false,
         mode: "development",
     });
+
+    // this.SocketGameService.setServer(server);
   }
 
   async handleConnection(client: Socket, ...args: any[]) {
@@ -58,6 +63,7 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
     {
       console.log('\n\nClient disconnected=============\n', client.handshake.query.user_id ,client.id)
       this.SocketService.Disconnect(client.handshake.query.user_id, client.id);
+      // this.GameService.LeaveGameRoom(Number(client.handshake.query.user_id));
       // console.log(this.server.sockets.sockets,"\n");
     }
     // console.log('Client disconnected');
@@ -98,6 +104,7 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
   async SendRerenderAll(event: string, payload?: any)
   {
     const rtn = this.server.emit(`render-${event}`, { data: payload ? payload : new Date().valueOf() });
+    console.log(rtn);
   }
   
   @SubscribeMessage('chat')
@@ -139,5 +146,12 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
   async GetDM(Client: Socket, payload: any)
   {
     await this.SocketService.GetDm(payload.user_id, this.server);
+  }
+
+  async SendReRenderGameRoom(room:GameRoom, user1_id: number, user2_id: number = null)
+  {
+    this.server.to(String(user1_id)).emit(`render-gameroom`, {room: room});
+    if (user2_id !== null)
+      this.server.to(String(user2_id)).emit(`render-gameroom`, {room: room});
   }
 }

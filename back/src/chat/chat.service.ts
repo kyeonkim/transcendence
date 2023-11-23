@@ -178,6 +178,7 @@ export class ChatService {
                 },
             });
             await this.prismaService.chatroom.delete({ where: { idx: data.room_id } });
+            await this.socketService.SendRerenderAll("chat");
         }
         return {status: true, message: 'success'};
         // const users = room.roomusers;

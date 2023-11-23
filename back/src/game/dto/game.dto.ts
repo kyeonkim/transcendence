@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsBoolean, IsNumber } from "class-validator";
+import { IsBoolean, IsNumber, IsOptional, IsString } from "class-validator";
 
 export class gameDataDto
 {
@@ -22,4 +22,38 @@ export class gameDataDto
     @ApiProperty()
     @IsNumber()
     enemy_score: number;
+}
+
+export class gameRoomDto
+{
+    @ApiProperty()
+    @IsNumber()
+    user1_id: number;
+
+    @ApiProperty()
+    @IsString()
+    @IsOptional()
+    user1_nickname?: string;
+
+    @ApiProperty()
+    @IsNumber()
+    @IsOptional()
+    user2_id: number;
+
+    @ApiProperty()
+    @IsString()
+    @IsOptional()
+    user2_nickname?: string;
+
+    @ApiProperty()
+    @IsNumber()
+    @IsOptional()
+    event_id: number;
+}
+
+export class leaveGameRoomDto
+{
+    @ApiProperty()
+    @IsNumber()
+    user_id: number;
 }
