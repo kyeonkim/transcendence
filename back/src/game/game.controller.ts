@@ -1,6 +1,6 @@
 import { Body, Controller, Get, UseGuards, ParseIntPipe, Post, Query, Patch } from '@nestjs/common';
 import { ApiOperation, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
-import { gameDataDto, gameRoomDto, leaveGameRoomDto } from './dto/game.dto';
+import { gameDataDto, gameRoomDto, leaveGameRoomDto, readyGameDto, startGameDto } from './dto/game.dto';
 import { GameService } from './game.service';
 import { AuthGuard } from '@nestjs/passport';
 import { eventDto } from 'src/event/dto/event.dto';
@@ -68,6 +68,24 @@ export class GameController {
     async JoinRoom(@Body() data: gameRoomDto)
     {
         const room = await this.GameService.JoinGameRoom(data.user1_id, data.user2_id, data.event_id);
+        console.log(room);
+        return room;
+    }
+
+    @ApiOperation({summary: `게임 준비 API`, description: `게임을 준비한다.`})
+    @Patch("ready")
+    async Ready(@Body() data: readyGameDto)
+    {
+        const room = await this.GameService.Ready(data.user_id, data.ready);
+        console.log(room);
+        return room;
+    }
+
+    @ApiOperation({summary: `게임 시작 API`, description: `게임을 시작한다.`})
+    @Post("start")
+    async Start(@Body() data: startGameDto)
+    {
+        const room = await this.GameService.Start(data.user_id);
         console.log(room);
         return room;
     }

@@ -57,3 +57,21 @@ export class leaveGameRoomDto
     @IsNumber()
     user_id: number;
 }
+
+export class readyGameDto
+{
+    @ApiProperty()
+    @IsNumber()
+    user_id: number;
+
+    @ApiProperty()
+    @IsBoolean()
+    ready: boolean;
+}
+
+export class startGameDto
+{
+    @ApiProperty()
+    @IsNumber()
+    user_id: number;
+}

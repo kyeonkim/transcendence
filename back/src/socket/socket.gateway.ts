@@ -34,7 +34,7 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
         mode: "development",
     });
 
-    // this.SocketGameService.setServer(server);
+    this.SocketGameService.setServer(server);
   }
 
   async handleConnection(client: Socket, ...args: any[]) {
@@ -154,5 +154,11 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
     console.log(this.server.to(String(user1_id)).emit(`render-gameroom`, {room: room}));
     if (user2_id !== null)
       console.log(this.server.to(String(user2_id)).emit(`render-gameroom`, {room: room}));
+  }
+
+  async SendDMTest(from_id: number, to_id: number, message: string)
+  {
+    console.log("=====SendDM Test======", from_id, to_id, message);
+    await this.SocketService.SendDm(from_id, to_id, message, this.server);
   }
 }
