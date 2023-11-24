@@ -122,8 +122,7 @@ export default function Chat(props: any) {
 	  ];
 	return (
 		<div>
-			<Box sx={{ flexGrow: 1 }}>
-			<AppBar position="static">
+			<AppBar position="absolute" sx={{borderRadius: '10px'}}>
 				<Toolbar>
 				<IconButton
 					size="large"
@@ -131,7 +130,7 @@ export default function Chat(props: any) {
 					color="inherit"
 					aria-label="close"
 					sx={{ mr: 2 }}
-					onClick={handleExit}
+					onClick={handleExit}	
 				>
 					<CloseIcon />
 				</IconButton>
@@ -150,7 +149,6 @@ export default function Chat(props: any) {
 				</IconButton>
 				</Toolbar>
 			</AppBar>
-			</Box>
 			<Drawer anchor='right' open={drawer} onClose={handleDrawerClose}>
 				<IconButton edge="start"onClick={handleDrawerClose}>
 					<ChevronRightIcon />
@@ -169,7 +167,12 @@ export default function Chat(props: any) {
 					setMTbox={setMTbox}
 				/>
 			</Drawer>
-			<Grid container component={Paper}>
+			<Grid container component={Paper} sx={{
+				position: 'absolute',
+				top: '5.4%',
+				height: '95%',
+				borderRadius: '10px',
+				maxWidth: '100%'}}>
 				<List className={styles.messageArea} ref={messageAreaRef}>
 					<TextSend
 						my_name={my_name}
@@ -178,13 +181,18 @@ export default function Chat(props: any) {
 						scrollref={messageAreaRef}
 					/>
 				</List>
-				<Divider />
-				<Grid container style={{ padding: "20px" }}>
-					<Grid item xs={11}>
+			</Grid>
+				<Grid item style={{ padding: "20px" }}>
 						<TextField
+							sx={{
+								position: 'absolute',
+								bottom: 20,
+								right: 70,
+								width: '80%',
+
+							}}
 							id="outlined-basic-email"
 							label="Input message"
-							fullWidth 
 							value={message}
 							onChange={(e) => setMessage(e.target.value)}
 							inputProps={{ maxLength: 50 }}
@@ -194,7 +202,6 @@ export default function Chat(props: any) {
 									handleSendMessage();
 								}}}
 						/>
-					</Grid>
 					<Grid item xs={1}>
 						<SpeedDial
 							ariaLabel="SpeedDial controlled open example"
@@ -214,7 +221,6 @@ export default function Chat(props: any) {
 							))}
 						</SpeedDial>
 					</Grid>
-				</Grid>
 			</Grid>
 			<Dialog
 				open={dialogOpen}

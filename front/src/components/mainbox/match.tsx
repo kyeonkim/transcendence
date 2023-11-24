@@ -7,6 +7,7 @@ import React, { use, useEffect, useState } from 'react';
 import MatchHome from '@/components/matching/matchHome';
 import GameRoom from '../matching/gameroom';
 import RankMatch from '../matching/rankmatch';
+import Pong from '../game/pong'
 import { Grid } from '@mui/material';
 import { useChatSocket } from '@/app/main_frame/socket_provider';
 
@@ -19,7 +20,11 @@ export default function Matching() {
 	useEffect(() => {
 		socket.on('render-gameroom', (data: any) => {
 			console.log("game room render data===", data); /*{user1_id, user2_id, user1_ready, user2_ready}*/
-				setData(data);
+			if (data.room.user1_id === null && data.room.user2_id === null)
+				setRender(0);
+			else
+				setRender(2);	
+			setData(data);
 		});
 		// return () => {
 		// 	socket.off('reder-gameroom');
@@ -32,6 +37,12 @@ export default function Matching() {
 			return <RankMatch/>
 		else if (render === 2)
 			return <GameRoom setRender={setRender} userData={data}/>
+		else if (render === 3)
+		{
+			return <div></div>;
+			{/* return <Pong setRender={setRender} /> */}
+		}
+
 		else
 			return <MatchHome setRender={setRender}/>
 	}

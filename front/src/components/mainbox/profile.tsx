@@ -8,7 +8,7 @@ import { useState, useEffect } from 'react';
 import { useCookies } from 'next-client-cookies';
 import OtpModal from '../profile/otp';
 import TwoFAPass from '@/app/login/twoFAPass';
-import { Unstable_Grid2 } from '@mui/material';
+import { Avatar, Grid, Typography, Unstable_Grid2 } from '@mui/material';
 import { useChatSocket } from "../../app/main_frame/socket_provider"
 import { axiosToken } from '@/util/token';
 
@@ -183,15 +183,13 @@ const ProfilePage = (props: any) => {
   }
 
   return (  
-    <div className={styles.mainContainer}>
-      <div className={styles.topComponent}>
-      <div className={styles.imageContainer}>
-          <Image loader={imageLoader} src={`${userNickname}`} alt="User Image" className={styles.userImage} width={0} height={0} /> 
+    <div>
+      <Grid container className={styles.profileBox}>
+        <Image loader={imageLoader} src={`${userNickname}`} alt="User Image" className={styles.userImage} width={0} height={0} />
           <div className={styles.userName}>
             {userNickname !== my_nick ? `${userNickname}` : my_nick}
           </div>
           {userNickname !==  my_nick ? ( 
-            <div className={styles.imageContent}>
               <div className={styles.buttons}>
                 {isFriend? (
                   <Button variant="outlined" className={styles.roundButton} onClick={() => handleFriend()}>
@@ -212,7 +210,6 @@ const ProfilePage = (props: any) => {
                   </Button>
                   )}
               </div>
-            </div>
           ) : (
             <div className={styles.imageContent}>
               <div className={styles.buttons}>
@@ -238,13 +235,74 @@ const ProfilePage = (props: any) => {
               {/* <TwoFAPass/> */}
             </div>
           )}
-        </div>
-      </div>
-      <div className={styles.bottomHalfContainer}>
+      </Grid>
+        <Grid container className={styles.matchlistBox}>
           <Matchlist id={userNickname} />
-      </div>
+        </Grid>
     </div>
   );
 }
 
 export default ProfilePage;
+
+    // <div className={styles.mainContainer}>
+    //   <div className={styles.topComponent}>
+    //   <div className={styles.imageContainer}>
+    //       <Image loader={imageLoader} src={`${userNickname}`} alt="User Image" className={styles.userImage} width={0} height={0} /> 
+    //       <div className={styles.userName}>
+    //         {userNickname !== my_nick ? `${userNickname}` : my_nick}
+    //       </div>
+      //     {userNickname !==  my_nick ? ( 
+      //       <div className={styles.imageContent}>
+      //         <div className={styles.buttons}>
+      //           {isFriend? (
+      //             <Button variant="outlined" className={styles.roundButton} onClick={() => handleFriend()}>
+      //               친구삭제
+      //             </Button>
+      //             ) : (
+      //             <Button variant="outlined" className={styles.roundButton} onClick={() => handleFriend()}>
+      //               친구추가
+      //             </Button>
+      //             )}
+      //           {isBlock? (
+      //             <Button variant="outlined" className={styles.roundButton} onClick={() => handleBlock()}>
+      //               차단해제
+      //             </Button>
+      //             ) : (
+      //             <Button variant="outlined" className={styles.roundButton} onClick={() => handleBlock()}>
+      //               차단
+      //             </Button>
+      //             )}
+      //         </div>
+      //       </div>
+      //     ) : (
+      //       <div className={styles.imageContent}>
+      //         <div className={styles.buttons}>
+      //           <Button variant="outlined" className={styles.roundButton}>
+      //             프로필 수정
+      //           </Button>
+      //           <Button variant="outlined" className={styles.roundButton} onClick={() => handleOTP()}>
+      //             {isActivated? '2차인증 비활성화' : '2차인증 활성화'}
+      //           </Button>
+      //           <Button variant="outlined" className={styles.roundButton}>
+      //             로그아웃
+      //           </Button>
+      //         </div>
+      //         <OtpModal
+      //           open={isOTP}
+      //           isActivated={isActivated}
+      //           setActive={handleActivte}
+      //           onClose={handleClose}
+      //           myId={my_id}
+      //           myNick={my_nick}
+      //           token={cookies.get('access_token')}
+      //           />
+      //         {/* <TwoFAPass/> */}
+      //       </div>
+      //     )}
+      //   </div>
+      // </div>
+    //   <div className={styles.bottomHalfContainer}>
+    //       <Matchlist id={userNickname} />
+    //   </div>
+    // </div>

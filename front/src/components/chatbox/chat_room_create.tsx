@@ -27,6 +27,7 @@ import { styled } from '@mui/system';
 import { axiosToken } from '@/util/token';
 
 import { genSaltSync, hashSync } from "bcrypt-ts";
+import { Typography } from '@mui/material';
 
 const CreateRoomAppBar = styled(AppBar) ({
 	backgroundColor: "white",
@@ -36,12 +37,10 @@ const CreateRoomAppBar = styled(AppBar) ({
 
 const MainChatRoomCreate = styled(Box) ({
 	position: 'absolute',
-	top: 65,
-	left: 0,
-	width: 560,
-	height: 1332,
+	top: '5.4%',
+	width: "100%",
+	height: "30%",
 	backgroundColor: 'white',
-	opacity: 0.7,
 	borderRadius: '10px', // 옵션: 모서리를 둥글게 설정
   });
 
@@ -120,22 +119,19 @@ export default function ChatRoomCreate(props: any) {
 	// modal 형태 고려 - 우선순위 낮음
 	return (
 		<div>
-            <CreateRoomAppBar position="static">
+            <AppBar position="absolute" sx={{borderRadius: '10px'}}>
 				<Toolbar>
-                    <Button sx={{ background: "white", color: "black"}} variant='contained' onClick={handleCancel}>
-                        취소
-                    </Button>
-					<Button sx={{ background: "white", color: "black", left: 375}} variant='contained' onClick={handleDone}>
-                        완료
-                	</Button>
+					<Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+					채팅방 생성
+					</Typography>
 				</Toolbar>
-			</CreateRoomAppBar>
+			</AppBar>
 			<MainChatRoomCreate>
 				<TextField
 					sx={{
-						left:30,
-						top:30,
-						width:400
+						left:'5%',
+						top:'10%',
+						width: '80%',
 					}}
 					id="chatroom_name_text_field"
 					label="Chatroom Name"
@@ -149,9 +145,9 @@ export default function ChatRoomCreate(props: any) {
 				/>
 				<TextField
 					sx={{
-						left:30,
-						top:60,
-						width:400
+						left:'5%',
+						top:'20%',
+						width:'80%'
 					}}
 					id="password_text_field"
 					label="password"
@@ -165,15 +161,56 @@ export default function ChatRoomCreate(props: any) {
 					/>
 				<FormControlLabel
 					sx={{
-						left:100,
-						top:100,
-						width:400
+						position: 'relative',
+						left:'5%',
+						top:'20%',
 					}}
-					control={<Switch checked={roomPrivate} onChange={handleRoomPrivate}/>} label="Private" labelPlacement='end'
-					style={{ marginLeft: '20px', marginTop: '90px' }}
-					/>
+					control={<Switch checked={roomPrivate}
+					onChange={handleRoomPrivate}/>}
+					label="Private"
+					labelPlacement='start'
+				/>
+				<Button
+				sx={{
+					position: 'absolute',
+					top: '80%',
+					left: '65%',
+					background: "white",
+					color: "black",
+				}}
+				variant='contained'
+				color='error'
+				onClick={handleCancel}
+				>
+				취소
+				</Button>
+				<Button
+				sx={{
+					position: 'absolute',
+					top: '80%',
+					left: '80%',
+					background: "white",
+					color: "black",
+					marginLeft: "10px",
+				}}
+				variant='contained'
+				color='success'
+				onClick={handleDone}
+				>
+				완료
+				</Button>
 				{nameError ? (
-						<Alert severity="error">채팅방 이름이 없습니다. 입력해주세요! </Alert>
+						<Alert
+							severity="error"
+							sx={{
+								position: 'absolute',
+								top: '63%',
+								left: '5%',
+								width: '80%',
+							}}
+						>
+							채팅방 이름이 없습니다. 입력해주세요!
+						</Alert>
 					) : (
 						<div></div>
 					)}

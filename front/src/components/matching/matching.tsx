@@ -6,10 +6,12 @@ import { styled } from '@mui/system';
 const MainMatchingButton = styled(Button) ({
   backgroundColor: '#4fca35',
   position: 'absolute',
-  top: 70,
-  left: 50,
-  width: 300,
-  height: 170,
+  alignItems: 'center',
+  textAlign: 'center',
+  top: '35%',
+  left: '12.5%',
+  width: '75%',
+  height: '20%',
   color: "black",
   borderRadius: '100%',
 });

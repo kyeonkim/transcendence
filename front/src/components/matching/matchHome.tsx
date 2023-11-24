@@ -1,19 +1,38 @@
 import { Grid, Button, Typography} from "@mui/material";
 import styles from './match.module.css';
-import { Margin } from "@mui/icons-material";
+import { axiosToken } from "@/util/token";
+import { useCookies } from "next-client-cookies";
+import { useEffect } from "react";
 
 export default function MatchHome(props: any) {
 	const { setRender } = props;
+	const cookies = useCookies();
 
-
-	const handleRankClick = () => {
-		console.log("랭크 매칭 클릭");
-		setRender(1);
+	const createRoom = async() => {
+		await axiosToken.post(`${process.env.NEXT_PUBLIC_API_URL}game/createroom`, {
+				user1_id: Number(cookies.get('user_id')),
+			},
+			{
+				headers: {
+					'Authorization': `Bearer ${cookies.get('access_token')}`
+				}
+			})
+			.then((res) => {
+				console.log("create room reesponse===", res);
+			})
+			.catch((err) => {
+				console.log("create room error===", err);
+			})
 	}
 
 	const handleInviteClick = () => {
 		console.log("초대하기 클릭");
-		setRender(2);
+		createRoom();
+	}
+
+	const handleRankClick = () => {
+		console.log("랭크 매칭 클릭");
+		setRender(1);
 	}
 
 	return (
@@ -28,7 +47,7 @@ export default function MatchHome(props: any) {
 			</Grid>
 			<Grid item sx={{marginTop: '20px'}}>
 				<Button className={styles.homeButton}variant="contained" onClick={handleInviteClick}>
-					초대하기
+					방 만들기
 				</Button>
 			</Grid>
 		</Grid>

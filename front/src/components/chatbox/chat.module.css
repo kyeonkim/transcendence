@@ -15,9 +15,16 @@
 	border-right: 1px solid #e0e0e0
 }
 
+.messageBox {
+	background-color: #e0e0e0;
+	top: 100%;
+	width: 93.5%;
+}
+
 .messageArea {
-	width: 550px;
-	height: 1170px;
+	position: absolute;
+	height: 90%;
+	width: 100%;
 	overflow-y: auto;
 }
 

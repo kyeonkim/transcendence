@@ -17,12 +17,14 @@ import Modal from '@mui/material/Modal';
 import LockIcon from '@mui/icons-material/Lock';
 
 import { styled } from '@mui/system';
+import { Paper } from '@mui/material';
 
 const ChatRoom = styled(Card) ({
-	// width: 400,
-	height: 200,
+    position: 'absolute',
+    height: '20%',
+    width: '100%',
 	backgroundColor: 'white',
-	opacity: 0.7
+    border: '2px solid #000',
 });
 
 const modalStyle = {
@@ -81,21 +83,26 @@ export default function ChatRoomBlock({room, openModal, setOpenModal, selectedId
 
 
     return (
-        <Grid key={room.idx} item xs={12}>
-        <CardContent>
-            <ChatRoom>
-                <Typography sx={{marginLeft: 2, marginTop: 2}} variant='h4' gutterBottom>
-                    {room.name}
-                </Typography>
-                <Typography sx={{marginLeft: 2}} gutterBottom>
-                    {room.owner_nickname}의 방
-                </Typography>
-                <Box style={{width: 450, height: 30, textAlign:'right'}}>
-                    {room.ispassword ? ( <LockIcon style={{fontSize: 40}}/>) : ( <p></p> )}		
-                </Box>
-                <CardActions>
-                    <Button sx={{left: 10} }size="small" variant="contained" onClick={() => handlePasswordModal(room.is_password, room.idx)}>Join</Button>
-                </CardActions>
+        <Grid key={room.idx}>
+        <CardContent 
+        sx={{
+            position: 'absolute',
+            height: '10%',
+            width: '100%',
+        }}>
+        <ChatRoom>
+            <Typography sx={{marginLeft: 2, marginTop: 2}} variant='h4' gutterBottom>
+                {room.name}
+            </Typography>
+            <Typography sx={{marginLeft: 2}} gutterBottom>
+                {room.owner_nickname}의 방
+            </Typography>
+            <Box style={{width: 450, height: 30, textAlign:'right'}}>
+                {room.ispassword ? ( <LockIcon style={{fontSize: 40}}/>) : ( <p></p> )}		
+            </Box>
+            <CardActions>
+                <Button sx={{ position: 'absolute', }}size="small" variant="contained" onClick={() => handlePasswordModal(room.is_password, room.idx)}>Join</Button>
+            </CardActions>
             </ChatRoom>
         </CardContent>
         <Modal

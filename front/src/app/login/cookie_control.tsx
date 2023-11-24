@@ -92,8 +92,6 @@ export default function CookieControl ({res}: {res: any}) {
     return (
         <div>
             <Particles options={particlesOptions as ISourceOptions} init={particlesInit} />
-            <div></div>
-            {/* {otp && <otpModal />} */}
         </div>
       );
 }

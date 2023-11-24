@@ -21,6 +21,8 @@ import { useCookies } from 'next-client-cookies';
 import { useChatSocket } from "../../app/main_frame/socket_provider"
 import { useFriendList } from './friend_status';
 import { useChatBlockContext } from '@/app/main_frame/shared_state';
+import { Grid } from '@mui/material';	
+import styles from '@/app/main_frame/frame.module.css';
 
 interface TabPanelProps {
 	children?: React.ReactNode;
@@ -200,7 +202,7 @@ export default function BasicTabs({ setMTbox }: SearchUserProps) {
 	};
 
 	return (
-		<Box sx={{ width: '100%'}}>
+		<Grid className={styles.userlist}>
 			<Box sx={{ borderBottom: 1, borderColor: 'divider'}}>
 				<Paper elevation={6}>
 				<Tabs value={value} ref={tabsRef} onChange={handleChange} centered aria-label="basic tabs example">
@@ -229,12 +231,6 @@ export default function BasicTabs({ setMTbox }: SearchUserProps) {
 					tapref={tabsRef}
 				/>
 			</CustomTabPanel>
-			{/* <CustomTabPanel value={value} index={1}>
-				Channel list
-			</CustomTabPanel>
-			<CustomTabPanel value={value} index={2}>
-				User list
-			</CustomTabPanel> */}
 			<CustomTabPanel value={value} index={1}>
 				<AlarmListPanal
 					alarmList={AlarmList}
@@ -242,6 +238,6 @@ export default function BasicTabs({ setMTbox }: SearchUserProps) {
 					alarmCountHandler={setAlarmCountHandler}
 					setMTbox={setMTbox}/>
 			</CustomTabPanel>
-		</Box>
+		</Grid>
 	);
 }

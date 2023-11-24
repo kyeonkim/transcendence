@@ -13,22 +13,25 @@ import Skeleton from '@mui/material/Skeleton';
 import { styled } from '@mui/system';
 import { axiosToken } from '@/util/token';
 import { useCookies } from 'next-client-cookies';
+import { Background } from 'tsparticles-engine';
 
-const MainSearchUser = styled(TextField) ({
-  position: 'absolute',
-  top: 0,
-  left: 0,
-  width: 400,
-  height: 100,
-  color: "black"
+const MainSearchUser = styled(TextField)({
+    position: 'absolute',
+    top: '30%',
+    left: 0,
+    width: '80%',
+    height: '4.6%',
+    color: "black",
+    background: "white",
+    borderRadius: '10px',
 });
 
 const MainSearchButton = styled(Button) ({
     position: 'absolute',
-    top: 0,
-    left: 330,
-    width: 70,
-    height: 55,
+    top: '30%',
+    left: '80%',
+    width: '20%',
+    height: '4.6%',
     color: "black"
   });
 

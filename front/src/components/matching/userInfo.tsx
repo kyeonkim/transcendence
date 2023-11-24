@@ -42,7 +42,7 @@ export default function UserInfo(props: any) {
 						src={imageLoader({ src: user.nick_name })}
 						sx={{ width: 300, height: 300, marginTop: '20px'}}
 						/>
-					<Typography variant="h2">
+					<Typography variant="h2" align="center">
 						{user.nick_name}
 					</Typography>
 				</>

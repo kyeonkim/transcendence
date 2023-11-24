@@ -1,6 +1,7 @@
 
 'use client'
 import { memo, useMemo, createContext, useState, useContext } from 'react';
+import { Socket } from 'socket.io-client';
 
 interface ChatBlockState {
     chatBlockRenderMode: string;

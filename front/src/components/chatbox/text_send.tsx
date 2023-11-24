@@ -66,7 +66,7 @@ const TextSend = ({ my_name, socket, setMTbox, scrollref}: any) => {
 	const renderMessage = (message: any) => {
 		return (
 			<Grid container key={message.time}>
-				<ListItem style={{ padding: '5px', paddingBottom: '0px', marginLeft: message.from === my_name? '455px' : '0px'}}>
+				<ListItem style={{ padding: '5px', paddingBottom: '0px', marginLeft: message.from === my_name? '80%' : '0px'}}>
 					<Stack direction="row" spacing={1}>
 						<Chip
 							avatar={<Avatar src={imageLoader({src: message.from})} />}

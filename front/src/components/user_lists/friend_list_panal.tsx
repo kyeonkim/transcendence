@@ -28,6 +28,7 @@ export default function FriendListPanel(props: any) {
 	const { setMTbox, dmOpenId, dmOpenNickname, handleDmAlarmCount, handleChatTarget, list, myId, tapref} = props;
 
 	const dmOpenIdRef = useRef(dmOpenId);
+	const dmCountListRef = useRef(dmCountList);
 
 	useEffect(() => {
 		if (list && JSON.stringify(list) === JSON.stringify(apiResponse)) {
@@ -37,13 +38,32 @@ export default function FriendListPanel(props: any) {
 			console.log('friend list panel===========', list, apiResponse);
 			socket.emit('status', { user_id: myId, status: 'login' });
 			
-			// const newList = list.map((user: any) => {
-			// 	const findUser = apiResponse.find((item: any) => item.followed_user_id === user.followed_user_id);
-			// 	return findUser ? {...user, count: findUser.count} : user;
-			// });
+			// dmCountList를 순회하여 list에 없는 '인원'을 제거한다.
+			// list를 순회하여 dmCountList에 없는 '인원'을 추가한다.
 
-			
-			// List를 순회해서 인원을 복사해서 넣는다. 현재 count를 설정한다.
+			list.map((user :any) => {
+				const target = dmCountListRef.current.find((countList :any) => countList.id === user.followed_user_id) 
+				if (target === undefined)
+				{
+					// 없을 경우 인원 추가
+					console.log('add friend to dmCountList, id - ', user.followed_user_id);
+					setDmCountList((prevDmCountList :any) => [...prevDmCountList, { id: user.followed_user_id, count: 0 }]);
+				}
+			})
+
+			dmCountListRef.current.map((countList :any) => {
+				// 
+				const target = list.find((user :any) => user.followed_user_id === countList.id) 
+				if (target === undefined)
+				{
+					// 없을 경우 인원 제거
+					console.log('delete friend from dmCountList, id - ', countList.id);
+					const newCountList = dmCountListRef.current.filter((searchList :any) => {
+						return searchList.id !== countList.id
+					})
+					setDmCountList(newCountList);
+				}
+			})
 			
 
 			setApiResponse(list);
@@ -66,49 +86,38 @@ export default function FriendListPanel(props: any) {
 			console.log('dmAlarm dmOpenId - ', dmOpenIdRef.current);
 			console.log('dmAlarm data.from_id - ', data.from_id);
 
+			console.log('dmCountList - ', dmCountListRef.current);
+
 			if (dmOpenIdRef.current === Number(data.from_id))
 			{
 				console.log('pass count');
 				return ;
 			}
 
-			setApiResponse((prevState) =>
-				prevState.map((user: any) => {
-			  		if (user.followed_user_id == Number(data.from_id)) {
-						console.log('dm event from===', user);
-						handleDmAlarmCount(data.from_id, true);
-						return { ...user, count: (user.count || 0 ) + 1 };
-			  		}
-			  		return user;
-				})
-		  	);
-			
+			// dmCountList를 순회하여 count를 올린다.
+			// setDmCountList에 넣어야함.
 
-			// array search
+			// 이런 경우에 ref로 하는 방법도 있지만, handler 함수를 useCallback으로 빼고,
+			// useCallback의 의존성을 현재 ref로 사용 중인 state로 지정하는 방법도 있다.
 
-			// const resUser = dmCountList.find((element) => (element.id === data.from_id));
+			const newDmCountList = dmCountListRef.current.map((countList :any) => {
 				
+					if (countList.id === data.from_id)
+					{
+						const newCountList = {...countList}; 
+						handleDmAlarmCount(data.from_id, true);
+						
+						newCountList.count += 1;
+	
+						console.log('add count to friend dmCount to ,', newCountList.count);
+						return newCountList;
+					}
+					return countList;
+				})
+			
+			console.log('newDmCountList - ', newDmCountList);
 
-			// if (resUser === undefined)
-			// {
-			// 	// 없으면 user를 추가하고 count를 추가
-			// 	setDmCountList((prevDmCountList) => [...prevDmCountList, { id: data.from_id, count: 1 }]);
-			// }
-			// else
-			// {
-			// 	// 있으면 count를 추가
-			// 	// resUser.id
-			// 	setDmCountList((prevState) =>
-			// 			prevState.map((user: any) => {
-			// 				if (user.id == resUser.id) {
-			// 					console.log('dm event from===', user);
-			// 					handleDmAlarmCount(data.from_id, true);
-			// 					return { ...user, count: (user.count || 0 ) + 1 };
-			// 				}
-			// 				return user;
-			// 			})
-			// 		);
-			// }
+			setDmCountList(newDmCountList);
 
 		}
 
@@ -126,13 +135,11 @@ export default function FriendListPanel(props: any) {
 		dmOpenIdRef.current = dmOpenId;
 	}, [dmOpenId])
 
-	// useEffect(() => {
-	// 	console.log('apiResponse===', apiResponse);
-	// }, [apiResponse]);
-
 
 	useEffect(() => {
 		console.log('apiResponse===', apiResponse);
+		console.log('dmCountList updated');
+		dmCountListRef.current = dmCountList;
 	}, [apiResponse, dmCountList]);
 
 
@@ -163,21 +170,43 @@ export default function FriendListPanel(props: any) {
 		
 		console.log('on');
 
-		const newList = apiResponse.map((user: any) => {
-			if (user.followed_user_id === Number(from)) {
-				return { ...user, count: 0 };
+		// dmCountList를 순회하여 count를 0으로 만든다.
+
+		const newList = dmCountListRef.current.map((countList: any) => {
+			
+			if (countList.id === Number(from)) {
+				const newCountList = {...countList};
+
+				console.log('clear friend dmCount id - ', from);
+				newCountList.count = 0;
+
+				return newCountList;
 			}
-			return user;
+			return countList;
 		});
 
-		setApiResponse(newList);
+		setDmCountList(newList);
 		handleChatTarget(from, name);
 		console.log('call handleDmAlarmCount in handlerClear - ', from, name);
 		handleDmAlarmCount(from, false);
 	}
 	
-	const handleBadgeCount = (id :number) => {
+	const handleFriendDmCount = (id :number) => {
 		
+		var res :number = 0;
+
+		// some 구조 고려
+
+		dmCountList.map((countList :any) => {
+			
+			if (countList.id === id)
+			{
+				console.log('count checking id - ', id, ' + count - ', countList.count);
+				res = countList.count;
+			}
+		})
+
+		return res;
 	}
 
 	return (
@@ -205,7 +234,7 @@ export default function FriendListPanel(props: any) {
 								</div>
 							</ListItemButton>
 							<IconButton edge="end" aria-label="comments" onClick={() => {handlerClear(user.followed_user_id, user.followed_user_nickname)}}>
-								<Badge color="error" badgeContent={user.count ? user.count : 0}>
+								<Badge color="error" badgeContent={handleFriendDmCount(user.followed_user_id)}>
 									<CommentIcon/>
 								</Badge>
 							</IconButton>

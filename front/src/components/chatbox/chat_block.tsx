@@ -87,32 +87,10 @@ export default function ChatBlock(props: any) {
 	const { setMTbox } = props;
 
 	if (renderMode === 'chatList')
-	{
-		return (
-			<div>
-				<ChatRoomList
-					handleRenderMode={handleRenderMode}
-				/>
-			</div>
-
-		);
-	}
+		return <ChatRoomList handleRenderMode={handleRenderMode}/>;
 	else if (renderMode === 'newChat')
-	{
-		return (
-			<div>
-				<ChatRoomCreate handleRenderMode={handleRenderMode} />
-			</div>
-		);
-	}
+		return <ChatRoomCreate handleRenderMode={handleRenderMode} />;
 	else if (renderMode === 'chatRoom')
-	{
-		return (
-			<div>
-				<Chat setMTbox={setMTbox} handleRenderMode={handleRenderMode} roominfo={roominfo}/>
-			</div>
-		
-		);
-	}
+		return <Chat setMTbox={setMTbox} handleRenderMode={handleRenderMode} roominfo={roominfo}/>;
 }
 
