@@ -7,6 +7,7 @@ import { SocialService } from 'src/social/social.service';
 import * as fs from 'fs';
 import { join } from 'path';
 import { ChatService } from 'src/chat/chat.service';
+import { SocketGateway } from 'src/socket/socket.gateway';
 
 @Injectable()
 export class TestService {
@@ -16,6 +17,7 @@ export class TestService {
         private readonly prisma: PrismaService,
         private readonly SocialService: SocialService,
         private readonly chatService: ChatService,
+        private readonly SocketService: SocketGateway,
     ) {}
 
     async DeleteUserByNickName(nickName: string)
@@ -202,4 +204,8 @@ export class TestService {
         }
     }
     
+    async SendMessageByID(user_id: number, target_id: number, message: string)
+    {
+        this.SocketService.SendDMTest(user_id, target_id, message);
+    }
 }
