@@ -150,8 +150,9 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 
   async SendReRenderGameRoom(room:GameRoom, user1_id: number, user2_id: number = null)
   {
-    this.server.to(String(user1_id)).emit(`render-gameroom`, {room: room});
+    console.log("SendReRenderGameRoom: ", room, user1_id);
+    console.log(this.server.to(String(user1_id)).emit(`render-gameroom`, {room: room}));
     if (user2_id !== null)
-      this.server.to(String(user2_id)).emit(`render-gameroom`, {room: room});
+      console.log(this.server.to(String(user2_id)).emit(`render-gameroom`, {room: room}));
   }
 }

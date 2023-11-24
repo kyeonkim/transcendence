@@ -96,8 +96,12 @@ export class GameService {
 
     async CreateGameRoom(user_id: number)
     {
+        console.log("CreateGameRoom: ", this.gameRoomMap.get(user_id));
         if (this.gameRoomMap.get(user_id) !== undefined)
+        {
+            this.SocketGateway.SendReRenderGameRoom(this.gameRoomMap.get(user_id), user_id);
             return {status: false, message: "이미 게임방이 존재합니다."};
+        }
         this.gameRoomMap.set(user_id, new GameRoom(user_id));
         this.SocketGateway.SendReRenderGameRoom(this.gameRoomMap.get(user_id), user_id);
         return {status: true, message: "게임방 생성 성공"};
@@ -127,21 +131,22 @@ export class GameService {
             this.gameRoomMap.delete(room.user1_id);
         this.gameRoomMap.delete(room.user2_id);
         room.user2_id = null;
-        this.SocketGateway.SendReRenderGameRoom(room, user_id);
+        room.user2_ready = false;
+        this.SocketGateway.SendReRenderGameRoom(room, room.user1_id);
         return {status: true, message: "게임방 나가기 성공"};
     }
 
     async InviteGameRoom(user_id: number, target_id: number, user_nicknmae: string)
     {
+        console.log("InviteGameRoom1: ", this.gameRoomMap.get(user_id));
         if (this.gameRoomMap.get(user_id) === undefined)
             return {status: false, message: "게임방이 존재하지 않습니다."};
         const room = this.gameRoomMap.get(user_id);
         if (room.user2_id !== null)
             return {status: false, message: "이미 상대가 있습니다."};
         console.log(room);
-        room.user2_id = target_id;
-        this.gameRoomMap.set(target_id, room);
         this.eventService.SendEvent({to: target_id, type: `game`, from: user_nicknmae, chatroom_id:user_id});
+        console.log("InviteGameRoom2: ", this.gameRoomMap.get(user_id));
         return {status: true, message: "게임 초대 보내기 성공"};
     }
 

@@ -50,7 +50,7 @@ export class AuthController {
 	@Get("token/varify")
 	async VarifyToken()
 	{
-		console.log("token varify");
+		// console.log("token varify");
 		return `okay`;
 		// return this.UserService.VarifyToken(token);
 	}
@@ -61,7 +61,7 @@ export class AuthController {
 	@Post("2fa/pass")
 	async TwoFAPass(@Body() twofa: TwoFADTO)
 	{
-		console.log(`twofa/pass call`, twofa);
+		// console.log(`twofa/pass call`, twofa);
 		return await this.AuthService.TwoFAPass(twofa);
 	}
 

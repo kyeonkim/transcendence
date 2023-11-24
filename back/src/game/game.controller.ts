@@ -36,6 +36,7 @@ export class GameController {
     async CreateRoom(@Body() data: gameRoomDto)
     {
         const room = await this.GameService.CreateGameRoom(data.user1_id);
+        console.log(room);
         return room;
     }
 
@@ -56,6 +57,7 @@ export class GameController {
     async InviteRoom(@Body() data: gameRoomDto)
     {
         const room = await this.GameService.InviteGameRoom(data.user1_id, data.user2_id, data.user1_nickname);
+        console.log(room);
         return room;
     }
 

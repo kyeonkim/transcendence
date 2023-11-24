@@ -136,7 +136,7 @@ export class AuthService {
 		if (authorizedId === null)
 			return {status: false, access_token: userData.access_token};
 		const newUser = await this.userService.CreateUser( authorizedId, userData.nick_name);
-        console.log("newUser ====\n\n",newUser);
+        // console.log("newUser ====\n\n",newUser);
         if (newUser == null)
             return {status: false, message: "이미 사용 중인  이름입니다."};
         else
@@ -151,8 +151,8 @@ export class AuthService {
 		const secret = authenticator.generateSecret();
 		//otpauth:// 환경변수화 필요
 		const otpauthUrl = authenticator.keyuri(user.user_nickname, `otpauth://`, secret);
-		console.log(`secret: ${secret}`);
-		console.log("otpauthUrl: ", otpauthUrl);
+		// console.log(`secret: ${secret}`);
+		// console.log("otpauthUrl: ", otpauthUrl);
 		return {status: true, message: "success", secret: secret, otpauthUrl: otpauthUrl};
 	}
 

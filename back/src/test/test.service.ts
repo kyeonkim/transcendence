@@ -101,7 +101,7 @@ export class TestService {
             });
         }
         if (user.roomuser !== null)
-            await this.chatService.LeaveRoom({user_id: id, user_nickname: nickName, room_id: 0});
+            await this.chatService.LeaveRoom({user_id: id, user_nickname: nickName, room_id: user.roomuser.chatroom_id});
         if (user.blocks.length > 0)
             await this.prisma.block.deleteMany({ where: { user_id: id } });
         await this.prisma.user.delete({

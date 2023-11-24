@@ -98,7 +98,7 @@ export class SocketService {
 
     async JoinRoom(user_id: any, room: string, server: Server)
     {
-        console.log("JoinRoom user_id: ", user_id, " | JoinRoom: ", this.sockets.get(String(user_id)));
+        console.log("JoinRoom user_id: ", user_id, " | JoinRoom: ", this.sockets.get(String(user_id)) || "logoff");
         if(this.sockets.get(String(user_id)) !== undefined)
             server.sockets.sockets.get(this.sockets.get(String(user_id))).join(room);
     }
@@ -148,7 +148,7 @@ export class SocketService {
                 is_read: false,
             },
         });
-        console.log("GetDm: ", dm);
+        // console.log("GetDm: ", dm);
         dm.forEach((element) => {
             server.to(String(user_id)).emit('dm', element);
         });
