@@ -19,6 +19,7 @@ export class InGameRoom {
     {
         this.user1_id = user_id;
     }
+    game_mode: boolean = false;
     user1_id: number;
     user2_id: number;
     score1: number;
@@ -105,21 +106,6 @@ export class SocketGameService {
         return this.gameRoomMap.get(user_id);
     }
 
-    MatchGame(user_id: number)
-    {
-        if (this.gameMatchQue.length === 0)
-        {
-            this.gameMatchQue.push(user_id);
-            return {status: true, message: "매칭 대기 중"};
-        }
-        const enemy_id = this.gameMatchQue.pop();
-        this.InGame.set(user_id, new InGameRoom(user_id));
-        this.InGame.get(user_id).user2_id = enemy_id;
-        this.InGame.set(enemy_id, this.InGame.get(user_id));
-        this.SocketService.JoinRoom(user_id, `game-${user_id}`, this.server);
-        return {status: true, message: "매칭 성공", data: this.InGame.get(user_id)};
-    }
-
     Ready(user_id: number, ready: boolean)
     {
         const room = this.gameRoomMap.get(user_id);
@@ -143,8 +129,6 @@ export class SocketGameService {
             return {status: false, message: "정상적인 방이 아닙니다."};
         if (!room.user1_ready || !room.user2_ready)
             return {status: false, message: "준비가 되지 않았습니다."};
-        // this.SocketService.JoinRoom(room.user1_id, `game-${room.user1_id}`, this.server);
-        // this.SocketService.JoinRoom(room.user2_id, `game-${room.user2_id}`, this.server);
         this.gameRoomMap.delete(room.user1_id);
         this.gameRoomMap.delete(room.user2_id);
         this.server.to(`${room.user1_id}`).emit(`start-game`, {room: room});
@@ -152,5 +136,21 @@ export class SocketGameService {
         this.SocketService.JoinRoom(room.user1_id, `game-${room.user1_id}`, this.server);
         this.SocketService.JoinRoom(room.user2_id, `game-${room.user1_id}`, this.server);
         return {status: true, message: "게임 시작 성공"};
+    }
+
+    MatchGame(user_id: number)
+    {
+        if (this.gameMatchQue.length === 0)
+        {
+            this.gameMatchQue.push(user_id);
+            return {status: true, message: "매칭 대기 중"};
+        }
+        const enemy_id = this.gameMatchQue.pop();
+        this.InGame.set(enemy_id, new InGameRoom(user_id));
+        this.InGame.get(enemy_id).user2_id = user_id;
+        this.InGame.set(user_id, this.InGame.get(user_id));
+        this.SocketService.JoinRoom(enemy_id, `game-${enemy_id}`, this.server);
+        this.SocketService.JoinRoom(user_id, `game-${enemy_id}`, this.server);
+        return {status: true, message: "매칭 성공", data: this.InGame.get(user_id)};
     }
 }

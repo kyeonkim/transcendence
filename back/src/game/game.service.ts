@@ -131,18 +131,4 @@ export class GameService {
         return this.socketGameService.GetRoomInfo(user_id);
     }
 
-    // MatchGame(user_id: number)
-    // {
-    //     if (this.gameMatchQue.length === 0)
-    //     {
-    //         this.gameMatchQue.push(user_id);
-    //         return {status: true, message: "매칭 대기 중"};
-    //     }
-    //     const enemy_id = this.gameMatchQue.pop();
-    //     this.InGame.set(user_id, new InGameRoom(user_id));
-    //     this.InGame.get(user_id).user2_id = enemy_id;
-    //     this.InGame.set(enemy_id, this.InGame.get(user_id));
-    //     this.SocketGateway.JoinRoom(user_id, `game-${user_id}`);
-    //     return {status: true, message: "매칭 성공", data: this.InGame.get(user_id)};
-    // }
 }
