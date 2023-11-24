@@ -142,7 +142,7 @@ export default function Pong (props :any){
 
         function drawing() {
             // 공 이동
-            ball.set('left', ball.left + ballVecXY.x);
+            bawll.set('left', ball.left + ballVecXY.x);
             ball.set('top', ball.top + ballVecXY.y);
       
             // 공 화면 위-아래 튕기기
