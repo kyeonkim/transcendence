@@ -40,6 +40,7 @@ export default function Signup (props:any) {
 	}
 
 	const handleEnter = async () => {
+		setError('');
 		formData.append('nick_name', nickname);
 		if (imageFile) {
 			formData.append('file', imageFile);

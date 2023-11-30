@@ -6,8 +6,17 @@ COPY . /app/front_server/
 
 RUN npm install
 
-# RUN npm run build
-
-# CMD ["npm", "run", "start"]
-
 CMD ["npm", "run", "dev"]
+
+######dumb-init 사용시
+
+# FROM node:latest
+
+# WORKDIR /app/front_server
+
+# COPY . /app/front_server/
+
+# RUN apt install -y dumb-init
+# RUN npm install
+
+# CMD ["/usr/bin/dumb-init", "--", "npm", "run", "dev"]
