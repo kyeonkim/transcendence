@@ -29,6 +29,15 @@ export class GameController {
         return gameData;
     }
 
+    @ApiOperation({summary: `게임방 체크 API`, description: `게임방에 있는지 체크한다.`})
+    @Post("checkroom")
+    async CheckRoom(@Body() data: gameRoomDto)
+    {
+        const room = await this.GameService.CheckGameRoom(data.user1_id);
+        console.log("checkroom: ", room);
+        return room;
+    }
+
     @ApiOperation({summary: `게임방 만들기 API`, description: `게임방을 만든다.`})
 	// @UseGuards(AuthGuard('jwt-access'))
 	// @ApiBearerAuth('JWT-acces')

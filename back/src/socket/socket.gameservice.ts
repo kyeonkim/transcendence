@@ -41,6 +41,16 @@ export class SocketGameService {
       this.server = server;
     }
 
+    async CheckGameRoom(user_id: number)
+    {
+        if (this.gameRoomMap.get(user_id) !== undefined)
+        {
+            this.server.to(String(user_id)).emit(`render-gameroom`, {room: this.gameRoomMap.get(user_id)});
+            return {status: true, message: "게임방이 존재합니다."};
+        }
+        return {status: false, message: "게임방이 없습니다."};
+    }
+
     async CreateGameRoom(user_id: number)
     {
         if (this.gameRoomMap.get(user_id) !== undefined)
@@ -143,7 +153,7 @@ export class SocketGameService {
         if (this.gameMatchQue.length === 0)
         {
             this.gameMatchQue.push(user_id);
-            return {status: true, message: "매칭 대기 중"};
+            return {status: false, message: "매칭 대기 중"};
         }
         const enemy_id = this.gameMatchQue.pop();
         this.InGame.set(enemy_id, new InGameRoom(user_id));
@@ -152,5 +162,11 @@ export class SocketGameService {
         this.SocketService.JoinRoom(enemy_id, `game-${enemy_id}`, this.server);
         this.SocketService.JoinRoom(user_id, `game-${enemy_id}`, this.server);
         return {status: true, message: "매칭 성공", data: this.InGame.get(user_id)};
+    }
+
+    MatchCancel()
+    {
+        const user_id = this.gameMatchQue.pop();
+        return {status: true, message: "매칭 취소 완료", data: user_id}
     }
 }

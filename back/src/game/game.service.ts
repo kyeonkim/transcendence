@@ -96,6 +96,11 @@ export class GameService {
         return {status: true, data: user.games};
     }
 
+    async CheckGameRoom(user_id: number)
+    {
+        return this.socketGameService.CheckGameRoom(user_id);
+    }
+
     async CreateGameRoom(user_id: number)
     {
         return this.socketGameService.CreateGameRoom(user_id);
