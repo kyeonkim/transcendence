@@ -14,7 +14,7 @@ import { styled } from '@mui/system';
 import { axiosToken } from '@/util/token';
 import { useCookies } from 'next-client-cookies';
 import { Background } from 'tsparticles-engine';
-import { Grid } from '@mui/material';
+import { Grid, Typography } from '@mui/material';
 import styles from './search_bar.module.css';
 
 
@@ -75,13 +75,17 @@ export default function SearchUser({ setMTbox }: SearchUserProps) {
                 variant="outlined"
                 onChange={(e) => setSearchTarget(e.target.value)}
                 onKeyDown={handleEnterkey}
+                focused
+                sx={{input: {color: 'white'}}}
                 >
             </TextField>
             <MainSearchButton
                 variant='contained'
                 onClick={() => handleMTbox(1, searchTarget)}
                 >
-                검색
+                <Typography style={{color: 'white'}}>
+                    검색
+                </Typography>
             </MainSearchButton>
         </Grid>
     );

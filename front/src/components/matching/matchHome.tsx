@@ -37,17 +37,21 @@ export default function MatchHome(props: any) {
 
 	return (
 		<Grid container direction="column" alignItems="center" justifyContent="center">
-			<Typography variant="h1">
+			<Typography variant="h1" color="white" style={{fontWeight: 'bold'}}>
 				PONG42
 			</Typography> 	
 			<Grid item sx={{marginTop: '50px'}}>
-				<Button className={styles.homeButton} variant="contained" onClick={handleRankClick}>
-					랭크 매칭
+				<Button className={styles.homeButton} sx={{border: 7, borderColor: '#2196f3',background: '#1565c0'}} variant="contained" onClick={handleRankClick}>
+					<Typography fontSize={80} style={{fontWeight: 'bold'}}>
+                		랭크
+            		</Typography>
 				</Button>
 			</Grid>
 			<Grid item sx={{marginTop: '20px'}}>
-				<Button className={styles.homeButton}variant="contained" onClick={handleInviteClick}>
-					방 만들기
+				<Button className={styles.homeButton} sx={{border: 7, borderColor: '#2196f3',background: '#1565c0'}} variant="contained" onClick={handleInviteClick}>
+					<Typography fontSize={80} style={{fontWeight: 'bold'}}>
+                		일반
+            		</Typography>
 				</Button>
 			</Grid>
 		</Grid>

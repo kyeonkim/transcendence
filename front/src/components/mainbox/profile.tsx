@@ -19,9 +19,10 @@ const ProfilePage = (props: any) => {
   const [isActivated, setIsActivated] = useState(false);
   const [userId, setUserId] = useState(0);
   const [rendering, setRendering] = useState('');
+  const [file, setFile] = useState<File>();
   const cookies = useCookies();
   const socket = useChatSocket();
-
+  const formData = new FormData();
   const userNickname = props.nickname;
   const my_id = Number(cookies.get('user_id'));
   const my_nick = cookies.get('nick_name');
@@ -178,17 +179,44 @@ const ProfilePage = (props: any) => {
     setIsOTP(true)
   }
 
+  const handleImgChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    setFile(file);
+    formData.append('file', file);
+    formData.append('access_token', cookies.get('access_token'));
+    formData.append('nick_name', my_nick);
+
+    await axiosToken.post( `${process.env.NEXT_PUBLIC_API_URL}user/upload`,
+      formData,
+      {
+          headers: {
+              'Content-Type': 'multipart/form-data',
+              'Authorization': `Bearer ${formData.get('access_token')}`
+          },
+          params: {
+              nickname: my_nick
+          }
+      })
+      .then((res) => {
+        console.log("이미지변경요청 response====", res.data)
+        // window.location.reload();
+        setRendering(res.data.time);
+      })
+  }
   const imageLoader = ({ src }: any) => {
-    return `${process.env.NEXT_PUBLIC_API_URL}user/getimg/nickname/${src}`
+    let time = rendering;
+      return `${process.env.NEXT_PUBLIC_API_URL}user/getimg/nickname/${src}`
   }
 
   return (  
     <div>
       <Grid container className={styles.profileBox}>
-        <Image loader={imageLoader} src={`${userNickname}`} alt="User Image" className={styles.userImage} width={0} height={0}/>
-          <div className={styles.userName}>
+        <Grid item alignItems='center' display='flex' flexDirection='column' padding='1%'>
+          <Image loader={imageLoader} src={`${userNickname}`} alt="User Image" className={styles.userImage} width={0} height={0}/>
+          <Typography className={styles.userName} fontSize={60} sx={{color: 'white',  whiteSpace: 'nowrap'}}>
             {userNickname !== my_nick ? `${userNickname}` : my_nick}
-          </div>
+          </Typography>
+        </Grid>
           {userNickname !==  my_nick ? ( 
               <div className={styles.buttons}>
                 {isFriend? (
@@ -213,14 +241,12 @@ const ProfilePage = (props: any) => {
           ) : (
             <div className={styles.imageContent}>
               <div className={styles.buttons}>
-                <Button variant="outlined" className={styles.roundButton}>
+                <Button variant="outlined"  component="label" className={styles.roundButton}>
                   프로필 수정
+                  <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleImgChange} />
                 </Button>
                 <Button variant="outlined" className={styles.roundButton} onClick={() => handleOTP()}>
                   {isActivated? '2차인증 비활성화' : '2차인증 활성화'}
-                </Button>
-                <Button variant="outlined" className={styles.roundButton}>
-                  로그아웃
                 </Button>
               </div>
               <OtpModal
