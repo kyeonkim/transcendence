@@ -16,7 +16,7 @@ import { ISourceOptions } from "tsparticles-engine";
 import type { Engine } from "tsparticles-engine";
 import { useChatSocket } from "../../app/main_frame/socket_provider"
 import Divider from '@mui/material/Divider';
-import { Grid } from '@mui/material';
+import { Grid, Typography } from '@mui/material';
 
 import styles from './frame.module.css';
 
@@ -77,6 +77,28 @@ export default function Main() {
   const [id, setSearch] = useState('');
   const [socketReady, setSocketReady] = useState(false);
   const socket = useChatSocket();
+  const [isSize, setIsSize] = useState(false);
+
+  const minWidth = 2000;
+  const minHeight = 1000;
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < minWidth || window.innerHeight < minHeight) {
+        console.log('잘작동중!!!!!!');
+        setIsSize(true);
+      } else {
+        setIsSize(false);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    // 컴포넌트가 unmount되면 리스너 제거
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [minWidth]);
 
   const particlesInit = useCallback(async (engine: Engine) => {
     // console.log(engine);
@@ -100,41 +122,38 @@ export default function Main() {
   if (!socketReady) {
     console.log('socket not ready');
   
-    return <div>loading...</div>;
+    return (
+      <div>
+        <Particles options={particlesOptions as ISourceOptions} init={particlesInit} />
+      </div>
+    );
   }
 
  return (
       <div>
         <Particles options={particlesOptions as ISourceOptions} init={particlesInit} />
-        <Grid container className={styles.leftBox}>
-          <MyProfile setMTbox={handleClick}/>
-          <SearchUser setMTbox={handleClick}/>
-          <MatchingButton setMTbox={handleClick}/>
-          <UserLists setMTbox={handleClick}/>
-        </Grid>
-        <Grid container className={styles.mainBox}>
-          <Mainbox mod={clicked} search={id}/>
-        </Grid>
-        <Grid container className={styles.rightBox}>
-          <ChatBlock setMTbox={handleClick}/>
-        </Grid>
+        {isSize ? (
+          <Grid container className={styles.warning} justifyContent="center" alignItems="center">
+            <Typography variant="caption" color="error" fontSize={'40px'}>
+              화면을 늘려주세요!
+            </Typography>
+          </Grid>
+        ) : (
+        <>
+          <Grid container className={styles.leftBox}>
+            <MyProfile setMTbox={handleClick}/>
+            <SearchUser setMTbox={handleClick}/>
+            <MatchingButton setMTbox={handleClick}/>
+            <UserLists setMTbox={handleClick}/>
+          </Grid>
+          <Grid container className={styles.mainBox}>
+            <Mainbox mod={clicked} search={id}/>
+          </Grid>
+          <Grid container className={styles.rightBox}>
+            <ChatBlock setMTbox={handleClick}/>
+          </Grid>
+        </>
+        )}
       </div>
     )
   }
-  
-        // <CssBaseline />
-        // <MyProfile setMTbox={handleClick}/>
-        // <MTBox>
-        //   <Mainbox mod={clicked} search={id}/>
-        // </MTBox>
-        // <MLBox>
-        //   <SearchUser setMTbox={handleClick}/>
-        //   <MatchingButton setMTbox={handleClick}/>
-        // </MLBox>
-        // <Divider />
-        // <BLBox>
-        //   <UserLists setMTbox={handleClick}/>
-        // </BLBox>
-        // <Chatbox>
-          // <ChatBlock setMTbox={handleClick}/>
-        // </Chatbox>

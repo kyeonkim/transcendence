@@ -26,7 +26,7 @@ export default function MatchHome(props: any) {
 	}
 
 	const handleInviteClick = () => {
-		console.log("초대하기 클릭");
+		console.log("방만들기 클릭");
 		createRoom();
 	}
 

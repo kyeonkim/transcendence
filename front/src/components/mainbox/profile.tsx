@@ -185,7 +185,7 @@ const ProfilePage = (props: any) => {
   return (  
     <div>
       <Grid container className={styles.profileBox}>
-        <Image loader={imageLoader} src={`${userNickname}`} alt="User Image" className={styles.userImage} width={0} height={0} />
+        <Image loader={imageLoader} src={`${userNickname}`} alt="User Image" className={styles.userImage} width={0} height={0}/>
           <div className={styles.userName}>
             {userNickname !== my_nick ? `${userNickname}` : my_nick}
           </div>

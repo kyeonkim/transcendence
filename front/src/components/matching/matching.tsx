@@ -1,20 +1,7 @@
 import Button from '@mui/material/Button';
+import styles from './match.module.css';
+import { Typography } from '@mui/material';
 
-import { styled } from '@mui/system';
-
-
-const MainMatchingButton = styled(Button) ({
-  backgroundColor: '#4fca35',
-  position: 'absolute',
-  alignItems: 'center',
-  textAlign: 'center',
-  top: '35%',
-  left: '12.5%',
-  width: '75%',
-  height: '20%',
-  color: "black",
-  borderRadius: '100%',
-});
 
 interface MyProfileProps {
     setMTbox: (num: number, searchTarget: string) => void;
@@ -28,8 +15,10 @@ export default function MatchingButton({ setMTbox }: MyProfileProps) {
     }
 
     return (
-        <MainMatchingButton variant="outlined" onClick={handleMTbox(3)}>
-            START
-        </MainMatchingButton>
+        <Button sx={{border: 7, borderColor: '#2196f3',background: '#1565c0'}} className={styles.matchButton} variant="contained" onClick={handleMTbox(3)}>
+            <Typography fontSize={100} style={{fontWeight: 'bold'}}>
+                PLAY
+            </Typography>
+        </Button>
     );
 }

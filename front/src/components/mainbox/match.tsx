@@ -10,14 +10,27 @@ import RankMatch from '../matching/rankmatch';
 import Pong from '../game/pong'
 import { Grid } from '@mui/material';
 import { useChatSocket } from '@/app/main_frame/socket_provider';
+import { axiosToken } from '@/util/token';
+import { useCookies } from 'next-client-cookies';
 
 
 export default function Matching() {
 	const [render, setRender] = useState(0);
 	const socket = useChatSocket();
+	const cookies = useCookies();
 	const [data, setData] = useState<any>([]);
 
 	useEffect(() => {
+		const fetchData = async () => {
+			console.log("게임방확인 api call");
+			await axiosToken.post(`${process.env.NEXT_PUBLIC_API_URL}game/checkroom`, {
+				user1_id: Number(cookies.get('user_id')),
+			})
+			.then((res) => {
+				console.log("게임방확인 api response===", res);
+			})
+		}
+		
 		socket.on('render-gameroom', (data: any) => {
 			console.log("game room render data===", data); /*{user1_id, user2_id, user1_ready, user2_ready}*/
 			if (data.room.user1_id === null && data.room.user2_id === null)
@@ -26,10 +39,11 @@ export default function Matching() {
 				setRender(2);	
 			setData(data);
 		});
-		// return () => {
-		// 	socket.off('reder-gameroom');
-		// }
+
+		fetchData();
 	}, []);
+
+
 
 	const handleRender = () => {
 		console.log("render: ", render);

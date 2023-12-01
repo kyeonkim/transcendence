@@ -16,17 +16,22 @@ import axios from 'axios';
 
 import { useChatSocket } from "../../app/main_frame/socket_provider"
 import { axiosToken } from '@/util/token';
+import { Typography } from '@mui/material';
 
 const MainChatRoomList = styled(Grid) ({
 	position: 'absolute',
-	top: 100,
-	left: 0,
-	width: 560,
+	top: '7.5%',
+	left: '4%',
 	overflowY: "scroll",
-	maxHeight: "1200px" 
-	// height: 1332,
-	// backgroundColor: 'white',
-	// borderRadius: '10px',
+	height: '94%',
+		// backgroundColor: 'white',
+	borderRadius: '10px',
+	maxWidth: '100%',
+	maxHeight: '100%',
+	scrollbarWidth: 'none',
+    '&::-webkit-scrollbar': {
+      display: 'none',
+    },
   });
   
   // 채팅 방 1개
@@ -34,7 +39,7 @@ const MainChatRoomList = styled(Grid) ({
 	// width: 400,
 	height: 200,
 	backgroundColor: 'white',
-	opacity: 0.7
+	opacity: 0.7,
   })
 
 
@@ -173,15 +178,16 @@ const MainChatRoomList = styled(Grid) ({
 				{roomList.map((room) => {
 					console.log('room data - ', room);
 					return (
-						<ChatRoomBlock
-							key={room.idx}
-							room={room}
-							openModal={openModal}
-							setOpenModal={setOpenModal}
-							selectedIdx={selectedIdx}
-							setSelectedIdx={setSelectedIdx}
-							handleJoin={handleJoin}
-							/>
+						<Grid container key={room.idx}>
+							<ChatRoomBlock
+								room={room}
+								openModal={openModal}
+								setOpenModal={setOpenModal}
+								selectedIdx={selectedIdx}
+								setSelectedIdx={setSelectedIdx}
+								handleJoin={handleJoin}
+								/>
+						</Grid>
 					);
 				})}
 				</MainChatRoomList>

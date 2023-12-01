@@ -45,6 +45,7 @@ export default function Signup (props:any) {
 		if (imageFile) {
 			formData.append('file', imageFile);
 		}
+		console.log('access_token =',props.access_token);
 		await axios.post( `${process.env.NEXT_PUBLIC_FRONT_URL}api/user_create`, {
 				access_token: props.access_token,
 				nick_name: nickname,

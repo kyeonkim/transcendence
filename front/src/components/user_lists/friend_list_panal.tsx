@@ -12,10 +12,12 @@ import { useEffect, useState, useRef } from 'react';
 import { useCookies } from 'next-client-cookies';
 import axios from 'axios';
 import { useChatSocket } from "../../app/main_frame/socket_provider"
-import { Skeleton } from '@mui/material';
+import { Skeleton, Typography } from '@mui/material';
 import { send } from 'process';
 import Divider from '@mui/material/Divider';
 import DirectMessage from './direct_message';
+import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
+import { axiosToken } from '@/util/token';
 
 export default function FriendListPanel(props: any) {
 	
@@ -29,6 +31,8 @@ export default function FriendListPanel(props: any) {
 
 	const dmOpenIdRef = useRef(dmOpenId);
 	const dmCountListRef = useRef(dmCountList);
+
+	const cookies = useCookies();
 
 	useEffect(() => {
 		if (list && JSON.stringify(list) === JSON.stringify(apiResponse)) {
@@ -209,9 +213,38 @@ export default function FriendListPanel(props: any) {
 		return res;
 	}
 
+	const handleInviteGame = async (nick: any, name:any) => {
+		console.log("invite game ", myId, " to ", nick)
+		await axiosToken.post(`${process.env.NEXT_PUBLIC_API_URL}game/inviteroom`, {
+			user1_id: Number(myId),
+			user1_nickname: cookies.get("nick_name"),
+			user2_id: Number(nick),
+			user2_nickname: name,
+		},
+		{
+			headers: {
+				Authorization: `Bearer ${cookies.get('access_token')}`,
+			},
+		})
+		.then((res: any) => {
+			console.log('invite game res - ', res);
+		})
+	}
+
 	return (
 		<div>
-			<List dense sx={{ width: '100%', maxWidth: 400, maxHeight: 580, bgcolor: 'background.paper', overflow: 'auto'}}>
+			<List dense 
+				sx={{
+					width: '110%',
+					left: '-10%',
+					maxWidth: 400,
+					maxHeight: 580,
+					bgcolor: 'transparent',
+					// border: '2px solid #fff',
+					// borderRadius: 3,
+					overflow: 'auto',
+
+				}}>
 				{apiResponse?.length > 0 ? (
 					apiResponse.map((user: any) => (
 						<ListItem key={user.followed_user_id}>
@@ -219,7 +252,7 @@ export default function FriendListPanel(props: any) {
 								<ListItemAvatar>
 									<Avatar src={`${process.env.NEXT_PUBLIC_API_URL}user/getimg/nickname/${user.followed_user_nickname}`} />
 								</ListItemAvatar>
-								<ListItemText primary={user.followed_user_nickname}/>
+								<ListItemText primary={user.followed_user_nickname} sx={{color: 'white'}}/>
 								<div style={{ display: 'flex', alignItems: 'center' }}>
 									<div style={{
 										width: '10px',
@@ -230,13 +263,18 @@ export default function FriendListPanel(props: any) {
 										marginRight: '8px'
 										}}>
 									</div>
-									<div>{user.status === 'online' || user.status === 'login' ? 'ON' : 'OFF'}</div>
+									<Typography sx={{color: 'white'}}>
+										{user.status === 'online' || user.status === 'login' ? 'ON' : 'OFF'}
+									</Typography>
 								</div>
 							</ListItemButton>
 							<IconButton edge="end" aria-label="comments" onClick={() => {handlerClear(user.followed_user_id, user.followed_user_nickname)}}>
 								<Badge color="error" badgeContent={handleFriendDmCount(user.followed_user_id)}>
-									<CommentIcon/>
+									<CommentIcon sx={{ color: 'white' }}/>
 								</Badge>
+							</IconButton>
+							<IconButton edge="end" onClick={() => {handleInviteGame(user.followed_user_id, user.followed_user_nickname)}}>
+								<SportsEsportsIcon sx={{ color: 'white' }}/>
 							</IconButton>
 						</ListItem>
 					))

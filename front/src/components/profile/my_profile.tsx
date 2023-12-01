@@ -2,6 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import styles from '../mainbox/mainbox.module.css'
 import { useCookies } from 'next-client-cookies';
+import { Grid } from '@mui/material';
 
 interface MyProfileProps {
   setMTbox: (num: number, searchTarget: string | undefined) => void;
@@ -17,14 +18,16 @@ export default function MyProfile({ setMTbox }: MyProfileProps) {
     return `${process.env.NEXT_PUBLIC_API_URL}user/getimg/nickname/${src}`
   }
   return (
-    <Image
-      loader={imageLoader}
-      src={`${my_nick}`}
-      className={styles.myprofilelink}
-      alt="User Image"
-      width={0}
-      height={0}
-      onClick={handleMTbox(1)}
-    />
+    <Grid container className={styles.myprofileimg}>
+      <Image
+        loader={imageLoader}
+        src={`${my_nick}`}
+        className={styles.myprofilelink}
+        alt="User Image"
+        width={0}
+        height={0}
+        onClick={handleMTbox(1)}
+      />
+      </Grid>
   );
 }

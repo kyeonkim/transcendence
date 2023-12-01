@@ -55,15 +55,15 @@ export default function MatchList(props: any) {
   }, [page]);
   
   const listStyle = {
-    width: '100%',
-    height: '100%',
-    maxWidth: 1600,
-    maxHeight: 850,
+    position: 'relative',
+    width: '90%',
+    height: '85%',
+    maxHeight: '85%',
     bgcolor: 'rgba(135, 206, 235, 0.2)',
     alignItems: 'center',
-    marginLeft: '70px',
-    marginRight: '70px',
-    marginTop: '50px',
+    marginLeft: '5%',
+    marginRight: '5%',
+    marginTop: '3.5%',
     borderRadius: '20px',
     border: '5px solid rgba(135, 207, 235, 0.2);',
     overflowY: 'scroll',
@@ -71,17 +71,19 @@ export default function MatchList(props: any) {
     '&::-webkit-scrollbar': {
       display: 'none',
     },
+    display: 'flex',
+    justifyContent: 'center',
+    flexDirection: 'column',
   };
 
   const emptyStyle = {
-    width: '100%',
-    height: '100%',
-    maxWidth: 1300,
-    maxHeight: 250,
+    position: 'relative',
+    width: '90%',
+    height: '15%',
     bgcolor: 'rgba(135, 206, 235, 0.2)',
     alignItems: 'center',
-    marginLeft: '70px',
-    marginRight: '70px',
+    marginLeft: '4%',
+    marginRight: '4%',
     marginTop: '50px',
     borderRadius: '20px',
     border: '5px solid #000',
@@ -98,7 +100,7 @@ export default function MatchList(props: any) {
           padding: '10px', // 옵션: 패딩 설정
           margin : '9px', // 옵션: 마진 설정
           width: '1200px', // 옵션: 너비 설정
-          marginLeft: '120px',
+          // marginLeft: '120px',
           borderRadius: '10px', // 옵션: 모서리를 둥글게 설정
           // opacity: '1'
         };

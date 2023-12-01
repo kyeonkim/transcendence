@@ -22,12 +22,12 @@ export async function POST (request: NextRequest)
         const   data = await request.json();
 
         console.log('api/user_create - data: ', data);
-
         response = await axios.post(process.env.NEXT_PUBLIC_API_URL + 'auth/signup', {
             access_token: data.access_token,
             nick_name: data.nick_name,
             // img_name: data.img_name
         });
+        console.log('api/user_create - response: ', response);
     }
     catch (err)
     {

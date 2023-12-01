@@ -14,14 +14,16 @@ import { styled } from '@mui/system';
 import { axiosToken } from '@/util/token';
 import { useCookies } from 'next-client-cookies';
 import { Background } from 'tsparticles-engine';
+import { Grid } from '@mui/material';
+import styles from './search_bar.module.css';
+
 
 const MainSearchUser = styled(TextField)({
     position: 'absolute',
     top: '30%',
     left: 0,
     width: '80%',
-    height: '4.6%',
-    color: "black",
+    height: '11%',  
     background: "white",
     borderRadius: '10px',
 });
@@ -31,7 +33,7 @@ const MainSearchButton = styled(Button) ({
     top: '30%',
     left: '80%',
     width: '20%',
-    height: '4.6%',
+    height: '11%',
     color: "black"
   });
 
@@ -65,21 +67,22 @@ export default function SearchUser({ setMTbox }: SearchUserProps) {
     }
 
     return (
-        <React.Fragment>
-            <MainSearchUser
+        <Grid className={styles.search_bar}>
+            <TextField
+                className={styles.search_user}
                 id="outlined_search_user"
                 label="유저 검색"
                 variant="outlined"
                 onChange={(e) => setSearchTarget(e.target.value)}
                 onKeyDown={handleEnterkey}
                 >
-            </MainSearchUser>
+            </TextField>
             <MainSearchButton
                 variant='contained'
                 onClick={() => handleMTbox(1, searchTarget)}
                 >
                 검색
             </MainSearchButton>
-        </React.Fragment>
+        </Grid>
     );
 }

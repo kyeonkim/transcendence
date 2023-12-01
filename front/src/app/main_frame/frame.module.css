@@ -44,37 +44,20 @@
 	max-width: 58%;
 	max-height: 90%;
 }	
-/* 
 
-.profileBox {
+.warning {
 	position: absolute;
-	top: 5%;
-	left: 19%;
-	transform: translate(0%, 0%);
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
 
 	background-color: rgba(135, 206, 235, 0.2);
 	border-radius: 20px;
 	border: 5px solid rgba(135, 207, 235, 0.2);
-	width: 58%;
-	height: 25%;
-	max-width: 58%;
-	max-height: 25%
+
+	width: 1000px;
+	height: 400px;
 }
-
-.matchlistBox {
-	position: absolute;
-	top: 32%;
-	left: 19%;
-	transform: translate(0%, 0%);
-
-	background-color: rgba(135, 206, 235, 0.2);
-	border-radius: 20px;
-	border: 5px solid rgba(135, 207, 235, 0.2);
-	width: 58%;
-	height: 63%;
-	max-width: 58%;
-	max-height: 63%;
-} */
 
 .userlist {
 	position: absolute;
