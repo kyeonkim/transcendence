@@ -134,7 +134,7 @@ export class ChatService {
         return {status: true, message: 'success'};
     }
     
-    async JoinRoom(data: JoinRoomDto)
+    async JoinRoom(data: JoinRoomDto, is_invite: boolean = false)
     {
         const chatuser = await this.prismaService.chatroom_user.findUnique({
             where: { user_id: data.user_id, }
@@ -146,7 +146,7 @@ export class ChatService {
         });
         if (room === null)
             return {status: false, message: 'fail to find room'};
-        if (room.is_password)
+        if (room.is_password && is_invite === false)
         {
             if (bcrypt.compareSync(data.password, room.room_password) !== true)
                 return {status: false, message: 'password is invaild'}
@@ -251,6 +251,7 @@ export class ChatService {
                 is_manager: false,
             },
         });
+        this.socketService.HandleNotice(data.room_id, `${data.target_nickname}님이 매니저가 해제되었습니다.`);
         return {status: true, message: 'success'};
     }
 
@@ -378,7 +379,7 @@ export class ChatService {
                 idx: data.room_id,
                 roomusers : {
                     some: {
-                        user_id: data.user_id,
+                        user_id: data.target_id,
                     },
                 }
             }
@@ -435,12 +436,12 @@ export class ChatService {
         });
         if (event === null || event.idx !== data.event_id)
             return {status: false, message: 'fail to find event'};
-        await this.prismaService.event.delete({
-            where: {
-                idx: event.idx,
-            },
+            await this.prismaService.event.delete({
+                where: {
+                    idx: event.idx,
+                },
         });
-        return await this.JoinRoom(data);
+        return await this.JoinRoom(data, true);
     }
 
     async GetDm(idx: number, user_id: number, from_id: number)
