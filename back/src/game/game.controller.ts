@@ -98,4 +98,30 @@ export class GameController {
         console.log(room);
         return room;
     }
+
+    @ApiOperation({summary: `게임 매칭 API`, description: `게임을 매칭한다.`})
+    @Post("match")
+    async MatchGame(@Body() data: startGameDto)
+    {
+        const room = await this.GameService.MatchGame(data.user_id);
+        console.log(room);
+        return room;
+    }
+
+    @ApiOperation({summary: `게임 매칭 취소 API`, description: `게임을 매칭을 취소한다.`})
+    @Patch("cancelmatch")
+    async CancelMatch()
+    {
+        const room = await this.GameService.CancleMatch();
+        console.log(room);
+        return room;
+    }
+
+    @ApiOperation({summary: `게임 종료 API`, description: `게임을 종료한다.`})
+    @Patch("exitgame")
+    async ExitGame(@Body() data: startGameDto) {
+        const room = await this.GameService.ExitGame(data.user_id);
+        console.log(room);
+        return room;
+    }
 }

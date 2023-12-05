@@ -45,8 +45,14 @@ export class SocketGameService {
     {
         if (this.gameRoomMap.get(user_id) !== undefined)
         {
-            this.server.to(String(user_id)).emit(`render-gameroom`, {room: this.gameRoomMap.get(user_id)});
+            this.server.to(String(user_id)).emit(`render-gameroom`, {status: 'gameroom', room: this.gameRoomMap.get(user_id)});
             return {status: true, message: "게임방이 존재합니다."};
+        } else if (this.InGame.get(user_id) !== undefined) {
+            this.server.to(String(user_id)).emit(`render-gameroom`, {status: 'ingame', room: this.InGame.get(user_id)});
+            return {status: true, message: "게임 중입니다."};
+        } else if (this.gameMatchQue.includes(user_id)) {
+            this.server.to(String(user_id)).emit(`render-gameroom`, {status: 'matching', room: user_id});
+            return {status: true, message: "매칭 중입니다."};
         }
         return {status: false, message: "게임방이 없습니다."};
     }
@@ -55,11 +61,11 @@ export class SocketGameService {
     {
         if (this.gameRoomMap.get(user_id) !== undefined)
         {
-            this.server.to(String(user_id)).emit(`render-gameroom`, {room: this.gameRoomMap.get(user_id)});
+            this.server.to(String(user_id)).emit(`render-gameroom`, {status: 'gameroom', room: this.gameRoomMap.get(user_id)});
             return {status: false, message: "이미 게임방이 존재합니다."};
         }
         this.gameRoomMap.set(user_id, new GameRoom(user_id));
-        console.log(this.server.to(String(user_id)).emit(`render-gameroom`, {room: this.gameRoomMap.get(user_id)}));
+        this.server.to(String(user_id)).emit(`render-gameroom`, {status: 'gameroom', room: this.gameRoomMap.get(user_id)});
         return {status: true, message: "게임방 생성 성공"};
     }
 
@@ -72,8 +78,8 @@ export class SocketGameService {
             return {status: false, message: "초대가 만료되었습니다."};
         room.user2_id = user2_id;
         this.gameRoomMap.set(user2_id, room);
-        console.log(this.server.to(String(user1_id)).emit(`render-gameroom`, {room: room}));
-        console.log(this.server.to(String(user2_id)).emit(`render-gameroom`, {room: room}));
+        this.server.to(String(user1_id)).emit(`render-gameroom`, {status: 'gameroom', room: this.gameRoomMap.get(user1_id)});
+        this.server.to(String(user2_id)).emit(`render-gameroom`, {status: 'gameroom', room: this.gameRoomMap.get(user2_id)});
         this.eventService.DeleteAlarms(event_id);
         return {status: true, message: "게임방 참가 성공"};
     }
@@ -94,9 +100,9 @@ export class SocketGameService {
         room.user2_id = null;
         room.user2_ready = false;
         console.log(this.gameRoomMap);
-        console.log(this.server.to(String(room.user1_id)).emit(`render-gameroom`, {room: room}));
+        console.log(this.server.to(String(room.user1_id)).emit(`render-gameroom`, {status: 'gameroom', room: room}));
         if(user2 !== null)
-            console.log(this.server.to(String(user2)).emit(`render-gameroom`, {room: room}));
+            console.log(this.server.to(String(user2)).emit(`render-gameroom`, {status: 'home', room: room}));
         return {status: true, message: "게임방 나가기 성공"};
     }
 
@@ -126,9 +132,9 @@ export class SocketGameService {
         else
             room.user2_ready = ready;
         console.log(this.gameRoomMap);
-        console.log(this.server.to(String(room.user1_id)).emit(`render-gameroom`, {room: room}));
+        console.log(this.server.to(String(room.user1_id)).emit(`render-gameroom`, {status: 'gameroom', room: room}));
         if (room.user2_id !== null)
-            console.log(this.server.to(String(room.user2_id)).emit(`render-gameroom`, {room: room}));
+            console.log(this.server.to(String(room.user2_id)).emit(`render-gameroom`, {status: 'gameroom', room: room}));
         return {status: true, message: "게임 준비 성공"};
     }
 
@@ -141,8 +147,8 @@ export class SocketGameService {
             return {status: false, message: "준비가 되지 않았습니다."};
         this.gameRoomMap.delete(room.user1_id);
         this.gameRoomMap.delete(room.user2_id);
-        this.server.to(`${room.user1_id}`).emit(`start-game`, {room: room});
-        this.server.to(`${room.user1_id}`).emit(`start-game`, {room: room});
+        this.server.to(`${room.user1_id}`).emit(`render-gameroom`, {status:'ingame', room: room});
+        this.server.to(`${room.user2_id}`).emit(`render-gameroom`, {status:'ingame', room: room});
         this.SocketService.JoinRoom(room.user1_id, `game-${room.user1_id}`, this.server);
         this.SocketService.JoinRoom(room.user2_id, `game-${room.user1_id}`, this.server);
         return {status: true, message: "게임 시작 성공"};
@@ -150,23 +156,41 @@ export class SocketGameService {
 
     MatchGame(user_id: number)
     {
+        if (this.gameMatchQue.includes(user_id)) {
+            return {status: false, message: "매칭 대기 중"};
+        }
         if (this.gameMatchQue.length === 0)
         {
             this.gameMatchQue.push(user_id);
+            this.server.to(String(user_id)).emit(`render-gameroom`, {status: 'matching', room: user_id});
             return {status: false, message: "매칭 대기 중"};
         }
         const enemy_id = this.gameMatchQue.pop();
-        this.InGame.set(enemy_id, new InGameRoom(user_id));
+        this.InGame.set(enemy_id, new InGameRoom(enemy_id));
         this.InGame.get(enemy_id).user2_id = user_id;
-        this.InGame.set(user_id, this.InGame.get(user_id));
+        this.InGame.set(user_id, this.InGame.get(enemy_id));
         this.SocketService.JoinRoom(enemy_id, `game-${enemy_id}`, this.server);
         this.SocketService.JoinRoom(user_id, `game-${enemy_id}`, this.server);
+        this.server.to(`game-${enemy_id}`).emit(`render-gameroom`, {status: 'ingame', room: this.InGame.get(enemy_id)});
         return {status: true, message: "매칭 성공", data: this.InGame.get(user_id)};
     }
 
-    MatchCancel()
+    CancelMatch()
     {
         const user_id = this.gameMatchQue.pop();
+        this.server.to(String(user_id)).emit(`render-gameroom`, {status: 'home', room: user_id});
         return {status: true, message: "매칭 취소 완료", data: user_id}
+    }
+
+    ExitGame(user_id: number)
+    {
+        const user1_id = this.InGame.get(user_id).user1_id;
+        const user2_id = this.InGame.get(user_id).user2_id;
+        this.InGame.delete(user1_id);
+        this.InGame.delete(user2_id);
+        this.server.to(`game-${user1_id}`).emit(`render-gameroom`, {status: 'home', room: ``});
+        this.SocketService.LeaveRoom(String(user1_id), `game-${user1_id}`, this.server);
+        this.SocketService.LeaveRoom(String(user2_id), `game-${user1_id}`, this.server);
+        return {status: true, message: "게임 종료"};
     }
 }

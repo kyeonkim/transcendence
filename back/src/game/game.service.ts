@@ -136,4 +136,18 @@ export class GameService {
         return this.socketGameService.GetRoomInfo(user_id);
     }
 
+    async MatchGame(user_id: number)
+    {
+        return this.socketGameService.MatchGame(user_id);
+    }
+
+    async CancleMatch()
+    {
+        return this.socketGameService.CancelMatch();
+    }
+
+    async ExitGame(user_id: number)
+    {
+        return this.socketGameService.ExitGame(user_id);
+    }
 }
