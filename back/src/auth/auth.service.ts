@@ -48,14 +48,14 @@ export class AuthService {
 			},
 			update: {
 				access_token: await this.jwtService.signAsync(payload, {expiresIn: '1h', secret: process.env.JWT_SECRET}),
-				refresh_token:await this.jwtService.signAsync(payload, {expiresIn: '1h', secret: process.env.JWT_SECRET}),
+				refresh_token:await this.jwtService.signAsync(payload, {expiresIn: '1d', secret: process.env.JWT_SECRET}),
 				twoFAPass: twoFAPass,
 			},
 			create: {
 				user_id: id,
 				nick_name: nickName,
 				access_token: await this.jwtService.signAsync(payload, {expiresIn: '1h', secret: process.env.JWT_SECRET}),
-				refresh_token:await this.jwtService.signAsync(payload, {expiresIn: '1h', secret: process.env.JWT_SECRET}),
+				refresh_token:await this.jwtService.signAsync(payload, {expiresIn: '1d', secret: process.env.JWT_SECRET}),
 				twoFAPass: twoFAPass,
 			},
 		});
