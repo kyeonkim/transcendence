@@ -46,10 +46,12 @@ export class ChatController {
 	@UseGuards(AuthGuard('jwt-access'))
 	@ApiBearerAuth('JWT-acces')
     @Patch("changeroom")
-    async ChangeRoom(@Body() room: ChatRoomDto)
+    async ChangeRoom(@Headers() headers, @Body() data: ChatRoomDto)
     {
-        //권환 확인 필요
-        return await this.ChatService.ChangeRoom(room);
+        const room =  await this.ChatService.GetMyRoomByHeader(headers);
+        if (room === null || room.chatroom_id !== data.room_idx || room.chatroom.owner_id !== room.user_id)
+            return {status: false, message: 'not manager'};
+        return await this.ChatService.ChangeRoom(data);
     }
 
     @ApiOperation({summary: `채팅 방 입장 API`, description: `채팅방에 입장한다.`})
@@ -72,7 +74,6 @@ export class ChatController {
     async LeaveRoom(@Body() room : JoinRoomDto)
     {
         const rtn = await this.ChatService.LeaveRoom(room);
-        console.log(rtn);
         if (rtn.status === true)
             this.socketService.HandleNotice(room.room_id, `유저 ${room.user_nickname}님이 퇴장하였습니다.`);
         return rtn;
@@ -83,9 +84,11 @@ export class ChatController {
 	@UseGuards(AuthGuard('jwt-access'))
 	@ApiBearerAuth('JWT-acces')
     @Patch("setmanager")
-    async SetManager(@Body() data : SetChatUserDto)
+    async SetManager(@Headers() headers, @Body() data : SetChatUserDto)
     {
-        //토큰을 가져와서 유저아이디와 room_idx의 방장인지 확인해야할듯
+        const room =  await this.ChatService.GetMyRoomByHeader(headers);
+        if (room === null || room.chatroom_id !== data.room_id || room.chatroom.owner_id !== room.user_id)
+            return {status: false, message: 'not manager'};
         return await this.ChatService.SetManager(data);
     }
 
@@ -95,9 +98,8 @@ export class ChatController {
     @Patch("unsetmanager")
     async UnsetManager(@Headers() headers, @Body() data : SetChatUserDto)
     {
-        //토큰을 가져와서 유저아이디와 room_idx의 방장인지 확인해야할듯
         const room =  await this.ChatService.GetMyRoomByHeader(headers);
-        if (room === null || room.chatroom_id !== data.room_id || room.is_manager !== true)
+        if (room === null || room.chatroom_id !== data.room_id || room.chatroom.owner_id !== room.user_id)
             return {status: false, message: 'not manager'};
         return await this.ChatService.UnsetManager(data);
     }
@@ -108,22 +110,21 @@ export class ChatController {
     @Patch("muteuser")
     async MuteUser(@Headers() headers, @Body() data : SetChatUserDto)
     {
-        //토큰을 가져와서 유저아이디와 room_idx의 매니저인지 확인해야할듯
         const room =  await this.ChatService.GetMyRoomByHeader(headers);
-        // console.log(room);
         if (room === null || room.chatroom_id !== data.room_id || room.is_manager !== true)
             return {status: false, message: 'not manager'};
-        else
-            return await this.ChatService.MuteUser(data);
+        return await this.ChatService.MuteUser(data);
     }
 
     @ApiOperation({summary: `유저 unmute API`, description: `유저를 unmute한다.`})
 	@UseGuards(AuthGuard('jwt-access'))
 	@ApiBearerAuth('JWT-acces')
     @Patch("unmuteuser")
-    async UnmuteUser(@Body() data : SetChatUserDto)
+    async UnmuteUser(@Headers() headers, @Body() data : SetChatUserDto)
     {
-        //토큰을 가져와서 유저아이디와 room_idx의 매니저인지 확인해야할듯
+        const room =  await this.ChatService.GetMyRoomByHeader(headers);
+        if (room === null || room.chatroom_id !== data.room_id || room.is_manager !== true)
+            return {status: false, message: 'not manager'};
         return await this.ChatService.UnmuteUser(data);
     }
 
@@ -131,9 +132,11 @@ export class ChatController {
 	@UseGuards(AuthGuard('jwt-access'))
 	@ApiBearerAuth('JWT-acces')
     @Patch("banuser")
-    async BanUser(@Body() data : SetChatUserDto)
+    async BanUser(@Headers() headers, @Body() data : SetChatUserDto)
     {
-        //권한 확인 필요
+        const room =  await this.ChatService.GetMyRoomByHeader(headers);
+        if (room === null || room.chatroom_id !== data.room_id || room.is_manager !== true)
+            return {status: false, message: 'not manager'};
         return await this.ChatService.BanUser(data);
     }
 
@@ -141,9 +144,11 @@ export class ChatController {
 	@UseGuards(AuthGuard('jwt-access'))
 	@ApiBearerAuth('JWT-acces')
     @Patch("unbanuser")
-    async UnbanUser(@Body() data : SetChatUserDto)
+    async UnbanUser(@Headers() headers, @Body() data : SetChatUserDto)
     {
-        //권한 확인 필요
+        const room =  await this.ChatService.GetMyRoomByHeader(headers);
+        if (room === null || room.chatroom_id !== data.room_id || room.is_manager !== true)
+            return {status: false, message: 'not manager'};
         return await this.ChatService.UnbanUser(data);
     }
 
@@ -151,9 +156,11 @@ export class ChatController {
 	@UseGuards(AuthGuard('jwt-access'))
 	@ApiBearerAuth('JWT-acces')
     @Patch("kickuser")
-    async KickUser(@Body() data : SetChatUserDto)
+    async KickUser(@Headers() headers, @Body() data : SetChatUserDto)
     {
-        //권한 확인 필요
+        const room =  await this.ChatService.GetMyRoomByHeader(headers);
+        if (room === null || room.chatroom_id !== data.room_id || room.is_manager !== true)
+            return {status: false, message: 'not manager'};
         return await this.ChatService.KickUser(data);
     }
 
