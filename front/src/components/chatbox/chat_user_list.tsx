@@ -9,6 +9,7 @@ export default function UserList(props: any) {
 	const [list, setList] = useState([]);
 	const [targetData, setTargetData] = useState<any>(null);
 	const [isOwner, setIsOwner] = useState(false);
+	const [Creater, setCreater] = useState(0);
 	const cookies = useCookies();
 	const token = cookies.get("access_token");
 	const my_id = cookies.get("user_id");
@@ -23,6 +24,7 @@ export default function UserList(props: any) {
 			})
 			.then((res) => {
 				const userList = res.data.room.roomusers || [];
+				setCreater(res.data.room.owner_id);
 				setList(userList);
 			})
 			.catch((err) => {
@@ -56,8 +58,10 @@ export default function UserList(props: any) {
 			headers: {
 				Authorization: `Bearer ${cookies.get('access_token')}`,
 			},
-		}
-		)
+		})
+		.then((res) => {
+			setPop(false);
+		})
 	}
 
 	const handleOP = async () => {
@@ -71,8 +75,28 @@ export default function UserList(props: any) {
 			headers: {
 				Authorization: `Bearer ${cookies.get('access_token')}`,
 			},
-		}
-		)
+		})
+		.then((res) => {
+			setPop(false);
+		})
+	}
+
+	const handleUnOP = async () => {
+		await axiosToken.patch(`${process.env.NEXT_PUBLIC_API_URL}chat/unsetmanager`, {
+			user_id: Number(my_id),
+			room_id: Number(roominfo.idx),
+			target_id: Number(targetData.user_id),
+			target_nickname: targetData.user_nickname,
+		},
+		{
+			headers: {
+				Authorization: `Bearer ${cookies.get('access_token')}`,
+			},
+		})
+		.then((res) => {
+			console.log("unsetmanager response===", res);
+			setPop(false);
+		})
 	}
 
 	const handleKick = async () => {
@@ -86,8 +110,10 @@ export default function UserList(props: any) {
 			headers: {
 				Authorization: `Bearer ${cookies.get('access_token')}`,
 			},
-		}
-		)
+		})
+		.then((res) => {
+			setPop(false);
+		})
 	}
 
 	const handleProfile = () => {	
@@ -168,12 +194,24 @@ export default function UserList(props: any) {
 						<Typography variant="inherit">게임초대</Typography>
 					</ListItemButton>
 					<Divider />
-					{isOwner && targetData?.user_id !== Number(my_id) && (
+					{Number(my_id) === Creater && !targetData?.is_manager && (
+						<>
+						<ListItemButton onClick={handleOP}>
+							<Typography variant="inherit">권한부여</Typography>
+						</ListItemButton>
+						<Divider />
+						</>
+					)}
+					{Number(my_id) === Creater && targetData?.is_manager && (
+						<>
+						<ListItemButton onClick={handleUnOP}>
+							<Typography variant="inherit">권한해제</Typography>
+						</ListItemButton>
+						<Divider />
+						</>
+					)}
+					{isOwner && targetData?.user_id !== Number(my_id) && targetData?.user_id !== Creater && (
 					<>
-					<ListItemButton onClick={handleOP}>
-						<Typography variant="inherit">권한부여</Typography>
-					</ListItemButton>
-					<Divider />
 					<ListItemButton onClick={handleMute}>
 						<Typography variant="inherit">뮤트</Typography>
 					</ListItemButton>	

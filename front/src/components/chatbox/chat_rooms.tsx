@@ -157,11 +157,12 @@ const MainChatRoomList = styled(Grid) ({
 			<ChatRoomBar setMTbox={setMTbox} handleRenderMode={handleRenderMode} />
             {roomList ? (
 			<div>
-				<MainChatRoomList spacing={2}>
+				<MainChatRoomList>
 				{roomList.map((room) => {
 					console.log('room data - ', room);
 					return (
 							<ChatRoomBlock
+								key={room.idx}
 								room={room}
 								openModal={openModal}
 								setOpenModal={setOpenModal}
