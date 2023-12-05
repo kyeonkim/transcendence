@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { Server } from "socket.io";
 import { SocketService } from "./socket.service";
 import { EventService } from "src/event/event.service";
+import { PrismaService } from "src/prisma/prisma.service";
 
 export class GameRoom {
     constructor(user_id: number)
@@ -32,6 +33,7 @@ export class SocketGameService {
     constructor(
         private readonly SocketService: SocketService,
         private readonly eventService: EventService,
+        private readonly prismaservice: PrismaService,
     ){}
     private gameRoomMap = new Map<number, GameRoom>();
     private gameMatchQue = new Array<number>();
@@ -182,8 +184,10 @@ export class SocketGameService {
         return {status: true, message: "매칭 취소 완료", data: user_id}
     }
 
-    ExitGame(user_id: number)
+    async ExitGame(user_id: number)
     {
+        if (this.InGame.get(user_id) === undefined)
+            return {status: false, message: "게임이 존재하지 않습니다."};
         const user1_id = this.InGame.get(user_id).user1_id;
         const user2_id = this.InGame.get(user_id).user2_id;
         this.InGame.delete(user1_id);
@@ -191,6 +195,40 @@ export class SocketGameService {
         this.server.to(`game-${user1_id}`).emit(`render-gameroom`, {status: 'home', room: ``});
         this.SocketService.LeaveRoom(String(user1_id), `game-${user1_id}`, this.server);
         this.SocketService.LeaveRoom(String(user2_id), `game-${user1_id}`, this.server);
+        const user1 =   await this.prismaservice.user.findUnique({
+            where: {
+                user_id: user1_id,
+            },
+        });
+        const user2 =   await this.prismaservice.user.findUnique({
+            where: {
+                user_id: user2_id,
+            },
+        });
+        //Elo 계산
+        const user2_we = 1 / ((10 ** ((user1.ladder - user2.ladder) / 400)) + 1);
+        const user1_we = 1 - user2_we;
+        const k = 20;
+        const user2_pb = user2.ladder + k * ((user_id === user2.user_id ? 0 : 1) - user2_we);
+        const user1_pb = user1.ladder + k * ((user_id === user1.user_id ? 0 : 1) - user1_we);
+        console.log("user2_pb : ", Math.round(user2_pb), "user1_pb : ", Math.round(user1_pb));
+        //prisma data에 넣기
+        await this.prismaservice.user.update({
+            where: {
+                user_id: user1_id,
+            },
+            data: {
+                ladder: Math.round(user1_pb),
+            },
+        });
+        await this.prismaservice.user.update({
+            where: {
+                user_id: user2_id,
+            },
+            data: {
+                ladder: Math.round(user2_pb),
+            },
+        });
         return {status: true, message: "게임 종료"};
     }
 }
