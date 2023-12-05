@@ -8,7 +8,7 @@ export class SocketService {
     constructor(
         private readonly prismaService: PrismaService,
     ) {}
-    private sockets = new Map<any, string>();
+    private sockets = new Map<string, string>();
 
     async Connect(user_id: any, socket_id: string, server: Server)
     {
@@ -103,11 +103,11 @@ export class SocketService {
             server.sockets.sockets.get(this.sockets.get(String(user_id))).join(room);
     }
 
-    async LeaveRoom(user_id: any, room: string, server: Server)
+    async LeaveRoom(user_id: string, room: string, server: Server)
     {
-        console.log("LeaveRoom user_id: ", user_id, " | LeaveRoom: ", this.sockets.get(String(user_id)));
-        if(this.sockets.get(user_id) !== undefined)
-            server.sockets.sockets.get(this.sockets.get(user_id)).leave(room);
+        console.log("LeaveRoom user_id: ", user_id, " | LeaveRoom: ", room);
+        if(this.sockets.get(String(user_id)) !== undefined)
+            server.sockets.sockets.get(this.sockets.get(String(user_id))).leave(room);
     }
 
     async SendStatusTest(user_id: any, status: string, server: Server)
