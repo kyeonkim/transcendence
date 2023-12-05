@@ -135,7 +135,7 @@ export default function ChatRoomCreate(props: any) {
 					}}
 					id="chatroom_name_text_field"
 					label="Chatroom Name"
-					inputProps={{ maxLength: 20}}
+					inputProps={{ maxLength: 10}}
 					onChange={handleRoomnameChange}
 					onKeyDown={(e) => {
 						if (e.key === 'Enter') {

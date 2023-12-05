@@ -66,19 +66,19 @@ export default function AlarmAddFriend ( {alarm, alarmReducer, handleProfile, im
                     // key={alarm.from_nickname}
                     disablePadding
                 >
-                <HandshakeIcon />
+                <HandshakeIcon sx={{color: 'white'}}/>
                 <ListItemButton onClick={handleProfile(alarm)}>
                     <ListItemAvatar>
                     <Avatar
                         src={alarm.from_nickname ? imageLoader({src: alarm.from_nickname}) : null}
                     />
                     </ListItemAvatar>
-                    <ListItemText id={labelId} primary={`${alarm.from_nickname}`} />
+                    <ListItemText id={labelId} sx={{color: 'white'}} primary={`${alarm.from_nickname}`} />
                 </ListItemButton>
-                <IconButton onClick={acceptFriendRequest(alarm)}>
+                <IconButton sx={{color: 'green'}} onClick={acceptFriendRequest(alarm)}>
                     <CheckCircleOutlineRoundedIcon />
                 </IconButton>
-                <IconButton onClick={denyRequest(alarm)}>
+                <IconButton sx={{color: 'red'}}onClick={denyRequest(alarm)}>
                     <ClearRoundedIcon />
                 </IconButton>
                 </ListItem>

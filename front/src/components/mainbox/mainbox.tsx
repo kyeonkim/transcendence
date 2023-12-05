@@ -4,6 +4,7 @@ import Matching from './match';
 
 const MainBox = (props: any) => {
   const { mod, search } = props;
+
   const handleRender = () => {
     if (mod === 1)
       return <ProfilePage nickname={search}/>;

@@ -13,6 +13,9 @@ import { useChatSocket } from '@/app/main_frame/socket_provider';
 import { axiosToken } from '@/util/token';
 import { useCookies } from 'next-client-cookies';
 
+//게임화면 test
+import Test from '../game/test';
+
 
 export default function Matching() {
 	const [render, setRender] = useState(0);
@@ -32,28 +35,29 @@ export default function Matching() {
 		}
 		
 		socket.on('render-gameroom', (data: any) => {
-			console.log("game room render data===", data); /*{user1_id, user2_id, user1_ready, user2_ready}*/
-			if (data.room.user1_id === null && data.room.user2_id === null)
+			console.log("game render data===", data);
+			if (data.status === 'matching')
+				setRender(1);
+			else if (data.status === 'gameroom')
+				setRender(2);
+			else if (data.status === 'ingame')
+				setRender(3);
+			else 
 				setRender(0);
-			else
-				setRender(2);	
 			setData(data);
 		});
-
 		fetchData();
 	}, []);
-
-
 
 	const handleRender = () => {
 		console.log("render: ", render);
 		if (render === 1)
-			return <RankMatch/>
+			return <RankMatch setRender={setRender}/>
 		else if (render === 2)
 			return <GameRoom setRender={setRender} userData={data}/>
 		else if (render === 3)
 		{
-			return <div></div>;
+			return <Test setRender={setRender}/>;
 			{/* return <Pong setRender={setRender} /> */}
 		}
 

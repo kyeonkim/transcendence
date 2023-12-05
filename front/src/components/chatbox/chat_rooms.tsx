@@ -23,11 +23,11 @@ const MainChatRoomList = styled(Grid) ({
 	top: '7.5%',
 	left: '4%',
 	overflowY: "scroll",
-	height: '94%',
+	height: '92.5%',
+	width: '92%',
 		// backgroundColor: 'white',
 	borderRadius: '10px',
-	maxWidth: '100%',
-	maxHeight: '100%',
+	// maxHeight: '100%',
 	scrollbarWidth: 'none',
     '&::-webkit-scrollbar': {
       display: 'none',
@@ -47,7 +47,7 @@ const MainChatRoomList = styled(Grid) ({
 	const socket = useChatSocket();
 	const cookies = useCookies();
 	const [roomList, setRoomList] = useState([]);
-	const [render, setRender] = useState(false);
+	const [data, setData] = useState<any>();
 	const [openModal, setOpenModal] = useState(false);
 	const [selectedIdx, setSelectedIdx] = useState(-1);
 
@@ -57,13 +57,6 @@ const MainChatRoomList = styled(Grid) ({
 	console.log("ChatRoomList");
 	console.log("CHL - user_id - ", user_id);
 	console.log("CHL - nickname - ", user_nickname);
-	
-	const handleRender = () => {
-		if (render === true)
-			setRender(false);
-		else 
-			setRender(true);
-	}
 
 	async function handleRoomList() {
 		setRoomList([]);
@@ -123,7 +116,7 @@ const MainChatRoomList = styled(Grid) ({
 			// !!!!! 방 인원이 가득 찬 경우 - 방에 들어가지 못하고, 목록 다시 렌더링
 				// 에러로 뺄 수도 있을 것 같은데, 협의 필요.
 			console.log('trying to render');
-			handleRender();
+			// handleData(data);
 		}
 		})
 		.catch ((error) => {
@@ -133,7 +126,7 @@ const MainChatRoomList = styled(Grid) ({
 			// internal error
 				// 종류 따라 다를 듯
 			console.log('trying to render');
-			handleRender();
+			// handleData(data);
 		});
 
 	}
@@ -141,11 +134,10 @@ const MainChatRoomList = styled(Grid) ({
 	useEffect(() => {
 
 		const doRenderChatRooms = (data :any) => {
-			handleRender();
+			setData(data);
 		}
 
 		socket.on('render-chat', doRenderChatRooms)
-
 		return () => {
 			socket.off('render-chat', doRenderChatRooms);
 		}
@@ -158,27 +150,17 @@ const MainChatRoomList = styled(Grid) ({
 		handleRoomList();
 		// 다시 가져오는 신호는?
 		// handleRenderList(false);
-	}, [render])
-
-	// useEffect(() => {
-
-	// 	handleRoomList();
-	// 	// 다시 가져오는 신호는?
-	// 	// handleRenderList(false);
-	// }, [renderChild])
-
-	// const	setMTbox = props.setMTbox;
+	}, [data])
 
 	return (
 		<div>
 			<ChatRoomBar setMTbox={setMTbox} handleRenderMode={handleRenderMode} />
             {roomList ? (
 			<div>
-				<MainChatRoomList container spacing={2}>
+				<MainChatRoomList spacing={2}>
 				{roomList.map((room) => {
 					console.log('room data - ', room);
 					return (
-						<Grid container key={room.idx}>
 							<ChatRoomBlock
 								room={room}
 								openModal={openModal}
@@ -187,7 +169,6 @@ const MainChatRoomList = styled(Grid) ({
 								setSelectedIdx={setSelectedIdx}
 								handleJoin={handleJoin}
 								/>
-						</Grid>
 					);
 				})}
 				</MainChatRoomList>

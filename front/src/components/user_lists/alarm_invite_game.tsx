@@ -1,11 +1,12 @@
 'use client'
 
-import { Avatar, IconButton, ListItem, ListItemButton, Typography } from "@mui/material";
+import { Avatar, IconButton, ListItem, ListItemAvatar, ListItemButton, ListItemText, Typography } from "@mui/material";
 import { axiosToken } from "@/util/token";
 import { useCookies } from "next-client-cookies";
 
 import CheckCircleOutlineRoundedIcon from '@mui/icons-material/CheckCircleOutlineRounded';
 import ClearRoundedIcon from '@mui/icons-material/ClearRounded';
+import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
 
 export default function AlarmInviteGame (props: any) {
 	const { alarm, handleProfile, imageLoader, denyRequest, cookies, alarmReducer} = props;
@@ -29,17 +30,22 @@ export default function AlarmInviteGame (props: any) {
 			alarmReducer(alarm);
 		})
 	}
+	const labelId = `comment-list-secondary-label-${alarm.from_nickname}`;
+
 	return (
 		<div>
 			<ListItem disablePadding>
+				<SportsEsportsIcon sx={{color: 'white'}}/>
 				<ListItemButton onClick={handleProfile(alarm)}>
-					<Avatar src={alarm.from_nickname ? imageLoader({src: alarm.from_nickname}) : null} />
-					<Typography>{alarm.from_nickname}</Typography>
+					<ListItemAvatar>
+						<Avatar src={alarm.from_nickname ? imageLoader({src: alarm.from_nickname}) : null} />
+					</ListItemAvatar>
+					<ListItemText id={labelId} sx={{color: 'white'}} primary={`${alarm.from_nickname}`} />
 				</ListItemButton>
-				<IconButton onClick={acceptInviteGame(alarm)}>
+				<IconButton sx={{color: 'green'}}onClick={acceptInviteGame(alarm)}>
 					<CheckCircleOutlineRoundedIcon />
 				</IconButton>
-				<IconButton onClick={denyRequest(alarm)}>
+				<IconButton sx={{color: 'red'}}onClick={denyRequest(alarm)}>
 					<ClearRoundedIcon />
 				</IconButton>
 			</ListItem>

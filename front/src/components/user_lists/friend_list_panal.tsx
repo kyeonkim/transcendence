@@ -243,7 +243,6 @@ export default function FriendListPanel(props: any) {
 					// border: '2px solid #fff',
 					// borderRadius: 3,
 					overflow: 'auto',
-
 				}}>
 				{apiResponse?.length > 0 ? (
 					apiResponse.map((user: any) => (
@@ -279,7 +278,7 @@ export default function FriendListPanel(props: any) {
 						</ListItem>
 					))
 				) : (
-					<div>친구없음</div>
+					<div></div>
 				)}
 			</List>
 			{(dmOpenId > -1) ? (

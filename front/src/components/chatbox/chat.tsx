@@ -227,7 +227,7 @@ export default function Chat(props: any) {
 				BackdropProps={{
 					onClick: handledialogClose,
 				  }}
-				sx={{marginLeft: '2000px'}}>
+				sx={{marginLeft: '76%'}}>
 			<DialogTitle>Invite</DialogTitle>
 				<DialogContent>
 				<DialogContentText>

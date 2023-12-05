@@ -74,6 +74,8 @@ export default function AlarmListPanal (props: any) {
   const setMTbox = props.setMTbox;
 
   const alarmReducer = (alarm :any) => {
+      if (alarm.event_type === 'game')
+        setMTbox(2);
       alarmListRemover(alarm);
       alarmCountHandler(false);
   }
@@ -115,7 +117,7 @@ export default function AlarmListPanal (props: any) {
           console.log('add_friend deny request');
           removeEventFromDatabase(alarm);
       }
-      else if (alarm.event_event_type === 'invite_chat')
+      else if (alarm.event_type === 'invite_chat')
       {
           console.log('invite_chat deny request');
           removeEventFromDatabase(alarm);
@@ -145,12 +147,17 @@ export default function AlarmListPanal (props: any) {
 
   return (
     <div>
-      {alarmList ? (
-        <List dense sx={{ width: '100%', maxWidth: 400, maxHeight: 580,bgcolor: 'background.paper', overflow: 'auto'}}>
-          {alarmList.map((alarm :any, idx :number) => {
-            if (alarm.event_type === 'add_friend')
-            {
-              console.log('alarm data - ', alarm);
+      <List dense
+        sx={{
+          width: '110%',
+          maxWidth: 400,
+          maxHeight: 580,
+          bgcolor: 'transparent',
+          overflow: 'auto',
+        }}>
+      {alarmList?.length > 0 ? (
+          alarmList.map((alarm :any, idx :number) => {
+            if (alarm.event_type === 'add_friend') {
               return (
                   <AlarmAddFriend
                     key={idx}
@@ -162,10 +169,7 @@ export default function AlarmListPanal (props: any) {
                     >
                   </AlarmAddFriend>
               );
-            }
-            else if (alarm.event_type === 'invite_chat')
-            {
-              console.log('alarm data - ', alarm);
+            } else if (alarm.event_type === 'invite_chat') {
               return (
                   <AlarmInviteChat
                     key={idx}
@@ -181,9 +185,7 @@ export default function AlarmListPanal (props: any) {
                   >
                   </AlarmInviteChat>
               );
-            }
-            else if (alarm.event_type === 'game')
-            {
+            } else if (alarm.event_type === 'game') {
               return (
                 <AlarmInviteGame
                   ket={idx}
@@ -196,11 +198,12 @@ export default function AlarmListPanal (props: any) {
                 />
               );
             }
-          })}
-        </List>
-      ) : (
-        <p>알람이 없습니다.</p>
-      )}
+            return null;
+          })
+          ) : (
+            <></>
+          )}
+      </List>
     </div>
   );
 }

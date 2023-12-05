@@ -188,19 +188,19 @@ export default function AlarmInviteChat (
                 //    key={alarm.from_nickname}
                    disablePadding
                 >
-                   <AddCommentIcon />
+                   <AddCommentIcon sx={{color: 'white'}}/>
                    <ListItemButton onClick={handleProfile(alarm)}>
                        <ListItemAvatar>
                        <Avatar
                          src={alarm.from_nickname ? imageLoader({src: alarm.from_nickname}) : null}
                        />
                        </ListItemAvatar>
-                       <ListItemText id={labelId} primary={`${alarm.from_nickname}`} />
+                       <ListItemText id={labelId} sx={{color: 'white'}} primary={`${alarm.from_nickname}`} />
                    </ListItemButton>
-                    <IconButton onClick={acceptInviteChat(alarm)}>
+                    <IconButton sx={{color: 'green'}}onClick={acceptInviteChat(alarm)}>
                        <CheckCircleOutlineRoundedIcon />
                    </IconButton>
-                   <IconButton onClick={denyRequest(alarm)}>
+                   <IconButton sx={{color: 'red'}}onClick={denyRequest(alarm)}>
                        <ClearRoundedIcon />
                    </IconButton>
                  </ListItem>

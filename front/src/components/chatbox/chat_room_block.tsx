@@ -20,16 +20,15 @@ import { styled } from '@mui/system';
 import { Paper } from '@mui/material';
 
 const modalStyle = {
-    position: 'absolute' as 'absolute',
+    position: 'absolute',
     top: '50%',
-    left: '50%',
+    left: '88%',
     transform: 'translate(-50%, -50%)',
-    width: '1%',
+    width: '10%',
     bgcolor: 'background.paper',
     border: '2px solid #000',
-    boxShadow: 24,
+    boxShadow: 0,
     p: 4,
-    opacity: 0.5
 };
 
 export default function ChatRoomBlock({room, openModal, setOpenModal, selectedIdx, setSelectedIdx, handleJoin} :any) {
@@ -75,11 +74,12 @@ export default function ChatRoomBlock({room, openModal, setOpenModal, selectedId
 
 
     return (
-        <Grid item>
+        <>
             <CardContent
               sx = {{
-                width: '100%',
+                width: '80%',
                 minWidth: 300,
+                maxHeight: 180,
                 margin: '5%',
                 background: 'transparent',
                 border: '2px solid #fff',
@@ -87,16 +87,14 @@ export default function ChatRoomBlock({room, openModal, setOpenModal, selectedId
               }} 
             >
                 <Typography sx={{marginLeft: 2, marginTop: 2, color: 'white'}} variant='h4' gutterBottom>
-                    {room.name}
+                    {room.name} 
+                    {room.is_password ? ( <LockIcon style={{fontSize: 40, color: 'white', marginLeft: 2,}}/>) : ( <p></p> )}		
                 </Typography>
                 <Typography sx={{marginLeft: 2, color: 'white'}} gutterBottom>
                     {room.owner_nickname}의 방
-                </Typography>
-                <Box style={{width: 150, height: 30, textAlign:'right'}}>
-                    {room.ispassword ? ( <LockIcon style={{fontSize: 40}}/>) : ( <p></p> )}		
-                </Box>
+                </Typography>	
                 <CardActions>
-                    <Button sx={{ position: 'absolute', }}size="small" variant="contained" onClick={() => handlePasswordModal(room.is_password, room.idx)}>Join</Button>
+                    <Button sx={{marginTop: 2,}}size="small" variant="contained" onClick={() => handlePasswordModal(room.is_password, room.idx)}>Join</Button>
                 </CardActions>
             </CardContent>
             <Modal
@@ -104,6 +102,9 @@ export default function ChatRoomBlock({room, openModal, setOpenModal, selectedId
                 onClose={handleModalClose}
                 aria-labelledby="input-password"
                 aria-describedby="password-text-field"
+                BackdropProps={{
+                    invisible: true,
+                  }}
             >
                 <Box sx={modalStyle}>
                     <Typography id="modal-modal-title">
@@ -112,7 +113,7 @@ export default function ChatRoomBlock({room, openModal, setOpenModal, selectedId
                     <TextField
                         sx={{
                                 top: 10,
-                                width:300
+                                width:'80%'
                         }}
                         id="password_text_field"
                         label="password"
@@ -121,6 +122,6 @@ export default function ChatRoomBlock({room, openModal, setOpenModal, selectedId
                 <Button sx={{top: 20}} size="small" variant="contained" onClick={() => handleCheckPassword()}>Join</Button>
                 </Box>
             </Modal>
-        </Grid>
+            </>
     );
 }

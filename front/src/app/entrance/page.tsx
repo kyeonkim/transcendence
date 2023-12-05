@@ -30,7 +30,7 @@ export default function Home() {
 
 
 function ButtonUsage() {
-  return <Button variant="contained" onClick={handleLogin}>Hello world</Button>;
+  return <Button variant="contained" onClick={handleLogin}>Sign with 42</Button>;
 
 }
 
