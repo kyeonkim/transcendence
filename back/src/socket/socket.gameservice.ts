@@ -23,6 +23,10 @@ export class InGameRoom {
     game_mode: boolean = false;
     user1_id: number;
     user2_id: number;
+    user1_ready: boolean = false;
+    user2_ready: boolean = false;
+    user1_position: number;
+    user2_position: number;
     score1: number;
     score2: number;
 }
@@ -230,5 +234,35 @@ export class SocketGameService {
             },
         });
         return {status: true, message: "게임 종료"};
+    }
+
+    async GameStart(payload: any)
+    {
+        if (this.InGame.get(payload.user_id) === undefined)
+            return ;
+        if (this.InGame.get(payload.user_id).user1_id === Number(payload.user_id))
+            this.InGame.get(payload.user_id).user1_ready = true;
+        else
+            this.InGame.get(payload.user_id).user2_ready = true;
+        if (this.InGame.get(payload.user_id).user1_ready && this.InGame.get(Number(payload.user_id)).user2_ready)
+        {
+            console.log("game start send");
+            this.server.to(`game-${this.InGame.get(payload.user_id).user1_id}`).emit(`initGame`, {room: this.InGame.get(payload.user_id)});
+        }
+    }
+
+    async Game(payload: any, user_id: number)
+    {
+        console.log("game: ", payload, user_id, this.InGame.get(user_id));
+        if (this.InGame.get(user_id) === undefined)
+            return ;
+        if (this.InGame.get(user_id).user1_id === user_id) {
+            console.log(`game-${this.InGame.get(user_id).user2_id}`);
+            this.server.to(`${this.InGame.get(user_id).user2_id}`).emit(`game`, {y: payload.y});
+        }
+        else {
+            console.log(`game-${this.InGame.get(user_id).user1_id}`);
+            this.server.to(`${this.InGame.get(user_id).user1_id}`).emit(`game`, {y: payload.y});
+        }
     }
 }

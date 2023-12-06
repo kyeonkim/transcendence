@@ -162,4 +162,18 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
     console.log("=====SendDM Test======", from_id, to_id, message);
     await this.SocketService.SendDm(from_id, to_id, message, this.server);
   }
+
+  @SubscribeMessage(`gameStart`)
+  async GameStart(Client: Socket, payload: any)
+  {
+    console.log("=====GameStart======", payload);
+    await this.SocketGameService.GameStart(payload);
+  }
+
+  @SubscribeMessage(`game`)
+  async Game(Client: Socket, payload: any)
+  {
+    console.log("=====Game======", Client.handshake.query.user_id,payload);
+    await this.SocketGameService.Game(payload, Number(Client.handshake.query.user_id));
+  }
 }
