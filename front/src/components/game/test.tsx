@@ -1,6 +1,7 @@
 import { axiosToken } from "@/util/token";
 import { Button, Typography } from "@mui/material";
 import { useCookies } from "next-client-cookies";
+import Pong from "./pong";
 
 export default function Test(props: any) {
 	const { setRender } = props;
@@ -24,9 +25,10 @@ export default function Test(props: any) {
 
 	return (
 		<div>
-			<Typography variant="h1" color="white" style={{fontWeight: 'bold'}}>
-				테스트 (게임화면임)
-			</Typography> 
+			<Pong />
+			{/* <Typography variant="h1" color="white" style={{fontWeight: 'bold'}}> */}
+				{/* 테스트 (게임화면임) */}
+			{/* </Typography>  */}
 			<Button variant="contained" color='error' onClick={exitGame}>
 				<Typography fontSize={50} style={{fontWeight: 'bold'}}>
 					Exit
