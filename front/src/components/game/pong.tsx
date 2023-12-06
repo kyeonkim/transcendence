@@ -1,6 +1,8 @@
 "use client"
 import { useState, useEffect, useRef } from 'react';
 import { fabric } from 'fabric';
+import { useChatSocket } from '@/app/main_frame/socket_provider';
+import { useCookies } from "next-client-cookies";
 
 // 새로 고침했을 때, 상위 컴포넌트에서 참가자 데이터를 받아오는가? 아니면 back에 요청을 하는가?
 
@@ -24,12 +26,16 @@ function initialData() {
 };
 
 export default function Pong (props :any){
-    
+    const socket = useChatSocket();
     const [canvas, setCanvas] = useState<fabric.Canvas>();
     const [board, setBoard] = useState<fabric.Canvas>();
     const [ball, setBall] = useState<fabric.Circle>();
     const [player1, setPlayer1] = useState<fabric.Rect>();
     const [player2, setPlayer2] = useState<fabric.Rect>();
+    
+    const [user, setUser] = useState<fabric.Rect>();
+    const [enemy, setEnemy] = useState<fabric.Rect>();
+
     const [user1Score, setUser1Score] = useState<fabric.Text>();
     const [user2Score, setUser2Score] = useState<fabric.Text>();
     const [scoreValue, setScoreValue] = useState([0, 0]);
@@ -56,6 +62,7 @@ export default function Pong (props :any){
 
     // const arrowupRef = useRef(isArrowUp);
     // const arrowdownRef = useRef(isArrowDown);
+	const   cookies = useCookies();
     const   score1Ref = useRef(user1Score);
     const   score2Ref = useRef(user2Score);
 
@@ -176,11 +183,14 @@ export default function Pong (props :any){
         function drawing() {
             // 플레이어 이동
             // console.log(`allow up : ${isArrowUp} and allow down : ${isArrowDown}`);
-            if (isArrowPressed.arrowUp === true && player1.top > 0) {
-                player1.set('top', Math.max(player1.top - 10, 0));
+            // console.log("drawingdrawingdrawingdrawing : ", user);
+            if (isArrowPressed.arrowUp === true && user.top > 0) {
+                user.set('top', Math.max(user.top - 10, 0));
+                socket.emit(`game`, {y: user.top});
             }
-            if (isArrowPressed.arrowDown === true && player1.top < CANVAS_HEIGHT - BAR_HEIGHT) {
-                player1.set('top', Math.min(player1.top + 10, CANVAS_HEIGHT - BAR_HEIGHT));
+            if (isArrowPressed.arrowDown === true && user.top < CANVAS_HEIGHT - BAR_HEIGHT) {
+                user.set('top', Math.min(user.top + 10, CANVAS_HEIGHT - BAR_HEIGHT));
+                socket.emit(`game`, {y: user.top});
             }
             // 공 이동
             ball.set('left', ball.left + ballVecXY.x);
@@ -354,10 +364,39 @@ export default function Pong (props :any){
         initPong();
         setReady(1);
     }, []);
-
+    
     useEffect(() => {
-        if(ready)
+        if(ready === 1)
+        {
+            console.log("init player : ", player1, player2);
+            console.log(`run pong`,ready, user);
+            socket.on(`initGame`, (data :any) => {
+                console.log('initGame');
+                if (data.room.user1_id === Number(cookies.get('user_id')))
+                {
+                    setUser(player1);
+                    setEnemy(player2);
+                } else {
+                    setUser(player2);
+                    setEnemy(player1);
+                }
+                console.log("init player : ", player1, player2);
+                console.log("init user : ", user, ready);
+                setReady(2);
+            });
+            socket.emit(`gameStart`, {user_id: Number(cookies.get('user_id'))});
+        }
+    }, [ready]);
+    
+    useEffect(() => {
+        if(ready === 2)
+        {
+            socket.on(`game`, (data :any) => {
+                console.log(`game : ${data.y}`, enemy);
+                enemy.top = data.y;
+            });
             runPong();
+        }
     }, [ready]);
 
     useEffect(() => {
