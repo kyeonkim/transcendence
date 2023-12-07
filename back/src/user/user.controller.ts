@@ -51,7 +51,7 @@ export class UserController {
 	@ApiConsumes('multipart/form-data')
 	UserFileUpload(@Query('nickname') nickName: string, @Body() img: uploadImgDto, @UploadedFile() file: Express.Multer.File)
 	{
-		return {status: true};
+		return {status: true, time: Date.now()};
 	}
 
 	@ApiTags('User API')
