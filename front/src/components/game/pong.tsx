@@ -35,6 +35,9 @@ export default function Pong (props :any){
     
     const [user, setUser] = useState<fabric.Rect>();
     const [enemy, setEnemy] = useState<fabric.Rect>();
+    const [gameData, setGameData] = useState({
+        startTime: 0,
+    })
 
     const [user1Score, setUser1Score] = useState<fabric.Text>();
     const [user2Score, setUser2Score] = useState<fabric.Text>();
@@ -57,6 +60,7 @@ export default function Pong (props :any){
         arrowUp: false,
         arrowDown: false
     });
+    const [ballFix, setBallFix] = useState({newData: false, time: 0, enemy: {}, ball: {}, ballVecXY: {}});
     // const [isArrowUp, setIsArrowUp] = useState(0);
     // const [isArrowDown, setIsArrowDown] = useState(0);
 
@@ -181,30 +185,44 @@ export default function Pong (props :any){
         let lastRequestId :number;
 
         function drawing() {
+ 
             // 플레이어 이동
-            // console.log(`allow up : ${isArrowUp} and allow down : ${isArrowDown}`);
-            // console.log("drawingdrawingdrawingdrawing : ", user);
             if (isArrowPressed.arrowUp === true && user.top > 0) {
                 user.set('top', Math.max(user.top - 10, 0));
-                socket.emit(`game`, {y: user.top});
+                socket.emit(`game-user-position`, {y: user.top});
             }
             if (isArrowPressed.arrowDown === true && user.top < CANVAS_HEIGHT - BAR_HEIGHT) {
                 user.set('top', Math.min(user.top + 10, CANVAS_HEIGHT - BAR_HEIGHT));
-                socket.emit(`game`, {y: user.top});
+                socket.emit(`game-user-position`, {y: user.top});
             }
             // 공 이동
             ball.set('left', ball.left + ballVecXY.x);
             ball.set('top', ball.top + ballVecXY.y);
 
+            // game-ball-fix - kyeonkim
+            if (ballFix.newData === true)
+            {
+                ball.set(`left`, ballFix.ball.left);
+                ball.set(`top`, ballFix.ball.top);
+                ballVecXY.x = ballFix.ballVecXY.x;
+                ballVecXY.y = ballFix.ballVecXY.y;
+                // enemy.set('left', ballFix.enemy.left);
+                // enemy.set('top', ballFix.enemy.top);
+                ballFix.newData = false;
+            }
             // 공 화면 위-아래 튕기기
             if (ball.top <= 0 || ball.top >= canvas.height - BALL_SIZE)
+            {
                 ballVecXY.y = -ballVecXY.y;
+                // game-ball-hit event - kyeonkim
+            }
             // 공 화면 바깥에 닿았는지 확인
-                // scoreValue를 set으로 설정해야함.
             if (ball.left + BALL_SIZE <= 0)
             {
                 ball.set({ left: canvas.width / 2 - BALL_SIZE / 2, top: canvas.height / 2 - BALL_SIZE / 2});
                 ballVecXY.x = -ballVecXY.x;
+                // game-ball-hit event - kyeonkim
+                socket.emit('game-ball-hit', {time: Date.now(), enemy: user, ball: ball, ballVecXY: ballVecXY});
                 scoreValue[1]++;
                 user2Score.set("text",`${scoreValue[1]}`);
             } 
@@ -212,13 +230,14 @@ export default function Pong (props :any){
             {
                 ball.set({ left: canvas.width / 2 - BALL_SIZE / 2, top: canvas.height / 2 - BALL_SIZE / 2});
                 ballVecXY.x = -ballVecXY.x;
+                // game-ball-hit event - kyeonkim
+                socket.emit('game-ball-hit', {time: Date.now(), enemy: user, ball: ball, ballVecXY: ballVecXY});
                 scoreValue[0]++;
                 user1Score.set("text",`${scoreValue[0]}`);
             }
             else
             {
-                // 공 플레이어에 닿는지 확인
-                // if (ballVecXY.x < 0 && ball.left - BALL_SIZE / 2 <= player1.left + player1.width && ball.top >= player1.top && ball.top <= player1.top + player1.height)
+                // 공 플레이어1 에 닿는지 확인
                 if (ballVecXY.x < 0 &&
                     ball.left <= player1.left + player1.width &&
                     ball.left >= player1.left &&
@@ -229,103 +248,13 @@ export default function Pong (props :any){
                     ballVecXY.x = Math.cos(Math.PI/4 * angle) * ballSpeed;
                     ballVecXY.x = ballVecXY.x > 0 ? ballVecXY.x : -ballVecXY.x;
                     ballVecXY.y = Math.sin(Math.PI/4 * angle) * ballSpeed;
-                    console.log('ballVecXY.x - ', ballVecXY.x, ' and ballVecXY.y - ', ballVecXY.y);
-                    {
-                        // 추가적으로 player 이동 방향 및 속도 기반으로 X 조정
-                        // if (ballVecXY.y > 0 && player1Speed > 0 || ballVecXY.y < 0 && player1Speed < 0)
-                        // {
-                        //     console.log('same direction');
-                        //     // 동일 방향
-                        //         // 사실상 player_speed의 음수 양수 말고는 방식이 동일한 것 같음.
-                        //     if (ballVecXY.y > 0)
-                        //     {
-                        //         // 위로 갈 때
-                        //         // 유저 속도 절삭
-                        //         const changedPlayerSpeed = (player1Speed * 8 / 20)
-                        //         const accumballVecY = ballVecXY.y + changedPlayerSpeed;
-
-                        //         const currentBallLength = Math.SQRT2 * (Math.pow(ballVecXY.x, 2) + Math.pow(accumballVecY, 2));
-                                
-                        //         if (currentBallLength > ballMaxSpeed)
-                        //         {
-                        //             ballVecXY.x = ballVecXY.x * ( ballMaxSpeed / currentBallLength );
-                        //             ballVecXY.y = accumballVecY * ( ballMaxSpeed / currentBallLength );
-                        //         }
-                        //         else
-                        //         {
-                        //             ballVecXY.y = accumballVecY;
-                        //         }
-                        //     }
-                        //     else
-                        //     {
-                        //         // 아래로 갈 때
-                        //         const changedPlayerSpeed = (player1Speed * 8 / 20)
-                        //         const accumballVecY = ballVecXY.y + changedPlayerSpeed;
-                        //         const currentBallLength = Math.SQRT2 * (Math.pow(ballVecXY.x, 2) + Math.pow(accumballVecY, 2));
-                                
-                        //         if (currentBallLength > ballMaxSpeed)
-                        //         {
-                        //             ballVecXY.x = ballVecXY.x * ( ballMaxSpeed / currentBallLength );
-                        //             ballVecXY.y = accumballVecY * ( ballMaxSpeed / currentBallLength );
-                        //         }
-                        //         else
-                        //         {
-                        //             ballVecXY.y = accumballVecY;
-                        //         }
-                            //     }
-                    }
-                    // else
-                    {
-                        //     console.log('opposite direction');
-                        //     // 반대 방향
-                        //     if (ballVecXY.y > 0)
-                        //     {
-                        //         // 위로 갈 때
-                        //         // 유저 속도 절삭
-                        //         const changedPlayerSpeed = (player1Speed * 8 / 20)
-                        //         const accumballVecY = ballVecXY.y + changedPlayerSpeed;
-                        //         const currentBallLength = Math.SQRT2 * (Math.pow(ballVecXY.x, 2) + Math.pow(accumballVecY, 2));
-                                
-                        //         if (currentBallLength < ballMinSpeed)
-                        //         {
-                        //             ballVecXY.x = ballVecXY.x * ( ballMinSpeed / currentBallLength );
-                        //             ballVecXY.y = accumballVecY * ( ballMinSpeed / currentBallLength );
-                        //         }
-                        //         else
-                        //         {
-                        //             ballVecXY.y = accumballVecY;
-                        //         }
-                        //     }
-                        //     else
-                        //     {
-                        //         // 아래로 갈 때
-                        //         const changedPlayerSpeed = (player1Speed * 8 / 20)
-                        //         const accumballVecY = ballVecXY.y + changedPlayerSpeed;
-                        //         const currentBallLength = Math.SQRT2 * (Math.pow(ballVecXY.x, 2) + Math.pow(accumballVecY, 2));
-                                
-                        //         if (currentBallLength < ballMinSpeed)
-                        //         {
-                        //             ballVecXY.x = ballVecXY.x * ( ballMinSpeed / currentBallLength );
-                        //             ballVecXY.y = accumballVecY * ( ballMinSpeed / currentBallLength );
-                        //         }
-                        //         else
-                        //         {
-                        //             ballVecXY.y = accumballVecY;
-                        //         }
-                        //     }
-
-                        // }
-                        // console.log('ballVecXY.x - ', ballVecXY.x, ' and ballVecXY.y - ', ballVecXY.y)
-                        // 추가적으로 ball 속도 조정
-                    }
+                    // game-ball-hit event - kyeonkim
+                    // console.log('ballVecXY.x - ', ballVecXY.x, ' and ballVecXY.y - ', ballVecXY.y);
+                    // user === player1 > send
+                    if (user === player1)
+                        socket.emit('game-ball-hit', {time: Date.now(), enemy: user, ball: ball, ballVecXY: ballVecXY});
                 }
-                // else if (
-                //     // 공 npc에 닿는지 확인
-                //     ballVecXY.x > 0 &&
-                //     ball.left + (2 * ball.radius) >= player2.left &&
-                //     ball.top >= player2.top &&
-                //     ball.top <= player2.top + player2.height
-                // )
+                // 공 플레이어2 에 닿는지 확인
                 else if (
                     ballVecXY.x > 0 &&
                     ball.left + BALL_SIZE >= player2.left &&
@@ -333,10 +262,16 @@ export default function Pong (props :any){
                     ball.top + BALL_SIZE >= player2.top &&
                     ball.top <= player2.top + player2.height)
                 {
-                    ballVecXY.x = -ballVecXY.x;
+                    const angle = (ball.top - (player2.top + (player2.height / 2)))/(player2.height / 2);
+                    ballVecXY.x = Math.cos(Math.PI/4 * angle) * ballSpeed;
+                    ballVecXY.x = ballVecXY.x > 0 ? -ballVecXY.x : ballVecXY.x;
+                    ballVecXY.y = Math.sin(Math.PI/4 * angle) * ballSpeed;
+                    // user === player2 > send
+                    // game-ball-hit event - kyeonkim
+                    if (user === player2)
+                        socket.emit('game-ball-hit', {time: Date.now(), enemy: user, ball: ball, ballVecXY: ballVecXY});
                 }
             }
-
             // 다시 그리기
             canvas.renderAll();
             board.renderAll();
@@ -370,8 +305,9 @@ export default function Pong (props :any){
         {
             console.log("init player : ", player1, player2);
             console.log(`run pong`,ready, user);
-            socket.on(`initGame`, (data :any) => {
-                console.log('initGame');
+            socket.on(`game-init`, (data :any) => {
+                console.log('game-init');
+                gameData.startTime = Date.now();
                 if (data.room.user1_id === Number(cookies.get('user_id')))
                 {
                     setUser(player1);
@@ -384,17 +320,24 @@ export default function Pong (props :any){
                 console.log("init user : ", user, ready);
                 setReady(2);
             });
-            socket.emit(`gameStart`, {user_id: Number(cookies.get('user_id'))});
+            socket.emit(`game-start`, {user_id: Number(cookies.get('user_id'))});
         }
     }, [ready]);
     
     useEffect(() => {
         if(ready === 2)
         {
-            socket.on(`game`, (data :any) => {
+            socket.on(`game-user-position`, (data :any) => {
                 console.log(`game : ${data.y}`, enemy);
                 enemy.top = data.y;
             });
+            socket.on('game-ball-fix', (data: any) => {
+                console.log(`game-ball-fix on`, data);
+                ballFix.newData = true;
+                ballFix.enemy = data.enemy;
+                ballFix.ball = data.ball;
+                ballFix.ballVecXY = data.ballVecXY;
+            })
             runPong();
         }
     }, [ready]);
@@ -403,16 +346,16 @@ export default function Pong (props :any){
         function handleKeyDown(e :any) {
                 let speed = player1Speed;
                 if (e.key === 'ArrowUp') {
-                    console.log('Arrow up');
+                    // console.log('Arrow up');
                     isArrowPressed.arrowUp = true;
-                    console.log(`allow up : ${isArrowPressed.arrowUp}`);
+                    // console.log(`allow up : ${isArrowPressed.arrowUp}`);
                     // speed = Math.max(speed - 0.1, -20);
                 } 
                 else if (e.key === 'ArrowDown') 
                 {
-                    console.log('Arrow down');
+                    // console.log('Arrow down');
                     isArrowPressed.arrowDown = true;
-                    console.log(`allow down : ${isArrowPressed.arrowDown}`);
+                    // console.log(`allow down : ${isArrowPressed.arrowDown}`);
                     // speed = Math.min(speed + 0.1, 20);
                 }
             // setPlayer1Speed(speed);
