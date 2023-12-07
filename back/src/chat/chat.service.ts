@@ -171,6 +171,11 @@ export class ChatService {
         });
         if (room.owner_id === data.user_id)
         {
+            await this.prismaService.ban.deleteMany({
+                where: {
+                    chatroom_id: data.room_id,
+                },
+            })
             await this.socketService.DeleteRoom(data.room_id);
             await this.prismaService.chatroom_user.deleteMany({
                 where : {
