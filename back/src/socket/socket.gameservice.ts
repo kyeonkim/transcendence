@@ -23,6 +23,8 @@ export class InGameRoom {
     game_mode: boolean = false;
     user1_id: number;
     user2_id: number;
+    user1_nickname: string;
+    user2_nickname: string;
     user1_ready: boolean = false;
     user2_ready: boolean = false;
     user1_position: number;
@@ -194,9 +196,9 @@ export class SocketGameService {
             return {status: false, message: "게임이 존재하지 않습니다."};
         const user1_id = this.InGame.get(user_id).user1_id;
         const user2_id = this.InGame.get(user_id).user2_id;
+        this.server.to(`game-${user1_id}`).emit(`game-end`, {gameData: this.InGame.get(user_id)});
         this.InGame.delete(user1_id);
         this.InGame.delete(user2_id);
-        this.server.to(`game-${user1_id}`).emit(`render-gameroom`, {status: 'home', room: ``});
         this.SocketService.LeaveRoom(String(user1_id), `game-${user1_id}`, this.server);
         this.SocketService.LeaveRoom(String(user2_id), `game-${user1_id}`, this.server);
         const user1 =   await this.prismaservice.user.findUnique({
@@ -238,31 +240,59 @@ export class SocketGameService {
 
     async GameStart(payload: any)
     {
-        if (this.InGame.get(payload.user_id) === undefined)
+        if (!this.InGame.get(Number(payload.user_id)))
             return ;
-        if (this.InGame.get(payload.user_id).user1_id === Number(payload.user_id))
-            this.InGame.get(payload.user_id).user1_ready = true;
-        else
-            this.InGame.get(payload.user_id).user2_ready = true;
-        if (this.InGame.get(payload.user_id).user1_ready && this.InGame.get(Number(payload.user_id)).user2_ready)
+        if (this.InGame.get(Number(payload.user_id)).user1_id === Number(payload.user_id))
         {
-            console.log("game start send");
-            this.server.to(`game-${this.InGame.get(payload.user_id).user1_id}`).emit(`initGame`, {room: this.InGame.get(payload.user_id)});
+            this.InGame.get(Number(payload.user_id)).user1_ready = true;
+            this.InGame.get(Number(payload.user_id)).user1_nickname = payload.user_nickname;
+        }
+        else
+        {
+            this.InGame.get(Number(payload.user_id)).user2_ready = true;
+            this.InGame.get(Number(payload.user_id)).user2_nickname = payload.user_nickname;
+        }
+        if (this.InGame.get(Number(payload.user_id)).user1_ready && this.InGame.get(Number(payload.user_id)).user2_ready)
+        {
+            console.log("game start send", this.InGame.get(Number(payload.user_id)));
+            const room = this.InGame.get(Number(payload.user_id));
+            setTimeout(() => {
+                console.log(`after time out`,room);
+                this.server.to(`game-${room.user1_id}`).emit(`game-init`, {room: room});
+            }, 3000);
         }
     }
 
-    async Game(payload: any, user_id: number)
+    async GameUserPosition(payload: any, user_id: number)
     {
         console.log("game: ", payload, user_id, this.InGame.get(user_id));
         if (this.InGame.get(user_id) === undefined)
             return ;
         if (this.InGame.get(user_id).user1_id === user_id) {
             console.log(`game-${this.InGame.get(user_id).user2_id}`);
-            this.server.to(`${this.InGame.get(user_id).user2_id}`).emit(`game`, {y: payload.y});
+            this.server.to(`${this.InGame.get(user_id).user2_id}`).emit(`game-user-position`, payload);
         }
         else {
             console.log(`game-${this.InGame.get(user_id).user1_id}`);
-            this.server.to(`${this.InGame.get(user_id).user1_id}`).emit(`game`, {y: payload.y});
+            this.server.to(`${this.InGame.get(user_id).user1_id}`).emit(`game-user-position`, payload);
+        }
+    }
+
+    async GameBallHit(payload: any, user_id: number)
+    {
+        if (this.InGame.get(user_id) === undefined)
+            return ;
+        this.InGame.get(user_id).score1 = payload.score.player1;
+        this.InGame.get(user_id).score2 = payload.score.player2;
+        if (this.InGame.get(user_id).score1 >= 11 || this.InGame.get(user_id).score2 >= 11)
+            return this.ExitGame(user_id);
+        if (this.InGame.get(user_id).user1_id === user_id) {
+            console.log(`game-${this.InGame.get(user_id).user2_id}`);
+            this.server.to(`${this.InGame.get(user_id).user2_id}`).emit(`game-ball-fix`, payload);
+        }
+        else {
+            console.log(`game-${this.InGame.get(user_id).user1_id}`);
+            this.server.to(`${this.InGame.get(user_id).user1_id}`).emit(`game-ball-fix`, payload);
         }
     }
 }
