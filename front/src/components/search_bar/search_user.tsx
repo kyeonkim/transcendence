@@ -17,26 +17,6 @@ import { Background } from 'tsparticles-engine';
 import { Grid, Typography } from '@mui/material';
 import styles from './search_bar.module.css';
 
-
-const MainSearchUser = styled(TextField)({
-    position: 'absolute',
-    top: '30%',
-    left: 0,
-    width: '80%',
-    height: '11%',  
-    background: "white",
-    borderRadius: '10px',
-});
-
-const MainSearchButton = styled(Button) ({
-    position: 'absolute',
-    top: '30%',
-    left: '80%',
-    width: '20%',
-    height: '11%',
-    color: "black"
-  });
-
 interface SearchUserProps {
     setMTbox: (num: number, searchTarget: string) => void;
 }
@@ -54,7 +34,6 @@ export default function SearchUser({ setMTbox }: SearchUserProps) {
                   },
             })
                 .then((res) => {
-                    // console.log(typeof res.data.userData.user_id)
                     if (res.data.status === true)
                         setMTbox(num, searchTarget);
                 })
@@ -67,7 +46,7 @@ export default function SearchUser({ setMTbox }: SearchUserProps) {
     }
 
     return (
-        <Grid className={styles.search_bar}>
+        <Grid item className={styles.search_bar}>
             <TextField
                 className={styles.search_user}
                 id="outlined_search_user"
@@ -79,14 +58,6 @@ export default function SearchUser({ setMTbox }: SearchUserProps) {
                 sx={{input: {color: 'white'}}}
                 >
             </TextField>
-            <MainSearchButton
-                variant='contained'
-                onClick={() => handleMTbox(1, searchTarget)}
-                >
-                <Typography style={{color: 'white'}}>
-                    검색
-                </Typography>
-            </MainSearchButton>
         </Grid>
     );
 }

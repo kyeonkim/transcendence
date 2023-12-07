@@ -132,7 +132,7 @@ export default function Main() {
  return (
       <div>
         <Particles options={particlesOptions as ISourceOptions} init={particlesInit} />
-        {isSize ? (
+        {/* {isSize ? (
           <Grid container className={styles.warning} justifyContent="center" alignItems="center">
             <Typography variant="caption" color="error" fontSize={'40px'}>
               화면을 늘려주세요!
@@ -153,7 +153,19 @@ export default function Main() {
             <ChatBlock setMTbox={handleClick}/>
           </Grid>
         </>
-        )}
+        )} */}
+        <Grid container className={styles.leftBox}>
+          <MyProfile setMTbox={handleClick}/>
+          <SearchUser setMTbox={handleClick}/>
+          <MatchingButton setMTbox={handleClick}/>
+          <UserLists setMTbox={handleClick}/>
+        </Grid>
+        <Grid container className={styles.mainBox}>
+          <Mainbox mod={clicked} search={id}/>
+        </Grid>
+        <Grid container className={styles.rightBox}>
+          <ChatBlock setMTbox={handleClick}/>
+        </Grid>
       </div>
     )
   }

@@ -226,7 +226,6 @@ export default function AlarmInviteChat (
                         <Button sx={{top: 20}} size="small" variant="contained" onClick={() => handleCheckPassword()}>Join</Button>
                         </Box>
                     </Modal>
-
         </div>
     );
   }

@@ -204,16 +204,25 @@ const ProfilePage = (props: any) => {
         setRendering(res.data.time);
       })
   }
-  const imageLoader = ({ src }: any) => {
+  const imageLoader = (src: any) => {
+    console.log("image loader src===", src);
     return `${process.env.NEXT_PUBLIC_API_URL}user/getimg/nickname/${src}`
   }
 
   return (  
     <div>
       <Grid container className={styles.profileBox}>
-        <Grid item alignItems='center' display='flex' flexDirection='column' padding='1%'>
-          <Image loader={imageLoader} src={`${userNickname}?${rendering}`} alt="User Image" width={0} height={0}/>
-          <Typography className={styles.userName} fontSize={60} sx={{color: 'white',  whiteSpace: 'nowrap'}}>
+        <Grid item className={styles.imageContainer}alignItems='center' display='flex' padding='1%'>
+          <Avatar
+            src={imageLoader(`${userNickname}?${rendering}`)}
+            sx={{
+              width: '100%',
+              height: '80%',
+              border: '2px solid white',
+              boxShadow: '0px 0px 10px 0px rgba(255,255,255,0.5)',
+            }}
+          />
+          <Typography className={styles.userName} fontSize={60} sx={{color: 'white',  whiteSpace: 'nowrap', marginLeft: '10px'}}>
             {userNickname !== my_nick ? `${userNickname}` : my_nick}
           </Typography>
         </Grid>

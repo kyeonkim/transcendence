@@ -5,6 +5,7 @@ import { Socket } from "socket.io-client"
 
 import { useCookies } from "next-client-cookies"
 import { io } from "socket.io-client";
+import { redirect } from 'next/navigation';
 
 
 const ChatSocketContext = createContext<Socket>(null);
@@ -40,7 +41,8 @@ export function ChatSocket ({ children }: any) {
     
       tmpSocket.on("disconnect", () => {
         console.log('socket diconnected - ', tmpSocket.id); // undefined
-        // 홈으로 보내기
+        // window.alert('서버와 연결이 끊어졌습니다.');
+        redirect('/');
       });
 
       setSocket(tmpSocket);

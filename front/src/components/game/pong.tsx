@@ -29,7 +29,7 @@ export default function Pong (props :any){
     const socket = useChatSocket();
     const [canvas, setCanvas] = useState<fabric.Canvas>();
     const [board, setBoard] = useState<fabric.Canvas>();
-    const [ball, setBall] = useState<fabric.Circle>();
+    const [ball, setBall] = useState<fabric.Rect>();
     const [player1, setPlayer1] = useState<fabric.Rect>();
     const [player2, setPlayer2] = useState<fabric.Rect>();
     
@@ -41,7 +41,7 @@ export default function Pong (props :any){
 
     const [user1Score, setUser1Score] = useState<fabric.Text>();
     const [user2Score, setUser2Score] = useState<fabric.Text>();
-    const [scoreValue, setScoreValue] = useState([0, 0]);
+    const [scoreValue, setScoreValue] = useState({player1: 0, player2: 0});
     const [ready, setReady] = useState(0);
 
     const [player1Speed, setPlayer1Speed] = useState(0);
@@ -60,7 +60,7 @@ export default function Pong (props :any){
         arrowUp: false,
         arrowDown: false
     });
-    const [ballFix, setBallFix] = useState({newData: false, time: 0, enemy: {}, ball: {}, ballVecXY: {}});
+    const [ballFix, setBallFix] = useState({newData: false, time: 0, enemy: {}, ball: {}, ballVecXY: {}, score:{}});
     // const [isArrowUp, setIsArrowUp] = useState(0);
     // const [isArrowDown, setIsArrowDown] = useState(0);
 
@@ -154,15 +154,23 @@ export default function Pong (props :any){
         });
         let user2_score = new fabric.Textbox(`${data.score[1]}`,{
             width: BOARD_WIDTH / 8,
-            left: BOARD_WIDTH / 4 * 2,
+            left: BOARD_WIDTH / 2 + BOARD_WIDTH / 8,
             top: 0,
             textAlign: 'left',
         });
-    
+        
+        let scoreBar = new fabric.Textbox('-', {
+            width: BOARD_WIDTH / 8,
+            left: BOARD_WIDTH / 4 * 2,
+            top: 0,
+            textAlign: 'left',
+        })
+
         setUser1Score(user1_score);
         setUser2Score(user2_score);
         scoreBoard.add(user1_score);
         scoreBoard.add(user2_score);
+        scoreBoard.add(scoreBar);
     
     
         // Canvas 수정 막기
@@ -202,12 +210,18 @@ export default function Pong (props :any){
             // game-ball-fix - kyeonkim
             if (ballFix.newData === true)
             {
+                console.log('ballFix data - ', ballFix);
+                
                 ball.set(`left`, ballFix.ball.left);
                 ball.set(`top`, ballFix.ball.top);
                 ballVecXY.x = ballFix.ballVecXY.x;
                 ballVecXY.y = ballFix.ballVecXY.y;
                 // enemy.set('left', ballFix.enemy.left);
                 // enemy.set('top', ballFix.enemy.top);
+                scoreValue.player1 = ballFix.score.player1;
+                scoreValue.player2 = ballFix.score.player2;
+                user1Score.set("text",`${scoreValue.player1}`);
+                user2Score.set("text",`${scoreValue.player2}`);
                 ballFix.newData = false;
             }
             // 공 화면 위-아래 튕기기
@@ -222,18 +236,24 @@ export default function Pong (props :any){
                 ball.set({ left: canvas.width / 2 - BALL_SIZE / 2, top: canvas.height / 2 - BALL_SIZE / 2});
                 ballVecXY.x = -ballVecXY.x;
                 // game-ball-hit event - kyeonkim
-                socket.emit('game-ball-hit', {time: Date.now(), enemy: user, ball: ball, ballVecXY: ballVecXY});
-                scoreValue[1]++;
-                user2Score.set("text",`${scoreValue[1]}`);
+
+                scoreValue.player2++;
+                user2Score.set("text",`${scoreValue.player2}`);
+                console.log("scoreValue.player2 : ", scoreValue.player2);
+                socket.emit('game-ball-hit', {time: Date.now(), enemy: user, ball: ball, ballVecXY: ballVecXY, score: scoreValue});
+
+                // scoreValue.player2++;
+                // socket.emit('game-ball-hit', {time: Date.now(), enemy: user, ball: ball, ballVecXY: ballVecXY, score: scoreValue});
+                // user2Score.set("text",`${scoreValue.player2}`);
             } 
             else if (ball.left >= canvas.width)
             {
                 ball.set({ left: canvas.width / 2 - BALL_SIZE / 2, top: canvas.height / 2 - BALL_SIZE / 2});
                 ballVecXY.x = -ballVecXY.x;
                 // game-ball-hit event - kyeonkim
-                socket.emit('game-ball-hit', {time: Date.now(), enemy: user, ball: ball, ballVecXY: ballVecXY});
-                scoreValue[0]++;
-                user1Score.set("text",`${scoreValue[0]}`);
+                scoreValue.player1++;
+                socket.emit('game-ball-hit', {time: Date.now(), enemy: user, ball: ball, ballVecXY: ballVecXY, score: scoreValue});
+                user1Score.set("text",`${scoreValue.player1}`);
             }
             else
             {
@@ -252,7 +272,7 @@ export default function Pong (props :any){
                     // console.log('ballVecXY.x - ', ballVecXY.x, ' and ballVecXY.y - ', ballVecXY.y);
                     // user === player1 > send
                     if (user === player1)
-                        socket.emit('game-ball-hit', {time: Date.now(), enemy: user, ball: ball, ballVecXY: ballVecXY});
+                        socket.emit('game-ball-hit', {time: Date.now(), enemy: user, ball: ball, ballVecXY: ballVecXY, score: scoreValue});
                 }
                 // 공 플레이어2 에 닿는지 확인
                 else if (
@@ -269,7 +289,7 @@ export default function Pong (props :any){
                     // user === player2 > send
                     // game-ball-hit event - kyeonkim
                     if (user === player2)
-                        socket.emit('game-ball-hit', {time: Date.now(), enemy: user, ball: ball, ballVecXY: ballVecXY});
+                        socket.emit('game-ball-hit', {time: Date.now(), enemy: user, ball: ball, ballVecXY: ballVecXY, score: scoreValue});
                 }
             }
             // 다시 그리기
