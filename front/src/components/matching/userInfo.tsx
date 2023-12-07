@@ -40,16 +40,16 @@ export default function UserInfo(props: any) {
 				<>
 					<Avatar
 						src={imageLoader({ src: user.nick_name })}
-						sx={{ width: 300, height: 300, marginTop: '20px'}}
+						sx={{ width: '10vw', height: '10vw', marginTop: '20px'}}
 						/>
-					<Typography variant="h2" align="center">
+					<Typography align="center" style={{color: 'white',fontSize: '3vw'}}>
 						{user.nick_name}
 					</Typography>
 				</>
 			) : (
 				<>
-					<Skeleton variant="circular" width={300} height={300} sx={{ marginTop: '20px'}}/>
-					<Skeleton variant="text" width={300} height={100} />
+					<Skeleton variant="circular" width={'10vw'} height={'10vw'} sx={{ marginTop: '20px'}}/>
+					<Skeleton variant="text" width={'10vw'} height={'3vw'} />
 				</>
 			)
 			}

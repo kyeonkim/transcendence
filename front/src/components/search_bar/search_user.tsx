@@ -14,7 +14,7 @@ import { styled } from '@mui/system';
 import { axiosToken } from '@/util/token';
 import { useCookies } from 'next-client-cookies';
 import { Background } from 'tsparticles-engine';
-import { Alert, Grid, Stack, Typography } from '@mui/material';
+import { Alert, AlertTitle, Grid, Stack, Typography } from '@mui/material';
 import styles from './search_bar.module.css';
 
 
@@ -71,13 +71,13 @@ export default function SearchUser({ setMTbox }: SearchUserProps) {
                 onClose={() => {setval(true)}}
                 sx={{
                     position: 'fixed',
-                    top: '1500%',
-                    left: '0%',
+                    top: '110%',
+                    left: '5%',
                     zIndex: 9999,
                     transform: 'translate(0, 0)',
                 }}
             >
-                닉네임 검색 실패!!
+                <strong>영문 숫자만 입력해주세요!</strong>
             </Alert>}
         </Grid>
     );

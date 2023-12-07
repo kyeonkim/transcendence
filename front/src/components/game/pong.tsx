@@ -78,6 +78,7 @@ export default function Pong (props :any){
 	const   cookies = useCookies();
     const   score1Ref = useRef(user1Score);
     const   score2Ref = useRef(user2Score);
+    const   exitGame = props.exitGame;
 
     const handleGameEnd = () => {
         console.log('end? is it?');
@@ -333,15 +334,17 @@ export default function Pong (props :any){
                 }
                 console.log("init player : ", player1, player2);
                 console.log("init user : ", user, ready);
-                setInGameData(data);
+                setInGameData(data.gameData);
                 setReady(2);
             });
             socket.emit(`game-start`, {user_id: Number(cookies.get('user_id')), user_nickname: cookies.get('nick_name')});
+
+            return () => {
+                socket.off('game-init');
+            }
         }
         
-        return () => {
-            socket.off('game-init');
-        }
+
 
     }, [ready]);
     
@@ -362,12 +365,14 @@ export default function Pong (props :any){
                 ballFix.score = data.score;
             })
             setReady(3);
+
+            return () => {
+                socket.off('game-user-position');
+                socket.off('game-ball-fix');
+            };
+    
         }
 
-        return () => {
-            socket.off('game-user-position');
-            socket.off('game-ball-fix');
-        };
 
     }, [ready]);
 
@@ -383,7 +388,7 @@ export default function Pong (props :any){
 
                 // 종료 컴포넌트 렌더하게 만들기
                     // data에 nickname 및 결과 데이터 들어있음.
-                    setEndData(data);
+                    setEndData(data.gameData);
                     // 게임 실행 종료
                     setGameEnd(true);
                     // 조건부 렌더링
@@ -500,14 +505,16 @@ export default function Pong (props :any){
 
             };
             drawPong();
+        
+            return () => {
+                console.log('before pong component unmount - cancelanimationframe');
+                socket.off('game-end');
+                cancelAnimationFrame(lastRequestId);
+                
+            };
         }
 
-        return () => {
-            console.log('before pong component unmount - cancelanimationframe');
-            socket.off('game-end');
-            cancelAnimationFrame(lastRequestId);
-            
-        };
+
 
     }, [ready]);
 
@@ -711,18 +718,20 @@ export default function Pong (props :any){
             <div>
                 <canvas id="pongCanvas"></canvas>
                 <canvas id="scoreBoard"></canvas>
-                <GameProfile
-                    inGameData={inGameData}/>
+                {inGameData && (
+                    <GameProfile
+                        inGameData={inGameData}/>
+                    )
+                }
             </div>
         );
     }
     else if (gameEnd === true)
     {
         return (
-            <div>
                 <GameEnd
-                    endData={endData} />
-            </div>
+                    endData={endData}
+                    exitGame={exitGame} />
         );
     }
 };

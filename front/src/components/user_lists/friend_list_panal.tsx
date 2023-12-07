@@ -240,45 +240,43 @@ export default function FriendListPanel(props: any) {
 					maxWidth: 400,
 					maxHeight: 580,
 					bgcolor: 'transparent',
-					// border: '2px solid #fff',
-					// borderRadius: 3,
-					overflow: 'auto',
+					overflowY: 'auto',
 				}}>
-				{apiResponse?.length > 0 ? (
+				{apiResponse?.length > 0 && (
 					apiResponse.map((user: any) => (
 						<ListItem key={user.followed_user_id}>
-							<ListItemButton onClick={handleProfile(user.followed_user_nickname)} sx={{width: "10px"}}>
+							<ListItemButton onClick={handleProfile(user.followed_user_nickname)} sx={{maxWidth: '300px'}}>
 								<ListItemAvatar>
-									<Avatar src={`${process.env.NEXT_PUBLIC_API_URL}user/getimg/nickname/${user.followed_user_nickname}`} />
+									<Avatar src={`${process.env.NEXT_PUBLIC_API_URL}user/getimg/nickname/${user.followed_user_nickname}`} style={{ width: '2vw', height: '2vw'}}/>
 								</ListItemAvatar>
-								<ListItemText primary={user.followed_user_nickname} sx={{color: 'white'}}/>
+								<Typography sx={{ color: 'white', fontSize: '0.8vw' }}>
+									{user.followed_user_nickname}
+								</Typography>
 								<div style={{ display: 'flex', alignItems: 'center' }}>
 									<div style={{
-										width: '10px',
-										height: '10px',
+										width: '0.7vw',
+										height: '0.7vw',
 										borderRadius: '50%',
 										border: '1px solid #000',
+										marginLeft: '1.5vw',
 										backgroundColor: getStatusColor(user.status),
-										marginRight: '8px'
 										}}>
 									</div>
-									<Typography sx={{color: 'white'}}>
+									<Typography sx={{color: 'white', fontSize: '0.8vw'}}>
 										{user.status === 'online' || user.status === 'login' ? 'ON' : 'OFF'}
 									</Typography>
 								</div>
 							</ListItemButton>
 							<IconButton edge="end" aria-label="comments" onClick={() => {handlerClear(user.followed_user_id, user.followed_user_nickname)}}>
 								<Badge color="error" badgeContent={handleFriendDmCount(user.followed_user_id)}>
-									<CommentIcon sx={{ color: 'white' }}/>
+									<CommentIcon sx={{ color: 'white', fontSize: '1.5vw' }}/>
 								</Badge>
 							</IconButton>
 							<IconButton edge="end" onClick={() => {handleInviteGame(user.followed_user_id, user.followed_user_nickname)}}>
-								<SportsEsportsIcon sx={{ color: 'white' }}/>
+								<SportsEsportsIcon sx={{ color: 'white', fontSize: '1.5vw'  }}/>
 							</IconButton>
 						</ListItem>
 					))
-				) : (
-					<div></div>
 				)}
 			</List>
 			{(dmOpenId > -1) ? (
