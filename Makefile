@@ -5,6 +5,9 @@ all: up
 up:
 	docker compose -f $(COMPOSE) up -d --build
 
+log:
+	docker compose logs -f
+
 down:
 	docker compose -f $(COMPOSE) down
 

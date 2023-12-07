@@ -11,6 +11,7 @@ import TwoFAPass from '@/app/login/twoFAPass';
 import { Avatar, Grid, Typography, Unstable_Grid2 } from '@mui/material';
 import { useChatSocket } from "../../app/main_frame/socket_provider"
 import { axiosToken } from '@/util/token';
+import { render } from 'react-dom';
 
 const ProfilePage = (props: any) => {
   const [isFriend, setIsFriend] = useState(false);
@@ -204,15 +205,14 @@ const ProfilePage = (props: any) => {
       })
   }
   const imageLoader = ({ src }: any) => {
-    let time = rendering;
-      return `${process.env.NEXT_PUBLIC_API_URL}user/getimg/nickname/${src}`
+    return `${process.env.NEXT_PUBLIC_API_URL}user/getimg/nickname/${src}`
   }
 
   return (  
     <div>
       <Grid container className={styles.profileBox}>
         <Grid item alignItems='center' display='flex' flexDirection='column' padding='1%'>
-          <Image loader={imageLoader} src={`${userNickname}`} alt="User Image" className={styles.userImage} width={0} height={0}/>
+          <Image loader={imageLoader} src={`${userNickname}?${rendering}`} alt="User Image" width={0} height={0}/>
           <Typography className={styles.userName} fontSize={60} sx={{color: 'white',  whiteSpace: 'nowrap'}}>
             {userNickname !== my_nick ? `${userNickname}` : my_nick}
           </Typography>
