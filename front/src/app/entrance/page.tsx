@@ -25,7 +25,7 @@ export default function Home() {
   }, []);
 
   const handleLogin = () => {
-     window.location.href = 'https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-3afc4b8a1109d8737d710c22763629e1194e1870826e1665c55be57215b35dd1&redirect_uri=http%3A%2F%2F10.13.9.4%3A3000%2Flogin&response_type=code';
+    window.location.href = process.env.NEXT_PUBLIC_REDIRECT_URL;
   };
 
 
