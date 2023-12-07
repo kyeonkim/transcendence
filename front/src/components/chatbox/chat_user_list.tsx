@@ -81,6 +81,24 @@ export default function UserList(props: any) {
 		})
 	}
 
+	const handleban = async () => {
+		await axiosToken.patch(`${process.env.NEXT_PUBLIC_API_URL}chat/banuser`, {
+			user_id: Number(my_id),
+			room_id: Number(roominfo.idx),
+			target_id: Number(targetData.user_id),
+			target_nickname: targetData.user_nickname,
+		},
+		{
+			headers: {
+				Authorization: `Bearer ${cookies.get('access_token')}`,
+			},
+		})
+		.then((res) => {
+			console.log('banuser response===', res);
+			setPop(false);
+		})
+	}
+
 	const handleUnOP = async () => {
 		await axiosToken.patch(`${process.env.NEXT_PUBLIC_API_URL}chat/unsetmanager`, {
 			user_id: Number(my_id),
@@ -218,6 +236,9 @@ export default function UserList(props: any) {
 					<Divider />
 					<ListItemButton onClick={handleKick}>
 						<Typography variant="inherit">강퇴</Typography>
+					</ListItemButton>
+					<ListItemButton onClick={handleban}>
+						<Typography variant="inherit">밴</Typography>
 					</ListItemButton>
 					</>
 					)}

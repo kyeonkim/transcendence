@@ -70,10 +70,12 @@ const MainChatRoomList = styled(Grid) ({
 			console.log(res.data);
 			if (res.data.rooms.length !== 0)
 			{
+				console.log('handle room list success res==', res);
+				setRoomList(res.data.rooms);
 				// 방 목록 배열, 순차 저장
-				res.data.rooms.map((room :any) => {
-					setRoomList(prevRoomList => [...prevRoomList, room]);
-				})
+				// res.data.rooms.map((room :any) => {
+				// 	setRoomList(prevRoomList => [...prevRoomList, room]);
+				// })
 				console.log('room list for chat_rooms - ', roomList);
 			}
 			else

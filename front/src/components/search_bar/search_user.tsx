@@ -14,8 +14,9 @@ import { styled } from '@mui/system';
 import { axiosToken } from '@/util/token';
 import { useCookies } from 'next-client-cookies';
 import { Background } from 'tsparticles-engine';
-import { Grid, Typography } from '@mui/material';
+import { Alert, Grid, Stack, Typography } from '@mui/material';
 import styles from './search_bar.module.css';
+
 
 interface SearchUserProps {
     setMTbox: (num: number, searchTarget: string) => void;
@@ -23,20 +24,27 @@ interface SearchUserProps {
 
 export default function SearchUser({ setMTbox }: SearchUserProps) {
     const [searchTarget, setSearchTarget] = useState('');
+    const [val, setval] = useState(true);
     const cookies = useCookies();
 
     const handleMTbox =  async (num: number, searchTarget: string) => {
         if (searchTarget) {
-            await axiosToken.get(`${process.env.NEXT_PUBLIC_API_URL}user/getdata/nickname/${searchTarget}`, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${cookies.get('access_token')}`
-                  },
-            })
-                .then((res) => {
-                    if (res.data.status === true)
-                        setMTbox(num, searchTarget);
+            setval(/^[a-zA-Z0-9]+$/.test(searchTarget));
+            console.log('searchTarget - ', searchTarget, val);
+            if (val) {
+                await axiosToken.get(`${process.env.NEXT_PUBLIC_API_URL}user/getdata/nickname/${searchTarget}`, {
+                    headers: {
+                        'Authorization': `Bearer ${cookies.get('access_token')}`
+                    },
                 })
+                    .then((res) => {
+                        console.log('userData in chat==',res);
+                        if (res.data.status === true)
+                            setMTbox(num, searchTarget);
+                    })
+            }
+            else {
+            }
         }
     }
 
@@ -58,6 +66,19 @@ export default function SearchUser({ setMTbox }: SearchUserProps) {
                 sx={{input: {color: 'white'}}}
                 >
             </TextField>
+            {!val && <Alert
+                severity="error"
+                onClose={() => {setval(true)}}
+                sx={{
+                    position: 'fixed',
+                    top: '1500%',
+                    left: '0%',
+                    zIndex: 9999,
+                    transform: 'translate(0, 0)',
+                }}
+            >
+                닉네임 검색 실패!!
+            </Alert>}
         </Grid>
     );
 }

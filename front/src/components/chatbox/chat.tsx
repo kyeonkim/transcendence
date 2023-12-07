@@ -122,7 +122,7 @@ export default function Chat(props: any) {
 	  ];
 	return (
 		<div>
-			<AppBar position="absolute" sx={{borderRadius: '10px'}}>
+			<AppBar position="absolute" sx={{borderRadius: '10px', height: '6%'}}>
 				<Toolbar>
 				<IconButton
 					size="large"

@@ -85,41 +85,50 @@ export default function AlarmInviteChat (
         setInPassword('');
 	}
 
-    function handlePasswordModal(alarm :any) {
-        if (alarm.is_password === true)
-        {
-            console.log('!!!!! open modal plesae');
-            console.log('idx is - ', alarm.chatroom_id);
-            handleModalOpen(alarm);
-            // modal 자체가 async할 가능성
-        }
-        else
-        {
-            console.log('do without modal~~');
-            handleJoin(alarm, inPassword);
-        }
-	}
-
-    const acceptInviteChat = (alarm :any) => () => {
-        
-        checkUserInChat(alarm)
+    const acceptInviteChat = (alarm :any) => async () => {
+       
+        await axiosToken.get(`${process.env.NEXT_PUBLIC_API_URL}user/getdata/id/${alarm.to_id}`, {
+            headers: {
+                Authorization: `Bearer ${cookies.get("access_token")}`,
+            },
+        })
         .then((res :any) => {
             console.log('room check - ', res);
-            if (res.data.userdata.roomuser === null)
+            handleinvite(alarm);
+        });
+    }
+
+    async function handleinvite(alarm :any) {
+        console.log('handle invite - ', alarm);
+        await axiosToken.post(`${process.env.NEXT_PUBLIC_API_URL}chat/acceptinvite`,
+        {
+            user_id : user_id,
+            user_nickname: user_nickname,
+            room_id: alarm.chatroom_id,
+            event_id: alarm.idx,
+        },
+        {
+            headers: {
+                Authorization: `Bearer ${cookies.get("access_token")}`,
+            },
+        })
+        .then((res) => {
+            console.log('invite accept - ', res);
+            if (res.data.status === false)
             {
-                // 방 들어가기 함수
-                console.log('get in room');
-                handlePasswordModal(alarm);
+                console.log('fail to find room');
+                denyRequest(alarm);
             }
             else
             {
-                // 이미 채팅방에 들어가있습니다!
-                // 예외 처리
-                // 일단 아무것도 안함
+			    console.log('success to join !!! === data', res);
+                alarmReducer(alarm);
+                setChatBlockRenderMode('chatRoom');
+                setChatBlockTriggerRender(true);
             }
         })
-        .catch();
     }
+
 
     async function handleJoin(alarm :any, inPassword :string) {
 
@@ -170,14 +179,6 @@ export default function AlarmInviteChat (
 		});
 
 	}
-
-    const checkUserInChat = async (alarm :any) => {
-        return (await axiosToken.get(`${process.env.NEXT_PUBLIC_API_URL}user/getdata/id/${alarm.to_id}`, {
-            headers: {
-                Authorization: `Bearer ${cookies.get("access_token")}`,
-            },
-        }));
-    };
 
     const labelId = `comment-list-secondary-label-${alarm.from_nickname}`;
     console.log('alamr type - ', alarm);

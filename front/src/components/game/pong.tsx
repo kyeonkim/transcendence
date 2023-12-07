@@ -4,6 +4,9 @@ import { fabric } from 'fabric';
 import { useChatSocket } from '@/app/main_frame/socket_provider';
 import { useCookies } from "next-client-cookies";
 
+import  GameProfile  from "./gameProfile";
+import  GameEnd from "./gameEnd";
+
 // 새로 고침했을 때, 상위 컴포넌트에서 참가자 데이터를 받아오는가? 아니면 back에 요청을 하는가?
 
 const CANVAS_WIDTH = 1600;
@@ -27,6 +30,12 @@ function initialData() {
 
 export default function Pong (props :any){
     const socket = useChatSocket();
+
+    const [gameEnd, setGameEnd] = useState(false);
+    const [endData, setEndData] = useState({});
+
+    const [inGameData, setInGameData] = useState({});
+
     const [canvas, setCanvas] = useState<fabric.Canvas>();
     const [board, setBoard] = useState<fabric.Canvas>();
     const [ball, setBall] = useState<fabric.Rect>();
@@ -148,20 +157,20 @@ export default function Pong (props :any){
         // score 표기하기
         let user1_score = new fabric.Textbox(`${data.score[0]}`,{
             width: BOARD_WIDTH / 8,
-            left: BOARD_WIDTH / 2 - BOARD_WIDTH / 8,
+            left: BOARD_WIDTH / 2 - BOARD_WIDTH / 4,
             top: 0,
-			textAlign: "right",
+			textAlign: "left",
         });
         let user2_score = new fabric.Textbox(`${data.score[1]}`,{
             width: BOARD_WIDTH / 8,
             left: BOARD_WIDTH / 2 + BOARD_WIDTH / 8,
             top: 0,
-            textAlign: 'left',
+            textAlign: 'right',
         });
         
         let scoreBar = new fabric.Textbox('-', {
             width: BOARD_WIDTH / 8,
-            left: BOARD_WIDTH / 4 * 2,
+            left: BOARD_WIDTH / 4 * 2 - 5,
             top: 0,
             textAlign: 'left',
         })
@@ -189,131 +198,113 @@ export default function Pong (props :any){
         }
     };
 
-    const runPong = () => {
-        let lastRequestId :number;
+    // function drawPong() {
 
-        function drawing() {
- 
-            // 플레이어 이동
-            if (isArrowPressed.arrowUp === true && user.top > 0) {
-                user.set('top', Math.max(user.top - 10, 0));
-                socket.emit(`game-user-position`, {y: user.top});
-            }
-            if (isArrowPressed.arrowDown === true && user.top < CANVAS_HEIGHT - BAR_HEIGHT) {
-                user.set('top', Math.min(user.top + 10, CANVAS_HEIGHT - BAR_HEIGHT));
-                socket.emit(`game-user-position`, {y: user.top});
-            }
-            // 공 이동
-            ball.set('left', ball.left + ballVecXY.x);
-            ball.set('top', ball.top + ballVecXY.y);
+    //     // 플레이어 이동
+    //     if (isArrowPressed.arrowUp === true && user.top > 0) {
+    //         user.set('top', Math.max(user.top - 10, 0));
+    //         socket.emit(`game-user-position`, {y: user.top});
+    //     }
+    //     if (isArrowPressed.arrowDown === true && user.top < CANVAS_HEIGHT - BAR_HEIGHT) {
+    //         user.set('top', Math.min(user.top + 10, CANVAS_HEIGHT - BAR_HEIGHT));
+    //         socket.emit(`game-user-position`, {y: user.top});
+    //     }
+    //     // 공 이동
+    //     ball.set('left', ball.left + ballVecXY.x);
+    //     ball.set('top', ball.top + ballVecXY.y);
 
-            // game-ball-fix - kyeonkim
-            if (ballFix.newData === true)
-            {
-                console.log('ballFix data - ', ballFix);
-                
-                ball.set(`left`, ballFix.ball.left);
-                ball.set(`top`, ballFix.ball.top);
-                ballVecXY.x = ballFix.ballVecXY.x;
-                ballVecXY.y = ballFix.ballVecXY.y;
-                // enemy.set('left', ballFix.enemy.left);
-                // enemy.set('top', ballFix.enemy.top);
-                scoreValue.player1 = ballFix.score.player1;
-                scoreValue.player2 = ballFix.score.player2;
-                user1Score.set("text",`${scoreValue.player1}`);
-                user2Score.set("text",`${scoreValue.player2}`);
-                ballFix.newData = false;
-            }
-            // 공 화면 위-아래 튕기기
-            if (ball.top <= 0 || ball.top >= canvas.height - BALL_SIZE)
-            {
-                ballVecXY.y = -ballVecXY.y;
-                // game-ball-hit event - kyeonkim
-            }
-            // 공 화면 바깥에 닿았는지 확인
-            if (ball.left + BALL_SIZE <= 0)
-            {
-                ball.set({ left: canvas.width / 2 - BALL_SIZE / 2, top: canvas.height / 2 - BALL_SIZE / 2});
-                ballVecXY.x = -ballVecXY.x;
-                // game-ball-hit event - kyeonkim
+    //     // game-ball-fix - kyeonkim
+    //     if (ballFix.newData === true)
+    //     {
+    //         console.log('ballFix data - ', ballFix);
+            
+    //         ball.set(`left`, ballFix.ball.left);
+    //         ball.set(`top`, ballFix.ball.top);
+    //         ballVecXY.x = ballFix.ballVecXY.x;
+    //         ballVecXY.y = ballFix.ballVecXY.y;
+    //         // enemy.set('left', ballFix.enemy.left);
+    //         // enemy.set('top', ballFix.enemy.top);
+    //         scoreValue.player1 = ballFix.score.player1;
+    //         scoreValue.player2 = ballFix.score.player2;
+    //         user1Score.set("text",`${scoreValue.player1}`);
+    //         user2Score.set("text",`${scoreValue.player2}`);
+    //         ballFix.newData = false;
+    //     }
+    //     // 공 화면 위-아래 튕기기
+    //     if (ball.top <= 0 || ball.top >= canvas.height - BALL_SIZE)
+    //     {
+    //         ballVecXY.y = -ballVecXY.y;
+    //         // game-ball-hit event - kyeonkim
+    //     }
+    //     // 공 화면 바깥에 닿았는지 확인
+    //     if (ball.left + BALL_SIZE <= 0)
+    //     {
+    //         ball.set({ left: canvas.width / 2 - BALL_SIZE / 2, top: canvas.height / 2 - BALL_SIZE / 2});
+    //         ballVecXY.x = -ballVecXY.x;
+    //         // game-ball-hit event - kyeonkim
 
-                scoreValue.player2++;
-                user2Score.set("text",`${scoreValue.player2}`);
-                console.log("scoreValue.player2 : ", scoreValue.player2);
-                socket.emit('game-ball-hit', {time: Date.now(), enemy: user, ball: ball, ballVecXY: ballVecXY, score: scoreValue});
+    //         scoreValue.player2++;
+    //         user2Score.set("text",`${scoreValue.player2}`);
+    //         console.log("scoreValue.player2 : ", scoreValue.player2);
+    //         socket.emit('game-ball-hit', {time: Date.now(), enemy: user, ball: ball, ballVecXY: ballVecXY, score: scoreValue});
 
-                // scoreValue.player2++;
-                // socket.emit('game-ball-hit', {time: Date.now(), enemy: user, ball: ball, ballVecXY: ballVecXY, score: scoreValue});
-                // user2Score.set("text",`${scoreValue.player2}`);
-            } 
-            else if (ball.left >= canvas.width)
-            {
-                ball.set({ left: canvas.width / 2 - BALL_SIZE / 2, top: canvas.height / 2 - BALL_SIZE / 2});
-                ballVecXY.x = -ballVecXY.x;
-                // game-ball-hit event - kyeonkim
-                scoreValue.player1++;
-                socket.emit('game-ball-hit', {time: Date.now(), enemy: user, ball: ball, ballVecXY: ballVecXY, score: scoreValue});
-                user1Score.set("text",`${scoreValue.player1}`);
-            }
-            else
-            {
-                // 공 플레이어1 에 닿는지 확인
-                if (ballVecXY.x < 0 &&
-                    ball.left <= player1.left + player1.width &&
-                    ball.left >= player1.left &&
-                    ball.top + BALL_SIZE >= player1.top &&
-                    ball.top <= player1.top + player1.height)
-                {
-                    const angle = (ball.top - (player1.top + (player1.height / 2)))/(player1.height / 2);
-                    ballVecXY.x = Math.cos(Math.PI/4 * angle) * ballSpeed;
-                    ballVecXY.x = ballVecXY.x > 0 ? ballVecXY.x : -ballVecXY.x;
-                    ballVecXY.y = Math.sin(Math.PI/4 * angle) * ballSpeed;
-                    // game-ball-hit event - kyeonkim
-                    // console.log('ballVecXY.x - ', ballVecXY.x, ' and ballVecXY.y - ', ballVecXY.y);
-                    // user === player1 > send
-                    if (user === player1)
-                        socket.emit('game-ball-hit', {time: Date.now(), enemy: user, ball: ball, ballVecXY: ballVecXY, score: scoreValue});
-                }
-                // 공 플레이어2 에 닿는지 확인
-                else if (
-                    ballVecXY.x > 0 &&
-                    ball.left + BALL_SIZE >= player2.left &&
-                    ball.left + BALL_SIZE <= player2.left + player2.width &&
-                    ball.top + BALL_SIZE >= player2.top &&
-                    ball.top <= player2.top + player2.height)
-                {
-                    const angle = (ball.top - (player2.top + (player2.height / 2)))/(player2.height / 2);
-                    ballVecXY.x = Math.cos(Math.PI/4 * angle) * ballSpeed;
-                    ballVecXY.x = ballVecXY.x > 0 ? -ballVecXY.x : ballVecXY.x;
-                    ballVecXY.y = Math.sin(Math.PI/4 * angle) * ballSpeed;
-                    // user === player2 > send
-                    // game-ball-hit event - kyeonkim
-                    if (user === player2)
-                        socket.emit('game-ball-hit', {time: Date.now(), enemy: user, ball: ball, ballVecXY: ballVecXY, score: scoreValue});
-                }
-            }
-            // 다시 그리기
-            canvas.renderAll();
-            board.renderAll();
-            // user1Score.renderAll();
-            // user2Score.renderAll();
+    //         // scoreValue.player2++;
+    //         // socket.emit('game-ball-hit', {time: Date.now(), enemy: user, ball: ball, ballVecXY: ballVecXY, score: scoreValue});
+    //         // user2Score.set("text",`${scoreValue.player2}`);
+    //     } 
+    //     else if (ball.left >= canvas.width)
+    //     {
+    //         ball.set({ left: canvas.width / 2 - BALL_SIZE / 2, top: canvas.height / 2 - BALL_SIZE / 2});
+    //         ballVecXY.x = -ballVecXY.x;
+    //         // game-ball-hit event - kyeonkim
+    //         scoreValue.player1++;
+    //         socket.emit('game-ball-hit', {time: Date.now(), enemy: user, ball: ball, ballVecXY: ballVecXY, score: scoreValue});
+    //         user1Score.set("text",`${scoreValue.player1}`);
+    //     }
+    //     else
+    //     {
+    //         // 공 플레이어1 에 닿는지 확인
+    //         if (ballVecXY.x < 0 &&
+    //             ball.left <= player1.left + player1.width &&
+    //             ball.left >= player1.left &&
+    //             ball.top + BALL_SIZE >= player1.top &&
+    //             ball.top <= player1.top + player1.height)
+    //         {
+    //             const angle = (ball.top - (player1.top + (player1.height / 2)))/(player1.height / 2);
+    //             ballVecXY.x = Math.cos(Math.PI/4 * angle) * ballSpeed;
+    //             ballVecXY.x = ballVecXY.x > 0 ? ballVecXY.x : -ballVecXY.x;
+    //             ballVecXY.y = Math.sin(Math.PI/4 * angle) * ballSpeed;
+    //             // game-ball-hit event - kyeonkim
+    //             // console.log('ballVecXY.x - ', ballVecXY.x, ' and ballVecXY.y - ', ballVecXY.y);
+    //             // user === player1 > send
+    //             if (user === player1)
+    //                 socket.emit('game-ball-hit', {time: Date.now(), enemy: user, ball: ball, ballVecXY: ballVecXY, score: scoreValue});
+    //         }
+    //         // 공 플레이어2 에 닿는지 확인
+    //         else if (
+    //             ballVecXY.x > 0 &&
+    //             ball.left + BALL_SIZE >= player2.left &&
+    //             ball.left + BALL_SIZE <= player2.left + player2.width &&
+    //             ball.top + BALL_SIZE >= player2.top &&
+    //             ball.top <= player2.top + player2.height)
+    //         {
+    //             const angle = (ball.top - (player2.top + (player2.height / 2)))/(player2.height / 2);
+    //             ballVecXY.x = Math.cos(Math.PI/4 * angle) * ballSpeed;
+    //             ballVecXY.x = ballVecXY.x > 0 ? -ballVecXY.x : ballVecXY.x;
+    //             ballVecXY.y = Math.sin(Math.PI/4 * angle) * ballSpeed;
+    //             // user === player2 > send
+    //             // game-ball-hit event - kyeonkim
+    //             if (user === player2)
+    //                 socket.emit('game-ball-hit', {time: Date.now(), enemy: user, ball: ball, ballVecXY: ballVecXY, score: scoreValue});
+    //         }
+    //     }
+    //     // 다시 그리기
+    //     canvas.renderAll();
+    //     board.renderAll();
+    //     // user1Score.renderAll();
+    //     // user2Score.renderAll();
 
-            // requestAnimationFrame 재귀 - 스택 상 재귀는 아니고, callback을 재귀 호출한다고 보는게 나음. 그래서 stack overflow 안난다고 함.
-            // if (scoreValue[0] !== 5 && scoreValue[1] !== 5)
-            // {
-            lastRequestId = requestAnimationFrame(drawing);
-            // }
-            // else
-            // {
-                // handleGameEnd();
-            // }
-        }
-        lastRequestId = requestAnimationFrame(drawing);
-        return () => {
-            cancelAnimationFrame(lastRequestId);
-        };
-
-    };
+    // };
 
     useEffect(() => {
         initPong();
@@ -327,6 +318,10 @@ export default function Pong (props :any){
             console.log(`run pong`,ready, user);
             socket.on(`game-init`, (data :any) => {
                 console.log('game-init');
+
+                // 세팅할 때 자신, 상대 일부 데이터 필요함 (GameProfile 용도)
+                console.log('ready data - ', data);
+
                 gameData.startTime = Date.now();
                 if (data.room.user1_id === Number(cookies.get('user_id')))
                 {
@@ -338,13 +333,20 @@ export default function Pong (props :any){
                 }
                 console.log("init player : ", player1, player2);
                 console.log("init user : ", user, ready);
+                setInGameData(data);
                 setReady(2);
             });
-            socket.emit(`game-start`, {user_id: Number(cookies.get('user_id'))});
+            socket.emit(`game-start`, {user_id: Number(cookies.get('user_id')), user_nickname: cookies.get('nick_name')});
         }
+        
+        return () => {
+            socket.off('game-init');
+        }
+
     }, [ready]);
     
     useEffect(() => {
+
         if(ready === 2)
         {
             socket.on(`game-user-position`, (data :any) => {
@@ -357,10 +359,158 @@ export default function Pong (props :any){
                 ballFix.enemy = data.enemy;
                 ballFix.ball = data.ball;
                 ballFix.ballVecXY = data.ballVecXY;
+                ballFix.score = data.score;
             })
-            runPong();
+            setReady(3);
         }
+
+        return () => {
+            socket.off('game-user-position');
+            socket.off('game-ball-fix');
+        };
+
     }, [ready]);
+
+
+    useEffect(() => {
+        let lastRequestId :number; 
+
+        if(ready === 3)
+        {
+            socket.on('game-end', (data :any) => {
+                // 게임 종료 인식하는 이벤트
+                cancelAnimationFrame(lastRequestId);
+
+                // 종료 컴포넌트 렌더하게 만들기
+                    // data에 nickname 및 결과 데이터 들어있음.
+                    setEndData(data);
+                    // 게임 실행 종료
+                    setGameEnd(true);
+                    // 조건부 렌더링
+            })
+            console.log('before requestAnaimationFrame-drawPong begin');
+
+            const drawPong = () => {
+
+                // 플레이어 이동
+                if (isArrowPressed.arrowUp === true && user.top > 0) {
+                    user.set('top', Math.max(user.top - 10, 0));
+                    socket.emit(`game-user-position`, {y: user.top});
+                }
+                if (isArrowPressed.arrowDown === true && user.top < CANVAS_HEIGHT - BAR_HEIGHT) {
+                    user.set('top', Math.min(user.top + 10, CANVAS_HEIGHT - BAR_HEIGHT));
+                    socket.emit(`game-user-position`, {y: user.top});
+                }
+                // 공 이동
+                ball.set('left', ball.left + ballVecXY.x);
+                ball.set('top', ball.top + ballVecXY.y);
+        
+                // game-ball-fix - kyeonkim
+                if (ballFix.newData === true)
+                {
+                    console.log('ballFix data - ', ballFix);
+                    
+                    ball.set(`left`, ballFix.ball.left);
+                    ball.set(`top`, ballFix.ball.top);
+                    ballVecXY.x = ballFix.ballVecXY.x;
+                    ballVecXY.y = ballFix.ballVecXY.y;
+                    // enemy.set('left', ballFix.enemy.left);
+                    // enemy.set('top', ballFix.enemy.top);
+                    scoreValue.player1 = ballFix.score.player1;
+                    scoreValue.player2 = ballFix.score.player2;
+                    user1Score.set("text",`${scoreValue.player1}`);
+                    user2Score.set("text",`${scoreValue.player2}`);
+                    ballFix.newData = false;
+                }
+                // 공 화면 위-아래 튕기기
+                if (ball.top <= 0 || ball.top >= canvas.height - BALL_SIZE)
+                {
+                    ballVecXY.y = -ballVecXY.y;
+                    // game-ball-hit event - kyeonkim
+                }
+                // 공 화면 바깥에 닿았는지 확인
+                if (ball.left + BALL_SIZE <= 0)
+                {
+                    ball.set({ left: canvas.width / 2 - BALL_SIZE / 2, top: canvas.height / 2 - BALL_SIZE / 2});
+                    ballVecXY.x = -ballVecXY.x;
+                    // game-ball-hit event - kyeonkim
+        
+                    scoreValue.player2++;
+                    user2Score.set("text",`${scoreValue.player2}`);
+                    console.log("scoreValue.player2 : ", scoreValue.player2);
+                    socket.emit('game-ball-hit', {time: Date.now(), enemy: user, ball: ball, ballVecXY: ballVecXY, score: scoreValue});
+        
+                    // scoreValue.player2++;
+                    // socket.emit('game-ball-hit', {time: Date.now(), enemy: user, ball: ball, ballVecXY: ballVecXY, score: scoreValue});
+                    // user2Score.set("text",`${scoreValue.player2}`);
+                } 
+                else if (ball.left >= canvas.width)
+                {
+                    ball.set({ left: canvas.width / 2 - BALL_SIZE / 2, top: canvas.height / 2 - BALL_SIZE / 2});
+                    ballVecXY.x = -ballVecXY.x;
+                    // game-ball-hit event - kyeonkim
+                    scoreValue.player1++;
+                    socket.emit('game-ball-hit', {time: Date.now(), enemy: user, ball: ball, ballVecXY: ballVecXY, score: scoreValue});
+                    user1Score.set("text",`${scoreValue.player1}`);
+                }
+                else
+                {
+                    // 공 플레이어1 에 닿는지 확인
+                    if (ballVecXY.x < 0 &&
+                        ball.left <= player1.left + player1.width &&
+                        ball.left >= player1.left &&
+                        ball.top + BALL_SIZE >= player1.top &&
+                        ball.top <= player1.top + player1.height)
+                    {
+                        const angle = (ball.top - (player1.top + (player1.height / 2)))/(player1.height / 2);
+                        ballVecXY.x = Math.cos(Math.PI/4 * angle) * ballSpeed;
+                        ballVecXY.x = ballVecXY.x > 0 ? ballVecXY.x : -ballVecXY.x;
+                        ballVecXY.y = Math.sin(Math.PI/4 * angle) * ballSpeed;
+                        // game-ball-hit event - kyeonkim
+                        // console.log('ballVecXY.x - ', ballVecXY.x, ' and ballVecXY.y - ', ballVecXY.y);
+                        // user === player1 > send
+                        if (user === player1)
+                            socket.emit('game-ball-hit', {time: Date.now(), enemy: user, ball: ball, ballVecXY: ballVecXY, score: scoreValue});
+                    }
+                    // 공 플레이어2 에 닿는지 확인
+                    else if (
+                        ballVecXY.x > 0 &&
+                        ball.left + BALL_SIZE >= player2.left &&
+                        ball.left + BALL_SIZE <= player2.left + player2.width &&
+                        ball.top + BALL_SIZE >= player2.top &&
+                        ball.top <= player2.top + player2.height)
+                    {
+                        const angle = (ball.top - (player2.top + (player2.height / 2)))/(player2.height / 2);
+                        ballVecXY.x = Math.cos(Math.PI/4 * angle) * ballSpeed;
+                        ballVecXY.x = ballVecXY.x > 0 ? -ballVecXY.x : ballVecXY.x;
+                        ballVecXY.y = Math.sin(Math.PI/4 * angle) * ballSpeed;
+                        // user === player2 > send
+                        // game-ball-hit event - kyeonkim
+                        if (user === player2)
+                            socket.emit('game-ball-hit', {time: Date.now(), enemy: user, ball: ball, ballVecXY: ballVecXY, score: scoreValue});
+                    }
+                }
+                // 다시 그리기
+                canvas.renderAll();
+                board.renderAll();
+                // user1Score.renderAll();
+                // user2Score.renderAll();
+
+                lastRequestId = requestAnimationFrame(drawPong);
+
+            };
+            drawPong();
+        }
+
+        return () => {
+            console.log('before pong component unmount - cancelanimationframe');
+            socket.off('game-end');
+            cancelAnimationFrame(lastRequestId);
+            
+        };
+
+    }, [ready]);
+
 
     useEffect(() => {
         function handleKeyDown(e :any) {
@@ -552,10 +702,27 @@ export default function Pong (props :any){
 
     }, [isArrowPressed]);
     */
-    return (
-        <div>
-            <canvas id="pongCanvas"></canvas>
-            <canvas id="scoreBoard"></canvas>
-        </div>
-    );
+
+
+    if (gameEnd === false)
+    {
+        return (
+        
+            <div>
+                <canvas id="pongCanvas"></canvas>
+                <canvas id="scoreBoard"></canvas>
+                <GameProfile
+                    inGameData={inGameData}/>
+            </div>
+        );
+    }
+    else if (gameEnd === true)
+    {
+        return (
+            <div>
+                <GameEnd
+                    endData={endData} />
+            </div>
+        );
+    }
 };

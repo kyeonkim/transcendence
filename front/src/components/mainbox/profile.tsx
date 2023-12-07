@@ -25,6 +25,7 @@ const ProfilePage = (props: any) => {
   const socket = useChatSocket();
   const formData = new FormData();
   const userNickname = props.nickname;
+  const { setProfile } = props;
   const my_id = Number(cookies.get('user_id'));
   const my_nick = cookies.get('nick_name');
 
@@ -182,6 +183,11 @@ const ProfilePage = (props: any) => {
 
   const handleImgChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    if (file && file.size > 1024 * 1024 * 1) {
+      console.log('1MB 이하의 이미지만 업로드 가능합니다.');
+      window.alert('1MB 이하의 이미지만 업로드 가능합니다.');
+      return;
+    }
     setFile(file);
     formData.append('file', file);
     formData.append('access_token', cookies.get('access_token'));
@@ -202,6 +208,7 @@ const ProfilePage = (props: any) => {
         console.log("이미지변경요청 response====", res.data)
         // window.location.reload();
         setRendering(res.data.time);
+        setProfile(res.data.time);
       })
   }
   const imageLoader = (src: any) => {

@@ -42,7 +42,7 @@ export function ChatSocket ({ children }: any) {
       tmpSocket.on("disconnect", () => {
         console.log('socket diconnected - ', tmpSocket.id); // undefined
         // window.alert('서버와 연결이 끊어졌습니다.');
-        redirect('/');
+        // redirect('/');
       });
 
       setSocket(tmpSocket);

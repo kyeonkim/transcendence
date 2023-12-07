@@ -78,6 +78,7 @@ export default function Main() {
   const [socketReady, setSocketReady] = useState(false);
   const socket = useChatSocket();
   const [isSize, setIsSize] = useState(false);
+  const [profile, setProfile] = useState('');
 
   const minWidth = 2000;
   const minHeight = 1000;
@@ -109,7 +110,9 @@ export default function Main() {
     setClick(value);
     setSearch(searchTarget || '');
   }
-
+  const profileChange = (value: any) => {
+    setProfile(value);
+  }
   useEffect(() => {
     if (socket) {
       setSocketReady(true);
@@ -155,13 +158,13 @@ export default function Main() {
         </>
         )} */}
         <Grid container className={styles.leftBox}>
-          <MyProfile setMTbox={handleClick}/>
+          <MyProfile setMTbox={handleClick} profile={profile}/>
           <SearchUser setMTbox={handleClick}/>
           <MatchingButton setMTbox={handleClick}/>
           <UserLists setMTbox={handleClick}/>
         </Grid>
         <Grid container className={styles.mainBox}>
-          <Mainbox mod={clicked} search={id}/>
+          <Mainbox mod={clicked} search={id} setProfile={setProfile}/>
         </Grid>
         <Grid container className={styles.rightBox}>
           <ChatBlock setMTbox={handleClick}/>

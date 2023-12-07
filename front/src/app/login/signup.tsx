@@ -29,6 +29,10 @@ export default function Signup (props:any) {
 	const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
 		if (file) {
+			if (file.size > 1024 * 1024 * 1) {
+				window.alert('1MB 이하의 이미지만 업로드 가능합니다.');
+				return;
+			}
 			setFile(file);
 			const imageURL = URL.createObjectURL(file);
 			setProfileImage(imageURL)

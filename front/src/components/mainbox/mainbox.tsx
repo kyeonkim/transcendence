@@ -3,11 +3,11 @@ import ProfilePage from './profile';
 import Matching from './match';
 
 const MainBox = (props: any) => {
-  const { mod, search } = props;
+  const { mod, search, setProfile } = props;
 
   const handleRender = () => {
     if (mod === 1)
-      return <ProfilePage nickname={search}/>;
+      return <ProfilePage nickname={search} setProfile={setProfile}/>;
     else
 		  return <Matching />;
   };	
