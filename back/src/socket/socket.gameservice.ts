@@ -21,7 +21,7 @@ export class InGameRoom {
     {
         this.user1_id = user_id;
     }
-    rank: boolean = false;
+    rank: boolean = true;
     game_mode: boolean = false;
     user1_id: number;
     user2_id: number;
@@ -147,7 +147,7 @@ export class SocketGameService {
             console.log(this.server.to(String(room.user2_id)).emit(`render-gameroom`, {status: 'gameroom', room: room, game_mode: game_mode}));
         return {status: true, message: "게임 준비 성공"};
     }
-
+    // 일반
     Start(user_id: number)
     {
         const room = this.gameRoomMap.get(user_id);
@@ -157,13 +157,16 @@ export class SocketGameService {
             return {status: false, message: "준비가 되지 않았습니다."};
         this.gameRoomMap.delete(room.user1_id);
         this.gameRoomMap.delete(room.user2_id);
+        this.InGame.set(room.user1_id, new InGameRoom(room.user1_id));
+        this.InGame.get(room.user1_id).user2_id = room.user2_id;
+        this.InGame.set(room.user2_id, this.InGame.get(room.user1_id));
         this.server.to(`${room.user1_id}`).emit(`render-gameroom`, {status:'ingame', room: room});
         this.server.to(`${room.user2_id}`).emit(`render-gameroom`, {status:'ingame', room: room});
         this.SocketService.JoinRoom(room.user1_id, `game-${room.user1_id}`, this.server);
         this.SocketService.JoinRoom(room.user2_id, `game-${room.user1_id}`, this.server);
         return {status: true, message: "게임 시작 성공"};
     }
-
+    // 랭크
     MatchGame(user_id: number)
     {
         if (this.gameMatchQue.includes(user_id)) {
@@ -253,6 +256,8 @@ export class SocketGameService {
         });
         // 전적 추가
         const room = (user1_id === user_id) ? this.InGame.get(user1_id) : this.InGame.get(user2_id);
+        if (room.rank === undefined)
+            return {status: false, message: "rank 에러"};
         this.AddGameData({rank: room.rank, user_nickname: room.user1_nickname, user_id: room.user1_id, enemy_id: room.user2_id, my_score: room.score1, enemy_score: room.score2});
         // 객체 삭제
         this.InGame.delete(user1_id);
@@ -307,21 +312,21 @@ export class SocketGameService {
 
     async GameUserPosition(payload: any, user_id: number)
     {
-        console.log("game: ", payload, user_id, this.InGame.get(user_id));
         if (this.InGame.get(user_id) === undefined)
             return ;
         if (this.InGame.get(user_id).user1_id === user_id) {
-            console.log(`game-${this.InGame.get(user_id).user2_id}`);
             this.server.to(`${this.InGame.get(user_id).user2_id}`).emit(`game-user-position`, payload);
         }
         else {
-            console.log(`game-${this.InGame.get(user_id).user1_id}`);
             this.server.to(`${this.InGame.get(user_id).user1_id}`).emit(`game-user-position`, payload);
         }
     }
 
     async GameBallHit(payload: any, user_id: number)
     {
+        // console.log("game-ball-hit : ", payload);
+        // console.log("game-ball-hit - left: ", payload.enemy.left);
+        // console.log("game-ball-hit - top: ", payload.enemy.top);
         if (this.InGame.get(user_id) === undefined)
             return ;
         this.InGame.get(user_id).score1 = payload.score.player1;
@@ -329,11 +334,11 @@ export class SocketGameService {
         if (this.InGame.get(user_id).score1 >= 11 || this.InGame.get(user_id).score2 >= 11)
             return this.ExitGame(user_id);
         if (this.InGame.get(user_id).user1_id === user_id) {
-            console.log(`game-${this.InGame.get(user_id).user2_id}`);
+            // console.log(`game-${this.InGame.get(user_id).user2_id}`);
             this.server.to(`${this.InGame.get(user_id).user2_id}`).emit(`game-ball-fix`, payload);
         }
         else {
-            console.log(`game-${this.InGame.get(user_id).user1_id}`);
+            // console.log(`game-${this.InGame.get(user_id).user1_id}`);
             this.server.to(`${this.InGame.get(user_id).user1_id}`).emit(`game-ball-fix`, payload);
         }
     }

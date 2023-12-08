@@ -174,14 +174,14 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
   @SubscribeMessage(`game-user-position`)
   async GameUserPosition(Client: Socket, payload: any)
   {
-    console.log("=====GameUserPosition======", Client.handshake.query.user_id,payload);
+    // console.log("=====GameUserPosition======", Client.handshake.query.user_id,payload);
     await this.SocketGameService.GameUserPosition(payload, Number(Client.handshake.query.user_id));
   }
 
   @SubscribeMessage(`game-ball-hit`)
   async GameBallHit(Client: Socket, payload: any)
   {
-    console.log("=====GameBallHit======", Client.handshake.query.user_id,payload);
+    console.log("=====GameBallHit======", Client.handshake.query.user_id);
     await this.SocketGameService.GameBallHit(payload, Number(Client.handshake.query.user_id));
   }
 }
