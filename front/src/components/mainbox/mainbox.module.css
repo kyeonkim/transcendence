@@ -52,11 +52,6 @@
   height: 15%;
 }
 
-.roundButton {
-  background-color: white;
-  border-radius: 10%;
-}
-
 .myprofileimg
 {
   position: absolute;
@@ -87,4 +82,12 @@
   width: 20%;
   height: 100%;
   border-radius: 50%;
+}
+
+.medalIcon1 {
+  position: absolute;
+  font-size: 10vw;
+  border-radius: 50%;
+  border: 1px solid #fff;
+  background-color: rgba(56, 25, 254, 0.947);
 }

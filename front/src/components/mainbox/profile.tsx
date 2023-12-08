@@ -12,6 +12,7 @@ import { Avatar, Grid, Typography, Unstable_Grid2 } from '@mui/material';
 import { useChatSocket } from "../../app/main_frame/socket_provider"
 import { axiosToken } from '@/util/token';
 import { render } from 'react-dom';
+import MedalIcon from '@mui/icons-material/WorkspacePremium';
 
 const ProfilePage = (props: any) => {
   const [isFriend, setIsFriend] = useState(false);
@@ -21,6 +22,7 @@ const ProfilePage = (props: any) => {
   const [userId, setUserId] = useState(0);
   const [rendering, setRendering] = useState('');
   const [file, setFile] = useState<File>();
+  const [challenge, setChallenge] = useState([]);
   const cookies = useCookies();
   const socket = useChatSocket();
   const formData = new FormData();
@@ -40,6 +42,7 @@ const ProfilePage = (props: any) => {
         .then((res) => {
         if (res.data.userData)
         {
+          setChallenge(res.data.achievements);
           setUserId(res.data.userData.user_id);
           if (res.data.userData.nick_name === my_nick && res.data.userData.twoFA)
             setIsActivated(true);
@@ -216,6 +219,8 @@ const ProfilePage = (props: any) => {
     return `${process.env.NEXT_PUBLIC_API_URL}user/getimg/nickname/${src}`
   }
 
+  console.log("challenge===", challenge);
+
   return (  
     <div>
       <Grid container className={styles.profileBox}>
@@ -229,7 +234,7 @@ const ProfilePage = (props: any) => {
               boxShadow: '0px 0px 10px 0px rgba(255,255,255,0.5)',
             }}
           />
-          <Typography className={styles.userName} fontSize={60} sx={{color: 'white',  whiteSpace: 'nowrap', marginLeft: '10px'}}>
+          <Typography className={styles.userName} sx={{color: 'white',  whiteSpace: 'nowrap', marginLeft: '1%', fontSize: '5vw'}}>
             {userNickname !== my_nick ? `${userNickname}` : my_nick}
           </Typography>
         </Grid>
@@ -257,12 +262,16 @@ const ProfilePage = (props: any) => {
           ) : (
             <div className={styles.imageContent}>
               <div className={styles.buttons}>
-                <Button variant="outlined"  component="label" className={styles.roundButton}>
+                <Button variant="contained"  component="label" >
+                  <Typography sx={{ color: 'white', fontSize: '1vw' }}>
                   프로필 수정
+                  </Typography>
                   <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleImgChange} />
                 </Button>
-                <Button variant="outlined" className={styles.roundButton} onClick={() => handleOTP()}>
+                <Button variant="contained" onClick={() => handleOTP()} sx={{marginLeft: '1vw'}}>
+                  <Typography sx={{ color: 'white', fontSize: '1vw' }}>
                   {isActivated? '2차인증 비활성화' : '2차인증 활성화'}
+                  </Typography>
                 </Button>
               </div>
               <OtpModal
@@ -276,6 +285,33 @@ const ProfilePage = (props: any) => {
                 />
               {/* <TwoFAPass/> */}
             </div>
+          )}
+          {challenge[0] && (
+              <MedalIcon sx={{
+                fontSize: '5vw',
+                position: 'absolute',
+                top: '0',
+                left: '73%',
+                color: 'brown',
+              }}/>
+          )}
+          {challenge[1] && (
+              <MedalIcon sx={{
+                fontSize: '5vw',
+                position: 'absolute',
+                top: '0',
+                left: '80%',
+                color: 'silver',
+              }}/>
+          )}
+          {challenge[2] && (
+            <MedalIcon sx={{
+              fontSize: '5vw',
+              position: 'absolute',
+              top: '0',
+              left: '87%',
+              color: 'gold',
+            }}/>
           )}
       </Grid>
         <Grid container className={styles.matchlistBox}>

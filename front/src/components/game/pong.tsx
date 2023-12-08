@@ -30,7 +30,7 @@ function initialData() {
 
 export default function Pong (props :any){
     const socket = useChatSocket();
-
+    const { rank, mode } = props;
     const [gameEnd, setGameEnd] = useState(false);
     const [endData, setEndData] = useState({});
 
@@ -79,6 +79,9 @@ export default function Pong (props :any){
     const   myRef = useRef(null);
     
     const   [viewportRatio, setViewportRatio] = useState(1.0);
+    
+    console.log("in game rank : ", rank);
+    console.log("in game mode : ", mode);
 
     const handleGameEnd = () => {
         console.log('end? is it?');
@@ -272,10 +275,10 @@ export default function Pong (props :any){
                 setInGameData(data.gameData);
                 setReady(2);
             });
-            socket.emit(`game-start`, {user_id: Number(cookies.get('user_id')), user_nickname: cookies.get('nick_name')});
+            socket.emit(`game-start`, {user_id: Number(cookies.get('user_id')), user_nickname: cookies.get('nick_name'), rank: true});
 
             return () => {
-                socket.off('game-init');
+                // socket.off('game-init');
             }
         }
         
@@ -302,8 +305,8 @@ export default function Pong (props :any){
             setReady(3);
 
             return () => {
-                socket.off('game-user-position');
-                socket.off('game-ball-fix');
+                // socket.off('game-user-position');
+                // socket.off('game-ball-fix');
             };
     
         }
@@ -445,7 +448,7 @@ export default function Pong (props :any){
         
             return () => {
                 console.log('before pong component unmount - cancelanimationframe');
-                socket.off('game-end');
+                // socket.off('game-end');
                 cancelAnimationFrame(lastRequestId);
                 
             };

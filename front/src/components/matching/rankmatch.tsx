@@ -7,7 +7,7 @@ import { useEffect } from "react";
 import { axiosToken } from "@/util/token";
 
 export default function RankMatch(props: any) {
-	const { setRender } = props;
+	const { setRender, setRank } = props;
 
 	const cookies = useCookies();
 
@@ -41,7 +41,6 @@ export default function RankMatch(props: any) {
 			console.log("Cancel Match Response===", res);
 			setRender(0);
 		})
-		setRender(0);
 	}
 
 	return (
