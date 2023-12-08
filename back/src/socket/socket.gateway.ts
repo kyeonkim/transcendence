@@ -62,7 +62,8 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
     if (client.handshake.query.user_id !== undefined)
     {
       this.server.to(`status-${client.handshake.query.user_id}`).emit(`status`, {user_id: client.handshake.query.user_id, status: 'offline'});
-      console.log('\n\nClient disconnected=============\n', client.handshake.query.user_id ,client.id)
+      console.log('\n\nClient disconnected=============\n', client.handshake.query.user_id ,client.id);
+      this.SocketGameService.ForceGameEnd(Number(client.handshake.query.user_id));
       this.SocketService.Disconnect(client.handshake.query.user_id, client.id);
       // this.GameService.LeaveGameRoom(Number(client.handshake.query.user_id));
       // console.log(this.server.sockets.sockets,"\n");

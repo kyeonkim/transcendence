@@ -190,6 +190,7 @@ export class SocketGameService {
         return {status: true, message: "매칭 취소 완료", data: user_id}
     }
 
+
     async ExitGame(user_id: number)
     {
         if (this.InGame.get(user_id) === undefined)
@@ -215,8 +216,20 @@ export class SocketGameService {
         const user2_we = 1 / ((10 ** ((user1.ladder - user2.ladder) / 400)) + 1);
         const user1_we = 1 - user2_we;
         const k = 20;
-        const user2_pb = user2.ladder + k * ((user_id === user2.user_id ? 0 : 1) - user2_we);
-        const user1_pb = user1.ladder + k * ((user_id === user1.user_id ? 0 : 1) - user1_we);
+        const user2_winLose = user_id === user2.user_id ? 0 : 1;
+        const user1_winLose = user_id === user1.user_id ? 0 : 1;
+        const user2_pb = user2.ladder + k * (user2_winLose - user2_we);
+        const user1_pb = user1.ladder + k * (user1_winLose - user1_we);
+        if (user1_winLose)
+        {
+            user1.win++;
+            user2.lose++;
+        }
+        else
+        {
+            user1.lose++;
+            user2.win++;
+        }
         console.log("user2_pb : ", Math.round(user2_pb), "user1_pb : ", Math.round(user1_pb));
         //prisma data에 넣기
         await this.prismaservice.user.update({
@@ -224,6 +237,8 @@ export class SocketGameService {
                 user_id: user1_id,
             },
             data: {
+                win : user1.win,
+                lose : user1.lose,
                 ladder: Math.round(user1_pb),
             },
         });
@@ -232,10 +247,30 @@ export class SocketGameService {
                 user_id: user2_id,
             },
             data: {
+                win : user2.win,
+                lose : user2.lose,
                 ladder: Math.round(user2_pb),
             },
         });
         return {status: true, message: "게임 종료"};
+    }
+
+    async ForceGameEnd(user_id: number)
+    {
+        if (this.InGame.get(user_id) === undefined)
+            return {status: false, message: "게임이 존재하지 않습니다."};
+        const inGame = this.InGame.get(user_id);
+        if (inGame.user1_id === user_id)
+        {
+            inGame.score2 = 11;
+            inGame.score1 = 0;
+        }
+        else
+        {
+            inGame.score2 = 0;
+            inGame.score1 = 11;
+        }
+        this.ExitGame(user_id);
     }
 
     async GameStart(payload: any)
@@ -259,7 +294,7 @@ export class SocketGameService {
             setTimeout(() => {
                 console.log(`after time out`,room);
                 this.server.to(`game-${room.user1_id}`).emit(`game-init`, {room: room});
-            }, 3000);
+            }, 1000);
         }
     }
 

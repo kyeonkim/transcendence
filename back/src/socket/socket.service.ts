@@ -107,7 +107,10 @@ export class SocketService {
     {
         console.log("LeaveRoom user_id: ", user_id, " | LeaveRoom: ", room);
         if(this.sockets.get(String(user_id)) !== undefined)
-            server.sockets.sockets.get(this.sockets.get(String(user_id))).leave(room);
+        {
+            if (server.sockets.sockets.get(this.sockets.get(String(user_id))) !== undefined)
+                server.sockets.sockets.get(this.sockets.get(String(user_id))).leave(room);
+        }
     }
 
     async SendStatusTest(user_id: any, status: string, server: Server)
