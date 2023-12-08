@@ -57,7 +57,15 @@ export class UserService {
         // console.log(userData);
         if (userData === null)
             return {status: false, message: "유저 찾기 실패"}
-        return {status: true, userData: userData};
+        // 도전 과제 (1승, 10승, 50승) - db 에 넣을수도 있음, 우선 간단하게 작성
+        let achievements = [false, false, false];
+        if (userData.win >= 1)
+            achievements[0] = true;
+        if (userData.win >= 10)
+            achievements[1] = true;
+        if (userData.win >= 50)
+            achievements[2] = true;
+        return {status: true, userData: userData, achievements: achievements};
     }
 
     async GetUserDataById(id: number)
