@@ -83,23 +83,23 @@ export default function Main() {
   const minWidth = 2000;
   const minHeight = 1000;
 
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth < minWidth || window.innerHeight < minHeight) {
-        console.log('잘작동중!!!!!!');
-        setIsSize(true);
-      } else {
-        setIsSize(false);
-      }
-    };
+  // useEffect(() => {
+  //   const handleResize = () => {
+  //     if (window.innerWidth < minWidth || window.innerHeight < minHeight) {
+  //       console.log('잘작동중!!!!!!');
+  //       setIsSize(true);
+  //     } else {
+  //       setIsSize(false);
+  //     }
+  //   };
 
-    window.addEventListener('resize', handleResize);
+  //   window.addEventListener('resize', handleResize);
 
-    // 컴포넌트가 unmount되면 리스너 제거
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, [minWidth]);
+  //   // 컴포넌트가 unmount되면 리스너 제거
+  //   return () => {
+  //     window.removeEventListener('resize', handleResize);
+  //   };
+  // }, [minWidth]);
 
   const particlesInit = useCallback(async (engine: Engine) => {
     // console.log(engine);

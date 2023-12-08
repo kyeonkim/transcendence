@@ -5,7 +5,6 @@ import Pong from "./pong";
 
 export default function Test(props: any) {
 	const { setRender } = props;
-	const cookies = useCookies();
 
 	const exitGame = async () => {
 		setRender(0);
