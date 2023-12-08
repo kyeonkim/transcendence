@@ -240,7 +240,7 @@ const ProfilePage = (props: any) => {
             <Typography sx={{ color: 'white', fontSize: '5vw' }}>
               점수
             </Typography>
-            <Grid container>
+            <Grid container sx={{flexWrap: 'unset'}}>
               <Typography sx={{ color: 'white', fontSize: '5vw' }}>
                 승
               </Typography>
