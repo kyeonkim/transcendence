@@ -54,7 +54,7 @@ export default function SearchUser({ setMTbox }: SearchUserProps) {
     }
 
     return (
-        <Grid item className={styles.search_bar}>
+        <>
             <TextField
                 className={styles.search_user}
                 id="outlined_search_user"
@@ -70,15 +70,14 @@ export default function SearchUser({ setMTbox }: SearchUserProps) {
                 severity="error"
                 onClose={() => {setval(true)}}
                 sx={{
-                    position: 'fixed',
-                    top: '110%',
-                    left: '5%',
+                    position: 'absolute',
+                    top: '35%',
                     zIndex: 9999,
                     transform: 'translate(0, 0)',
                 }}
             >
                 <strong>영문 숫자만 입력해주세요!</strong>
             </Alert>}
-        </Grid>
+        </>
     );
 }

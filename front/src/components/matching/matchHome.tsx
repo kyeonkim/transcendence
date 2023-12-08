@@ -41,14 +41,14 @@ export default function MatchHome(props: any) {
 				PONG42
 			</Typography> 	
 			<Grid item sx={{marginTop: '50px'}}>
-				<Button className={styles.homeButton} sx={{border: 7, borderColor: '#2196f3',background: '#1565c0'}} variant="contained" onClick={handleRankClick}>
+				<Button sx={{border: 7, borderColor: '#2196f3',background: '#1565c0'}} variant="contained" onClick={handleRankClick}>
 					<Typography style={{fontWeight: 'bold', fontSize: '3vw'}}>
                 		랭크
             		</Typography>
 				</Button>
 			</Grid>
 			<Grid item sx={{marginTop: '20px'}}>
-				<Button className={styles.homeButton} sx={{border: 7, borderColor: '#2196f3',background: '#1565c0'}} variant="contained" onClick={handleInviteClick}>
+				<Button sx={{border: 7, borderColor: '#2196f3',background: '#1565c0'}} variant="contained" onClick={handleInviteClick}>
 					<Typography style={{fontWeight: 'bold', fontSize: '3vw'}}>
                 		일반
             		</Typography>

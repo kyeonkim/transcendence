@@ -15,8 +15,8 @@
 
 .homeButton {
 	position: absolute;
-	width: '50%';
-	height: '0%';
+	/* width: '50%';
+	height: '0%'; */
 	border-radius: 30px;
 }
 

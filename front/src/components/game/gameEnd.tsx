@@ -18,7 +18,7 @@ export default function GameEnd({endData, exitGame} :any) {
     return (
         <div>
             <Grid container className={styles.profileBoxGameEnd}>
-                <Grid item className={styles.playerContainer1}alignItems='center' display='flex' padding='1%'>
+                <Grid item className={styles.playerContainer1}alignItems='center' display='flex' direction='colum' padding='1%'>
                     <Avatar
                         src={imageLoader(`${endData.user1_nickname}`)}
                             sx={{

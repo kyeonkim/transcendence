@@ -23,7 +23,6 @@ export default function ChatRoomBar(props: any) {
 				<Button
 					sx={{
 					position: "sticky",
-					width: "30%",
 					left: "65%",
 					height: "60%",
 					background: "white",

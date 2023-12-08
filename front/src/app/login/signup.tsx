@@ -4,6 +4,7 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { Avatar, Button, Grid, Skeleton, TextField, Typography } from "@mui/material"
 import styles from './login.module.css'
+import '@/util/loading.css';
 
 // tsparticles
 import type { Engine } from "tsparticles-engine";
@@ -19,6 +20,7 @@ export default function Signup (props:any) {
 	const [profileImage, setProfileImage] = useState<string | null>(null);
 	const [nickname, setNickname] = useState("");
 	const [error, setError] = useState("");
+	const [loading, setLoading] = useState(false);
 	const router = useRouter();
 	const formData = new FormData();
 
@@ -45,6 +47,7 @@ export default function Signup (props:any) {
 
 	const handleEnter = async () => {
 		setError('');
+		setLoading(true);
 		formData.append('nick_name', nickname);
 		if (imageFile) {
 			formData.append('file', imageFile);
@@ -67,6 +70,7 @@ export default function Signup (props:any) {
 				})})
 			.catch((error) => {
 				console.log ('sign up error =',error.response.data)
+				setLoading(false);
 				setError('중복된 닉네임이거나 특수문자가 포함되어있습니다! 다시 입력해주세요.');
 			})
 	}
@@ -79,11 +83,7 @@ export default function Signup (props:any) {
 					Wellcome!!
 				</Typography>
 				<Grid item className={styles.signupImage}>
-            {!profileImage ? (
-              <Skeleton variant="circular" width={'2vw'} height={'2vw'} />
-            ) : (
               <Avatar src={profileImage} alt="Uploaded" style={{ width: '10vw', height: '10vw', borderRadius: '50%' }} />
-            )}
 				</Grid>
 				<Grid item className={styles.signupImageText}>
 						<Typography style={{fontSize: '1.5vw'}}>🙏이미지를 등록해주세요🙏</Typography>
@@ -97,6 +97,9 @@ export default function Signup (props:any) {
 					<input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleImageUpload} />
 				</Button>
 			</Grid>
+			{loading ? (
+					<div id="loading"></div>
+			) : (
 			<Grid item className={styles.signupNickname}>
 				<TextField
 					color={error ? "error" : "primary"}
@@ -121,6 +124,7 @@ export default function Signup (props:any) {
 						}}}
 					/> 
 			</Grid>
+			)}
 			{error ? (
 			<Grid item className={styles.signupError}>
 				<Typography variant="caption" color="error" style={{fontSize: '1.5vw'}}>

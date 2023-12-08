@@ -88,7 +88,6 @@ export default function GameRoom(props: any) {
 					sx={{color: 'white'}}
 				/>
 				<Button
-				className={styles.gameButton}
 				variant="contained"
 				color="primary"
 				onClick={handleStart}
@@ -107,12 +106,12 @@ export default function GameRoom(props: any) {
 					Start
 				</Typography>
 				</Button>
-				<Button className={styles.gameButton} sx={{position: 'relative', marginTop: '40%', width: '100%'}} variant="contained" color="success" onClick={handleReady}>
+				<Button sx={{position: 'relative', marginTop: '40%', width: '100%'}} variant="contained" color="success" onClick={handleReady}>
 					<Typography sx={{ color: 'white', fontSize: '1.5vw' }}>
 						Ready
 					</Typography>
 				</Button>
-				<Button className={styles.gameButton} sx={{position: 'relative', marginTop: '40%', width: '100%'}} variant="contained" color="error" onClick={handleExit}>
+				<Button sx={{position: 'relative', marginTop: '40%', width: '100%'}} variant="contained" color="error" onClick={handleExit}>
 					<Typography sx={{ color: 'white', fontSize: '1.5vw' }}>
 						Exit
 					</Typography>
