@@ -144,17 +144,17 @@ export class TestService {
             await this.DeleteUserByNickName(`dummy${i}`);
     }
 
-    async CreateDummyGame()
-    {
-        for(let i = 0; i < 95; i++)
-            await this.GameService.AddGameData({
-                rank: true,
-                user_id: 0,
-                enemy_id: 1,
-                my_score: i,
-                enemy_score: 95 - i
-            });
-    }
+    // async CreateDummyGame()
+    // {
+    //     for(let i = 0; i < 95; i++)
+    //         await this.GameService.AddGameData({
+    //             rank: true,
+    //             user_id: 0,
+    //             enemy_id: 1,
+    //             my_score: i,
+    //             enemy_score: 95 - i
+    //         });
+    // }
 
     async DeleteDummyGame()
     {

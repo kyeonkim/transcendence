@@ -8,6 +8,10 @@ export class gameDataDto
     rank: boolean;
 
     @ApiProperty()
+    @IsString()
+    user_nickname : string;
+
+    @ApiProperty()
     @IsNumber()
     user_id: number;
 
@@ -60,6 +64,10 @@ export class leaveGameRoomDto
 
 export class readyGameDto
 {
+    @ApiProperty()
+    @IsBoolean()
+    game_mode: boolean;
+
     @ApiProperty()
     @IsNumber()
     user_id: number;

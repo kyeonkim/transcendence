@@ -40,42 +40,6 @@ export class GameService {
     private gameMatchQue = new Array<number>();
     private InGame = new Map<number, InGameRoom>();
 
-    async AddGameData(gameData: gameDataDto)
-    {
-        const isWin : boolean = gameData.my_score > gameData.enemy_score ? true : false;
-        try {
-            const enemy = await this.prismaService.user.findUnique({
-                where: {
-                    user_id: gameData.enemy_id,
-                },
-            });
-            await this.prismaService.game.create({
-                data: {
-                    rank: gameData.rank,
-                    user_id: gameData.user_id,
-                    enemy_id: gameData.enemy_id,
-                    enemy_name: enemy.nick_name,
-                    winner: isWin,
-                    my_score: gameData.my_score,
-                    enemy_score: gameData.enemy_score,
-                },
-            });
-            await this.prismaService.game.create({
-                data: {
-                    rank: gameData.rank,
-                    user_id: gameData.enemy_id,
-                    enemy_id: gameData.user_id,
-                    enemy_name: enemy.nick_name,
-                    winner: !isWin,
-                    my_score: gameData.enemy_score,
-                    enemy_score: gameData.my_score,
-                },
-            }); 
-        } catch (error) {
-            console.log("error: ", error);
-        }
-    }
-
     async GetGameDataById(id: number, index: number)
     {
         const user = await this.prismaService.user.findUnique({
@@ -121,9 +85,9 @@ export class GameService {
         return this.socketGameService.InviteGameRoom(user_id, target_id, user_nicknmae);
     }
 
-    async Ready(user_id: number, ready: boolean)
+    async Ready(game_mode: boolean, user_id: number, ready: boolean)
     {
-        return this.socketGameService.Ready(user_id, ready);
+        return this.socketGameService.Ready(game_mode, user_id, ready);
     }
 
     async Start(user_id: number)

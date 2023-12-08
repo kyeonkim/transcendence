@@ -3,6 +3,7 @@ import { Server } from "socket.io";
 import { SocketService } from "./socket.service";
 import { EventService } from "src/event/event.service";
 import { PrismaService } from "src/prisma/prisma.service";
+import { gameDataDto } from "src/game/dto/game.dto";
 
 export class GameRoom {
     constructor(user_id: number)
@@ -20,6 +21,7 @@ export class InGameRoom {
     {
         this.user1_id = user_id;
     }
+    rank: boolean = false;
     game_mode: boolean = false;
     user1_id: number;
     user2_id: number;
@@ -130,7 +132,7 @@ export class SocketGameService {
         return this.gameRoomMap.get(user_id);
     }
 
-    Ready(user_id: number, ready: boolean)
+    Ready(game_mode: boolean, user_id: number, ready: boolean)
     {
         const room = this.gameRoomMap.get(user_id);
         if (room === undefined)
@@ -140,9 +142,9 @@ export class SocketGameService {
         else
             room.user2_ready = ready;
         console.log(this.gameRoomMap);
-        console.log(this.server.to(String(room.user1_id)).emit(`render-gameroom`, {status: 'gameroom', room: room}));
+        console.log(this.server.to(String(room.user1_id)).emit(`render-gameroom`, {status: 'gameroom', room: room, game_mode: game_mode}));
         if (room.user2_id !== null)
-            console.log(this.server.to(String(room.user2_id)).emit(`render-gameroom`, {status: 'gameroom', room: room}));
+            console.log(this.server.to(String(room.user2_id)).emit(`render-gameroom`, {status: 'gameroom', room: room, game_mode: game_mode}));
         return {status: true, message: "게임 준비 성공"};
     }
 
@@ -198,8 +200,6 @@ export class SocketGameService {
         const user1_id = this.InGame.get(user_id).user1_id;
         const user2_id = this.InGame.get(user_id).user2_id;
         this.server.to(`game-${user1_id}`).emit(`game-end`, {gameData: this.InGame.get(user_id)});
-        this.InGame.delete(user1_id);
-        this.InGame.delete(user2_id);
         this.SocketService.LeaveRoom(String(user1_id), `game-${user1_id}`, this.server);
         this.SocketService.LeaveRoom(String(user2_id), `game-${user1_id}`, this.server);
         const user1 =   await this.prismaservice.user.findUnique({
@@ -230,7 +230,6 @@ export class SocketGameService {
             user1.lose++;
             user2.win++;
         }
-        console.log("user2_pb : ", Math.round(user2_pb), "user1_pb : ", Math.round(user1_pb));
         //prisma data에 넣기
         await this.prismaservice.user.update({
             where: {
@@ -252,6 +251,12 @@ export class SocketGameService {
                 ladder: Math.round(user2_pb),
             },
         });
+        // 전적 추가
+        const room = (user1_id === user_id) ? this.InGame.get(user1_id) : this.InGame.get(user2_id);
+        this.AddGameData({rank: room.rank, user_nickname: room.user1_nickname, user_id: room.user1_id, enemy_id: room.user2_id, my_score: room.score1, enemy_score: room.score2});
+        // 객체 삭제
+        this.InGame.delete(user1_id);
+        this.InGame.delete(user2_id);
         return {status: true, message: "게임 종료"};
     }
 
@@ -291,6 +296,8 @@ export class SocketGameService {
         {
             console.log("game start send", this.InGame.get(Number(payload.user_id)));
             const room = this.InGame.get(Number(payload.user_id));
+            room.rank = payload.rank;
+            room.game_mode = payload.game_mode;
             setTimeout(() => {
                 console.log(`after time out`,room);
                 this.server.to(`game-${room.user1_id}`).emit(`game-init`, {room: room});
@@ -330,4 +337,42 @@ export class SocketGameService {
             this.server.to(`${this.InGame.get(user_id).user1_id}`).emit(`game-ball-fix`, payload);
         }
     }
+
+    async AddGameData(gameData: gameDataDto)
+    {
+        const isWin : boolean = gameData.my_score > gameData.enemy_score ? true : false;
+        try {
+            const enemy = await this.prismaservice.user.findUnique({
+                where: {
+                    user_id: gameData.enemy_id,
+                },
+            });
+            await this.prismaservice.game.create({
+                data: {
+                    rank: gameData.rank,
+                    user_id: gameData.user_id,
+                    enemy_id: gameData.enemy_id,
+                    enemy_name: enemy.nick_name,
+                    winner: isWin,
+                    my_score: gameData.my_score,
+                    enemy_score: gameData.enemy_score,
+                },
+            });
+            await this.prismaservice.game.create({
+                data: {
+                    rank: gameData.rank,
+                    user_id: gameData.enemy_id,
+                    enemy_id: gameData.user_id,
+                    enemy_name: gameData.user_nickname,
+                    winner: !isWin,
+                    my_score: gameData.enemy_score,
+                    enemy_score: gameData.my_score,
+                },
+            }); 
+        } catch (error) {
+            console.log("error: ", error);
+        }
+    }
+
+
 }

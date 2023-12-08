@@ -12,12 +12,12 @@ export class GameController {
         private readonly GameService: GameService,
     ) {}
 
-    @ApiOperation({summary: `전적 추가 API`, description: `전적을 추가한다.`})
-    @Post("adddata")
-    AddGameData(@Body() gameData: gameDataDto)
-    {
-        return this.GameService.AddGameData(gameData);
-    }
+    // @ApiOperation({summary: `전적 추가 API`, description: `전적을 추가한다.`})
+    // @Post("adddata")
+    // AddGameData(@Body() gameData: gameDataDto)
+    // {
+    //     return this.GameService.AddGameData(gameData);
+    // }
 
     @ApiOperation({summary: `전적 데이터 API`, description: `전적 db를 가져온다`})
 	@UseGuards(AuthGuard('jwt-access'))
@@ -25,6 +25,7 @@ export class GameController {
     @Get("data")
     async GetGameDataById(@Query('id', ParseIntPipe) id: number, @Query('index', ParseIntPipe) index: number)
     {
+        console.log("GetGameDataById: ", id,", index: ", index);
         const gameData = await this.GameService.GetGameDataById(id, index);
         return gameData;
     }
@@ -85,7 +86,7 @@ export class GameController {
     @Patch("ready")
     async Ready(@Body() data: readyGameDto)
     {
-        const room = await this.GameService.Ready(data.user_id, data.ready);
+        const room = await this.GameService.Ready(data.game_mode, data.user_id, data.ready);
         console.log(room);
         return room;
     }

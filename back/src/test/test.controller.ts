@@ -37,12 +37,12 @@ export class TestController {
 		return this.TestService.DeleteUserByNickName(nickName);
 	}
 
-	@ApiOperation({summary: `더미 게임 데이터 추가 API`, description: `더미데이터를 생성한다.`})
-	@Post("creategamedummy")
-	CreateDummyGame()
-	{
-		return this.TestService.CreateDummyGame();
-	}
+	// @ApiOperation({summary: `더미 게임 데이터 추가 API`, description: `더미데이터를 생성한다.`})
+	// @Post("creategamedummy")
+	// CreateDummyGame()
+	// {
+	// 	return this.TestService.CreateDummyGame();
+	// }
 
 	@ApiOperation({summary: `더미  게임 데이터 삭제 API`, description: `더미게임데이터를 삭제한다.`})
 	@Delete("getdata/deletedummy")
