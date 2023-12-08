@@ -38,17 +38,22 @@ export default function MatchList(props: any) {
   }, [page]);
 
   useEffect(() => {
+    console.log("match list api call")
     const fetchData = async () => {
     await axiosToken.get(`${process.env.NEXT_PUBLIC_API_URL}game/data`, {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${cookies.get('access_token')}`
       },
-      params: { id: 0, index: res.length ? res[res.length - 1].idx - 1 : 0 },
+      params: { id: Number(cookies.get('user_id')), index: res.length ? res[res.length - 1].idx - 1 : 0 },
     })
     .then((response) => {
+      console.log("match list api response===", response);
       if (response.data.status)
         setRes([...res, ...response.data.data]);
+    })
+    .catch((error) => {
+      console.log("match list res err===",error);
     });
     };
     fetchData();
@@ -91,15 +96,16 @@ export default function MatchList(props: any) {
   return (
     <List ref={listRef} sx={listStyle}>
       {res.length > 0 ? (
+        console.log("match list res===", res),
         res.map((match: any, index: any) => {
         
         const listItemStyle = {
           border: '5px solid ' + (match.winner ? 'rgba(0, 0, 255, 0.4)' : 'rgba(255, 0, 0, 0.4)'), // 테두리 색상 설정
           backgroundColor: match.winner ? 'rgba(0, 0, 255, 0.4)' : 'rgba(255, 0, 0, 0.4)', // 배경 색상 설정
           color: 'white', // 텍스트 색상
-          padding: '10px', // 옵션: 패딩 설정
-          margin : '9px', // 옵션: 마진 설정
-          width: '1200px', // 옵션: 너비 설정
+          padding: '0.5vw', // 옵션: 패딩 설정
+          margin : '0.1vw', // 옵션: 마진 설정
+          width: '40vw', // 옵션: 너비 설정
           // marginLeft: '120px',
           borderRadius: '10px', // 옵션: 모서리를 둥글게 설정
           // opacity: '1'
@@ -107,19 +113,19 @@ export default function MatchList(props: any) {
         
         const textPrimaryStyle = {
           fontWeight: 'bold', // 텍스트를 굵게 설정
-          fontSize: '50px', // 폰트 크기 설정
-          marginLeft: '20px', // 왼쪽 마진 설정
-          marginRight: '20px', // 오른쪽 마진 설정
+          fontSize: '2vw', // 폰트 크기 설정
+          marginLeft: '1vw', // 왼쪽 마진 설정
+          marginRight: '1vw', // 오른쪽 마진 설정
         };
         
         const textScoreStyle = {
           fontWeight: 'bold', // 텍스트를 굵게 설정
-          fontSize: '50px', // 폰트 크기 설정
+          fontSize: '2vw', // 폰트 크기 설정
 
         };
         const avatarStyle = {
-          width: '90px', // 프로필 사진의 너비 조절
-          height: '90px', // 프로필 사진의 높이 조절
+          width: '5vw', // 프로필 사진의 너비 조절
+          height: '5vw', // 프로필 사진의 높이 조절
         };
         const imageLoader = ({ src }: any) => {
           return `${process.env.NEXT_PUBLIC_API_URL}user/getimg/nickname/${src}`
@@ -130,14 +136,14 @@ export default function MatchList(props: any) {
               <ListItemAvatar>
                 <Avatar alt="Remy Sharp" src={imageLoader({src: userNickname})} sx={avatarStyle}/>
               </ListItemAvatar>
-              <Typography variant="h6" sx={{ ...textPrimaryStyle, fontSize: '50px' }}>
+              <Typography sx={{ ...textPrimaryStyle}}>
                 {userNickname}
               </Typography>
               <ListItemText
                 primary={`${match.my_score}:${match.enemy_score}`}
                 primaryTypographyProps={{ textAlign: 'center', sx: textScoreStyle }}
               />
-              <Typography variant="h6" sx={{ ...textPrimaryStyle, fontSize: '50px' }}>
+              <Typography sx={{ ...textPrimaryStyle}}>
                 {match.enemy_name}
               </Typography>
               <ListItemAvatar>
@@ -150,7 +156,7 @@ export default function MatchList(props: any) {
         })
       ) : (
         <ListItem alignItems="center" sx={emptyStyle}>
-          <Typography variant="h6" sx={{ fontSize: '50px' }}>
+          <Typography sx={{ fontSize: '2vw' }}>
             매치 기록이 없습니다.
           </Typography>
         </ListItem>

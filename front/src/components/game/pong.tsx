@@ -28,9 +28,9 @@ import  GameEnd from "./gameEnd";
 //     );
 // };
 
-export default function Pong ({exitGame, reverse} :any){
+export default function Pong (props :any){
     const socket = useChatSocket();
-
+    const { rank, mode } = props;
     const [gameEnd, setGameEnd] = useState(false);
     const [endData, setEndData] = useState({});
 
@@ -98,8 +98,12 @@ export default function Pong ({exitGame, reverse} :any){
 
 	const   cookies = useCookies();
     const   myRef = useRef(null);
+    
+    
+    console.log("in game rank : ", rank);
+    console.log("in game mode : ", mode);
 
-    reverse = false;
+    mode = false;
 
 
     // 초기에 canvas 그리기 전에 width, height 설정 필요
@@ -286,7 +290,7 @@ export default function Pong ({exitGame, reverse} :any){
             });
             
             
-            if (reverse === true)
+            if (mode === true)
             {
                 setReverseSign(-1);
             }
