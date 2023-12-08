@@ -6,6 +6,7 @@ import { useCookies } from "next-client-cookies";
 
 import  GameProfile  from "./gameProfile";
 import  GameEnd from "./gameEnd";
+import { init } from 'next/dist/compiled/webpack/webpack';
 
 // 새로 고침했을 때, 상위 컴포넌트에서 참가자 데이터를 받아오는가? 아니면 back에 요청을 하는가?
 
@@ -30,7 +31,7 @@ import  GameEnd from "./gameEnd";
 
 export default function Pong (props :any){
     const socket = useChatSocket();
-    const { rank, mode } = props;
+    const { rank, mode, exitGame,  } = props;
     const [gameEnd, setGameEnd] = useState(false);
     const [endData, setEndData] = useState({});
 
@@ -103,7 +104,7 @@ export default function Pong (props :any){
     console.log("in game rank : ", rank);
     console.log("in game mode : ", mode);
 
-    mode = false;
+    mode;
 
 
     // 초기에 canvas 그리기 전에 width, height 설정 필요
@@ -436,9 +437,13 @@ export default function Pong (props :any){
 
         console.log("init player : ", player1, player2);
         console.log(`run pong`, user);
+        console.log('game_mode:', mode);
+        console.log('game_rank:', rank);
+        console.log(`init 1 `,initUserSetting);
 
         if (initUserSetting === true)
         {
+            console.log(`init 2`);
             const listenGameInit = (data :any) => {
                 console.log('game-init');
     
@@ -461,8 +466,8 @@ export default function Pong (props :any){
             }
     
             socket.on(`game-init`, listenGameInit);
-            socket.emit(`game-start`, {user_id: Number(cookies.get('user_id')), user_nickname: cookies.get('nick_name'), rank: true, game_mode: false});
-    
+            socket.emit(`game-start`, {user_id: Number(cookies.get('user_id')), user_nickname: cookies.get('nick_name'), rank: rank, game_mode: mode});
+            console.log('init 3');
             return () => {
                 console.log('closing game-init listener');
                 socket.off('game-init', listenGameInit);
