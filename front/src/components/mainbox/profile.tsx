@@ -8,21 +8,21 @@ import { useState, useEffect } from 'react';
 import { useCookies } from 'next-client-cookies';
 import OtpModal from '../profile/otp';
 import TwoFAPass from '@/app/login/twoFAPass';
-import { Avatar, Grid, Typography, Unstable_Grid2 } from '@mui/material';
+import { Avatar, Grid, Tooltip, Typography, Unstable_Grid2 } from '@mui/material';
 import { useChatSocket } from "../../app/main_frame/socket_provider"
 import { axiosToken } from '@/util/token';
 import { render } from 'react-dom';
 import MedalIcon from '@mui/icons-material/WorkspacePremium';
+
 
 const ProfilePage = (props: any) => {
   const [isFriend, setIsFriend] = useState(false);
   const [isBlock, setIsBlock] = useState(false);
   const [isOTP, setIsOTP] = useState(false);
   const [isActivated, setIsActivated] = useState(false);
-  const [userId, setUserId] = useState(0);
   const [rendering, setRendering] = useState('');
+  const [data, setData] = useState<any>();
   const [file, setFile] = useState<File>();
-  const [challenge, setChallenge] = useState([]);
   const cookies = useCookies();
   const socket = useChatSocket();
   const formData = new FormData();
@@ -42,9 +42,8 @@ const ProfilePage = (props: any) => {
         .then((res) => {
         if (res.data.userData)
         {
-          console.log(res.data);
-          setChallenge(res.data.achievements);
-          setUserId(res.data.userData.user_id);
+          console.log("데이터 리스폰스 =======",res.data);
+          setData(res.data)
           if (res.data.userData.nick_name === my_nick && res.data.userData.twoFA)
             setIsActivated(true);
           else
@@ -146,7 +145,7 @@ const ProfilePage = (props: any) => {
         data: {
           user_id: my_id,
           user_nickname: my_nick,
-          friend_id: Number(userId),
+          friend_id: Number(data.userData.user_id),
           friend_nickname: userNickname
         }})
       .then((res) => {
@@ -155,11 +154,11 @@ const ProfilePage = (props: any) => {
       })
     }
     else {
-      console.log("block to ", userNickname, userId);
+      console.log("block to ", userNickname, data.userData.user_id);
       await axiosToken.post(`${process.env.NEXT_PUBLIC_API_URL}social/addBlockedUser`,{
         user_id: my_id,
         user_nickname: my_nick,
-        friend_id: Number(userId),
+        friend_id: Number(data.userData.user_id),
         friend_nickname: userNickname
       },
       {
@@ -220,57 +219,80 @@ const ProfilePage = (props: any) => {
     return `${process.env.NEXT_PUBLIC_API_URL}user/getimg/nickname/${src}`
   }
 
+  if (!data)
+    return <div>loading...</div>;
+
   return (  
     <div>
       <Grid container className={styles.profileBox}>
-        <Grid item className={styles.imageContainer}alignItems='center' display='flex' padding='1%'>
+        <Grid item className={styles.imageContainer} alignItems='center' display='flex'padding='1%' flexDirection='column'>
           <Avatar
             src={imageLoader(`${userNickname}?${rendering}`)}
             sx={{
-              width: '100%',
+              width: '80%',
               height: '80%',
               border: '2px solid white',
               boxShadow: '0px 0px 10px 0px rgba(255,255,255,0.5)',
             }}
           />
-          <Typography sx={{color: 'white',  whiteSpace: 'nowrap', marginLeft: '1%', fontSize: '5vw'}}>
+          <Typography sx={{color: 'white',  whiteSpace: 'nowrap', marginLeft: '5%', fontSize: '1.5vw'}}>
             {userNickname !== my_nick ? `${userNickname}` : my_nick}
           </Typography>
-          <Grid container direction="column" alignItems="center">
-            <Typography sx={{ color: 'white', fontSize: '5vw' }}>
-              점수
+        </Grid>
+        <Grid container justifyContent="center" spacing={4}>
+        <Grid item>
+          <Grid container direction="column" alignItems="flex-end">
+          <Typography sx={{ color: 'green', fontSize: '3vw' }}>
+              Ladder
             </Typography>
-            <Grid container sx={{flexWrap: 'unset'}}>
-              <Typography sx={{ color: 'white', fontSize: '5vw' }}>
-                승
-              </Typography>
-              <Typography sx={{ color: 'white', fontSize: '5vw', marginLeft: '5px', marginRight: '5px' }}>
-                /
-              </Typography>
-              <Typography sx={{ color: 'white', fontSize: '5vw' }}>
-                패
-              </Typography>
-            </Grid>
+            <Typography sx={{ color: 'white', fontSize: '1.5vw' }}>
+              Win
+            </Typography>
+            <Typography sx={{ color: 'white', fontSize: '1.5vw' }}>
+              Lose
+            </Typography>
           </Grid>
         </Grid>
+        <Grid item>
+          <Grid container direction="column" alignItems="flex-start">
+            <Typography sx={{ color: 'green', fontSize: '3vw' }}>
+              {Math.round(data.userData.ladder)}
+            </Typography>
+            <Typography sx={{ color: 'white', fontSize: '1.5vw' }}>
+              {data.userData.win}
+            </Typography>
+            <Typography sx={{ color: 'white', fontSize: '1.5vw' }}>
+              {data.userData.lose}
+            </Typography>
+          </Grid>
+        </Grid>
+      </Grid>
           {userNickname !==  my_nick ? ( 
               <div className={styles.buttons}>
                 {isFriend? (
-                  <Button variant="outlined" className={styles.roundButton} onClick={() => handleFriend()}>
-                    친구삭제
+                  <Button variant="contained" onClick={() => handleFriend()}>
+                    <Typography sx={{ color: 'white', fontSize: '1vw' }}>
+                      친구삭제
+                    </Typography>
                   </Button>
                   ) : (
-                  <Button variant="outlined" className={styles.roundButton} onClick={() => handleFriend()}>
-                    친구추가
+                  <Button variant="contained" onClick={() => handleFriend()} sx={{marginLeft: '1vw'}}>
+                    <Typography sx={{ color: 'white', fontSize: '1vw' }}>
+                      친구추가
+                    </Typography>
                   </Button>
                   )}
                 {isBlock? (
-                  <Button variant="outlined" className={styles.roundButton} onClick={() => handleBlock()}>
-                    차단해제
+                  <Button variant="contained" onClick={() => handleBlock()}>
+                    <Typography sx={{ color: 'white', fontSize: '1vw' }}>
+                      차단해제
+                    </Typography>
                   </Button>
                   ) : (
-                  <Button variant="outlined" className={styles.roundButton} onClick={() => handleBlock()}>
-                    차단
+                  <Button variant="contained" onClick={() => handleBlock()} sx={{marginLeft: '1vw'}}>
+                    <Typography sx={{ color: 'white', fontSize: '1vw' }}>
+                      차단
+                    </Typography>
                   </Button>
                   )}
               </div>
@@ -301,7 +323,8 @@ const ProfilePage = (props: any) => {
               {/* <TwoFAPass/> */}
             </div>
           )}
-          {challenge[0] && (
+          {(data.achievements && data.achievements[0]) && (
+            <Tooltip title="도전과제: 첫승하기">
               <MedalIcon sx={{
                 fontSize: '5vw',
                 position: 'absolute',
@@ -309,8 +332,10 @@ const ProfilePage = (props: any) => {
                 left: '73%',
                 color: 'brown',
               }}/>
+            </Tooltip>
           )}
-          {challenge[1] && (
+          {(data.achievements && data.achievements[1]) && (
+            <Tooltip title="도전과제: 10승하기">
               <MedalIcon sx={{
                 fontSize: '5vw',
                 position: 'absolute',
@@ -318,19 +343,22 @@ const ProfilePage = (props: any) => {
                 left: '80%',
                 color: 'silver',
               }}/>
+            </Tooltip>
           )}
-          {challenge[2] && (
-            <MedalIcon sx={{
-              fontSize: '5vw',
-              position: 'absolute',
-              top: '0',
-              left: '87%',
-              color: 'gold',
-            }}/>
+          {(data.achievements && data.achievements[2]) && (
+            <Tooltip title="도전과제: 50승하기">
+              <MedalIcon sx={{
+                fontSize: '5vw',
+                position: 'absolute',
+                top: '0',
+                left: '87%',
+                color: 'gold',
+              }}/>
+            </Tooltip>
           )}
       </Grid>
         <Grid container className={styles.matchlistBox}>
-          <Matchlist id={userNickname} />
+          <Matchlist key={data.userData.user_id} id={data.userData.user_id} name={userNickname}/>
         </Grid>
     </div>
   );
