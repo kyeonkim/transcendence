@@ -35,7 +35,7 @@ import { styled } from '@mui/system';
 
 // get cookie
 import { useCookies } from 'next-client-cookies';
-
+import { useChatSocket } from "@/app/main_frame/socket_provider";
 import axios from 'axios';
 
 import AlarmAddFriend from './alarm_add_friend';
@@ -67,11 +67,15 @@ export default function AlarmListPanal (props: any) {
 	const [selectedAlarm, setSelectedAlarm] = useState(-1);
 
   const cookies = useCookies();
+  const socket = useChatSocket();
 
   const alarmList = props.alarmList;
   const alarmListRemover = props.alarmListRemover;
   const alarmCountHandler = props.alarmCountHandler;
+  const handleAlarmRerender = props.handleAlarmRerender;
   const setMTbox = props.setMTbox;
+
+
 
   const alarmReducer = (alarm :any) => {
       if (alarm.event_type === 'game')
@@ -106,6 +110,21 @@ export default function AlarmListPanal (props: any) {
 
   };
   
+
+  useEffect(() => {
+
+      const handleRenderAlarmList = () => {
+          console.log('render-alarm again plz');
+          handleAlarmRerender();
+      };
+
+      socket.on(`render-friend`, handleRenderAlarmList);
+
+
+      return () => {
+          socket.off(`render-friend`, handleRenderAlarmList);
+      }
+  }, [])
 
   const denyRequest = (alarm: any) => () => {
       console.log("deny request of - " + alarm.from_nickname);
@@ -144,6 +163,7 @@ export default function AlarmListPanal (props: any) {
     return `${process.env.NEXT_PUBLIC_API_URL}user/getimg/nickname/${src}`
   }
 
+  // 변경 필요 - friend list의 경우 참조하여 변경
 
   return (
     <div>
@@ -151,7 +171,7 @@ export default function AlarmListPanal (props: any) {
         sx={{
           width: '110%',
           maxWidth: 400,
-          maxHeight: 580,
+          maxHeight: 500,
           bgcolor: 'transparent',
           overflow: 'auto',
         }}>

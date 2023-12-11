@@ -63,11 +63,11 @@ function a11yProps(index: number) {
 
 export default function BasicTabs({ setMTbox }: SearchUserProps) {
 	const [value, setValue] = useState(0);
+	const [alarmRerender, setAlarmRerender] = useState(false);
 	const [alarmCount, setAlarmCount] = useState(0);
-	const [AlarmList, setAlarmList] = useState<any>([]);
+	const [alarmList, setAlarmList] = useState<any>([]);
 	const [dmOpenId, setDmOpenId] = useState(-1);
 	const [dmOpenNickname, setDmOpenNickname] = useState('');
-	const [dmAlarmCount, setDmAlarmCount] = useState(0);
 	const [dmAlarmList, setDmAlarmList] = useState([]);
 	const cookies = useCookies();
 	const socket = useChatSocket();
@@ -77,6 +77,18 @@ export default function BasicTabs({ setMTbox }: SearchUserProps) {
 	
 	const handleChange = (event: React.SyntheticEvent, newValue: number) => {
 		setValue(newValue);
+	};
+
+	const handleAlarmRerender = () => {
+		if (alarmRerender === true)
+			setAlarmRerender(false);
+		else
+			setAlarmRerender(true);
+	};
+
+	const handleAlarmGetAgain = () => {
+		// alarmList.clear();
+
 	};
 
 	const handleDmAlarmCount = (user_id :number, is_add :boolean) => {
@@ -133,12 +145,12 @@ export default function BasicTabs({ setMTbox }: SearchUserProps) {
 	};
 
 	const setAlarmListAdd = (alarm: any) => {
-		setAlarmList((prevAlarmList :any) => 
-			[...prevAlarmList, alarm]);
+		setAlarmList((prevalarmList :any) => 
+			[...prevalarmList, alarm]);
 	}
 
 	const setAlarmListRemover = (alarm :any) => {
-		const newAlarmList = AlarmList.filter(
+		const newAlarmList = alarmList.filter(
 			(listAlarm :any) => listAlarm.idx != alarm.idx
 		);
 
@@ -181,6 +193,13 @@ export default function BasicTabs({ setMTbox }: SearchUserProps) {
 			sseEvents.close();
 		};
 	}, []);
+
+
+	useEffect(() => {
+		handleAlarmGetAgain();
+		fetchAlarms();
+		setValue(1);
+	}, [alarmRerender]);
 
 	const handleChatTarget = (from_id :any, from_nickname: any) => {
 
@@ -233,9 +252,10 @@ export default function BasicTabs({ setMTbox }: SearchUserProps) {
 			</CustomTabPanel>
 			<CustomTabPanel value={value} index={1}>
 				<AlarmListPanal
-					alarmList={AlarmList}
+					alarmList={alarmList}
 					alarmListRemover={setAlarmListRemover}
 					alarmCountHandler={setAlarmCountHandler}
+					handleAlarmRerender={handleAlarmRerender}
 					setMTbox={setMTbox}/>
 			</CustomTabPanel>
 		</Grid>

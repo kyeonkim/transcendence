@@ -205,7 +205,7 @@ export default function FriendListPanel(props: any) {
 			
 			if (countList.id === id)
 			{
-				console.log('count checking id - ', id, ' + count - ', countList.count);
+				// console.log('count checking id - ', id, ' + count - ', countList.count);
 				res = countList.count;
 			}
 		})

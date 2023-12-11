@@ -13,7 +13,10 @@ export default function Test(props: any) {
 	return (
 		<div>
 			<Pong
-				exitGame={exitGame}/>
+				exitGame={exitGame}
+				rank={props.rank}
+				mode={props.mode}
+			/>
 			{/* <Typography variant="h1" color="white" style={{fontWeight: 'bold'}}> */}
 				{/* 테스트 (게임화면임) */}
 			{/* </Typography>  */}

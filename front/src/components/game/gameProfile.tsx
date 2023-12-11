@@ -1,48 +1,71 @@
 
+import { useEffect, useState } from 'react';
 import styles from './pong.module.css';
-import { Avatar, Grid, Typography} from '@mui/material';
+import { Avatar, Grid, Box, Typography} from '@mui/material';
 
-export default function GameProfile({inGameData} :any) {
+export default function GameProfile({inGameData, score1, score2} :any) {
+    const [p1, setScore1] = useState(0);
+    const [p2, setScore2] = useState(0);
 
     console.log('inGameData data - ', inGameData);
+
+    useEffect(() => {
+        setScore1(score1);
+    }, [score1]);
+
+    useEffect(() => {
+        setScore2(score2);
+    }, [score2]);
 
     const imageLoader = (src: any) => {
         console.log("image loader src===", src);
         return `${process.env.NEXT_PUBLIC_API_URL}user/getimg/nickname/${src}`
       }
 
+    // 자신과 상대 구분할 방법
 
     return (
         <div>
-            <Grid container className={styles.profileBox}>
-                <Grid item className={styles.playerContainer1}alignItems='center' display='flex' padding='1%'>
-                    <Avatar
-                        src={imageLoader(`${inGameData.user1_nickname}`)}
-                            sx={{
-                            width: '100%',
-                            height: '50%',
-                            border: '2px solid white',
-                            boxShadow: '0px 0px 10px 0px rgba(255,255,255,0.5)',
-                        }}
-                    />
-                    <Typography className={styles.userName} sx={{color: 'white',fontSize: '3vh',  whiteSpace: 'nowrap', marginLeft: '10px'}}>
-                        {inGameData.user1_nickname}
+            <Grid container className={styles.profileBoxInGame}>
+                <Box display="flex" flexDirection="column" alignItems="center" className={styles.playerContainer1}>
+                        <Avatar
+                            src={imageLoader(`${inGameData.user1_nickname}`)}
+                                sx={{
+                                width: '10vw',
+                                height: '10vw',
+                                border: '2px solid white',
+                                boxShadow: '0px 0px 10px 0px rgba(255,255,255,0.5)',
+                            }}
+                        />
+                        <Typography className={styles.userName} sx={{color: 'white',fontSize: '3vw',  whiteSpace: 'nowrap', marginLeft: '10px'}}>
+                            {inGameData.user1_nickname}
+                        </Typography>
+                </Box>
+                <Box className={styles.scoreContainer} alignItems='center' display='flex'>
+                    <Typography className={styles.winLose}  sx={{color: 'white', fontSize: '3vw', fontWeight: '600'}}>
+                        <span style={{ color: 'white', border: '10px soild white'}}>
+                            {score1}
+                        </span>
+                        {'  -  '}
+                        <span style={{ color: 'white' }}>
+                            {score2}
+                        </span>
                     </Typography>
-                </Grid>
-                <Grid item className={styles.playerContainer2}alignItems='center' display='flex' padding='1%'>
+                </Box>
+                <Box display="flex" flexDirection="column" alignItems="center" className={styles.playerContainer2}>
                     <Avatar
                         src={imageLoader(`${inGameData.user2_nickname}`)}
                             sx={{
-                            width: '100%',
-                            height: '50%',
+                            width: '10vw',
+                            height: '10vw',
                             border: '2px solid white',
                             boxShadow: '0px 0px 10px 0px rgba(255,255,255,0.5)',
                         }}
                     />
-                    <Typography className={styles.userName} sx={{color: 'white', fontSize: '3vh',  whiteSpace: 'nowrap', marginLeft: '10px'}}>
+                    <Typography className={styles.userName} sx={{color: 'white',fontSize: '3vw',  whiteSpace: 'nowrap', marginLeft: '10px'}}>
                         {inGameData.user2_nickname}
                     </Typography>
-                </Grid>
+                </Box>
             </Grid>
         </div>
     );
