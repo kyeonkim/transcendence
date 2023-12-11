@@ -198,13 +198,20 @@ export class SocketGameService {
 
     async ExitGame(user_id: number)
     {
-        if (this.InGame.get(user_id) === undefined)
+        const room = this.InGame.get(user_id);
+        if (room == undefined)
             return {status: false, message: "게임이 존재하지 않습니다."};
-        const user1_id = this.InGame.get(user_id).user1_id;
-        const user2_id = this.InGame.get(user_id).user2_id;
-        this.server.to(`game-${user1_id}`).emit(`game-end`, {gameData: this.InGame.get(user_id)});
+        const user1_id = room.user1_id;
+        const user2_id = room.user2_id;
+        this.server.to(`game-${user1_id}`).emit(`game-end`, {gameData: room});
         this.SocketService.LeaveRoom(String(user1_id), `game-${user1_id}`, this.server);
         this.SocketService.LeaveRoom(String(user2_id), `game-${user1_id}`, this.server);
+        // 객체 삭제
+        this.InGame.delete(user1_id);
+        this.InGame.delete(user2_id);
+        console.log("Room Rank : ", room.rank);
+        if (room.rank === false)
+            return {status: true, message: "게임 종료"};
         const user1 =   await this.prismaservice.user.findUnique({
             where: {
                 user_id: user1_id,
@@ -223,16 +230,10 @@ export class SocketGameService {
         const user1_winLose = user_id === user1.user_id ? 0 : 1;
         const user2_pb = user2.ladder + k * (user2_winLose - user2_we);
         const user1_pb = user1.ladder + k * (user1_winLose - user1_we);
-        if (user1_winLose)
-        {
-            user1.win++;
-            user2.lose++;
-        }
-        else
-        {
-            user1.lose++;
-            user2.win++;
-        }
+        user1.win += user1_winLose;
+        user1.lose += user2_winLose;
+        user2.win += user2_winLose;
+        user2.lose += user1_winLose;
         //prisma data에 넣기
         await this.prismaservice.user.update({
             where: {
@@ -241,7 +242,7 @@ export class SocketGameService {
             data: {
                 win : user1.win,
                 lose : user1.lose,
-                ladder: Math.round(user1_pb),
+                ladder: user1_pb,
             },
         });
         await this.prismaservice.user.update({
@@ -251,17 +252,11 @@ export class SocketGameService {
             data: {
                 win : user2.win,
                 lose : user2.lose,
-                ladder: Math.round(user2_pb),
+                ladder: user2_pb,
             },
         });
         // 전적 추가
-        const room = (user1_id === user_id) ? this.InGame.get(user1_id) : this.InGame.get(user2_id);
-        if (room.rank === undefined)
-            return {status: false, message: "rank 에러"};
         this.AddGameData({rank: room.rank, user_nickname: room.user1_nickname, user_id: room.user1_id, enemy_id: room.user2_id, my_score: room.score1, enemy_score: room.score2});
-        // 객체 삭제
-        this.InGame.delete(user1_id);
-        this.InGame.delete(user2_id);
         return {status: true, message: "게임 종료"};
     }
 
@@ -302,12 +297,14 @@ export class SocketGameService {
             console.log("game start send", this.InGame.get(Number(payload.user_id)));
             const room = this.InGame.get(Number(payload.user_id));
             room.rank = payload.rank;
-            room.game_mode = payload.game_mode;
+            if (room.rank === false)
+                room.game_mode = payload.game_mode;
             setTimeout(() => {
                 console.log(`after time out`,room);
                 this.server.to(`game-${room.user1_id}`).emit(`game-init`, {room: room});
             }, 1000);
         }
+        console.log("game start", this.InGame.get(Number(payload.user_id)));
     }
 
     async GameUserPosition(payload: any, user_id: number)
@@ -331,8 +328,8 @@ export class SocketGameService {
             return ;
         this.InGame.get(user_id).score1 = payload.score.player1;
         this.InGame.get(user_id).score2 = payload.score.player2;
-        if (this.InGame.get(user_id).score1 >= 11 || this.InGame.get(user_id).score2 >= 11)
-            return this.ExitGame(user_id);
+        // if (this.InGame.get(user_id).score1 >= 11 || this.InGame.get(user_id).score2 >= 11)
+        //     return this.ExitGame(user_id);
         if (this.InGame.get(user_id).user1_id === user_id) {
             // console.log(`game-${this.InGame.get(user_id).user2_id}`);
             this.server.to(`${this.InGame.get(user_id).user2_id}`).emit(`game-ball-fix`, payload);

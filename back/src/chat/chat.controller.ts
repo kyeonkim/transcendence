@@ -61,8 +61,6 @@ export class ChatController {
     async JoinRoom(@Body() data : JoinRoomDto)
     {
         const rtn =  await this.ChatService.JoinRoom(data);
-        if (rtn.status === true)
-            await this.socketService.HandleNotice(data.room_id, `${data.user_nickname}님이 입장하셨습니다.`);
         console.log("JoinRoom: ", data, rtn);
         return rtn;
     }
@@ -161,7 +159,10 @@ export class ChatController {
         const room =  await this.ChatService.GetMyRoomByHeader(headers);
         if (room === null || room.chatroom_id !== data.room_id || room.is_manager !== true)
             return {status: false, message: 'not manager'};
-        return await this.ChatService.KickUser(data);
+        const rtn = await this.ChatService.KickUser(data);
+        if(rtn.status === true)
+            await this.socketService.HandleNotice(data.room_id, `${data.target_nickname}님이 강제퇴장 당하셨습니다.`);
+        return rtn;
     }
 
     @ApiOperation({summary: `채팅방 초대 API`, description: `채팅방에 유저를 초대한다.`})

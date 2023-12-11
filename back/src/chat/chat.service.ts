@@ -159,6 +159,7 @@ export class ChatService {
             },
         });
         await this.socketService.JoinRoom(data.user_id, `chat-${data.room_id}`);
+        await this.socketService.HandleNotice(data.room_id, `${data.user_nickname}님이 입장하셨습니다.`);
         return {status: true, message: 'success'};
     }
 
@@ -391,7 +392,6 @@ export class ChatService {
         });
         if (room === null)
             return {status: false, message: 'fail to find room'};
-        await this.socketService.HandleNotice(data.room_id, `${data.target_nickname}님이 강제퇴장 당하셨습니다.`);
         await this.socketService.HandleKick(data.target_id, data.room_id);
         this.LeaveRoom({user_id: data.target_id, user_nickname: data.target_nickname, room_id: data.room_id});
         return {status: true, message: 'success'};
@@ -418,7 +418,12 @@ export class ChatService {
     {
         const user = await this.prismaService.user.findUnique({ where: { nick_name: data.to } });
         if (user === null)
-            return {status: false, message: "Can't friend"};
+            return {status: false, message: "Can't find friend"};
+        const room = await this.prismaService.chatroom.findUnique({ where: { idx: data.chatroom_id } , include: { bans: true }});
+        if (room === null)
+            return {status: false, message: "Can't find room"};
+        if (room.bans.some((ban) => ban.user_id === user.user_id))
+            return {status: false, message: "Can't invite banned user"};
         const eventData: eventDto = 
         {
             to: user.user_id,
