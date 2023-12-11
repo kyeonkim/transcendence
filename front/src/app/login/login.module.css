@@ -1,0 +1,68 @@
+.signupBox {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+
+	background-color: rgba(135, 206, 235, 0.2);
+	border-radius: 20px;
+	border: 5px solid rgba(135, 207, 235, 0.2);
+
+	width: 80%;
+	height: 80%;
+}
+
+.signupTitle {
+	position: absolute;
+	top: 10%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+
+	font-size: 100px;
+	font-weight: bold;
+	color: #87ceeb;
+}
+
+.signupImage {
+	position: absolute;
+	top: 52%;
+	left: 50%;
+	transform: translate(-50%, -140%);
+
+}
+
+.signupImageText {
+	position: absolute;
+	top: 52%;
+	left: 50%;
+	transform: translate(-50%, -150%);
+
+	font-size: 50px;
+	font-weight: bold;
+	color: #87ceeb;
+}
+
+.signupImageUpload {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, 0%);
+}
+
+.signupNickname {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, 150%);
+}
+
+.inputNickname {
+	background-color: rgba(135, 206, 235, 0.2);
+}
+
+.signupError {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, 500%);
+}

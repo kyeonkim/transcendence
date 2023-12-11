@@ -17,20 +17,15 @@ const MainChannelPanal = styled(Box) ({
   })
 
 
-export default function ChannelListPanal (props: any) {
-    const {value, index} = props;
+export default function ChannelListPanal () {
 
   return (
-    <div
-        hidden={value !== index}
-    >
-        {value === index && (
+    <div>
             <MainChannelPanal sx={{ p: 2 }}>
             <Typography>
                 test for text is changed. Is it Channel Panal.
             </Typography>
             </MainChannelPanal>
-        )}
     </div>
   );
 }

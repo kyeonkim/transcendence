@@ -1,25 +1,37 @@
 import Button from '@mui/material/Button';
-
-// 로딩되기 전에 그림자 띄울 수 있음. 아직 적용하지 않았음. 
-import Skeleton from '@mui/material/Skeleton';
-
-// styled component (컴포넌트 고정 style로 보임)
-import { styled } from '@mui/system';
+import styles from './match.module.css';
+import { Grid, Typography } from '@mui/material';
+import { headers } from 'next/headers';
 
 
-const MainMatchingButton = styled(Button) ({
-  position: 'absolute',
-  top: 55,
-  left: 0,
-  width: 400,
-  height: 100,
-  color: "black"
-});
+interface MyProfileProps {
+    setMTbox: (num: number, searchTarget: string) => void;
+  
+}
 
-export default function MatchingButton() {
+export default function MatchingButton({ setMTbox }: MyProfileProps) {
+
+    const handleMTbox = (num: number) => () => {
+        setMTbox(num, '');
+    }
+
     return (
-        <MainMatchingButton variant="outlined">
-            Matching
-        </MainMatchingButton>
+        <Grid className={styles.matchButton}>
+            <Button 
+                variant="contained" 
+                onClick={handleMTbox(3)}
+                sx={{
+                border: 7,
+                borderColor: '#2196f3',
+                background: '#1565c0', 
+                width: '100%',
+                height: '100%',
+                }} 
+            >
+                <Typography style={{fontWeight: 'bold', fontSize: '5vw'}}>
+                    PLAY
+                </Typography>
+            </Button>
+        </Grid>
     );
 }

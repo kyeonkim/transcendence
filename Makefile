@@ -6,6 +6,9 @@ up:
 	mkdir -p ./db
 	docker compose -f $(COMPOSE) up -d --build
 
+log:
+	docker compose logs -f
+
 down:
 	rm -rf ./db/*
 	docker compose -f $(COMPOSE) down

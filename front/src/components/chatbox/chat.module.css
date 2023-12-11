@@ -1,0 +1,39 @@
+.table {
+	min-width: 650;
+}
+
+.chatSection {
+	width: 100px;
+	height: 40vh;	
+}
+
+.hedBG {
+	background-color: #e0e0e0
+}
+
+.borderRight500 {
+	border-right: 1px solid #e0e0e0
+}
+
+.messageBox {
+	background-color: #e0e0e0;
+	top: 100%;
+	width: 93.5%;
+}
+
+.messageArea {
+	position: absolute;
+	height: 90%;
+	width: 100%;
+	overflow-y: auto;
+}
+
+.userList {
+	width: 100px;
+}
+
+.dialogStyle {
+	position: 'absolute';
+    top: '70%';
+    left: '1000px';
+}

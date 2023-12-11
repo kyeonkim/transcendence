@@ -1,5 +1,6 @@
 import React from 'react';
 import { useState } from 'react';
+import axios from 'axios';
 // import { UserContext } from '../../pages/main'; 
 
 import TextField from '@mui/material/TextField';
@@ -10,25 +11,12 @@ import Skeleton from '@mui/material/Skeleton';
 
 // styled component (컴포넌트 고정 style로 보임)
 import { styled } from '@mui/system';
+import { axiosToken } from '@/util/token';
+import { useCookies } from 'next-client-cookies';
+import { Background } from 'tsparticles-engine';
+import { Alert, AlertTitle, Grid, Stack, Typography } from '@mui/material';
+import styles from './search_bar.module.css';
 
-
-const MainSearchUser = styled(TextField) ({
-  position: 'absolute',
-  top: 0,
-  left: 0,
-  width: 400,
-  height: 100,
-  color: "black"
-});
-
-const MainSearchButton = styled(Button) ({
-    position: 'absolute',
-    top: 0,
-    left: 330,
-    width: 70,
-    height: 55,
-    color: "black"
-  });
 
 interface SearchUserProps {
     setMTbox: (num: number, searchTarget: string) => void;
@@ -36,26 +24,59 @@ interface SearchUserProps {
 
 export default function SearchUser({ setMTbox }: SearchUserProps) {
     const [searchTarget, setSearchTarget] = useState('');
+    const [val, setval] = useState(true);
+    const cookies = useCookies();
 
-    const handleMTbox = (num: number, searchTarget: string) => () => {
-        if (searchTarget === '')
-            return; // 검색어 비어있으면 창띄우기? 아무동작x?
-        setMTbox(num, searchTarget);
+    const handleMTbox =  async (num: number, searchTarget: string) => {
+        if (searchTarget) {
+            await axiosToken.get(`${process.env.NEXT_PUBLIC_API_URL}user/getdata/nickname/${searchTarget}`, {
+                headers: {
+                    'Authorization': `Bearer ${cookies.get('access_token')}`
+                },
+            })
+                .then((res) => {
+                    console.log('userData in chat==',res);
+                    if (res.data.status === true)
+                        setMTbox(num, searchTarget);
+                })
+        }
     }
-    // searchTarget을 MainSearchUser에서 갱신
+
+    const handleEnterkey = (e: any) => {
+        if (e.key === 'Enter')
+        {
+            if (/^[a-zA-Z0-9]+$/.test(searchTarget))
+                handleMTbox(1, searchTarget);
+            else
+                setval(false);
+        }
+    }
+
     return (
-        <React.Fragment>
-            <MainSearchUser
+        <>
+            <TextField
+                className={styles.search_user}
                 id="outlined_search_user"
                 label="유저 검색"
                 variant="outlined"
                 onChange={(e) => setSearchTarget(e.target.value)}
+                onKeyDown={handleEnterkey}
+                focused
+                sx={{input: {color: 'white'}}}
                 >
-                Matching
-            </MainSearchUser>
-            <MainSearchButton variant='contained' onClick={handleMTbox(1, searchTarget)}>
-                검색
-            </MainSearchButton>
-        </React.Fragment>
+            </TextField>
+            {!val && <Alert
+                severity="error"
+                onClose={() => {setval(true)}}
+                sx={{
+                    position: 'absolute',
+                    top: '35%',
+                    zIndex: 9999,
+                    transform: 'translate(0, 0)',
+                }}
+            >
+                <strong>영문 숫자만 입력해주세요!</strong>
+            </Alert>}
+        </>
     );
 }
