@@ -227,7 +227,7 @@ export default function BasicTabs({ setMTbox }: SearchUserProps) {
 				<Tabs value={value} ref={tabsRef} onChange={handleChange} centered aria-label="basic tabs example">
 					<Tab icon={
 						<Badge color="error" badgeContent={dmAlarmList.length ? "!" : 0}>
-						<GroupIcon/>
+						<GroupIcon sx={{}}/>
 						</Badge>
 						} {...a11yProps(0)} />
 					<Tab icon={

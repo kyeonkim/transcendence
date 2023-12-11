@@ -7,20 +7,18 @@ import { useCallback } from 'react';
 import particlesOptions from "../particles.json";
 import { loadFull } from "tsparticles";
 import Particles from "react-tsparticles";
-import {redirect} from 'next/navigation';
 
 const buttonStyle = {
   color : 'white',
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  height: '100vh',
+  height: '95vh',
 };
 
 
 export default function Home() {
   const particlesInit = useCallback(async (engine: Engine) => {
-    // console.log(engine);
     await loadFull(engine);
   }, []);
 

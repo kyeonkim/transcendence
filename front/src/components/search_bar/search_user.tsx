@@ -29,28 +29,27 @@ export default function SearchUser({ setMTbox }: SearchUserProps) {
 
     const handleMTbox =  async (num: number, searchTarget: string) => {
         if (searchTarget) {
-            setval(/^[a-zA-Z0-9]+$/.test(searchTarget));
-            console.log('searchTarget - ', searchTarget, val);
-            if (val) {
-                await axiosToken.get(`${process.env.NEXT_PUBLIC_API_URL}user/getdata/nickname/${searchTarget}`, {
-                    headers: {
-                        'Authorization': `Bearer ${cookies.get('access_token')}`
-                    },
+            await axiosToken.get(`${process.env.NEXT_PUBLIC_API_URL}user/getdata/nickname/${searchTarget}`, {
+                headers: {
+                    'Authorization': `Bearer ${cookies.get('access_token')}`
+                },
+            })
+                .then((res) => {
+                    console.log('userData in chat==',res);
+                    if (res.data.status === true)
+                        setMTbox(num, searchTarget);
                 })
-                    .then((res) => {
-                        console.log('userData in chat==',res);
-                        if (res.data.status === true)
-                            setMTbox(num, searchTarget);
-                    })
-            }
-            else {
-            }
         }
     }
 
     const handleEnterkey = (e: any) => {
         if (e.key === 'Enter')
-            handleMTbox(1, searchTarget);
+        {
+            if (/^[a-zA-Z0-9]+$/.test(searchTarget))
+                handleMTbox(1, searchTarget);
+            else
+                setval(false);
+        }
     }
 
     return (

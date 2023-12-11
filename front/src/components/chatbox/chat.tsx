@@ -24,6 +24,7 @@ export default function Chat(props: any) {
 	const [pop, setPop] = useState(false);
 	const [anchorEl, setAnchorEl] = useState(null);
 	const [dialogOpen, setDialogOpen] = useState(false);
+	const [errMessage, setErrMessage] = useState('');
 	const [inviteTarget, setInviteTarget] = useState('');
 	const [open, setOpen] = useState(false);
 
@@ -104,7 +105,11 @@ export default function Chat(props: any) {
 		})
 		.then((res) => {
 			console.log('invite success');
-			setDialogOpen(false);
+			console.log(res);
+			if (res.data.status)
+				setDialogOpen(false);
+			else
+				setErrMessage(res.data.message);
 		})
 		.catch((err) => {
 			console.log('invite fail');
