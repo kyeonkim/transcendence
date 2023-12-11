@@ -168,13 +168,19 @@ export default function AlarmListPanal (props: any) {
   return (
     <div>
       <List dense
-        sx={{
-          width: '110%',
-          maxWidth: 400,
-          maxHeight: 500,
-          bgcolor: 'transparent',
-          overflow: 'auto',
-        }}>
+				sx={{
+					position: 'absolute',
+					top: '10%',
+					width: '100%',
+					left: '0%',
+					maxWidth: '100%',
+					maxHeight: '85%',
+					overflow: 'auto',
+					bgcolor: 'transparent',
+					'&::-webkit-scrollbar': {
+						display: 'none',
+					},
+				}}>
       {alarmList?.length > 0 ? (
           alarmList.map((alarm :any, idx :number) => {
             if (alarm.event_type === 'add_friend') {
