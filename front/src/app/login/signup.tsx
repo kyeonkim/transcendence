@@ -4,6 +4,7 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { Avatar, Button, Grid, Skeleton, TextField, Typography } from "@mui/material"
 import styles from './login.module.css'
+import '@/util/loading.css';
 
 // tsparticles
 import type { Engine } from "tsparticles-engine";
@@ -19,6 +20,7 @@ export default function Signup (props:any) {
 	const [profileImage, setProfileImage] = useState<string | null>(null);
 	const [nickname, setNickname] = useState("");
 	const [error, setError] = useState("");
+	const [loading, setLoading] = useState(false);
 	const router = useRouter();
 	const formData = new FormData();
 
@@ -45,6 +47,7 @@ export default function Signup (props:any) {
 
 	const handleEnter = async () => {
 		setError('');
+		setLoading(true);
 		formData.append('nick_name', nickname);
 		if (imageFile) {
 			formData.append('file', imageFile);
@@ -67,6 +70,7 @@ export default function Signup (props:any) {
 				})})
 			.catch((error) => {
 				console.log ('sign up error =',error.response.data)
+				setLoading(false);
 				setError('중복된 닉네임이거나 특수문자가 포함되어있습니다! 다시 입력해주세요.');
 			})
 	}
@@ -75,26 +79,27 @@ export default function Signup (props:any) {
 		<div>
 			<Particles options={particlesOptions as ISourceOptions} init={particlesInit} />
 			<Grid container className={styles.signupBox} justifyContent="center">
-				<Typography variant="h1" className={styles.signupTitle}>
+				<Typography variant="h1" className={styles.signupTitle} style={{fontSize: '7vw'}}>
 					Wellcome!!
 				</Typography>
 				<Grid item className={styles.signupImage}>
-            {!profileImage ? (
-              <Skeleton variant="circular" width={200} height={200} />
-            ) : (
-              <Avatar src={profileImage} alt="Uploaded" style={{ width: '200px', height: '200px', borderRadius: '50%' }} />
-            )}
+              <Avatar src={profileImage} alt="Uploaded" style={{ width: '10vw', height: '10vw', borderRadius: '50%' }} />
 				</Grid>
 				<Grid item className={styles.signupImageText}>
-						<Typography variant="h5">🙏이미지를 등록해주세요🙏</Typography>
+						<Typography style={{fontSize: '1.5vw'}}>🙏이미지를 등록해주세요🙏</Typography>
 				</Grid> 
 			</Grid>
 			<Grid item className={styles.signupImageUpload}>
 				<Button variant="contained" component="label">
-					이미지 업로드
+					<Typography style={{fontSize: '1vw'}}>
+						이미지 업로드
+					</Typography>
 					<input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleImageUpload} />
 				</Button>
 			</Grid>
+			{loading ? (
+					<div id="loading"></div>
+			) : (
 			<Grid item className={styles.signupNickname}>
 				<TextField
 					color={error ? "error" : "primary"}
@@ -119,15 +124,16 @@ export default function Signup (props:any) {
 						}}}
 					/> 
 			</Grid>
+			)}
 			{error ? (
 			<Grid item className={styles.signupError}>
-				<Typography variant="caption" color="error" fontSize={'20px'}>
+				<Typography variant="caption" color="error" style={{fontSize: '1.5vw'}}>
 					{error}
 				</Typography>
 			</Grid>
 			): (
 				<Grid item className={styles.signupError}>
-					<Typography variant="caption" fontSize={'20px'} color="#87ceeb">
+					<Typography variant="caption" style={{fontSize: '1.5vw'}} color="#87ceeb">
 						영문, 숫자를 조합해서 2~10자 내로 입력 후 엔터를 눌러주세요.
 					</Typography>
 				</Grid>

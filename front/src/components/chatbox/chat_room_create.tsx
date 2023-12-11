@@ -36,10 +36,11 @@ const CreateRoomAppBar = styled(AppBar) ({
 });
 
 const MainChatRoomCreate = styled(Box) ({
-	position: 'absolute',
-	top: '5.4%',
+	position: 'relative',
 	width: "100%",
-	height: "30%",
+	maxWidth: "100%",
+	height: "40%",
+	maxHeight: "40%",
 	backgroundColor: 'white',
 	borderRadius: '10px', // 옵션: 모서리를 둥글게 설정
   });
@@ -119,19 +120,21 @@ export default function ChatRoomCreate(props: any) {
 	// modal 형태 고려 - 우선순위 낮음
 	return (
 		<div>
-            <AppBar position="absolute" sx={{borderRadius: '10px'}}>
+			<MainChatRoomCreate>
+            <AppBar sx={{borderRadius: '10px'}}>
 				<Toolbar>
-					<Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+					<Typography component="div" sx={{ flexGrow: 1, fontSize: '1.5vw'}}>
 					채팅방 생성
 					</Typography>
 				</Toolbar>
 			</AppBar>
-			<MainChatRoomCreate>
 				<TextField
 					sx={{
+						position: 'relative',
 						left:'5%',
-						top:'10%',
+						top:'20%',
 						width: '80%',
+						height: '10%',
 					}}
 					id="chatroom_name_text_field"
 					label="Chatroom Name"
@@ -145,9 +148,11 @@ export default function ChatRoomCreate(props: any) {
 				/>
 				<TextField
 					sx={{
+						position: 'relative',
 						left:'5%',
-						top:'20%',
-						width:'80%'
+						top:'30%',
+						width:'80%',
+						height: '10%',
 					}}
 					id="password_text_field"
 					label="password"
@@ -162,19 +167,26 @@ export default function ChatRoomCreate(props: any) {
 				<FormControlLabel
 					sx={{
 						position: 'relative',
-						left:'5%',
-						top:'20%',
+						left:'2%',
+						top:'35%',
 					}}
-					control={<Switch checked={roomPrivate}
-					onChange={handleRoomPrivate}/>}
-					label="Private"
+					control={
+						<Switch 
+							checked={roomPrivate}
+							onChange={handleRoomPrivate}
+						/>}
+					label={
+						<Typography sx={{fontSize: '0.7vw'}}>
+							Private
+						</Typography>
+						}
 					labelPlacement='start'
 				/>
 				<Button
 				sx={{
 					position: 'absolute',
-					top: '80%',
-					left: '65%',
+					top: '85%',
+					left: '55%',
 					background: "white",
 					color: "black",
 				}}
@@ -182,38 +194,38 @@ export default function ChatRoomCreate(props: any) {
 				color='error'
 				onClick={handleCancel}
 				>
-				취소
+					<Typography sx={{color: 'black', fontSize: '0.7vw'}}>
+						취소
+					</Typography>
 				</Button>
 				<Button
 				sx={{
 					position: 'absolute',
-					top: '80%',
-					left: '80%',
+					top: '85%',
+					left: '75%',
 					background: "white",
 					color: "black",
-					marginLeft: "10px",
 				}}
 				variant='contained'
 				color='success'
 				onClick={handleDone}
 				>
-				완료
+					<Typography sx={{color: 'black', fontSize: '0.7vw'}}>
+						완료
+					</Typography>
 				</Button>
-				{nameError ? (
-						<Alert
-							severity="error"
-							sx={{
-								position: 'absolute',
-								top: '63%',
-								left: '5%',
-								width: '80%',
-							}}
-						>
-							채팅방 이름이 없습니다. 입력해주세요!
-						</Alert>
-					) : (
-						<div></div>
-					)}
+				{nameError && <Alert
+					severity="error"
+					onClose={() => {setNameError(false)}}
+					sx={{
+						position: 'absolute',
+						top: '65%',
+						left: '5%',
+						width: '80%',
+					}}
+				>
+					<strong>채팅방 이름이 없습니다. 입력해주세요!</strong>
+				</Alert>}
 				</MainChatRoomCreate>		
 	
 		</div>

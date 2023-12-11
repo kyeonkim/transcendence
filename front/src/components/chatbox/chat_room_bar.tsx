@@ -17,11 +17,23 @@ export default function ChatRoomBar(props: any) {
 	return (
 		<AppBar position='absolute' sx={{borderRadius: '10px', width: '100%'}}>
 			<Toolbar>
-				<Typography sx={{flexGrow: 1, color: 'white'}}variant="h6" component="div">
+				<Typography sx={{flexGrow: 1, color: 'white', fontSize: '1vw'}} component="div">
 					채팅방 목록
 				</Typography>
-				<Button sx={{ background: "white", color: "black"}} variant='contained' onClick={handleNewChat}>
-					새 채팅
+				<Button
+					sx={{
+					position: "sticky",
+					left: "65%",
+					height: "60%",
+					background: "white",
+					color: "black"	
+					}} 
+					variant='contained'
+					onClick={handleNewChat}
+				>
+					<Typography sx={{color: 'black', fontSize: '1vw'}}>
+						새 채팅
+					</Typography>
 				</Button>
 			</Toolbar>
 		</AppBar>
