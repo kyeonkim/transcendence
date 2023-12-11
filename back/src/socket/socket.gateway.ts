@@ -6,6 +6,8 @@ import { AuthService } from 'src/auth/auth.service';
 import { SocketService } from './socket.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { instrument } from "@socket.io/admin-ui";
+import { GameRoom } from 'src/game/game.service';
+import { SocketGameService } from 'src/socket/socket.gameservice';
 
 //cors origin * is for development only
 // @UseGuards(AuthGuard('jwt-ws'))
@@ -17,6 +19,7 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
     private readonly authService: AuthService,
     private readonly SocketService: SocketService,
     private readonly prismaService: PrismaService,
+    private readonly SocketGameService: SocketGameService,
   ) {}
   @WebSocketServer() server: Server;
 
@@ -30,6 +33,8 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
         auth: false,
         mode: "development",
     });
+
+    this.SocketGameService.setServer(server);
   }
 
   async handleConnection(client: Socket, ...args: any[]) {
@@ -56,8 +61,11 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
   async handleDisconnect(client: Socket) {
     if (client.handshake.query.user_id !== undefined)
     {
-      console.log('\n\nClient disconnected=============\n', client.handshake.query.user_id ,client.id)
+      this.server.to(`status-${client.handshake.query.user_id}`).emit(`status`, {user_id: client.handshake.query.user_id, status: 'offline'});
+      console.log('\n\nClient disconnected=============\n', client.handshake.query.user_id ,client.id);
+      this.SocketGameService.ForceGameEnd(Number(client.handshake.query.user_id));
       this.SocketService.Disconnect(client.handshake.query.user_id, client.id);
+      // this.GameService.LeaveGameRoom(Number(client.handshake.query.user_id));
       // console.log(this.server.sockets.sockets,"\n");
     }
     // console.log('Client disconnected');
@@ -98,6 +106,7 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
   async SendRerenderAll(event: string, payload?: any)
   {
     const rtn = this.server.emit(`render-${event}`, { data: payload ? payload : new Date().valueOf() });
+    console.log(rtn);
   }
   
   @SubscribeMessage('chat')
@@ -115,7 +124,7 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
     if(payload.target === undefined)
     {
       Client.to(`status-${payload.user_id}`).emit(`status`, {user_id: payload.user_id, status: payload.status});
-      console.log("here");
+      // console.log("here");
     } 
     else
       Client.to(`${payload.target}`).emit(`status`, {user_id: payload.user_id, status: payload.status});
@@ -125,7 +134,8 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
   @SubscribeMessage(`dm`)
   async SendDM(Client: Socket, payload: any)
   {
-    await this.SocketService.SendDm(payload.user_id, payload.target_id, payload.message, this.server);
+    console.log("=====SendDM======", payload);
+    await this.SocketService.SendDm(payload.from_id, payload.to_id, payload.message, this.server);
   }
 
   @SubscribeMessage(`dmread`)
@@ -138,5 +148,40 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
   async GetDM(Client: Socket, payload: any)
   {
     await this.SocketService.GetDm(payload.user_id, this.server);
+  }
+
+  async SendReRenderGameRoom(room:GameRoom, user1_id: number, user2_id: number = null)
+  {
+    console.log("SendReRenderGameRoom: ", room, user1_id);
+    console.log(this.server.to(String(user1_id)).emit(`render-gameroom`, {room: room}));
+    if (user2_id !== null)
+      console.log(this.server.to(String(user2_id)).emit(`render-gameroom`, {room: room}));
+  }
+
+  async SendDMTest(from_id: number, to_id: number, message: string)
+  {
+    console.log("=====SendDM Test======", from_id, to_id, message);
+    await this.SocketService.SendDm(from_id, to_id, message, this.server);
+  }
+
+  @SubscribeMessage(`game-start`)
+  async GameStart(Client: Socket, payload: any)
+  {
+    console.log("=====GameStart======", payload);
+    await this.SocketGameService.GameStart(payload);
+  }
+
+  @SubscribeMessage(`game-user-position`)
+  async GameUserPosition(Client: Socket, payload: any)
+  {
+    // console.log("=====GameUserPosition======", Client.handshake.query.user_id,payload);
+    await this.SocketGameService.GameUserPosition(payload, Number(Client.handshake.query.user_id));
+  }
+
+  @SubscribeMessage(`game-ball-hit`)
+  async GameBallHit(Client: Socket, payload: any)
+  {
+    console.log("=====GameBallHit======", Client.handshake.query.user_id);
+    await this.SocketGameService.GameBallHit(payload, Number(Client.handshake.query.user_id));
   }
 }

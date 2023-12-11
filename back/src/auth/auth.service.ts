@@ -48,14 +48,14 @@ export class AuthService {
 			},
 			update: {
 				access_token: await this.jwtService.signAsync(payload, {expiresIn: '1h', secret: process.env.JWT_SECRET}),
-				refresh_token:await this.jwtService.signAsync(payload, {expiresIn: '1h', secret: process.env.JWT_SECRET}),
+				refresh_token:await this.jwtService.signAsync(payload, {expiresIn: '1d', secret: process.env.JWT_SECRET}),
 				twoFAPass: twoFAPass,
 			},
 			create: {
 				user_id: id,
 				nick_name: nickName,
 				access_token: await this.jwtService.signAsync(payload, {expiresIn: '1h', secret: process.env.JWT_SECRET}),
-				refresh_token:await this.jwtService.signAsync(payload, {expiresIn: '1h', secret: process.env.JWT_SECRET}),
+				refresh_token:await this.jwtService.signAsync(payload, {expiresIn: '1d', secret: process.env.JWT_SECRET}),
 				twoFAPass: twoFAPass,
 			},
 		});
@@ -136,7 +136,7 @@ export class AuthService {
 		if (authorizedId === null)
 			return {status: false, access_token: userData.access_token};
 		const newUser = await this.userService.CreateUser( authorizedId, userData.nick_name);
-        console.log("newUser ====\n\n",newUser);
+        // console.log("newUser ====\n\n",newUser);
         if (newUser == null)
             return {status: false, message: "이미 사용 중인  이름입니다."};
         else
@@ -151,8 +151,8 @@ export class AuthService {
 		const secret = authenticator.generateSecret();
 		//otpauth:// 환경변수화 필요
 		const otpauthUrl = authenticator.keyuri(user.user_nickname, `otpauth://`, secret);
-		console.log(`secret: ${secret}`);
-		console.log("otpauthUrl: ", otpauthUrl);
+		// console.log(`secret: ${secret}`);
+		// console.log("otpauthUrl: ", otpauthUrl);
 		return {status: true, message: "success", secret: secret, otpauthUrl: otpauthUrl};
 	}
 
@@ -305,7 +305,7 @@ export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'jwt-refresh'
 	  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
 	  //true로 설정하면 Passport에 토큰 검증을 위임하지 않고 직접 검증, false는 Passport에 검증 위임
 	  ignoreExpiration: false,
-	  //검증 비밀 값(유출 주의)
+	  //검증 비밀 값
 	  secretOrKey: process.env.JWT_SECRET,
 	  // request 값을 가져올 수 있도록 허용
 	  passReqToCallback: true,
@@ -318,6 +318,7 @@ export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'jwt-refresh'
    * @param payload 토큰 전송 내용
    */
   async validate(req: any, payload: UserToken): Promise<any> {
+	// console.log("JwtRefreshStrategy body: ", req.body);
 	if (payload.twoFAPass === false)// 2차인증 필요
 		throw new UnauthorizedException();
 	const storedToken = await this.prisma.tokens.findUnique({
@@ -325,16 +326,24 @@ export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'jwt-refresh'
 		  user_id: payload.user_id,
 		},
 	});
-	if (storedToken == null)
+	// console.log("JwtRefreshStrategy storedToken: ", storedToken);
+	if (storedToken === null)
+	{
+		// console.log("JwtRefreshStrategy storedToken null: ", storedToken);
 		throw new UnauthorizedException();
+	}
 	if (storedToken.access_token !== req.body.access_token)
-		throw new UnauthorizedException(); 
+	{
+		console.log("token 일치 x", storedToken);
+		throw new UnauthorizedException();
+	}
 	try {
 		await this.jwtService.verifyAsync(storedToken.access_token, { secret: process.env.JWT_SECRET });
 	} catch (error) {
 		if (error instanceof TokenExpiredError)
 			return { status: true };
 	}
+	console.log("token 만료 x");
 	throw new UnauthorizedException(); 
   }
 }

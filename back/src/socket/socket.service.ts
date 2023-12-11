@@ -8,7 +8,7 @@ export class SocketService {
     constructor(
         private readonly prismaService: PrismaService,
     ) {}
-    private sockets = new Map<any, string>();
+    private sockets = new Map<string, string>();
 
     async Connect(user_id: any, socket_id: string, server: Server)
     {
@@ -98,33 +98,37 @@ export class SocketService {
 
     async JoinRoom(user_id: any, room: string, server: Server)
     {
-        console.log("JoinRoom user_id: ", user_id, " | JoinRoom: ", this.sockets.get(String(user_id)));
+        console.log("JoinRoom user_id: ", user_id, " | JoinRoom: ", this.sockets.get(String(user_id)) || "logoff");
         if(this.sockets.get(String(user_id)) !== undefined)
             server.sockets.sockets.get(this.sockets.get(String(user_id))).join(room);
     }
 
-    async LeaveRoom(user_id: any, room: string, server: Server)
+    async LeaveRoom(user_id: string, room: string, server: Server)
     {
-        console.log("LeaveRoom user_id: ", user_id, " | LeaveRoom: ", this.sockets.get(String(user_id)));
-        if(this.sockets.get(user_id) !== undefined)
-            server.sockets.sockets.get(this.sockets.get(user_id)).leave(room);
+        console.log("LeaveRoom user_id: ", user_id, " | LeaveRoom: ", room);
+        if(this.sockets.get(String(user_id)) !== undefined)
+        {
+            if (server.sockets.sockets.get(this.sockets.get(String(user_id))) !== undefined)
+                server.sockets.sockets.get(this.sockets.get(String(user_id))).leave(room);
+        }
     }
 
     async SendStatusTest(user_id: any, status: string, server: Server)
     {
-        server.emit(`status-${user_id}`, {user_id: user_id, status: status});
+        server.emit(`status`, {user_id: user_id, status: status});
     }
 
-    async SendDm(from: number,to_id: number, message: string, server: Server)
+    async SendDm(from_id: number,to_id: number, message: string, server: Server)
     {
         const msg = await this.prismaService.message.create({
             data: {
-                from_id: from,
-                to_id: to_id,
+                from_id,
+                to_id,
                 content: message,
             }
         });
         server.to(String(to_id)).emit('dm', msg);
+        server.to(String(from_id)).emit('dm', msg);
     }
 
     async ReadDm(idx: number)
@@ -143,10 +147,11 @@ export class SocketService {
     {
         const dm = await this.prismaService.message.findMany({
             where: {
-                to_id: user_id,
+                to_id: Number(user_id),
                 is_read: false,
             },
         });
+        // console.log("GetDm: ", dm);
         dm.forEach((element) => {
             server.to(String(user_id)).emit('dm', element);
         });

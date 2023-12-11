@@ -134,7 +134,7 @@ export class ChatService {
         return {status: true, message: 'success'};
     }
     
-    async JoinRoom(data: JoinRoomDto)
+    async JoinRoom(data: JoinRoomDto, is_invite: boolean = false)
     {
         const chatuser = await this.prismaService.chatroom_user.findUnique({
             where: { user_id: data.user_id, }
@@ -146,7 +146,7 @@ export class ChatService {
         });
         if (room === null)
             return {status: false, message: 'fail to find room'};
-        if (room.is_password)
+        if (room.is_password && is_invite === false)
         {
             if (bcrypt.compareSync(data.password, room.room_password) !== true)
                 return {status: false, message: 'password is invaild'}
@@ -159,6 +159,7 @@ export class ChatService {
             },
         });
         await this.socketService.JoinRoom(data.user_id, `chat-${data.room_id}`);
+        await this.socketService.HandleNotice(data.room_id, `${data.user_nickname}님이 입장하셨습니다.`);
         return {status: true, message: 'success'};
     }
 
@@ -171,6 +172,11 @@ export class ChatService {
         });
         if (room.owner_id === data.user_id)
         {
+            await this.prismaService.ban.deleteMany({
+                where: {
+                    chatroom_id: data.room_id,
+                },
+            })
             await this.socketService.DeleteRoom(data.room_id);
             await this.prismaService.chatroom_user.deleteMany({
                 where : {
@@ -178,6 +184,7 @@ export class ChatService {
                 },
             });
             await this.prismaService.chatroom.delete({ where: { idx: data.room_id } });
+            await this.socketService.SendRerenderAll("chat");
         }
         return {status: true, message: 'success'};
         // const users = room.roomusers;
@@ -250,6 +257,7 @@ export class ChatService {
                 is_manager: false,
             },
         });
+        this.socketService.HandleNotice(data.room_id, `${data.target_nickname}님이 매니저가 해제되었습니다.`);
         return {status: true, message: 'success'};
     }
 
@@ -377,14 +385,13 @@ export class ChatService {
                 idx: data.room_id,
                 roomusers : {
                     some: {
-                        user_id: data.user_id,
+                        user_id: data.target_id,
                     },
                 }
             }
         });
         if (room === null)
             return {status: false, message: 'fail to find room'};
-        await this.socketService.HandleNotice(data.room_id, `${data.target_nickname}님이 강제퇴장 당하셨습니다.`);
         await this.socketService.HandleKick(data.target_id, data.room_id);
         this.LeaveRoom({user_id: data.target_id, user_nickname: data.target_nickname, room_id: data.room_id});
         return {status: true, message: 'success'};
@@ -411,7 +418,12 @@ export class ChatService {
     {
         const user = await this.prismaService.user.findUnique({ where: { nick_name: data.to } });
         if (user === null)
-            return {status: false, message: "Can't friend"};
+            return {status: false, message: "Can't find friend"};
+        const room = await this.prismaService.chatroom.findUnique({ where: { idx: data.chatroom_id } , include: { bans: true }});
+        if (room === null)
+            return {status: false, message: "Can't find room"};
+        if (room.bans.some((ban) => ban.user_id === user.user_id))
+            return {status: false, message: "Can't invite banned user"};
         const eventData: eventDto = 
         {
             to: user.user_id,
@@ -434,33 +446,33 @@ export class ChatService {
         });
         if (event === null || event.idx !== data.event_id)
             return {status: false, message: 'fail to find event'};
-        await this.prismaService.event.delete({
-            where: {
-                idx: event.idx,
-            },
+            await this.prismaService.event.delete({
+                where: {
+                    idx: event.idx,
+                },
         });
-        return await this.JoinRoom(data);
+        return await this.JoinRoom(data, true);
     }
 
     async GetDm(idx: number, user_id: number, from_id: number)
     {
-        const dm = await this.prismaService.user.findUnique({
+        const dm = await this.prismaService.message.findMany({
             where: {
-                user_id: user_id,
-                recv_messages: {
-                    some: {
+                OR: [
+                    {
+                        from_id: user_id,
+                        to_id: from_id,
+                    },
+                    {
                         from_id: from_id,
-                    },                    
-                },
+                        to_id: user_id,
+                    }
+                ]
             },
-            include: {
-                recv_messages: {
-                    cursor: idx ? { idx: idx } : undefined,
-                    take: 30,
-                    skip: 0,
-                    orderBy: { idx: 'desc'},
-                }
-            }
+            cursor: idx ? { idx: idx } : undefined,
+            take: 30,
+            skip: 0,     
+            orderBy: { idx: 'desc'},
         });
         if (dm === null)
             return {status: false, message: 'fail to find dm'}

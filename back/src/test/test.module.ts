@@ -7,10 +7,11 @@ import { PrismaModule } from 'src/prisma/prisma.module';
 import { AuthModule } from 'src/auth/auth.module';
 import { SocialModule } from 'src/social/social.module';
 import { ChatModule } from 'src/chat/chat.module';
+import { SocketModule } from 'src/socket/socket.module';
 
 @Module({
   controllers: [TestController],
   providers: [TestService],
-  imports: [UserModule, GameModule, PrismaModule, AuthModule, SocialModule, ChatModule]
+  imports: [UserModule, GameModule, PrismaModule, AuthModule, SocialModule, ChatModule, SocketModule]
 })
 export class TestModule {}

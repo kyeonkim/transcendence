@@ -25,18 +25,18 @@ export class EventService {
         return this.AlarmSseMap.get(id);
     }
 
-    async FriendListSse(req, id: number) {
-        // console.log('FriendList sse open', id, this.FriendListSseMap.size);
-        if (this.FriendListSseMap.get(id) !== undefined)
-            return this.FriendListSseMap.get(id);
-        const newEvent = new Subject<any>();
-        this.FriendListSseMap.set(id, newEvent);
-        req.on('close', (_) => {
-            this.FriendListSseMap.delete(id);
-            console.log('FriendList sse close', id);
-        });
-        return this.FriendListSseMap.get(id);
-    }
+    // async FriendListSse(req, id: number) {
+    //     // console.log('FriendList sse open', id, this.FriendListSseMap.size);
+    //     if (this.FriendListSseMap.get(id) !== undefined)
+    //         return this.FriendListSseMap.get(id);
+    //     const newEvent = new Subject<any>();
+    //     this.FriendListSseMap.set(id, newEvent);
+    //     req.on('close', (_) => {
+    //         this.FriendListSseMap.delete(id);
+    //         console.log('FriendList sse close', id);
+    //     });
+    //     return this.FriendListSseMap.get(id);
+    // }
 
     async SendFriendEvent(id: number)
     {
@@ -56,7 +56,10 @@ export class EventService {
             },
         });
         for(let i = 0; i < events.length; i++)
-            this.AlarmSseMap.get(id).next({data: events[i]});
+        {
+            if(this.AlarmSseMap.get(id) !== undefined)
+                this.AlarmSseMap.get(id).next({data: events[i]});
+        }
         // console.log(events);
     }
 
@@ -74,23 +77,34 @@ export class EventService {
         }
     }
 
-    async DeletAllAlarmsByNick(nick_name: string) {
-        const user = await this.pismaService.user.findUnique({
-            where: {
-                nick_name: nick_name,
-            },
-        });
-        if (user === null)
-            return {status: false, message: 'no user'};
-        await this.pismaService.event.deleteMany({
-            where: {
-                to_id: user.user_id,
-            },
-        });
-        return {status: true, message: 'success'};
-    }
+    // async DeletAllAlarmsByNick(nick_name: string) {
+    //     const user = await this.pismaService.user.findUnique({
+    //         where: {
+    //             nick_name: nick_name,
+    //         },
+    //     });
+    //     if (user === null)
+    //         return {status: false, message: 'no user'};
+    //     await this.pismaService.event.deleteMany({
+    //         where: {
+    //             to_id: user.user_id,
+    //         },
+    //     });
+    //     return {status: true, message: 'success'};
+    // }
 
     async SendEvent(event: eventDto) {
+        const fromuser = await this.pismaService.user.findUnique({ where: {nick_name: event.from} });
+        if (fromuser === null || fromuser.user_id === event.to)
+            return {status: false, message: 'invalid user'};
+        const ban = await this.pismaService.block.findFirst({
+            where: { 
+                user_id: fromuser.user_id, 
+                blocked_user_id: event.to,
+            }, 
+        });
+        if (ban !== null)
+            return {status: false, message: 'ban user'};
         const before_event = await this.pismaService.event.findFirst({
             where: {
                 to_id: event.to,
@@ -114,6 +128,7 @@ export class EventService {
         if (this.AlarmSseMap.get(event.to) === undefined)
             return {status: true, message: 'no client'};
         this.AlarmSseMap.get(event.to).next({data: alarm});
+        console.log('SendEvent: ', alarm);
         return {status: true, message: 'success'};
     }
 }

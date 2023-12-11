@@ -49,6 +49,7 @@ export class SocialService {
         });
         if (check !== null)
             return {status: false, message: "already frined"};
+
         // try 
         // {
         //     await this.prismaService.friends.create({
@@ -217,11 +218,24 @@ export class SocialService {
             await this.DeleteFriend(data);
         await this.prismaService.block.create({
             data: {
-                user_id: data.user_id,
-                blocked_user_id: data.friend_id,
-                blocked_user_nickname: data.friend_nickname,
+                user_id: data.friend_id,
+                blocked_user_id:  data.user_id,
+                blocked_user_nickname: data.user_nickname,
             },
         });
+        await this.prismaService.event.deleteMany({
+            where: {
+                from_nickname: data.user_nickname,
+                to_id: data.friend_id,
+            },
+        });
+        await this.prismaService.event.deleteMany({
+            where: {
+                from_nickname: data.friend_nickname,
+                to_id: data.user_id,
+            },
+        });
+        await this.socketGateway.JoinRoom(data.user_id, `block-${data.friend_id}`);
         await this.socketGateway.SendRerender(data.user_id, `friend`);
         await this.socketGateway.SendRerender(data.friend_id, `friend`);
         return {status: true, message: "Add block success"};

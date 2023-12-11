@@ -1,8 +1,10 @@
-import { Controller, Delete, Get, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Query, Res } from '@nestjs/common';
 import { TestService } from './test.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SocialService } from 'src/social/social.service';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { Response } from 'express';
+import { testMessageDto } from './dto/test.dto';
 
 
 @ApiTags('Test API')
@@ -35,12 +37,12 @@ export class TestController {
 		return this.TestService.DeleteUserByNickName(nickName);
 	}
 
-	@ApiOperation({summary: `더미 게임 데이터 추가 API`, description: `더미데이터를 생성한다.`})
-	@Post("creategamedummy")
-	CreateDummyGame()
-	{
-		return this.TestService.CreateDummyGame();
-	}
+	// @ApiOperation({summary: `더미 게임 데이터 추가 API`, description: `더미데이터를 생성한다.`})
+	// @Post("creategamedummy")
+	// CreateDummyGame()
+	// {
+	// 	return this.TestService.CreateDummyGame();
+	// }
 
 	@ApiOperation({summary: `더미  게임 데이터 삭제 API`, description: `더미게임데이터를 삭제한다.`})
 	@Delete("getdata/deletedummy")
@@ -87,5 +89,22 @@ export class TestController {
 	async CreateDummyMessage()
 	{
 		return await this.TestService.CreateDummyMessage();
+	}
+
+	@ApiOperation({summary: `ID로 메세지보내기 API`, description: `ID로 메세지를 보낸다.`})
+	@Post("sendmessagebyid")
+	async SendMessageByID(@Body() body: testMessageDto)
+	{
+		return await this.TestService.SendMessageByID(body.user_id, body.target_id ,body.message);
+	}
+
+	@ApiOperation({summary: `cookie set API`, description: `cookie를 설정한다.`})
+	@Get("setcookie")
+	async SetCookie(@Res() res: Response)
+	{
+		console.log("here!!!!");
+		res.cookie('test', 'test', {httpOnly: true});
+		res.end();
+		return "hello";
 	}
 }
