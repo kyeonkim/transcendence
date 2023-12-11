@@ -126,7 +126,8 @@ export default function MatchList(props: any) {
 					// marginLeft: '120px',
 					borderRadius: '10px', // 옵션: 모서리를 둥글게 설정
 					// opacity: '1'
-					position: 'relative'
+					position: 'relative',
+					fontFamily: 'Roboto,Helvetica,Arial,sans-serif'
 				};
 				
 				const textPrimaryStyle = {
@@ -177,11 +178,20 @@ export default function MatchList(props: any) {
 								{name}
 							</Typography>
 						</div>
-						<div style={{position: 'absolute', width: '100%', display: 'flex'}}>
-							<ListItemText
-								primary={`${match.my_score} : ${match.enemy_score}`}
-								primaryTypographyProps={{ textAlign: 'center', sx: textScoreStyle }}
-							/>
+						<div style={{position: 'absolute', width: '100%', display: 'flex', fontSize: '2vw', fontWeight: 'bold'}}>
+							<div style={{textAlign: 'right', width: '45%'}}>
+								<div style={{textAlign: 'center', position: 'relative', left: '45%'}}>
+									{match.my_score}
+								</div>
+							</div>
+							<div style={{textAlign: 'center', width: '10%', fontSize: '1.8vw'}}>
+								-
+							</div>
+							<div style={{textAlign: 'left', width: '45%'}}>
+								<div style={{textAlign: 'center', width: '10%'}}>
+									{match.enemy_score}
+								</div>
+							</div>
 						</div>
 						<div style={{display:'flex', alignItems:'center'}}>
 							<Typography sx={{ ...textPrimaryStyle}}>
