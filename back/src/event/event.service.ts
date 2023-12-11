@@ -56,7 +56,10 @@ export class EventService {
             },
         });
         for(let i = 0; i < events.length; i++)
-            this.AlarmSseMap.get(id).next({data: events[i]});
+        {
+            if(this.AlarmSseMap.get(id) !== undefined)
+                this.AlarmSseMap.get(id).next({data: events[i]});
+        }
         // console.log(events);
     }
 
@@ -91,6 +94,17 @@ export class EventService {
     // }
 
     async SendEvent(event: eventDto) {
+        const fromuser = await this.pismaService.user.findUnique({ where: {nick_name: event.from} });
+        if (fromuser === null || fromuser.user_id === event.to)
+            return {status: false, message: 'invalid user'};
+        const ban = await this.pismaService.block.findFirst({
+            where: { 
+                user_id: fromuser.user_id, 
+                blocked_user_id: event.to,
+            }, 
+        });
+        if (ban !== null)
+            return {status: false, message: 'ban user'};
         const before_event = await this.pismaService.event.findFirst({
             where: {
                 to_id: event.to,

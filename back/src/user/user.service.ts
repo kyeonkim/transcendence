@@ -52,6 +52,7 @@ export class UserService {
                         }
                     }
                 },
+                blocks : true
             }
         });
         // console.log(userData);
