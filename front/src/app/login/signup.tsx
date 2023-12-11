@@ -9,7 +9,7 @@ import '@/util/loading.css';
 // tsparticles
 import type { Engine } from "tsparticles-engine";
 import { ISourceOptions } from "tsparticles-engine";
-import { useCallback, useState } from 'react';
+import { use, useCallback, useEffect, useState } from 'react';
 import particlesOptions from "../particles.json";
 import { loadFull } from "tsparticles";
 import Particles from "react-tsparticles";
@@ -21,6 +21,7 @@ export default function Signup (props:any) {
 	const [nickname, setNickname] = useState("");
 	const [error, setError] = useState("");
 	const [loading, setLoading] = useState(false);
+	const [token, setToken] = useState("");
 	const router = useRouter();
 	const formData = new FormData();
 
@@ -44,6 +45,11 @@ export default function Signup (props:any) {
 	const handleNicknameChange = (e: any) => {
 		setNickname(e.target.value);
 	}
+	
+	useEffect(() => {
+		setToken(props.access_token);
+	}
+	, [props.access_token])
 
 	const handleEnter = async () => {
 		setError('');
@@ -52,7 +58,7 @@ export default function Signup (props:any) {
 		if (imageFile) {
 			formData.append('file', imageFile);
 		}
-		console.log('access_token =',props.access_token);
+		console.log('access_token =',token);
 		await axios.post( `${process.env.NEXT_PUBLIC_FRONT_URL}api/user_create`, {
 				access_token: props.access_token,
 				nick_name: nickname,
@@ -71,7 +77,7 @@ export default function Signup (props:any) {
 			.catch((error) => {
 				console.log ('sign up error =',error.response.data)
 				setLoading(false);
-				setError('중복된 닉네임이거나 특수문자가 포함되어있습니다! 다시 입력해주세요.');
+				setError('중복된 닉네임이거나 한글,특수문자가 포함되어있습니다! 다시 입력해주세요.');
 			})
 	}
 
