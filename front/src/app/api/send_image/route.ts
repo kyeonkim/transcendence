@@ -57,7 +57,7 @@ export async function POST (request: NextRequest)
         }
         else if (error.request)
         {
-            // console.log('error.request - ', error.request);
+            console.log('error.request - ', error.request, `${process.env.NEXT_PUBLIC_API_URL}user/upload`);
 
             return (NextResponse.json({
                 error: 'user_check request error',

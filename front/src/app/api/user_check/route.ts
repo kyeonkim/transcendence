@@ -35,6 +35,7 @@ export async function POST (request: NextRequest)
     {
         if (error.response)
         {
+            // console.log('api/user_check - error.response - ', error.response);
             return (NextResponse.json({
                 error: 'user_check response error',
                 error_status: response?.status,
@@ -44,6 +45,7 @@ export async function POST (request: NextRequest)
         }
         else if (error.request)
         {
+            console.log('error.request - ', error);
             return (NextResponse.json({
                 error: 'user_check request error'
             },{
