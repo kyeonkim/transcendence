@@ -99,6 +99,8 @@ export default function Login ({searchParams}:any) {
           responseData = response?.data;
           console.log('2차 인증 필요?====', responseData);
 
+          if(responseData == undefined)
+            redirect ('/');
           if (responseData?.refresh_token != undefined
             && responseData?.refresh_token != null)
           {

@@ -125,15 +125,6 @@ export default function Main() {
 
   return (
     <>
-      <Head>
-        <link rel="stylesheet" href="./frame.module.css" />
-        <link rel="stylesheet" href="@/components/chatbox/chat.module.css" />
-        <link rel="stylesheet" href="@/components/game/pong.module.css" />
-        <link rel="stylesheet" href="@/components/mainbox/mainbox.module.css" />
-        <link rel="stylesheet" href="@/components/matching/match.module.css" />
-        <link rel="stylesheet" href="@/components/search_bar/search_bar.module.css" />
-        <link rel="stylesheet" href="@/components/user_lists/dm.module.css" />
-      </Head>
         {!socketReady && (
           <div>
             <Particles options={particlesOptions as ISourceOptions} init={particlesInit} />

@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect ,useCallback} from 'react';
 import { useChatSocket } from "../../app/main_frame/socket_provider"
-import { useCookies } from 'next-client-cookies';
-import {Paper, Grid, Box, Divider, TextField, Typography, List,	IconButton, 
+import { useCookies } from 'next-client-cookies'
+import {Paper, Grid, Box, Divider, TextField, Typography, List,	IconButton, Popper,
 		AppBar, Toolbar, Drawer, Dialog, Button, DialogActions, DialogContent, DialogContentText, DialogTitle, ListItemButton} from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import MenuIcon from '@mui/icons-material/Menu';
@@ -125,6 +125,10 @@ export default function Chat(props: any) {
 		})
 	}
 
+	// back에서 password 수정 필요성을 알 수 있게 만들어야한다.
+		// 선택지
+		// 1. 수정 flag를 payload에 추가한다
+		// 2. api 자체를 추가한다.
 	const handleSettingChange = async() => {
 		await axiosToken.patch(`${process.env.NEXT_PUBLIC_API_URL}chat/changeroom`, {
 			room_idx: Number(roominfo.idx),
@@ -152,10 +156,6 @@ export default function Chat(props: any) {
 			console.log(err);
 		})
 	}
-
-
-
-
 
 
 	const imageLoader = (({ src }: any) => {
@@ -318,10 +318,12 @@ export default function Chat(props: any) {
 								<ListItemButton onClick={handleSettingClose}>
 									<Typography>Remove PassWord</Typography>
 								</ListItemButton>
+								
 								<Divider />
 								<ListItemButton onClick={handleSettingClose}>
 									<Typography>Change PassWord</Typography>
 								</ListItemButton>
+
 							</>
 						) : (
 							<ListItemButton onClick={handleSettingClose}>

@@ -50,6 +50,7 @@ export default function DirectMessage( {dmAlarmCount, dmAlarmCountList, dmAlarmR
 	};
 
 	const handleOpen = () => {
+
 		if (dmOpenId === -1)
 			return false;
 		else

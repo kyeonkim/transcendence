@@ -69,12 +69,13 @@ export default function Pong (props :any){
 	const   cookies = useCookies();
     const   containerRef = props.containerRef;
     
-    
+    let     isUserPl1 = false;
+
+
     console.log("in game rank : ", rank);
     console.log("in game mode : ", mode);
     console.log("in game inGameData : ", inGameData);
 
-    mode;
 
 
     // 초기에 canvas 그리기 전에 width, height 설정 필요
@@ -297,9 +298,11 @@ export default function Pong (props :any){
                 {
                     setUser(player1);
                     setEnemy(player2);
+                    isUserPl1 = true;
                 } else {
                     setUser(player2);
                     setEnemy(player1);
+                    isUserPl1 = false;
                 }
                 console.log("init player : ", player1, player2);
                 console.log("init user : ", user);
@@ -691,8 +694,6 @@ export default function Pong (props :any){
                 console.log('player2 set to unit value - ', viewportRatio.value, ' - width and height - ', player2.width / viewportRatio.value, player2.height / viewportRatio.value);
                 
                 console.log('setting player 1', player1.width, viewportRatio.value, ratio);
-                // player1.scaleX = player1.scaleX / viewportRatio.value * ratio;
-                // player1.scaleY = player1.scaleY / viewportRatio.value * ratio;
                 player1.set({
                     width: player1.width / viewportRatio.value * ratio,
                     height: player1.height / viewportRatio.value * ratio,
@@ -700,8 +701,6 @@ export default function Pong (props :any){
                     top: player1.top / viewportRatio.value * ratio,
                   }).setCoords();
 
-                // player2.scaleX = player2.scaleX / viewportRatio.value * ratio;
-                // player2.scaleY = player2.scaleY / viewportRatio.value * ratio;
                 player2.set({
                     width: player2.width / viewportRatio.value * ratio,
                     height: player2.height / viewportRatio.value * ratio,
@@ -709,8 +708,6 @@ export default function Pong (props :any){
                     top: player2.top / viewportRatio.value * ratio,
                   }).setCoords();
 
-                // ball.scaleX = ball.scaleX / viewportRatio.value * ratio;
-                // ball.scaleY = ball.scaleY / viewportRatio.value * ratio;
                 ball.set({
                     width: ball.width / viewportRatio.value * ratio,
                     height: ball.height / viewportRatio.value * ratio,
@@ -718,8 +715,6 @@ export default function Pong (props :any){
                     top: ball.top / viewportRatio.value * ratio,
                   }).setCoords();
 
-                // net.scaleX = net.scaleX / viewportRatio.value * ratio;
-                // net.scaleY = net.scaleY / viewportRatio.value * ratio;
                 net.set({
                     width: net.width / viewportRatio.value * ratio,
                     height: net.height / viewportRatio.value * ratio,
@@ -810,7 +805,8 @@ export default function Pong (props :any){
                     <GameProfile
                         inGameData={inGameData}
                         score1={propscore.player1}
-                        score2={propscore.player2} />
+                        score2={propscore.player2}
+                        isUserPL1={isUserPl1} />
                     )
                 }
             </div>
