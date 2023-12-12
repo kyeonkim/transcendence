@@ -87,8 +87,9 @@ export default function BasicTabs({ setMTbox }: SearchUserProps) {
 	};
 
 	const handleAlarmGetAgain = () => {
-		// alarmList.clear();
-
+		setAlarmList([]);
+		setAlarmCount(0);
+		console.log('handle alarm get again');
 	};
 
 	const handleDmAlarmCount = (user_id :number, is_add :boolean) => {
@@ -159,13 +160,17 @@ export default function BasicTabs({ setMTbox }: SearchUserProps) {
 
 
 	const fetchAlarms = async () => {
+		
 		await axiosToken.get(`${process.env.NEXT_PUBLIC_API_URL}event/getalarms/${cookies.get('user_id')}`,{
 			headers: {
 				'Content-Type': 'application/json',
 				'Authorization': `Bearer ${cookies.get('access_token')}`
 			  },
+		}).then((res) => {
+			console.log('fetchAlarm done');	
 		})
 	}
+
 
 	useEffect(() => {
 		const sseEvents = new EventSource(`${process.env.NEXT_PUBLIC_API_URL}event/alarmsse/${cookies.get('user_id')}`);
@@ -196,10 +201,14 @@ export default function BasicTabs({ setMTbox }: SearchUserProps) {
 
 
 	useEffect(() => {
+
+		console.log('in alarmRerender hook !!!');
+
 		handleAlarmGetAgain();
 		fetchAlarms();
 		setValue(1);
 	}, [alarmRerender]);
+
 
 	const handleChatTarget = (from_id :any, from_nickname: any) => {
 

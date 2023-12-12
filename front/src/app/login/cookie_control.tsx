@@ -76,6 +76,7 @@ export default function CookieControl ({res}: {res: any}) {
 
             
             router.replace('/main_frame');
+            
 
         }
         catch (error)

@@ -132,43 +132,43 @@ export default function Main() {
     );
   }
 
- return (
-      <div>
-        <Particles options={particlesOptions as ISourceOptions} init={particlesInit} />
-        {/* {isSize ? (
-          <Grid container className={styles.warning} justifyContent="center" alignItems="center">
-            <Typography variant="caption" color="error" fontSize={'40px'}>
-              화면을 늘려주세요!
-            </Typography>
-          </Grid>
-        ) : (
-        <>
-          <Grid container className={styles.leftBox}>
-            <MyProfile setMTbox={handleClick}/>
-            <SearchUser setMTbox={handleClick}/>
-            <MatchingButton setMTbox={handleClick}/>
-            <UserLists setMTbox={handleClick}/>
-          </Grid>
-          <Grid container className={styles.mainBox}>
-            <Mainbox mod={clicked} search={id}/>
-          </Grid>
-          <Grid container className={styles.rightBox}>
-            <ChatBlock setMTbox={handleClick}/>
-          </Grid>
-        </>
-        )} */}
+  return (
+    <div>
+      <Particles options={particlesOptions as ISourceOptions} init={particlesInit} />
+      {/* {isSize ? (
+        <Grid container className={styles.warning} justifyContent="center" alignItems="center">
+          <Typography variant="caption" color="error" fontSize={'40px'}>
+            화면을 늘려주세요!
+          </Typography>
+        </Grid>
+      ) : (
+      <>
         <Grid container className={styles.leftBox}>
-          <MyProfile setMTbox={handleClick} profile={profile}/>
+          <MyProfile setMTbox={handleClick}/>
           <SearchUser setMTbox={handleClick}/>
           <MatchingButton setMTbox={handleClick}/>
           <UserLists setMTbox={handleClick}/>
         </Grid>
         <Grid container className={styles.mainBox}>
-          <Mainbox mod={clicked} search={id} setProfile={setProfile}/>
+          <Mainbox mod={clicked} search={id}/>
         </Grid>
         <Grid container className={styles.rightBox}>
           <ChatBlock setMTbox={handleClick}/>
         </Grid>
-      </div>
-    )
-  }
+      </>
+      )} */}
+      <Grid container className={styles.leftBox}>
+        <MyProfile setMTbox={handleClick} profile={profile}/>
+        <SearchUser setMTbox={handleClick}/>
+        <MatchingButton setMTbox={handleClick}/>
+        <UserLists setMTbox={handleClick}/>
+      </Grid>
+      <Grid container className={styles.mainBox}>
+        <Mainbox mod={clicked} search={id} setProfile={setProfile}/>
+      </Grid>
+      <Grid container className={styles.rightBox}>
+        <ChatBlock setMTbox={handleClick}/>
+      </Grid>
+    </div>
+  );
+}

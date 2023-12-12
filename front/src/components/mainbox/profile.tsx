@@ -149,7 +149,7 @@ const ProfilePage = (props: any) => {
           friend_nickname: userNickname
         }})
       .then((res) => {
-        console.log(res.data)
+        console.log('disable BLOCK request done ! - ', res.data);
         setIsBlock(false);
       })
     }
@@ -168,7 +168,7 @@ const ProfilePage = (props: any) => {
         },
       })
       .then((res) => {
-        console.log(res.data)
+        console.log('BLOCK request done ! - ', res.data);
         setIsBlock(true);
       })
       .catch((err) => {

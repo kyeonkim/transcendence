@@ -114,7 +114,7 @@ export default function AlarmListPanal (props: any) {
   useEffect(() => {
 
       const handleRenderAlarmList = () => {
-          console.log('render-alarm again plz');
+          console.log('listened render-alarm!!!!');
           handleAlarmRerender();
       };
 

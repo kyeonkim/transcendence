@@ -39,7 +39,7 @@ export default function Pong (props :any){
     })
 
     const [scoreValue, setScoreValue] = useState({player1: 0, player2: 0});
-    const [propscore, setScore] = useState({});
+    const [propscore, setScore] = useState({player1: 0, player2: 0});
     const [viewportUpdate, setViewportUpdate] = useState(false);
     const [initCanvas, setInitCanvas] = useState(false);
     const [readyResize, setReadyResize] = useState(false);
@@ -47,7 +47,7 @@ export default function Pong (props :any){
     const [initListener, setInitListener] = useState(false);
     const [initGame, setInitGame] = useState(false);
 
-    const [playerSpeed, setPlayerSpeed] = useState(10);
+    const [playerSpeed, setPlayerSpeed] = useState({value: 10});
     const [reverseSign, setReverseSign] = useState(1);
 
     const [ballVecXY, setBallVecXY] = useState({
@@ -161,7 +161,7 @@ export default function Pong (props :any){
         }
 
         viewportRatio.value = ratio;
-        setPlayerSpeed(playerSpeed * ratio);
+        playerSpeed.value *= ratio;
         ballVecXY.speed *= ratio;
     }
 
@@ -412,12 +412,12 @@ export default function Pong (props :any){
                 {
                     if (isArrowPressed.arrowUp === true && user.top > 0) 
                     {
-                        user.set('top', Math.max(user.top - playerSpeed, 0));
+                        user.set('top', Math.max(user.top - playerSpeed.value, 0));
                         socket.emit(`game-user-position`, {y: user.top / viewportRatio.value});
                     }
                     if (isArrowPressed.arrowDown === true && user.top < canvas.height - user.height)
                     {
-                        user.set('top', Math.min(user.top + playerSpeed, canvas.height - user.height));
+                        user.set('top', Math.min(user.top + playerSpeed.value, canvas.height - user.height));
                         socket.emit(`game-user-position`, {y: user.top / viewportRatio.value});
                     }
                 }
@@ -425,12 +425,12 @@ export default function Pong (props :any){
                 {
                     if (isArrowPressed.arrowDown === true && user.top > 0)
                     {
-                        user.set('top', Math.max(user.top - playerSpeed, 0));
+                        user.set('top', Math.max(user.top - playerSpeed.value, 0));
                         socket.emit(`game-user-position`, {y: user.top / viewportRatio.value});
                     }
                     if (isArrowPressed.arrowUp === true && user.top < canvas.height - user.height)
                     {
-                        user.set('top', Math.min(user.top + playerSpeed, canvas.height - user.height));
+                        user.set('top', Math.min(user.top + playerSpeed.value, canvas.height - user.height));
                         socket.emit(`game-user-position`, {y: user.top / viewportRatio.value});
                     }
                 }
@@ -598,9 +598,6 @@ export default function Pong (props :any){
                 }
                 // 다시 그리기
                 canvas.renderAll();
-                // board.renderAll();
-                // user1Score.renderAll();
-                // user2Score.renderAll();
     
                 lastRequestId = requestAnimationFrame(drawPong);
     
@@ -615,7 +612,7 @@ export default function Pong (props :any){
             };
         }
 
-    }, [initGame])
+    }, [initGame]);
 
     // 화면 크기가 변하면 canvas 안에 있는 값들도 재설정
     useEffect(() => {
@@ -708,37 +705,41 @@ export default function Pong (props :any){
                 console.log('player2 set to unit value - ', viewportRatio.value, ' - width and height - ', player2.width / viewportRatio.value, player2.height / viewportRatio.value);
                 
                 console.log('setting player 1', player1.width, viewportRatio.value, ratio);
-                player1.width = player1.width / viewportRatio.value * ratio;
-                player1.height = player1.height / viewportRatio.value * ratio;
-                player1.scaleX = player1.scaleX / viewportRatio.value * ratio;
-                player1.scaleY = player1.scaleY / viewportRatio.value * ratio;
-                player1.left = player1.left / viewportRatio.value * ratio;
-                player1.top = player1.top / viewportRatio.value * ratio;
-                player1.setCoords();
+                // player1.scaleX = player1.scaleX / viewportRatio.value * ratio;
+                // player1.scaleY = player1.scaleY / viewportRatio.value * ratio;
+                player1.set({
+                    width: player1.width / viewportRatio.value * ratio,
+                    height: player1.height / viewportRatio.value * ratio,
+                    left: player1.left / viewportRatio.value * ratio,
+                    top: player1.top / viewportRatio.value * ratio,
+                  }).setCoords();
 
-                player2.width = player2.width / viewportRatio.value * ratio;
-                player2.height = player2.height / viewportRatio.value * ratio;
-                player2.scaleX = player2.scaleX / viewportRatio.value * ratio;
-                player2.scaleY = player2.scaleY / viewportRatio.value * ratio;
-                player2.left = player2.left / viewportRatio.value * ratio;
-                player2.top = player2.top / viewportRatio.value * ratio;
-                player2.setCoords();
+                // player2.scaleX = player2.scaleX / viewportRatio.value * ratio;
+                // player2.scaleY = player2.scaleY / viewportRatio.value * ratio;
+                player2.set({
+                    width: player2.width / viewportRatio.value * ratio,
+                    height: player2.height / viewportRatio.value * ratio,
+                    left: player2.left / viewportRatio.value * ratio,
+                    top: player2.top / viewportRatio.value * ratio,
+                  }).setCoords();
 
-                ball.scaleX = ball.scaleX / viewportRatio.value * ratio;
-                ball.scaleY = ball.scaleY / viewportRatio.value * ratio;
-                ball.width = ball.width / viewportRatio.value * ratio;
-                ball.height = ball.height / viewportRatio.value * ratio;
-                ball.left = ball.left / viewportRatio.value * ratio;
-                ball.top = ball.top / viewportRatio.value * ratio;
-                ball.setCoords();
+                // ball.scaleX = ball.scaleX / viewportRatio.value * ratio;
+                // ball.scaleY = ball.scaleY / viewportRatio.value * ratio;
+                ball.set({
+                    width: ball.width / viewportRatio.value * ratio,
+                    height: ball.height / viewportRatio.value * ratio,
+                    left: ball.left / viewportRatio.value * ratio,
+                    top: ball.top / viewportRatio.value * ratio,
+                  }).setCoords();
 
-                net.scaleX = net.scaleX / viewportRatio.value * ratio;
-                net.scaleY = net.scaleY / viewportRatio.value * ratio;
-                net.width = net.width / viewportRatio.value * ratio;
-                net.height = net.height / viewportRatio.value * ratio;
-                net.left = net.left / viewportRatio.value * ratio;
-                net.top = net.top / viewportRatio.value * ratio;
-                net.setCoords();
+                // net.scaleX = net.scaleX / viewportRatio.value * ratio;
+                // net.scaleY = net.scaleY / viewportRatio.value * ratio;
+                net.set({
+                    width: net.width / viewportRatio.value * ratio,
+                    height: net.height / viewportRatio.value * ratio,
+                    left: net.left / viewportRatio.value * ratio,
+                    top: net.top / viewportRatio.value * ratio,
+                  }).setCoords();
 
                 // net 수정 메커니즘도 추가 필요함
 
@@ -754,8 +755,10 @@ export default function Pong (props :any){
 
                 console.log('========test done=========');        
 
+                // player speed 반영 안되는 것 같음.
+
                 ballVecXY.speed = ballVecXY.speed / viewportRatio.value * ratio;
-                setPlayerSpeed(playerSpeed / viewportRatio.value * ratio);
+                playerSpeed.value = playerSpeed.value / viewportRatio.value * ratio;
                 viewportRatio.value = ratio;
 
                 console.log('resizing 5');
@@ -763,10 +766,9 @@ export default function Pong (props :any){
                 // canvas.discardActiveObject();
 
                 canvas.renderAll();
-                // board.renderAll();
 
                 // canvas.calcOffset();
-
+3
                 console.log('resizing done');
 
             };
@@ -784,7 +786,6 @@ export default function Pong (props :any){
 
     useEffect(() => {
         function handleKeyDown(e :any) {
-                let speed = playerSpeed;
                 if (e.key === 'ArrowUp') {
                     isArrowPressed.arrowUp = true;
                 } 
