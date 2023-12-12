@@ -235,7 +235,8 @@ export class SocialService {
                 to_id: data.user_id,
             },
         });
-        await this.socketGateway.JoinRoom(data.user_id, `block-${data.friend_id}`);
+        // await this.socketGateway.JoinRoom(data.user_id, `block-${data.friend_id}`);
+        await this.socketGateway.JoinRoom(data.friend_id, `block-${data.user_id}`);
         await this.socketGateway.SendRerender(data.user_id, `friend`);
         await this.socketGateway.SendRerender(data.friend_id, `friend`);
         return {status: true, message: "Add block success"};
@@ -243,11 +244,18 @@ export class SocialService {
 
     async DeleteBlockUser(data: friendDto)
     {
+        // const check = await this.prismaService.block.findFirst({
+        //     where: {
+        //         user_id: data.user_id,
+        //         blocked_user_id: data.friend_id,
+        //         blocked_user_nickname: data.friend_nickname
+        //     },
+        // });
         const check = await this.prismaService.block.findFirst({
             where: {
-                user_id: data.user_id,
-                blocked_user_id: data.friend_id,
-                blocked_user_nickname: data.friend_nickname
+                user_id: data.friend_id,
+                blocked_user_id: data.user_id,
+                blocked_user_nickname: data.user_nickname,
             },
         });
         if (check === null)
@@ -256,9 +264,9 @@ export class SocialService {
         {
             await this.prismaService.block.deleteMany({
                 where: { 
-                    user_id: data.user_id,
-                    blocked_user_id: data.friend_id, 
-                    blocked_user_nickname: data.friend_nickname,
+                    user_id: data.friend_id,
+                    blocked_user_id: data.user_id,
+                    blocked_user_nickname: data.user_nickname,
                 },
             });
         }
@@ -266,7 +274,8 @@ export class SocialService {
             console.log("DeleteblockUser failed error: ", error);
             return {status: false, message: "DeleteblockUser failed"}
         }
-        await this.socketGateway.LeaveRoom(data.user_id, `block-${data.friend_id}`);
+        // await this.socketGateway.LeaveRoom(data.user_id, `block-${data.friend_id}`);
+        await this.socketGateway.LeaveRoom(data.friend_id, `block-${data.user_id}`);
         // await this.socketGateway.SendRerender(data.user_id, `friend`);
         // await this.socketGateway.SendRerender(data.friend_id, `friend`);
         return {status: true, message: "success"};

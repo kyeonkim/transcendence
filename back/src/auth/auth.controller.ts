@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Headers, Param, Post, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Headers, Param, Post, Res, UseGuards, Req } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SignUpDto, TokenDto, TwoFADTO } from './dto/token.dto';
@@ -59,9 +59,10 @@ export class AuthController {
 	@UseGuards(AuthGuard('jwt-twoFA'))
 	@ApiBearerAuth('JWT-twoFA')
 	@Post("2fa/pass")
-	async TwoFAPass(@Body() twofa: TwoFADTO)
+	async TwoFAPass(@Req() req, @Body() twofa: TwoFADTO)
 	{
-		// console.log(`twofa/pass call`, twofa);
+		// console.log("2fa/pass2fa/pass2fa/pass2fa/pass", req);
+		console.log(`twofa/pass call`, twofa);
 		return await this.AuthService.TwoFAPass(twofa);
 	}
 
@@ -80,6 +81,7 @@ export class AuthController {
 	@Post("2fa/active")
 	async Active2FA(@Body() twofa: TwoFADTO)
 	{
+		console.log("Active2FAActive2FAActive2FA",twofa);
 		return await this.AuthService.Active2FA(twofa);
 	}
 
@@ -100,3 +102,4 @@ export class AuthController {
 		return await this.AuthService.Deactive2FAdev(id);
 	}
 }
+
