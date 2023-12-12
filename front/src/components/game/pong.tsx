@@ -629,8 +629,6 @@ export default function Pong (props :any){
 
             const handleResize = () => {
                 console.log("handleResize!!!");
-                // let screenWidth = myRef.current.offsetWidth;
-                // let screenHeight = myRef.current.offsetHeight;
 
                 let screenWidth = containerRef.current.offsetWidth;
                 let screenHeight = containerRef.current.offsetHeight * 0.5;
@@ -638,18 +636,6 @@ export default function Pong (props :any){
                 let ratio;
                 let fixWidth;
 
-                console.log('handleResize new Screen values - ', screenWidth, screenHeight);
-            
-                console.log('canvas size - ', canvas.width, canvas.height);
-
-                // const computedStyle = window.getComputedStyle(myRef.current);
-
-                // let screenWidth = parseFloat(computedStyle.width);
-                // let screenHeight = parseFloat(computedStyle.height);
-
-                // 다른 기준 추가 필요. 세로로 긴 경우에 의도하지 않는 사이즈 나오는 경우 있음
-
-                // 감지 기준에, 프로필 존재하는 크기를 추가할 필요 있음
                 if (screenWidth > screenHeight)
                 {
                     if (screenHeight / 9 * 16 > screenWidth)
@@ -786,6 +772,7 @@ export default function Pong (props :any){
 
     useEffect(() => {
         function handleKeyDown(e :any) {
+                let speed = playerSpeed.value;
                 if (e.key === 'ArrowUp') {
                     isArrowPressed.arrowUp = true;
                 } 
