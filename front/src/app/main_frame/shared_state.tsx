@@ -59,23 +59,11 @@ export const ChatBlockProvider = ({ children } :any) => {
         dmBlockTriggerRender, setDmBlockTriggerRender,
         handleRenderDmBlock])
 
-
-    // const value = useMemo(() => ({
-    //     chatBlockRenderMode,
-    //     setChatBlockRenderMode,
-    // }), [chatBlockRenderMode, setChatBlockRenderMode])
-
     return (
         <chatBlockContext.Provider value={value}>
             {children}
         </chatBlockContext.Provider>
     );
-
-    // return (
-    //      <chatBlockContext.Provider value={{chatBlockRenderMode, setChatBlockRenderMode}}>
-    //         {children}
-    //      </chatBlockContext.Provider>
-    // );
 };
 
 export const useChatBlockContext = () => {

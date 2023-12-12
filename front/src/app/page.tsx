@@ -1,17 +1,59 @@
-// import { permanentRedirect } from 'next/navigation';
+'use client'
+import React, { useState } from 'react'
+import Button from '@mui/material/Button';
+import type { Engine } from "tsparticles-engine";
+import { ISourceOptions } from "tsparticles-engine";
+import { useCallback } from 'react';
+import particlesOptions from "./particles.json";
+import { loadFull } from "tsparticles";
+import Particles from "react-tsparticles";
+import { Box, TextField } from '@mui/material';
 
-import {redirect} from 'next/navigation';
+export default function Home() {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  
+  const particlesInit = useCallback(async (engine: Engine) => {
+    await loadFull(engine);
+  }, []);
 
-export default async function entrance () {
+  const handleLogin = () => {
+    window.location.href = process.env.NEXT_PUBLIC_REDIRECT_URL;
+  };
 
-//   const cookies = new Cookies();
-//   const token = cookies.get('access_token');
-//   const refresh_token = cookies.get('refresh_token');
-//     if (token && refresh_token)
-//       redirect('/main');
-//     else
-    // 쿠키 확인해서 그대로 main으로 보낼 수도 있음
+  const handleSignUp = () => {
+  };
 
-    // permanentRedirect('/index');
-    redirect('/entrance');
+  return (
+    <Box sx={{ position: 'relative', height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+      <Particles options={particlesOptions as ISourceOptions} init={particlesInit} />
+      <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center' }}>
+        <Box sx={{ marginBottom: '16px' }}>
+          <TextField
+            label="ID"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            variant="outlined"
+            sx={{ marginRight: '8px' }}
+          />
+          <TextField
+            label="Password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            variant="outlined"
+            sx={{ marginRight: '8px' }}
+          />
+        </Box>
+        <Box sx={{ marginBottom: '16px' }}>
+          <Button variant="contained" onClick={handleLogin} sx={{ marginRight: '8px' }}>
+            Sign In
+          </Button>
+          <Button variant="contained" onClick={handleSignUp}>
+            Sign Up
+          </Button>
+        </Box>
+      </Box>
+    </Box>
+  );
 }
