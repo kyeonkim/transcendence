@@ -145,6 +145,5 @@ export default function Login ({searchParams}:any) {
   {
     console.log('/login - no code to call Auth42');
     redirect ('/');
-    return (<div></div>);
   }
 }

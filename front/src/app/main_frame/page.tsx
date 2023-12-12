@@ -10,12 +10,10 @@ import ChatBlockProvider from './shared_state';
 export default function MainFrame () {
 
   return (
-
         <ChatSocket>
           <ChatBlockProvider>
               <Main />
           </ChatBlockProvider>
         </ChatSocket>
-
   );
 }
