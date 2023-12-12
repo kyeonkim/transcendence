@@ -82,7 +82,7 @@ export default function CookieControl ({res}: {res: any}) {
         {
             console.log('/login/cookie_control - fail to set cookie');
             response_error = true;
-            router.replace("/entrance");
+            router.replace("/");
         }
 
     }, []);

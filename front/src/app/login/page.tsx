@@ -81,7 +81,7 @@ export default function Login ({searchParams}:any) {
     {
         // async 안에서 redirect 하지 말아야하나?
         console.log(error);
-        redirect('/entrance');
+        redirect('/');
     }
 
     return (userData);
@@ -135,7 +135,7 @@ export default function Login ({searchParams}:any) {
         catch
         {
           console.log('/login - fail to call Auth42');
-          redirect ('/entrance');
+          redirect ('/');
         }
         })()}
       </div>   
@@ -144,7 +144,7 @@ export default function Login ({searchParams}:any) {
   else
   {
     console.log('/login - no code to call Auth42');
-    redirect ('/entrance');
+    redirect ('/');
     return (<div></div>);
   }
 }
