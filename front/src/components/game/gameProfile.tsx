@@ -7,7 +7,7 @@ export default function GameProfile({inGameData, score1, score2, isUserPL1} :any
     const [p1, setScore1] = useState(0);
     const [p2, setScore2] = useState(0);
 
-    console.log('inGameData data - ', inGameData);
+    console.log('inGameData data - ', isUserPL1);
 
     useEffect(() => {
         setScore1(score1);
@@ -16,6 +16,7 @@ export default function GameProfile({inGameData, score1, score2, isUserPL1} :any
     useEffect(() => {
         setScore2(score2);
     }, [score2]);
+
 
     const imageLoader = (src: any) => {
         console.log("image loader src===", src);
