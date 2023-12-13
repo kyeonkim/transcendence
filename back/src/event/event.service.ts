@@ -94,7 +94,9 @@ export class EventService {
     // }
 
     async SendEvent(event: eventDto) {
-        const fromuser = await this.pismaService.user.findUnique({ where: {nick_name: event.from} });
+        const fromuser = event.type === 'game' ? 
+            await this.pismaService.user.findUnique({ where: {nick_name: event.from} }):
+            await this.pismaService.user.findUnique({ where: {user_id: event.to} });
         if (fromuser === null || fromuser.user_id === event.to)
             return {status: false, message: 'invalid user'};
         const ban = await this.pismaService.block.findFirst({

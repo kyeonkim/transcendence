@@ -46,12 +46,11 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
           throw new Error("user_id is undefined");
       
       const connect_user = await this.SocketService.Connect(client.handshake.query.user_id, client.id, this.server);
-      
       connect_user.roomuser ? await this.JoinRoom(connect_user.user_id, `chat-${connect_user.roomuser.chatroom_id}`) : null;
       client.join(String(connect_user.user_id));
       client.join(`status-${connect_user.user_id}`);
       connect_user.friends.map((friend) => { this.SocketService.JoinRoom(friend.followed_user_id, `status-${connect_user.user_id}`, this.server)});
-      connect_user.blocks.map((block) => { this.SocketService.JoinRoom(connect_user.user_id, `block-${block.blocked_user_id}`, this.server)});
+      connect_user.blocks.map((block) => {this.SocketService.JoinRoom(block.blocked_user_id, `block-${connect_user.user_id}`, this.server)});
     } catch (error) {
       console.log(error);
       client.disconnect();

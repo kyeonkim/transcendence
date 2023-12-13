@@ -151,7 +151,7 @@ export class AuthService {
 		const secret = authenticator.generateSecret();
 		//otpauth:// 환경변수화 필요
 		const otpauthUrl = authenticator.keyuri(user.user_nickname, `otpauth://`, secret);
-		// console.log(`secret: ${secret}`);
+		console.log(`secret: ${secret}`);
 		// console.log("otpauthUrl: ", otpauthUrl);
 		return {status: true, message: "success", secret: secret, otpauthUrl: otpauthUrl};
 	}
@@ -169,9 +169,10 @@ export class AuthService {
 					twoFA: true,
 				}
 			});
+			console.log("Active2FAActive2FAActive2FAActive2FAActive2FAresres", res);
 			if (res === null)
 				return {status: false, message: "fail"};
-			const token = this.prisma.twoFA_key.upsert({
+			const token = await this.prisma.twoFA_key.upsert({
 				where: {
 					user_id: twofa.user_id,
 				},
@@ -183,6 +184,7 @@ export class AuthService {
 					twoFA_key: twofa.secret,
 				}
 			});
+			console.log("Active2FAActive2FAActive2FAActive2FAActive2FAtokentoken", token);
 			if (token === null)
 				return {status: false, message: "fail"};
 			return {status: true, message: "success"};
@@ -282,14 +284,16 @@ export class JwtTwoFAStrategy extends PassportStrategy(Strategy, 'jwt-twoFA') {
 	  ignoreExpiration: false,
 	  //검증 비밀 값(유출 주의)
 	  secretOrKey: process.env.JWT_SECRET,
+	//   passReqToCallback: true,
 	});
   }
+  
   /**
    * @description 클라이언트가 전송한 Jwt 토큰 정보
    *
    * @param payload 토큰 전송 내용
    */
-  async validate(payload: UserToken): Promise<any> {
+  async validate(req: any, payload: UserToken): Promise<any> {
 	return { status: true };
   }
 }
