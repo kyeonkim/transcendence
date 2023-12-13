@@ -127,10 +127,12 @@ export class ChatService {
             data: {
                 name: room.chatroom_name,
                 is_private: room.private,
+                room_password: room.is_changePass ? room.password : chatroom.room_password,
             },
         });
         if (ChangeRoom === null)
             return {status: false, message: 'fail to change room'};
+        await this.socketService.SendRerenderAll("chat", {name: ChangeRoom.name, is_private: ChangeRoom.is_private});
         return {status: true, message: 'success'};
     }
     

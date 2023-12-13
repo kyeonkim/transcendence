@@ -29,6 +29,11 @@ export class ChatRoomDto
     @ApiProperty()
     @IsBoolean()
     private: boolean;
+
+    @ApiProperty()
+    @IsBoolean()
+    @IsOptional()
+    is_changePass?: boolean;
 }
 
 export class JoinRoomDto
