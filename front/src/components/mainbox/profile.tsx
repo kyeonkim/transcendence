@@ -48,6 +48,9 @@ const ProfilePage = (props: any) => {
             setIsActivated(true);
           else
             setIsActivated(false);
+          if (res.data.userData.nick_name !== my_nick) {
+            setIsBlock(res.data.userData.blocks.some((block: any)=> block.blocked_user_id === my_id));
+          }
         }})
       }
 
@@ -108,8 +111,6 @@ const ProfilePage = (props: any) => {
         setIsFriend(false);
       })
       .catch((err) => {
-        //토큰이 만료되었을때
-        //리프레쉬토큰을들고 토큰 재발급후 쿠키에 저장해야함
         console.log(err);
       })
     }

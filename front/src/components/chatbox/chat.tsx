@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect ,useCallback} from 'react';
 import { useChatSocket } from "../../app/main_frame/socket_provider"
-import { useCookies } from 'next-client-cookies';
-import {Paper, Grid, Box, Divider, TextField, Typography, List,	IconButton, 
-		AppBar, Toolbar, Drawer, Dialog, Button, DialogActions, DialogContent, DialogContentText, DialogTitle} from "@mui/material";
+import { useCookies } from 'next-client-cookies'
+import {Paper, Grid, Box, Divider, TextField, Typography, List,	IconButton, Popper,
+		AppBar, Toolbar, Drawer, Dialog, Button, DialogActions, DialogContent, DialogContentText, DialogTitle, ListItemButton} from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
@@ -11,6 +11,7 @@ import axios from 'axios';
 import SpeedDial from '@mui/material/SpeedDial';
 import SpeedDialIcon from '@mui/material/SpeedDialIcon';
 import SpeedDialAction from '@mui/material/SpeedDialAction';
+import SettingsIcon from '@mui/icons-material/Settings';
 
 import styles from './chat.module.css';
 import TextSend from './text_send';
@@ -24,9 +25,14 @@ export default function Chat(props: any) {
 	const [pop, setPop] = useState(false);
 	const [anchorEl, setAnchorEl] = useState(null);
 	const [dialogOpen, setDialogOpen] = useState(false);
+	const [setingOpen, setSetingOpen] = useState(false);
 	const [errMessage, setErrMessage] = useState('');
 	const [inviteTarget, setInviteTarget] = useState('');
 	const [open, setOpen] = useState(false);
+	const [newPassword, setNewPassword] = useState('');
+	const [removePassword, setRemovePassword] = useState(false);
+	const [newRoomName, setNewRoomName] = useState('');
+	const [newRoomType, setNewRoomType] = useState(false);
 
 	const { setMTbox, handleRenderMode, roominfo } = props;
 	const socket = useChatSocket();
@@ -71,6 +77,8 @@ export default function Chat(props: any) {
 	const handleClose = () => setOpen(false);
 	const handleInvite = () => setDialogOpen(true);
 	const handledialogClose = () => setDialogOpen(false);
+	const handleSetting = () => setSetingOpen(true);
+	const handleSettingClose = () => setSetingOpen(false);
 	const handleInvitetarget = (e :any) => setInviteTarget(e.target.value);
 
 	const handleExit = async () => {
@@ -117,14 +125,48 @@ export default function Chat(props: any) {
 		})
 	}
 
+	// back에서 password 수정 필요성을 알 수 있게 만들어야한다.
+		// 선택지
+		// 1. 수정 flag를 payload에 추가한다
+		// 2. api 자체를 추가한다.
+	const handleSettingChange = async() => {
+		await axiosToken.patch(`${process.env.NEXT_PUBLIC_API_URL}chat/changeroom`, {
+			room_idx: Number(roominfo.idx),
+			user_id: my_id,
+			user_nickname: my_name,
+			chatroom_name: newRoomName? newRoomName : roominfo.name,
+			// password: `${removePassword ? '' : newPassword}`,
+		},
+		{
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${cookies.get('access_token')}`
+			  },
+		})
+		.then((res) => {
+			console.log('setting success');
+			console.log(res);
+			if (res.data.status)
+				setSetingOpen(false);
+			else
+				setErrMessage(res.data.message);
+		})
+		.catch((err) => {
+			console.log('setting fail');
+			console.log(err);
+		})
+	}
+
 
 	const imageLoader = (({ src }: any) => {
 		return `${process.env.NEXT_PUBLIC_API_URL}user/getimg/nickname/${src}`
 	});
 
 	const actions = [
-		{ icon: <SendIcon />, name: 'Invite' },
-	  ];
+		{ icon: <SettingsIcon />, name: 'Setting'},
+		{ icon: <SendIcon />, name: 'Invite'}
+	];
+	console.log('roominfo: ', roominfo);
 	return (
 		<div>
 			<AppBar position="absolute" sx={{borderRadius: '10px', height: '6%'}}>
@@ -217,12 +259,12 @@ export default function Chat(props: any) {
 							open={open}
 						>
 							{actions.map((action) => (
-							<SpeedDialAction
-								key={action.name}
-								icon={action.icon}
-								tooltipTitle={action.name}
-								onClick={handleInvite}
-							/>
+								<SpeedDialAction
+									key={action.name}
+									icon={action.icon}
+									tooltipTitle={action.name}
+									onClick={action.name === 'Invite' ? handleInvite : handleSetting}
+								/>
 							))}
 						</SpeedDial>
 					</Grid>
@@ -256,6 +298,51 @@ export default function Chat(props: any) {
 				<DialogActions>
 				<Button onClick={handledialogClose}>Cancel</Button>
 				<Button onClick={handleSendInvite}>Invite</Button>
+				</DialogActions>
+			</Dialog>
+			<Dialog
+				open={setingOpen}
+				BackdropProps={{
+					onClick: handleSettingClose,
+				  }}
+				sx={{marginLeft: '76%'}}>
+			<DialogTitle>Setting</DialogTitle>
+				<DialogActions>
+					<List>
+						<ListItemButton onClick={handleSettingClose}>
+							<Typography>Change Name</Typography>
+						</ListItemButton>
+						<Divider />
+						{roominfo.is_password ? (
+							<>
+								<ListItemButton onClick={handleSettingClose}>
+									<Typography>Remove PassWord</Typography>
+								</ListItemButton>
+								
+								<Divider />
+								<ListItemButton onClick={handleSettingClose}>
+									<Typography>Change PassWord</Typography>
+								</ListItemButton>
+
+							</>
+						) : (
+							<ListItemButton onClick={handleSettingClose}>
+								<Typography>Set PassWord</Typography>
+							</ListItemButton>
+						)}
+						<Divider />
+						{roominfo.is_private ? (
+							<ListItemButton onClick={handleSettingClose}>
+								<Typography>Set Public</Typography>
+							</ListItemButton>
+						) : (
+							<ListItemButton onClick={handleSettingClose}>
+								<Typography>Set Private</Typography>
+							</ListItemButton>
+						)}
+						<Divider />
+						<Button onClick={handleSettingClose} sx={{alignItems: "center"}}>Cancel</Button>
+					</List>
 				</DialogActions>
 			</Dialog>
 		</div>

@@ -19,6 +19,7 @@ import Divider from '@mui/material/Divider';
 import { Grid, Typography } from '@mui/material';
 
 import styles from './frame.module.css';
+import Head from 'next/head';
 
 // // Top left Box
 // const TLBox = styled(Box) ({
@@ -122,53 +123,30 @@ export default function Main() {
     };
   }, [socket]);
 
-  if (!socketReady) {
-    console.log('socket not ready');
-  
-    return (
-      <div>
-        <Particles options={particlesOptions as ISourceOptions} init={particlesInit} />
-      </div>
-    );
-  }
-
- return (
-      <div>
-        <Particles options={particlesOptions as ISourceOptions} init={particlesInit} />
-        {/* {isSize ? (
-          <Grid container className={styles.warning} justifyContent="center" alignItems="center">
-            <Typography variant="caption" color="error" fontSize={'40px'}>
-              화면을 늘려주세요!
-            </Typography>
-          </Grid>
-        ) : (
-        <>
-          <Grid container className={styles.leftBox}>
-            <MyProfile setMTbox={handleClick}/>
-            <SearchUser setMTbox={handleClick}/>
-            <MatchingButton setMTbox={handleClick}/>
-            <UserLists setMTbox={handleClick}/>
-          </Grid>
-          <Grid container className={styles.mainBox}>
-            <Mainbox mod={clicked} search={id}/>
-          </Grid>
-          <Grid container className={styles.rightBox}>
-            <ChatBlock setMTbox={handleClick}/>
-          </Grid>
-        </>
-        )} */}
-        <Grid container className={styles.leftBox}>
-          <MyProfile setMTbox={handleClick} profile={profile}/>
-          <SearchUser setMTbox={handleClick}/>
-          <MatchingButton setMTbox={handleClick}/>
-          <UserLists setMTbox={handleClick}/>
-        </Grid>
-        <Grid container className={styles.mainBox}>
-          <Mainbox mod={clicked} search={id} setProfile={setProfile}/>
-        </Grid>
-        <Grid container className={styles.rightBox}>
-          <ChatBlock setMTbox={handleClick}/>
-        </Grid>
-      </div>
-    )
+  return (
+    <>
+        {!socketReady && (
+          <div>
+            <Particles options={particlesOptions as ISourceOptions} init={particlesInit} />
+          </div>
+        )}
+        {socketReady && (
+          <>
+            <Particles options={particlesOptions as ISourceOptions} init={particlesInit} />
+            <Grid container className={styles.leftBox}>
+              <MyProfile setMTbox={handleClick} profile={profile}/>
+              <SearchUser setMTbox={handleClick}/>
+              <MatchingButton setMTbox={handleClick}/>
+              <UserLists setMTbox={handleClick}/>
+            </Grid>
+            <Grid container className={styles.mainBox}>
+              <Mainbox mod={clicked} search={id} setProfile={setProfile}/>
+            </Grid>
+            <Grid container className={styles.rightBox}>
+              <ChatBlock setMTbox={handleClick}/>
+            </Grid>
+          </>
+        )}
+    </>
+  );
   }

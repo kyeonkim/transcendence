@@ -20,14 +20,7 @@ export default function CookieControl ({res}: {res: any}) {
 
     let   response_error = false;
 
-    // if (otp)
-    // {
-    //     //do modal for otp
-    //     //input 6 digit number and send to server
-    // }
-
     const particlesInit = useCallback(async (engine: Engine) => {
-        // console.log(engine);
         await loadFull(engine);
       }, []);
     
@@ -49,22 +42,6 @@ export default function CookieControl ({res}: {res: any}) {
             console.log('cookie_control - error - ', err);
             throw new Error ('Cookie set fail');
         });
-        // try
-        // {
-        //     const response = await axios.post(`${process.env.NEXT_PUBLIC_FRONT_URL}api/set_cookie`, {
-        //         access_token: access_token,
-        //         refresh_token: refresh_token,
-        //         nick_name: nick_name,
-        //         user_id: user_id
-        //     });
-        
-        //     console.log('cookie_control - respone - ', response.data);
-        //     return (response);
-        // }
-        // catch
-        // {
-        //     throw new Error ('Cookie set fail');
-        // }
     }
 
     useEffect(() => {
@@ -75,23 +52,16 @@ export default function CookieControl ({res}: {res: any}) {
             console.log('cookie set done');
 
             
-            router.replace('/main_frame');
+            router.push('/main_frame');
 
         }
         catch (error)
         {
             console.log('/login/cookie_control - fail to set cookie');
             response_error = true;
-            router.replace("/entrance");
+            router.replace("/");
         }
-
     }, []);
 
-    console.log('in useEffect');
-
-    return (
-        <div>
-            <Particles options={particlesOptions as ISourceOptions} init={particlesInit} />
-        </div>
-      );
+    return <Particles options={particlesOptions as ISourceOptions} init={particlesInit} />;
 }

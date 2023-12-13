@@ -10,18 +10,7 @@ export default function RootLayout({ children }: any) {
           <ClientCookiesProvider value={cookies().getAll()}>
             {children}
           </ClientCookiesProvider>
-        {/* </Particles> */}
       </body>
     </html>
   );
 }
-
-// export default function RootLayout({ children }: any) {
-//   return (
-//     <html>
-//       <body>
-//         {children}
-//       </body>
-//     </html>
-//   );
-// }

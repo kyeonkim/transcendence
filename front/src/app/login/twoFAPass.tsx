@@ -9,6 +9,12 @@ import CookieControl from './cookie_control';
 import { useRouter } from 'next/navigation';
 import { axiosToken } from '@/util/token';
 import { useCookies } from 'next-client-cookies';
+import type { Engine } from "tsparticles-engine";
+import { ISourceOptions } from "tsparticles-engine";
+import { useCallback } from 'react';
+import particlesOptions from "../particles.json";
+import { loadFull } from "tsparticles";
+import Particles from "react-tsparticles";
 
 const style: React.CSSProperties = {
   position: 'absolute',
@@ -42,20 +48,24 @@ export default function TwoFAPass ({res}: {res: any}) {
 
   const router = useRouter();
   const cookies = useCookies();
- 
+
+  const particlesInit = useCallback(async (engine: Engine) => {
+    await loadFull(engine);
+  }, []);
 
   useEffect(() => {
 
+    console.log("access_tokken", access_token);
+
     const fetchData = async () => {
-        await axiosToken.post(`${process.env.NEXT_PUBLIC_API_URL}auth/2fa/pass`, {
+        await axios.post(`${process.env.NEXT_PUBLIC_API_URL}auth/2fa/pass`, {
           user_id: user_id,
           user_nickname: nick_name,
           code: code,
         },
         {
           headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${cookies.get('access_token')}`,
+            'Authorization': `Bearer ${access_token}`,
         },
         })
         .then((res) => { 
@@ -81,6 +91,7 @@ export default function TwoFAPass ({res}: {res: any}) {
   console.log('2차인증 리스폰스데이터', responseData);
   return (
     <div>
+      <Particles options={particlesOptions as ISourceOptions} init={particlesInit} />
       <Modal
         open={open}
         onClose={onClose}

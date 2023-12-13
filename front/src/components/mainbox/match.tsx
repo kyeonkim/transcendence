@@ -1,7 +1,7 @@
 'use client';
 
 import styles from '@/components/matching/match.module.css';
-import React, { use, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 
 // child components
 import MatchHome from '@/components/matching/matchHome';
@@ -21,8 +21,10 @@ export default function Matching() {
 	const socket = useChatSocket();
 	const cookies = useCookies();
 	const [data, setData] = useState<any>([]);
+	const myRef = useRef(null);
 
 	useEffect(() => {
+
 		const fetchData = async () => {
 			console.log("게임방확인 api call");
 			await axiosToken.post(`${process.env.NEXT_PUBLIC_API_URL}game/checkroom`, {
@@ -46,7 +48,9 @@ export default function Matching() {
 				setRender(2);
 			}
 			else if (data.status === 'ingame')
+			{
 				setRender(3);
+			}
 			else 
 			{
 				setIsRank(false);
@@ -56,11 +60,15 @@ export default function Matching() {
 			setData(data);
 		});
 		fetchData();
+
 	}, []);
 
 	const exitGame = async () => {
 		setRender(0);
 	}
+
+	if (myRef === null)
+		return <div>loading...</div>
 
 	const handleRender = () => {
 		console.log("render: ", render);
@@ -69,13 +77,13 @@ export default function Matching() {
 		else if (render === 2)
 			return <GameRoom setRender={setRender} userData={data}/>
 		else if (render === 3)
-			return <Pong exitGame={exitGame} rank={isRank} mode={isMode}/>
+			return <Pong exitGame={exitGame} rank={isRank} mode={isMode} containerRef={myRef} />
 		else
 			return <MatchHome setRender={setRender}/>
 	}
 
 	return (
-		<Grid container className={styles.matchroom}>
+		<Grid container className={styles.matchroom} ref={myRef}>
 			{handleRender()}
 		</Grid>
 	)
