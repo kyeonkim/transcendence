@@ -48,8 +48,8 @@ export default function ChatBlock(props: any) {
 				{
 					console.log("ChatBlock - user is in chatroom");
 					setRoominfo(res.data.userData.roomuser.chatroom);
-					console.log("roominfo - ", roominfo);
-					setRenderMode('chatRoom');;
+					console.log("roominfo - ", res.data.userData.roomuser.chatroom);
+					// setRenderMode('chatRoom');
 				}
 			}
 			else
@@ -74,6 +74,11 @@ export default function ChatBlock(props: any) {
 			getUserData();
 		}
 	}, [render])
+
+	useEffect(() => {
+		setRenderMode('chatRoom');
+		console.log('chat_block - roominfo');
+	}, [roominfo]);
 
 	// useEffect(() => {
 	// 	socket.on(`render-chat`, (data) => {

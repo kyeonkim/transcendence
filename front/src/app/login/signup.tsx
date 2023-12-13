@@ -4,7 +4,7 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { Avatar, Button, Grid, Skeleton, TextField, Typography } from "@mui/material"
 import styles from './login.module.css'
-import '@/util/loading.css';
+// import '@/util/loading.css';
 
 // tsparticles
 import type { Engine } from "tsparticles-engine";
