@@ -171,11 +171,11 @@ export class TestService {
         return {status: true, message: "success"};
     }
 
-    async CreateDummyChat()
-    {
-        for (let i = 0; i < 50; i++)
-            await this.chatService.CreateRoom({user_id: i, user_nickname: `dummy${i}`, chatroom_name: `dummy${i} room`, private: false});
-    }
+    // async CreateDummyChat()
+    // {
+    //     for (let i = 0; i < 50; i++)
+    //         await this.chatService.CreateRoom({user_id: i, user_nickname: `dummy${i}`, chatroom_name: `dummy${i} room`, private: false});
+    // }
 
     async DeleteDummyChat()
     {

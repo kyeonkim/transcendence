@@ -51,12 +51,12 @@ export class TestController {
 		return this.TestService.DeleteDummyGame();
 	}
 
-	@ApiOperation({summary: `더미 채팅방생성 API`, description: `더미데이터를 생성한다.`})
-	@Post("createchatdummy")
-	CreateDummyChat()
-	{
-		return this.TestService.CreateDummyChat();
-	}
+	// @ApiOperation({summary: `더미 채팅방생성 API`, description: `더미데이터를 생성한다.`})
+	// @Post("createchatdummy")
+	// CreateDummyChat()
+	// {
+	// 	return this.TestService.CreateDummyChat();
+	// }
 
 	@ApiOperation({summary: `더미 채팅방 삭제 API`, description: `더미데이터를 삭제한다.`})
 	@Delete("deletechatdummy")
