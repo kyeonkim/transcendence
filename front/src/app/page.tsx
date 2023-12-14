@@ -28,7 +28,7 @@ export default function Home() {
     <Box sx={{ position: 'relative', height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
       <Particles options={particlesOptions as ISourceOptions} init={particlesInit} />
       <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center' }}>
-        <Box sx={{ marginBottom: '16px' }}>
+        {/* <Box sx={{ marginBottom: '16px' }}>
           <TextField
             label="ID"
             value={username}
@@ -44,14 +44,14 @@ export default function Home() {
             variant="outlined"
             sx={{ marginRight: '8px' }}
           />
-        </Box>
+        </Box> */}
         <Box sx={{ marginBottom: '16px' }}>
           <Button variant="contained" onClick={handleLogin} sx={{ marginRight: '8px' }}>
             Sign In
           </Button>
-          <Button variant="contained" onClick={handleSignUp}>
+          {/* <Button variant="contained" onClick={handleSignUp}>
             Sign Up
-          </Button>
+          </Button> */}
         </Box>
       </Box>
     </Box>

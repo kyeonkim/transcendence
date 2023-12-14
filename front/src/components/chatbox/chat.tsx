@@ -16,23 +16,27 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import styles from './chat.module.css';
 import TextSend from './text_send';
 import UserList from './chat_user_list';
+import ChatModal from './chat_modal';
 import { axiosToken } from '@/util/token';
 
 export default function Chat(props: any) {
 	const messageAreaRef = useRef(null);
+	
+	const [chatname, setChatname] = useState('');
+	const [roomMode, setRoomMode] = useState(false);
+
 	const [message, setMessage] = useState('');
 	const [drawer, setDrawer] = useState(false);
 	const [pop, setPop] = useState(false);
 	const [anchorEl, setAnchorEl] = useState(null);
 	const [dialogOpen, setDialogOpen] = useState(false);
 	const [setingOpen, setSetingOpen] = useState(false);
-	const [errMessage, setErrMessage] = useState('');
 	const [inviteTarget, setInviteTarget] = useState('');
 	const [open, setOpen] = useState(false);
-	const [newPassword, setNewPassword] = useState('');
-	const [removePassword, setRemovePassword] = useState(false);
-	const [newRoomName, setNewRoomName] = useState('');
-	const [newRoomType, setNewRoomType] = useState(false);
+    const [errMessage, setErrMessage] = useState('');
+
+	const [modalCondition, setModalCodition] = useState('');
+	const [modalOpen, setModalOpen] = useState(false);
 
 	const { setMTbox, handleRenderMode, roominfo } = props;
 	const socket = useChatSocket();
@@ -41,12 +45,34 @@ export default function Chat(props: any) {
 	const my_name = cookies.get('nick_name');
 	const my_id = Number(cookies.get('user_id'));
 	
+
 	useEffect (() => {
 		const handleKick = (data :any) => {
 			handleRenderMode('chatList');
 		};
+
+		const doRenderChatRooms = (data :any) => {
+			console.log('doRenderChatRooms - ', data);
+			setChatname(data.data.name);
+			setRoomMode(data.data.is_private);
+		}
+
+		socket.on('render-chat', doRenderChatRooms)
 		socket.on("kick", handleKick);
-	}, []);
+		console.log('chat useEffect roominfo - ', roominfo);
+
+		return () => {
+			console.log('chat unmounted!!!');
+			socket.off("kick", handleKick);
+			socket.off('render-chat', doRenderChatRooms);
+		}
+
+	}, [socket]);
+
+	useEffect(() => {
+		setChatname(roominfo.name);
+		setRoomMode(roominfo.is_private);
+	}, [props.roominfo]);
 
 	const handleSendMessage = () => {
 		console.log('send message:==== \n', message);
@@ -94,7 +120,7 @@ export default function Chat(props: any) {
 		})
 		.then((res) => {
 			handleRenderMode('chatList');
-		})	
+		})
 	};
 	
 	const handleSendInvite = async() => {
@@ -125,37 +151,18 @@ export default function Chat(props: any) {
 		})
 	}
 
-	// back에서 password 수정 필요성을 알 수 있게 만들어야한다.
-		// 선택지
-		// 1. 수정 flag를 payload에 추가한다
-		// 2. api 자체를 추가한다.
-	const handleSettingChange = async() => {
-		await axiosToken.patch(`${process.env.NEXT_PUBLIC_API_URL}chat/changeroom`, {
-			room_idx: Number(roominfo.idx),
-			user_id: my_id,
-			user_nickname: my_name,
-			chatroom_name: newRoomName? newRoomName : roominfo.name,
-			// password: `${removePassword ? '' : newPassword}`,
-		},
-		{
-			headers: {
-				'Content-Type': 'application/json',
-				'Authorization': `Bearer ${cookies.get('access_token')}`
-			  },
-		})
-		.then((res) => {
-			console.log('setting success');
-			console.log(res);
-			if (res.data.status)
-				setSetingOpen(false);
-			else
-				setErrMessage(res.data.message);
-		})
-		.catch((err) => {
-			console.log('setting fail');
-			console.log(err);
-		})
-	}
+	const handleChatModalCondition = (type :string) => {
+		
+		if (type === 'change_password')
+			setModalCodition('change_password');
+		else if (type === 'remove_password')
+			setModalCodition('remove_password');
+		else if (type === 'change_name')
+			setModalCodition('change_name');
+		else if (type === 'change_visibility')
+			setModalCodition('change_visibility');
+		setModalOpen(true);
+	};
 
 
 	const imageLoader = (({ src }: any) => {
@@ -166,7 +173,9 @@ export default function Chat(props: any) {
 		{ icon: <SettingsIcon />, name: 'Setting'},
 		{ icon: <SendIcon />, name: 'Invite'}
 	];
+
 	console.log('roominfo: ', roominfo);
+
 	return (
 		<div>
 			<AppBar position="absolute" sx={{borderRadius: '10px', height: '6%'}}>
@@ -182,7 +191,7 @@ export default function Chat(props: any) {
 					<CloseIcon />
 				</IconButton>
 				<Typography variant="h6" component="div" sx={{ flexGrow: 1 ,align: 'center' }}>
-					{roominfo.name}
+					{chatname}
 				</Typography>
 				<IconButton
 					size="large"
@@ -300,6 +309,18 @@ export default function Chat(props: any) {
 				<Button onClick={handleSendInvite}>Invite</Button>
 				</DialogActions>
 			</Dialog>
+			<ChatModal
+				modalOpen={modalOpen}
+				setModalOpen={setModalOpen}
+				modalCondition={modalCondition}
+				my_id={my_id}
+				my_name={my_name}
+				roominfo={roominfo}
+				chatname={chatname}
+				setChatname={setChatname}
+				roomMode={roomMode}
+				setRoomMode={setRoomMode}
+			/>
 			<Dialog
 				open={setingOpen}
 				BackdropProps={{
@@ -309,34 +330,34 @@ export default function Chat(props: any) {
 			<DialogTitle>Setting</DialogTitle>
 				<DialogActions>
 					<List>
-						<ListItemButton onClick={handleSettingClose}>
+						<ListItemButton onClick={() => handleChatModalCondition('change_name')}>
 							<Typography>Change Name</Typography>
 						</ListItemButton>
 						<Divider />
 						{roominfo.is_password ? (
 							<>
-								<ListItemButton onClick={handleSettingClose}>
+								<ListItemButton onClick={() => handleChatModalCondition('remove_password')}>
 									<Typography>Remove PassWord</Typography>
 								</ListItemButton>
 								
 								<Divider />
-								<ListItemButton onClick={handleSettingClose}>
+								<ListItemButton onClick={() => handleChatModalCondition('change_password')}>
 									<Typography>Change PassWord</Typography>
 								</ListItemButton>
 
 							</>
 						) : (
-							<ListItemButton onClick={handleSettingClose}>
+							<ListItemButton onClick={() => handleChatModalCondition('change_password')}>
 								<Typography>Set PassWord</Typography>
 							</ListItemButton>
 						)}
 						<Divider />
 						{roominfo.is_private ? (
-							<ListItemButton onClick={handleSettingClose}>
+							<ListItemButton onClick={() => handleChatModalCondition('change_visibility')}>
 								<Typography>Set Public</Typography>
 							</ListItemButton>
 						) : (
-							<ListItemButton onClick={handleSettingClose}>
+							<ListItemButton onClick={() => handleChatModalCondition('change_visibility')}>
 								<Typography>Set Private</Typography>
 							</ListItemButton>
 						)}

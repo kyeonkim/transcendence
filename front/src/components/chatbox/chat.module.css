@@ -37,3 +37,8 @@
     top: '70%';
     left: '1000px';
 }
+
+.modalTextField{
+	top: '50%';
+	width: '50%';
+}

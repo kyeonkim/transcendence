@@ -62,7 +62,7 @@ export default function ChatRoomCreate(props: any) {
 
 	async function handleDone() {
 		
-		var hashRoomPassword;
+		let hashRoomPassword;
 
 		if (roomName === '')
 		{

@@ -34,6 +34,8 @@ export default function Pong (props :any){
     const [user, setUser] = useState<fabric.Rect>();
     const [enemy, setEnemy] = useState<fabric.Rect>();
 
+    const [isUserPL1, setIsUserPL1] = useState(false);
+
     const [gameData, setGameData] = useState({
         startTime: 0,
     })
@@ -69,7 +71,7 @@ export default function Pong (props :any){
 	const   cookies = useCookies();
     const   containerRef = props.containerRef;
     
-    let     isUserPl1 = false;
+    // let     isUserPl1 = false;
 
 
     console.log("in game rank : ", rank);
@@ -298,11 +300,11 @@ export default function Pong (props :any){
                 {
                     setUser(player1);
                     setEnemy(player2);
-                    isUserPl1 = true;
+                    setIsUserPL1(true);
                 } else {
                     setUser(player2);
                     setEnemy(player1);
-                    isUserPl1 = false;
+                    setIsUserPL1(false);
                 }
                 console.log("init player : ", player1, player2);
                 console.log("init user : ", user);
@@ -806,7 +808,7 @@ export default function Pong (props :any){
                         inGameData={inGameData}
                         score1={propscore.player1}
                         score2={propscore.player2}
-                        isUserPL1={isUserPl1} />
+                        isUserPL1={isUserPL1} />
                     )
                 }
             </div>
