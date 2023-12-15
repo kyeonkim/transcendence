@@ -5,6 +5,8 @@ services:
     build: ./front
     image: front_server
     container_name: next_container
+    env_file:
+      - .env
     volumes:
       - ./front/src:/app/front_server/src
     ports:
@@ -12,6 +14,7 @@ services:
     networks:
       - transcendence_net
     restart: always
+
   postgresql:
     image: postgres:latest
     container_name: postgre_container
@@ -30,6 +33,7 @@ services:
       - 5432
     networks:
       - transcendence_net
+
   nestjs:
     build: ./back
     image: back_server
@@ -49,6 +53,7 @@ services:
     networks:
       - transcendence_net
     restart: always
+    
   portainer:
     image: portainer/portainer
     container_name: portainer_container

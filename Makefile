@@ -10,12 +10,12 @@ log:
 	docker compose logs -f
 
 down:
-	rm -rf ./db/*
 	docker compose -f $(COMPOSE) down
 
 clean: down
 
 fclean: 
+	rm -rf ./db/*
 	-docker compose -f $(COMPOSE) down -v --rmi all --remove-orphans
 	-docker rm $(docker ps -a -q)
 	-docker system prune -f -a 
