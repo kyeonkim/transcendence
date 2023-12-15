@@ -49,25 +49,6 @@ export class SocialService {
         });
         if (check !== null)
             return {status: false, message: "already frined"};
-
-        // try 
-        // {
-        //     await this.prismaService.friends.create({
-        //         data: {
-        //             following_user_id: addFriend.user_id,
-        //             followed_user_id: friend.user_id,
-        //         },
-        //     });
-        //     await this.prismaService.friends.create({
-        //         data: {
-        //             following_user_id: friend.user_id,
-        //             followed_user_id: addFriend.user_id,
-        //         },
-        //     });
-        // } catch (error) {
-        //     console.error("AddFriend failed error: ", error);
-        //     return {status: false, message: "AddFriend failed"}
-        // }
         const sent_res = await this.eventService.SendEvent({
             to: friend.user_id,
             type: "add_friend",
@@ -201,8 +182,8 @@ export class SocialService {
     {
         const block_check = await this.prismaService.block.findFirst({
             where: {
-                user_id: data.user_id,
-                blocked_user_id: data.friend_id,
+                user_id: data.friend_id,
+                blocked_user_id: data.user_id,
             },
         });
         if (block_check !== null)
@@ -234,8 +215,7 @@ export class SocialService {
                 to_id: data.user_id,
             },
         });
-        // await this.socketGateway.JoinRoom(data.user_id, `block-${data.friend_id}`);
-        await this.socketGateway.JoinRoom(data.friend_id, `block-${data.user_id}`);
+        await this.socketGateway.JoinRoom(data.user_id, `block-${data.friend_id}`);
         await this.socketGateway.SendRerender(data.user_id, `friend`);
         await this.socketGateway.SendRerender(data.friend_id, `friend`);
         return {status: true, message: "Add block success"};
@@ -273,7 +253,7 @@ export class SocialService {
             console.error("DeleteblockUser failed error: ", error);
             return {status: false, message: "DeleteblockUser failed"}
         }
-        await this.socketGateway.LeaveRoom(data.friend_id, `block-${data.user_id}`);
+        await this.socketGateway.LeaveRoom(data.user_id, `block-${data.friend_id}`);
         return {status: true, message: "success"};
     }
 }

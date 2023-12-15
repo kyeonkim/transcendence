@@ -9,7 +9,6 @@ import { TokenExpiredError } from 'jsonwebtoken';
 
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { authenticate } from 'passport';
 import { authenticator } from 'otplib';
 import { WsException } from '@nestjs/websockets';
 
@@ -149,7 +148,7 @@ export class AuthService {
 	{
 		const secret = authenticator.generateSecret();
 		//otpauth:// 환경변수화 필요
-		const otpauthUrl = authenticator.keyuri(user.user_nickname, `otpauth://`, secret);
+		const otpauthUrl = authenticator.keyuri(user.user_nickname, process.env.OTPAUTH_ADDR, secret);
 		return {status: true, message: "success", secret: secret, otpauthUrl: otpauthUrl};
 	}
 

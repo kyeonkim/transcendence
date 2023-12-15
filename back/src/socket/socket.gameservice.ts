@@ -319,6 +319,8 @@ export class SocketGameService {
             return ;
         this.InGame.get(user_id).score1 = payload.score.player1;
         this.InGame.get(user_id).score2 = payload.score.player2;
+        if (this.InGame.get(user_id).score1 >= 11 || this.InGame.get(user_id).score2 >= 11)
+            return this.ExitGame(user_id);
         if (this.InGame.get(user_id).user1_id === user_id)
             this.server.to(`${this.InGame.get(user_id).user2_id}`).emit(`game-ball-fix`, payload);
         else
