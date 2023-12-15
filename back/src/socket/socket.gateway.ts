@@ -172,4 +172,11 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
   {
     await this.SocketGameService.GameBallHit(payload, Number(Client.handshake.query.user_id));
   }
+
+  @SubscribeMessage('game-force-end')
+  async GameForceEnd(Client: Socket)
+  {
+    console.log("GameForceEndGameForceEnd : ", Client.handshake.query.user_id);
+    await this.SocketGameService.ForceGameEnd(Number(Client.handshake.query.user_id));
+  }
 }

@@ -297,15 +297,12 @@ export class SocketGameService {
         if (this.InGame.get(Number(payload.user_id)).user1_ready && this.InGame.get(Number(payload.user_id)).user2_ready)
         {
             const room = this.InGame.get(Number(payload.user_id));
-            console.log(`room:`, room);
             this.server.to(`status-${room.user1_id}`).emit(`status`, {user_id: room.user1_id, status: `ingame`});
             this.server.to(`status-${room.user2_id}`).emit(`status`, {user_id: room.user2_id, status: `ingame`});
             room.rank = payload.rank;
             if (room.rank === false)
                 room.game_mode = payload.game_mode;
-            setTimeout(() => {
-                this.server.to(`game-${room.user1_id}`).emit(`game-init`, {room: room});
-            }, 1000);
+            this.server.to(`game-${room.user1_id}`).emit(`game-init`, {room: room});
         }
     }
 

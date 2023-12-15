@@ -119,6 +119,9 @@ export class ChatService {
         });
         if (chatroom === null)
             return {status: false, message: 'fail to find room'};
+        let isPassWord = chatroom.is_password;
+        if (room.is_changePass)
+            isPassWord = room.password ? true : false;
         const ChangeRoom = await this.prismaService.chatroom.update({
             where: {
                 idx: room.room_idx,
@@ -127,11 +130,13 @@ export class ChatService {
                 name: room.chatroom_name,
                 is_private: room.private,
                 room_password: room.is_changePass ? room.password : chatroom.room_password,
+                is_password: isPassWord,
             },
         });
         if (ChangeRoom === null)
             return {status: false, message: 'fail to change room'};
-        await this.socketService.SendRerenderChatRoom(ChangeRoom.idx, {name: ChangeRoom.name, is_private: ChangeRoom.is_private});
+        await this.socketService.SendRerenderAll('chat', {idx: ChangeRoom.idx, name: ChangeRoom.name, is_private: ChangeRoom.is_private, is_password: ChangeRoom.is_password});
+        await this.socketService.SendRerenderChatRoom(ChangeRoom.idx, {name: ChangeRoom.name, is_private: ChangeRoom.is_private, is_password: ChangeRoom.is_password});
         return {status: true, message: 'success'};
     }
     
