@@ -28,10 +28,6 @@ export default function DmMessageBlock({dmOpenId, dmOpenNickname, messageAreaRef
 
     const { dmBlockTriggerRender, handleRenderDmBlock } = useChatBlockContext();
 
-    // console.log('nick_name - ', nick_name);
-    // console.log('dmOpenNickName - ', dmOpenNickname);
-
-
     const handleRenderAppend = () => {
         if (renderAppend === true)
             setRenderAppend(false);
@@ -41,16 +37,6 @@ export default function DmMessageBlock({dmOpenId, dmOpenNickname, messageAreaRef
 
 
     const getNewDm = async (dmOpenId :number) => {
-
-        console.log('DmMessageBlock getNewD');
-
-        // HTTP 읽지 않은 DM 요청 api
-            // 존재 - idx 스스로 추출
-            // 없음 - 비어있음
-        
-            // 메시지가 아예 없으면 idx -1로 보내야하는거 아닌가? 0으로 관리하는 이유는?
-
-        console.log(dmOpenIdRef.current);
         await axiosToken.get(`${process.env.NEXT_PUBLIC_API_URL}chat/unreaddm`,{
             params: {
                 user_id: user_id,
@@ -66,9 +52,7 @@ export default function DmMessageBlock({dmOpenId, dmOpenNickname, messageAreaRef
 
             if (res.data.status === true)
             {
-                // idx -1부터 시작하지 않나?
                 var idx = 0;
-                console.log('unread dms - ', res.data.dm);
                 
                 setTmpNewDm([]);
                 if (res.data.dm.length !== 0)
@@ -76,10 +60,8 @@ export default function DmMessageBlock({dmOpenId, dmOpenNickname, messageAreaRef
                     idx = res.data.dm[res.data.dm.length - 1].idx - 1;
                     setLastIdx(idx + 1);
 
-
                     res.data.dm.map((data :any) => {
                         const newMessage = renderMessage(data);
-
 
                         setTmpNewDm((prevTmpDmList :any) => 
                         [...prevTmpDmList, newMessage]);
@@ -101,7 +83,6 @@ export default function DmMessageBlock({dmOpenId, dmOpenNickname, messageAreaRef
 
                     if (res.data.status === true)
                     {
-                        console.log('old dms - ', res.data.dm);
                         setTmpOldDm([]);
                         if (res.data.dm.length !== 0)
                         {
@@ -115,26 +96,15 @@ export default function DmMessageBlock({dmOpenId, dmOpenNickname, messageAreaRef
                             });
                         }
                     }
-
-                    console.log('getDm done')
-            
-                }).catch((err) => {
-                    console.log('chat/dm Error catched - ', err);
-                });
+                })
+                // .catch((err) => {
+                //     console.log('chat/dm Error catched - ', err);
+                // });
             }
-            else
-            {
-                // res는 존재하지만 백 서버에서 실패로 판단한 경우
-            }
-            
-
-
-        }).catch((err) => {
-            console.log('chat/unreaddm Error catched - ', err)
-        });
-
-        console.log('getUnreadDm done');
-
+        })
+        // .catch((err) => {
+        //     console.log('chat/unreaddm Error catched - ', err)
+        // });
     };
 
 
@@ -142,7 +112,7 @@ export default function DmMessageBlock({dmOpenId, dmOpenNickname, messageAreaRef
     useEffect(() => {
 
         const dmListener = (data :any) => {
-            // dmOpenId 이슈가 존재한다.
+
             if (data.from_id === dmOpenIdRef.current || data.from_id === user_id)
             {
                 const newMessage = renderMessage(data);
@@ -151,11 +121,6 @@ export default function DmMessageBlock({dmOpenId, dmOpenNickname, messageAreaRef
                 
                 setScrollTop(false);
                 handleRenderDmBlock();
-            }
-            else
-            {
-                console.log('dm message to different id');
-                // 아무 것도 안하기
             }
         }
 
@@ -169,27 +134,23 @@ export default function DmMessageBlock({dmOpenId, dmOpenNickname, messageAreaRef
         });
 
         return () => {
-            console.log('dm block unmounted');
             socket.off('dm', dmListener);
         }
 
     }, [socket]);
 
-    // dmOpenId 의존성 필요해짐
+
     useEffect(() => {
         dmOpenIdRef.current = dmOpenId;
     }, [dmOpenId]);
 
 
     useEffect(() => {
-
-        console.log('set tmp to dmList');
         setDmList([]);
         if (tmpOldDm.length !== 0)
         {
             // 역순으로 추가
             setTmpOldDm(tmpOldDm.reverse());
-            console.log('tmpOldDm list - ', tmpOldDm);
             tmpOldDm.map((data :any) => { setDmList((prevDmList :any) => [...prevDmList, data])})
         }
 
@@ -207,7 +168,6 @@ export default function DmMessageBlock({dmOpenId, dmOpenNickname, messageAreaRef
 
 
     useEffect(() => {
-        console.log('get dms for new target');
         getNewDm(dmOpenIdRef.current);
     }, [dmBlockTriggerRender])
 
@@ -216,7 +176,6 @@ export default function DmMessageBlock({dmOpenId, dmOpenNickname, messageAreaRef
         const handleScroll = (e:any) => {
           if (messageAreaRef.current && e.currentTarget.scrollTop === 0)
           {
-            console.log('top reached')
             setPage((prevPage) => prevPage + 1);
             setScrollTop(true);
           }
@@ -235,7 +194,6 @@ export default function DmMessageBlock({dmOpenId, dmOpenNickname, messageAreaRef
 
 
     useEffect(() => {
-        // page 값 변경 - idx 당겨서 새로 리스트 만들기 ()
         const getMoreDm = async () => {
             await axiosToken.get(`${process.env.NEXT_PUBLIC_API_URL}chat/dm`, {
                 params: {
@@ -247,13 +205,12 @@ export default function DmMessageBlock({dmOpenId, dmOpenNickname, messageAreaRef
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${cookies.get('access_token')}`
                 },
-            }).then((res) => {
+            })
+            .then((res) => {
                 const dms = res.data;
     
                 if (res.data.status === true)
                 {
-                    console.log('getOoooooold dm data - ', res.data.dm);
-
                     if (res.data.dm.lenth !== 0)
                     {   
                         // 가져온 리스트 임시 저장
@@ -266,10 +223,6 @@ export default function DmMessageBlock({dmOpenId, dmOpenNickname, messageAreaRef
                         const tmpNowDm = dmList;
 
                         setAppendLength(tmpResDm.length);
-
-                        console.log('tmpResDm - ', tmpResDm);
-                        console.log('tmpNowDm - ', tmpNowDm);
-
                         setDmList([]);
 
                         tmpResDm.map((data :any) => {
@@ -285,19 +238,9 @@ export default function DmMessageBlock({dmOpenId, dmOpenNickname, messageAreaRef
 
                     }
                 }
-    
-            }).catch((err) => {
-                console.log('getMoreDm error catched - ', err);
-            });
+            })
         }
-
-        getMoreDm().then((res) => {
-            
-            console.log('getMoreDm done');
-        });
-
-        // handleRenderAppend();
-
+        getMoreDm()
     }, [page]);
 
 
@@ -312,7 +255,6 @@ export default function DmMessageBlock({dmOpenId, dmOpenNickname, messageAreaRef
 	const moveScrollTop = (top :boolean) => {
 		if (scrollref.current)
         {
-            console.log('scrollTop - ', top);
             if (top === true)
             {
                 // 최대 높이에서 적당한 높이 빼서 배치 (가져온 갯수만큼)

@@ -10,12 +10,6 @@ import TwoFAPass from './twoFAPass';
 
 export default function Login ({searchParams}:any) {
 
-  console.log('---------------------------------------------------');
-  console.log('------------------ /login starts ------------------');
-  console.log('---------------------------------------------------');
-
-  console.log('code:', searchParams.code);
-
   const code = searchParams.code;
 
   let responseData;
@@ -34,18 +28,14 @@ export default function Login ({searchParams}:any) {
       })
       .then((res) => {
         responseDatabase = CheckUserInDatabase(res.data);
-        console.log('42api responses:', res.data);
       })
       .catch((err) => {
         if (err.response)
         {
-          console.log('Login - error response occured');
-          console.log(err);
           return (err.response);
         }
         else if (err.request)
         {
-          console.log('Login - error request occured');
           return (err.request);
         }
       });
@@ -65,8 +55,7 @@ export default function Login ({searchParams}:any) {
       userData = await axios.post(`${process.env.NEXT_PUBLIC_FRONT_URL}api/user_check`, {
         access_token: data.access_token
       });
-  
-      console.log('user_check response - ', userData.data);
+
       access_token = userData.data.access_token;
       status = userData.data.status;
 
@@ -80,7 +69,6 @@ export default function Login ({searchParams}:any) {
     catch (error)
     {
         // async 안에서 redirect 하지 말아야하나?
-        console.log(error);
         redirect('/');
     }
 
@@ -97,7 +85,6 @@ export default function Login ({searchParams}:any) {
           const response = await Auth42(code);
 
           responseData = response?.data;
-          console.log('2차 인증 필요?====', responseData);
 
           if(responseData == undefined)
             redirect ('/');
@@ -136,7 +123,6 @@ export default function Login ({searchParams}:any) {
         }
         catch
         {
-          console.log('/login - fail to call Auth42');
           redirect ('/');
         }
         })()}
@@ -145,7 +131,6 @@ export default function Login ({searchParams}:any) {
   }
   else
   {
-    console.log('/login - no code to call Auth42');
     redirect ('/');
   }
 }

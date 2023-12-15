@@ -18,7 +18,7 @@ export function useFriendList(myId: any) {
           },
         })
         .then((response) => {
-          // console.log('friend list response ', response.data);
+
           if (response.data.status) {
             const newResponse = response.data.data.map((user: any) => {
               user.status = 'offline';
@@ -30,7 +30,7 @@ export function useFriendList(myId: any) {
           }
         })
         .catch((err) => {
-          console.log('friend list error ', err);
+
         });
     };
 
@@ -45,6 +45,7 @@ export function useFriendList(myId: any) {
     return () => {
       socket.off(`render-friend`, handleRenderFriend);
     };
+
   }, [myId, socket]);
 
   useEffect(() => {
@@ -55,7 +56,7 @@ export function useFriendList(myId: any) {
     socket.on('status', handleStatusUpdate);
     return () => {
       socket.off('status', handleStatusUpdate);
-    };
+    }
   }, [apiResponse, socket]);
 
   const updateStatus = (userId: any, status: any) => {

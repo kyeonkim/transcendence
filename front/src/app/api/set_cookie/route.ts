@@ -11,10 +11,6 @@ export async function POST (request: NextRequest)
     let nick_name = data.nick_name;
     let user_id = data.user_id;
 
-    console.log("access_token: " + access_token);
-    console.log("refresh_token: " + refresh_token);
-    console.log("nick_name: " + nick_name);
-    console.log("user_id: " + user_id);
 
     if (access_token != undefined && refresh_token != undefined
         && access_token != null && refresh_token != null)

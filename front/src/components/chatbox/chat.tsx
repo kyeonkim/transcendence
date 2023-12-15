@@ -44,7 +44,6 @@ export default function Chat(props: any) {
 	
 	const my_name = cookies.get('nick_name');
 	const my_id = Number(cookies.get('user_id'));
-	
 
 	useEffect (() => {
 		const handleKick = (data :any) => {
@@ -52,17 +51,19 @@ export default function Chat(props: any) {
 		};
 
 		const doRenderChatRooms = (data :any) => {
-			console.log('doRenderChatRooms - ', data);
-			setChatname(data.data.name);
-			setRoomMode(data.data.is_private);
+			console.log("get socket", data);
+			if (data.data.name)
+				setChatname(data.data.name);
+			if (data.data.is_private)
+				setRoomMode(data.data.is_private);
 		}
 
 		socket.on('render-chat', doRenderChatRooms)
 		socket.on("kick", handleKick);
-		console.log('chat useEffect roominfo - ', roominfo);
+
 
 		return () => {
-			console.log('chat unmounted!!!');
+
 			socket.off("kick", handleKick);
 			socket.off('render-chat', doRenderChatRooms);
 		}
@@ -75,7 +76,7 @@ export default function Chat(props: any) {
 	}, [props.roominfo]);
 
 	const handleSendMessage = () => {
-		console.log('send message:==== \n', message);
+
 		if (message.trim() === '') {
 			return;
 		}
@@ -138,16 +139,14 @@ export default function Chat(props: any) {
 			  },
 		})
 		.then((res) => {
-			console.log('invite success');
-			console.log(res);
+
 			if (res.data.status)
 				setDialogOpen(false);
 			else
 				setErrMessage(res.data.message);
 		})
 		.catch((err) => {
-			console.log('invite fail');
-			console.log(err);
+
 		})
 	}
 
@@ -173,8 +172,6 @@ export default function Chat(props: any) {
 		{ icon: <SettingsIcon />, name: 'Setting'},
 		{ icon: <SendIcon />, name: 'Invite'}
 	];
-
-	console.log('roominfo: ', roominfo);
 
 	return (
 		<div>

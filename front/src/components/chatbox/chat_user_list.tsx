@@ -24,20 +24,26 @@ export default function UserList(props: any) {
 			})
 			.then((res) => {
 				const userList = res.data.room.roomusers || [];
+
 				setCreater(res.data.room.owner_id);
 				setList(userList);
 			})
 			.catch((err) => {
-				console.error("Error fetching user list:", err);
+
 			})
 		}
 		
 		fetchUserList();
 		socket.on("notice", fetchUserList);
+
+		return () => {
+			socket.off("notice", fetchUserList);
+		}
+
 	}, []);
 
 	const handlePopup = (event: any, userData: any) => {
-		console.log("in pop<", userData);
+
 		if (anchorEl === event.currentTarget) {
 			setPop(!pop);
 		} else {
@@ -94,7 +100,6 @@ export default function UserList(props: any) {
 			},
 		})
 		.then((res) => {
-			console.log('banuser response===', res);
 			setPop(false);
 		})
 	}
@@ -112,7 +117,6 @@ export default function UserList(props: any) {
 			},
 		})
 		.then((res) => {
-			console.log("unsetmanager response===", res);
 			setPop(false);
 		})
 	}
@@ -139,7 +143,6 @@ export default function UserList(props: any) {
 	}
 
 	const handleInviteGame = async () => {
-		console.log("invite game ", my_id, " to ", targetData.user_id)
 		await axiosToken.post(`${process.env.NEXT_PUBLIC_API_URL}game/inviteroom`, {
 			user1_id: Number(my_id),
 			user1_nickname: cookies.get("nick_name"),
@@ -152,12 +155,9 @@ export default function UserList(props: any) {
 			},
 		})
 		.then((res) => {
-			console.log("invite game response===", res);
+
 		})
 	}
-
-	console.log("userlist", list);
-	console.log("my", my_id);
 	return (
 	<Box
 		sx={{ width: '300px' }}

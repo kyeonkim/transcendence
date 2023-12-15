@@ -53,7 +53,7 @@ export default function OtpModal({ open, isActivated, setActive, onClose, myId, 
   const cookies = useCookies();
 
   useEffect(() => {
-    console.log('in otp page');
+
     const fetchData = async () => {
 
       try {
@@ -71,12 +71,11 @@ export default function OtpModal({ open, isActivated, setActive, onClose, myId, 
         );
 
         if (response.data.status) {
-          console.log('otp res========================', response.data);
           setURL(response.data.otpauthUrl);
           setKey(response.data.secret);
         }
       } catch (error) {
-        console.error('에러 발생:', error);
+
       } finally {
         setIsLoading(false);
       }
@@ -101,19 +100,11 @@ export default function OtpModal({ open, isActivated, setActive, onClose, myId, 
           },
         })
         .then((res) => {
-          console.log('2FA response====',res.data)
           if (res.data.status)
           {
             setActive(true);
             onClose();
           }
-          else
-            console.log('2fa active error');
-        })
-        .catch((err) => {
-          //토큰이 만료되었을때
-          //리프레쉬토큰을들고 토큰 재발급후 쿠키에 저장해야함
-          console.log(err);
         })
   };
 
@@ -132,19 +123,12 @@ export default function OtpModal({ open, isActivated, setActive, onClose, myId, 
           }
         })
         .then((res) => {
-          console.log('2FA response====',res.data)
+
           if (res.data.status)
           {
             setActive(false);
             onClose();
           }
-          else
-            console.log('2fa remove error');
-        })
-        .catch((err) => {
-          //토큰이 만료되었을때
-          //리프레쉬토큰을들고 토큰 재발급후 쿠키에 저장해야함
-          console.log(err);
         })
   };
 

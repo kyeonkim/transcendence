@@ -14,7 +14,6 @@ export async function GET (request: NextRequest)
     
     // 조건 추가 고려
         // data에서 참조하여 판단
-    console.log(' in get_cookie/route.ts=============');
     if (true)
     {
         return (NextResponse.json(

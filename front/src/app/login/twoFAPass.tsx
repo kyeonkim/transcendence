@@ -54,9 +54,6 @@ export default function TwoFAPass ({res}: {res: any}) {
   }, []);
 
   useEffect(() => {
-
-    console.log("access_tokken", access_token);
-
     const fetchData = async () => {
         await axios.post(`${process.env.NEXT_PUBLIC_API_URL}auth/2fa/pass`, {
           user_id: user_id,
@@ -70,13 +67,11 @@ export default function TwoFAPass ({res}: {res: any}) {
         })
         .then((res) => { 
           if (res.data.status) {
-            console.log('2차 인증 통과 - ', res);
             setResponseData(res.data);
             setIsPass(true);
           }
         })
         .catch((error) => {
-          console.log('2차 인증 실패 - ', error);
         })
     };
     if (code.length === 6) {
@@ -88,7 +83,7 @@ export default function TwoFAPass ({res}: {res: any}) {
     setOpen(false);
     router.push('/');
   };
-  console.log('2차인증 리스폰스데이터', responseData);
+
   return (
     <div>
       <Particles options={particlesOptions as ISourceOptions} init={particlesInit} />
@@ -99,10 +94,10 @@ export default function TwoFAPass ({res}: {res: any}) {
         aria-describedby="Otp text"
       >
         <Box sx={style}>
-          <Typography id="Otp text" sx={{ mt: 2 }}>
+          <Typography id="Otp text" sx={{ mt: 2, color: 'white'}}>
             OTP 어플을 통해 6자리 코드를 입력해주세요.
           </Typography>
-          <Typography id="Otp text" sx={{ mt: 2 }}>
+          <Typography id="Otp text" sx={{ mt: 2, color: 'white'}}>
             6자리가 정상적으로 입력되면 자동으로 넘어가집니다!
           </Typography>
           <input

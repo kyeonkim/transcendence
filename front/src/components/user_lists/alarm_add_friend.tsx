@@ -43,22 +43,14 @@ export default function AlarmAddFriend ( {alarm, alarmReducer, handleProfile, im
         }
         )
         .then((response) => {
-          console.log('accept event res=====',response)
             if (response.status)
             {
-                console.log('trying to remove event from alarmList');
-                // removeEventFromDatabase(alarm);
                 alarmReducer(alarm);
-                console.log('remove success');
             }
         })
-        .catch((err) => {
-            console.log('accepFriendAddRequest - api request failed');
-        });
     };
   
     const labelId = `comment-list-secondary-label-${alarm.from_nickname}`;
-    console.log('alamr type - ', alarm);
     
     return (
       <div>

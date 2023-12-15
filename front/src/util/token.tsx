@@ -17,9 +17,6 @@ axiosToken.interceptors.response.use(
   async (error) => {
       const originalRequest = error.config;
       
-      console.log('interceptor error - ', error); 
-  
-      
       if (error.response &&error.response.status === 401 && !originalRequest._retry) {
           originalRequest._retry = true;
           
@@ -38,7 +35,7 @@ axiosToken.interceptors.response.use(
 
               return axiosToken(originalRequest);
             } catch (e) {
-              console.error('토큰 재발급 실패', e);
+              // console.error('토큰 재발급 실패', e);
               window.location.href = '/';
             }
           }
@@ -57,7 +54,6 @@ axiosToken.interceptors.response.use(
 
 const getNewToken = async (access: any, refresh: any) => {
   try {
-    console.log('getNewToken - req - ', access.value, refresh.value);
     const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}auth/token/refresh`, {
       access_token: access.value
     }, {
@@ -66,7 +62,6 @@ const getNewToken = async (access: any, refresh: any) => {
         'Authorization': `Bearer ${refresh.value}`,
       },
     });
-    console.log('getNewToken - res - ', res.data);
     await axios.post(`${process.env.NEXT_PUBLIC_FRONT_URL}api/set_cookie`, res.data)
     return res.data;
   } catch (error) {

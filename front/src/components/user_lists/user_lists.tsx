@@ -89,14 +89,12 @@ export default function BasicTabs({ setMTbox }: SearchUserProps) {
 	const handleAlarmGetAgain = () => {
 		setAlarmList([]);
 		setAlarmCount(0);
-		console.log('handle alarm get again');
 	};
 
 	const handleDmAlarmCount = (user_id :number, is_add :boolean) => {
 
 		if (is_add === true)
 		{
-			console.log('handleDmAlarmCount - add to list', user_id, is_add);
 			dmAlarmList.map((user :any) => {
 				if (user === user_id)
 				{
@@ -108,7 +106,6 @@ export default function BasicTabs({ setMTbox }: SearchUserProps) {
 		}
 		else
 		{
-			console.log('handleDmAlarmCount - delete from list', user_id, is_add);
 			var tmp_list :any = [];
 
 			dmAlarmList.map((user :any) => {
@@ -123,24 +120,13 @@ export default function BasicTabs({ setMTbox }: SearchUserProps) {
 
 	}
 
-	useEffect(() => {
-		console.log('dmAlarmList - ', dmAlarmList);
-	}, [dmAlarmList]);
-	
-
 	const setAlarmCountHandler = (increment :boolean) => {
 		if (increment === true)
-		{
 			setAlarmCount((prevAlarmCount) => prevAlarmCount + 1);
-			console.log('it increased!!!');
-		}
 		else
 		{
 			if (alarmCount !== 0)
-			{
 				setAlarmCount((prevAlarmCount) => prevAlarmCount - 1);
-				console.log('it decreased!!!');
-			}
 		}
 
 	};
@@ -160,14 +146,11 @@ export default function BasicTabs({ setMTbox }: SearchUserProps) {
 
 
 	const fetchAlarms = async () => {
-		
 		await axiosToken.get(`${process.env.NEXT_PUBLIC_API_URL}event/getalarms/${cookies.get('user_id')}`,{
 			headers: {
 				'Content-Type': 'application/json',
 				'Authorization': `Bearer ${cookies.get('access_token')}`
 			  },
-		}).then((res) => {
-			console.log('fetchAlarm done');	
 		})
 	}
 
@@ -177,7 +160,6 @@ export default function BasicTabs({ setMTbox }: SearchUserProps) {
 
 		sseEvents.onopen = function() {
 			fetchAlarms();
-			// 알람 종류(type)는 game, chat, friend
 		}
 
 		sseEvents.onerror = function (error) {
@@ -186,8 +168,6 @@ export default function BasicTabs({ setMTbox }: SearchUserProps) {
 		sseEvents.onmessage = function (stream) {
 			const parsedData = JSON.parse(stream.data);
 			
-			console.log('sseEvents occured!! - ', parsedData );
-
 			setAlarmCountHandler(true);
 			setAlarmListAdd(parsedData);
 		}
@@ -201,9 +181,6 @@ export default function BasicTabs({ setMTbox }: SearchUserProps) {
 
 
 	useEffect(() => {
-
-		console.log('in alarmRerender hook !!!');
-
 		handleAlarmGetAgain();
 		fetchAlarms();
 		setValue(1);
@@ -211,17 +188,13 @@ export default function BasicTabs({ setMTbox }: SearchUserProps) {
 
 
 	const handleChatTarget = (from_id :any, from_nickname: any) => {
-
-		console.log('in handleChatTarget', dmOpenId, from_id);
 		if (dmOpenId === from_id)
 		{
-			console.log('dm closed');
 			setDmOpenId(-1);
 			setDmOpenNickname('');
 		}
 		else
 		{
-			console.log("dm to - ", from_id, from_nickname);
 			setDmOpenId(from_id);
 			setDmOpenNickname(from_nickname);
 			handleRenderDmBlock();

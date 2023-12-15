@@ -4,12 +4,8 @@ import { Avatar, Grid, Typography, Button, Box } from '@mui/material';
 
 export default function GameEnd({endData, exitGame} :any) {
 
-    // user, opponent 위치 이전 컴포넌트에서 받아와야하나?
-
-    console.log('gameEnd data - ', endData);
 
     const imageLoader = (src: any) => {
-        console.log("image loader src===", src);
         return `${process.env.NEXT_PUBLIC_API_URL}user/getimg/nickname/${src}`
       }
 

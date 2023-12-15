@@ -42,7 +42,6 @@ const ProfilePage = (props: any) => {
         .then((res) => {
         if (res.data.userData)
         {
-          console.log("데이터 리스폰스 =======",res.data);
           setData(res.data)
           if (res.data.userData.nick_name === my_nick && res.data.userData.twoFA)
             setIsActivated(true);
@@ -63,12 +62,10 @@ const ProfilePage = (props: any) => {
         params: { user1: my_id , user2: userNickname},
       })
       .then((res) => {
-        console.log(res.data)
         if (res.data.status)
           setIsFriend(true);
         else
           setIsFriend(false);
-        console.log(isFriend);
       });
     };
     fetchData();
@@ -79,7 +76,6 @@ const ProfilePage = (props: any) => {
 	useEffect(() => {
 
     const renderProfile = (data :any) => {
-        console.log('render-profile',data);
         if (data === 'false')
           setIsFriend(false)
         else
@@ -95,7 +91,6 @@ const ProfilePage = (props: any) => {
 
   const handleFriend = async () => {
     if (isFriend) {
-      console.log("delete friend!!!");
       await axiosToken.delete(`${process.env.NEXT_PUBLIC_API_URL}social/DeleteFriend`,{
         headers: {
           'Content-Type': 'application/json',
@@ -107,16 +102,12 @@ const ProfilePage = (props: any) => {
           friend_nickname: userNickname
         }})
       .then((res) => {
-        console.log(res.data)
         setIsFriend(false);
       })
       .catch((err) => {
-        console.log(err);
       })
     }
     else {
-      console.log("add friend!!!");
-      console.log(my_id, my_nick, userNickname);
       await axiosToken.post(`${process.env.NEXT_PUBLIC_API_URL}social/addFriend`,{
         user_id: my_id,
         user_nickname: my_nick,
@@ -129,7 +120,6 @@ const ProfilePage = (props: any) => {
         },
       })
       .then((res) => {
-        console.log(res.data)
       })
     }
    }
@@ -137,7 +127,6 @@ const ProfilePage = (props: any) => {
   const handleBlock = async() => {
     if (isBlock)
     {
-      console.log("disalbe block!!!");
       await axiosToken.delete(`${process.env.NEXT_PUBLIC_API_URL}social/deleteBlockedUser`,{
         headers: {
           'Content-Type': 'application/json',
@@ -150,12 +139,10 @@ const ProfilePage = (props: any) => {
           friend_nickname: userNickname
         }})
       .then((res) => {
-        console.log(res.data)
         setIsBlock(false);
       })
     }
     else {
-      console.log("block to ", userNickname, data.userData.user_id);
       await axiosToken.post(`${process.env.NEXT_PUBLIC_API_URL}social/addBlockedUser`,{
         user_id: my_id,
         user_nickname: my_nick,
@@ -169,7 +156,6 @@ const ProfilePage = (props: any) => {
         },
       })
       .then((res) => {
-        console.log(res.data)
         setIsBlock(true);
       })
       .catch((err) => {
@@ -188,7 +174,6 @@ const ProfilePage = (props: any) => {
   const handleImgChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file && file.size > 1024 * 1024 * 1) {
-      console.log('1MB 이하의 이미지만 업로드 가능합니다.');
       window.alert('1MB 이하의 이미지만 업로드 가능합니다.');
       return;
     }
@@ -209,14 +194,11 @@ const ProfilePage = (props: any) => {
           }
       })
       .then((res) => {
-        console.log("이미지변경요청 response====", res.data)
-        // window.location.reload();
         setRendering(res.data.time);
         setProfile(res.data.time);
       })
   }
   const imageLoader = (src: any) => {
-    console.log("image loader src===", src);
     return `${process.env.NEXT_PUBLIC_API_URL}user/getimg/nickname/${src}`
   }
 

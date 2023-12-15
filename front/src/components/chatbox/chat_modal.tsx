@@ -29,9 +29,6 @@ export default function ChatModal({modalOpen, setModalOpen, modalCondition,
 
     const cookies = useCookies();
 
-    useEffect(() => {
-        
-    }, []);
 
     const handleCloseModal = () => {
         setModalOpen(false);
@@ -46,8 +43,6 @@ export default function ChatModal({modalOpen, setModalOpen, modalCondition,
         setErrMessage('');
     }
 
-    // ChatModal 조건부 렌더링
-
     const handleInPassword = (event :any) => {
 		setInPassword(event.target.value as string);
     }
@@ -56,7 +51,6 @@ export default function ChatModal({modalOpen, setModalOpen, modalCondition,
 		setInChatname(event.target.value as string);
     }
   
-    // password, is_changePass 규칙 한 번만 더 확인
     const handleDone = async () => {
         
         let hashRoomPassword;
@@ -66,9 +60,6 @@ export default function ChatModal({modalOpen, setModalOpen, modalCondition,
 			const salt = genSaltSync(10);
 			hashRoomPassword = hashSync(inPassword, salt);
         }
-
-        console.log('changeroom - ', roominfo.idx, my_id, my_name, inChatname, chatname);
-        console.log(inPassword, hashRoomPassword, roomMode, inPassword);
 
 		await axiosToken.patch(`${process.env.NEXT_PUBLIC_API_URL}chat/changeroom`, {
 			room_idx: Number(roominfo.idx),
@@ -86,12 +77,10 @@ export default function ChatModal({modalOpen, setModalOpen, modalCondition,
 			  },
 		})
 		.then((res) => {
-			console.log('setting success');
-			console.log(res);
+
 			if (res.data.status)
             {
                 handleCloseModal();
-                // 성공 사실 알림창?
                 if (inChatname !== '')
                     setChatname(inChatname);
             }
@@ -99,20 +88,14 @@ export default function ChatModal({modalOpen, setModalOpen, modalCondition,
             {
 				setErrMessage(res.data.message);
                 setErrShow(true);
-                // 에러 알림
             }
 
 		})
 		.catch((err) => {
-			console.log('setting fail');
-			console.log(err);
+
 		})
 
     }
-
-    // 지금은 방 자체를 다시 그릴 수도 있다 -> 변경 사항이 즉시 반영 안될 가능성 있음
-        // chat 제목은 props의 roominfo에 의존한다 -> 변경 안할 가능성 있음 state 아니라서
-
 
     const handleRoomMode = () => {
         if (roomMode === false)
@@ -124,9 +107,7 @@ export default function ChatModal({modalOpen, setModalOpen, modalCondition,
     useEffect(() => {
 
     }, [roomMode]);
-
-    // console.log('ChatModalCondition - ', modalCondition);
-    // console.log('ChatModal roominfo - ', roominfo);
+ 
 
     return (
         <Modal

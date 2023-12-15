@@ -50,9 +50,6 @@ export default function ChatRoomBlock({room, openModal, setOpenModal, selectedId
 
     async function handleCheckPassword()
 	{
-		// 백 서버에 패스워드 체크 보내는 부분 필요
-		console.log('check ispassword and idx before handleJoin form Modal');
-		console.log('idx - ', selectedIdx);
 		handleJoin(selectedIdx, inPassword);
         setInPassword('');
 	}
@@ -60,14 +57,10 @@ export default function ChatRoomBlock({room, openModal, setOpenModal, selectedId
     function handlePasswordModal(ispassword:boolean, idx :number) {
         if (ispassword === true)
         {
-            console.log('!!!!! open modal plesae');
-            console.log('idx is - ', idx);
             handleModalOpen(idx);
-            // modal 자체가 async할 가능성
         }
         else
         {
-            console.log('do without modal~~');
             handleJoin(idx, inPassword);
         }
 	}

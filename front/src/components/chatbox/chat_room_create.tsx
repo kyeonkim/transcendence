@@ -58,7 +58,6 @@ export default function ChatRoomCreate(props: any) {
 
 	const {handleRenderMode} = props;
 
-	// TextField를 채워야 완료 활성화시키기
 
 	async function handleDone() {
 		

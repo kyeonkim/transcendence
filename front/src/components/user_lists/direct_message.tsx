@@ -26,15 +26,10 @@ export default function DirectMessage( {dmAlarmCount, dmAlarmCountList, dmAlarmR
 	const cookies = useCookies();
 	const messageAreaRef = useRef(null);
 	const socket = useChatSocket();
-	
-	// direct message 목록 받아오기
 
 	const user_id = Number(cookies.get('user_id'));
-	
-	console.log('direct_message dmOpenId - ', dmOpenId);
 
 	const handleSendMessage = () => {
-		console.log('send message:==== \n', message);
 		if (message.trim() === '') {
 			return;
 		}
@@ -44,7 +39,6 @@ export default function DirectMessage( {dmAlarmCount, dmAlarmCountList, dmAlarmR
 			to_id: dmOpenId,
 			message: message,
 		};
-		console.log('message sent! to "dm" - ', newMessage);
 		socket.emit("dm", newMessage);
 		setMessage('');
 	};

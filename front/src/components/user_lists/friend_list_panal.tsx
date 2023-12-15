@@ -39,29 +39,23 @@ export default function FriendListPanel(props: any) {
 			return;
 		}
 		if (list) {	
-			console.log('friend list panel===========', list, apiResponse);
 			socket.emit('status', { user_id: myId, status: 'login' });
-			
-			// dmCountList를 순회하여 list에 없는 '인원'을 제거한다.
-			// list를 순회하여 dmCountList에 없는 '인원'을 추가한다.
 
 			list.map((user :any) => {
 				const target = dmCountListRef.current.find((countList :any) => countList.id === user.followed_user_id) 
 				if (target === undefined)
 				{
 					// 없을 경우 인원 추가
-					console.log('add friend to dmCountList, id - ', user.followed_user_id);
 					setDmCountList((prevDmCountList :any) => [...prevDmCountList, { id: user.followed_user_id, count: 0 }]);
 				}
 			})
 
 			dmCountListRef.current.map((countList :any) => {
-				// 
+				
 				const target = list.find((user :any) => user.followed_user_id === countList.id) 
 				if (target === undefined)
 				{
 					// 없을 경우 인원 제거
-					console.log('delete friend from dmCountList, id - ', countList.id);
 					const newCountList = dmCountListRef.current.filter((searchList :any) => {
 						return searchList.id !== countList.id
 					})
@@ -84,25 +78,8 @@ export default function FriendListPanel(props: any) {
 	useEffect(() => {
 
 		const dmAlarmListener = (data :any) => {
-			console.log('dm event!!===', data);
-			
-
-			console.log('dmAlarm dmOpenId - ', dmOpenIdRef.current);
-			console.log('dmAlarm data.from_id - ', data.from_id);
-
-			console.log('dmCountList - ', dmCountListRef.current);
-
 			if (dmOpenIdRef.current === Number(data.from_id))
-			{
-				console.log('pass count');
 				return ;
-			}
-
-			// dmCountList를 순회하여 count를 올린다.
-			// setDmCountList에 넣어야함.
-
-			// 이런 경우에 ref로 하는 방법도 있지만, handler 함수를 useCallback으로 빼고,
-			// useCallback의 의존성을 현재 ref로 사용 중인 state로 지정하는 방법도 있다.
 
 			const newDmCountList = dmCountListRef.current.map((countList :any) => {
 				
@@ -112,17 +89,12 @@ export default function FriendListPanel(props: any) {
 						handleDmAlarmCount(data.from_id, true);
 						
 						newCountList.count += 1;
-	
-						console.log('add count to friend dmCount to ,', newCountList.count);
+
 						return newCountList;
 					}
 					return countList;
 				})
-			
-			console.log('newDmCountList - ', newDmCountList);
-
 			setDmCountList(newDmCountList);
-
 		}
 
 		socket.on('dm', dmAlarmListener);
@@ -130,7 +102,6 @@ export default function FriendListPanel(props: any) {
 		socket.emit('getdm', { user_id: Number(myId) });
 
 		return () => {
-			console.log('friend list socket dm unmounted');
 			socket.off('dm', dmAlarmListener);
 		}
 	}, [socket]);
@@ -141,14 +112,11 @@ export default function FriendListPanel(props: any) {
 
 
 	useEffect(() => {
-		console.log('apiResponse===', apiResponse);
-		console.log('dmCountList updated');
 		dmCountListRef.current = dmCountList;
 	}, [apiResponse, dmCountList]);
 
 
 	const handleProfile = (id: any) => () => {
-		console.log("profile to " + id);
 		setMTbox(1, id);
 	}
 
@@ -160,28 +128,18 @@ export default function FriendListPanel(props: any) {
 		};
 
 	const handlerClear = (from: any, name: any) => {
-		// 열 때도 실행함
-
-		console.log('handlerCLear - ', from, name);
 
 		if (dmOpenIdRef.current === from)
 		{
-			// 끄는 동작임
-			console.log('off');
 			handleChatTarget(from, name);
 			return ;
 		}
-		
-		console.log('on');
-
-		// dmCountList를 순회하여 count를 0으로 만든다.
 
 		const newList = dmCountListRef.current.map((countList: any) => {
 			
 			if (countList.id === Number(from)) {
 				const newCountList = {...countList};
 
-				console.log('clear friend dmCount id - ', from);
 				newCountList.count = 0;
 
 				return newCountList;
@@ -191,7 +149,6 @@ export default function FriendListPanel(props: any) {
 
 		setDmCountList(newList);
 		handleChatTarget(from, name);
-		console.log('call handleDmAlarmCount in handlerClear - ', from, name);
 		handleDmAlarmCount(from, false);
 	}
 	
@@ -199,13 +156,10 @@ export default function FriendListPanel(props: any) {
 		
 		var res :number = 0;
 
-		// some 구조 고려
-
 		dmCountList.map((countList :any) => {
 			
 			if (countList.id === id)
 			{
-				// console.log('count checking id - ', id, ' + count - ', countList.count);
 				res = countList.count;
 			}
 		})
@@ -214,7 +168,7 @@ export default function FriendListPanel(props: any) {
 	}
 
 	const handleInviteGame = async (nick: any, name:any) => {
-		console.log("invite game ", myId, " to ", nick)
+
 		await axiosToken.post(`${process.env.NEXT_PUBLIC_API_URL}game/inviteroom`, {
 			user1_id: Number(myId),
 			user1_nickname: cookies.get("nick_name"),
@@ -226,9 +180,9 @@ export default function FriendListPanel(props: any) {
 				Authorization: `Bearer ${cookies.get('access_token')}`,
 			},
 		})
-		.then((res: any) => {
-			console.log('invite game res - ', res);
-		})
+		// .then((res: any) => {
+		// 	console.log('invite game res - ', res);
+		// })
 	}
 
 	return (

@@ -5,13 +5,6 @@ const StatusContext = createContext<any>(null);
 
 const StatusContextProvider = ({ children }: any) => {
 	const [Status, setStatus] = useState<any>([]);
-	/*
-	status = {
-		myStatus: 'online' | 'offline' | 'ingame';
-		ingameroom: boolean;
-	}
-	*/
-	console.log("status context provider===", Status);
 
 	return (
 	  <StatusContext.Provider value={{ Status, setStatus }}>

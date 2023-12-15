@@ -9,8 +9,6 @@ export default function MyProfile(props: any) {
   const cookies = useCookies();
   const my_nick = cookies.get('nick_name');
 
-
-
   const handleMTbox = (num: number) => () => {
     setMTbox(num, my_nick);
   }
@@ -18,7 +16,7 @@ export default function MyProfile(props: any) {
   const imageLoader = (src: any) => {
     return `${process.env.NEXT_PUBLIC_API_URL}user/getimg/nickname/${src}`
   }
-  console.log('my_profile change ', profile)
+
   return (
     <Grid container className={styles.myprofileimg} alignItems='center' display='flex' padding='1%'>
       <Avatar

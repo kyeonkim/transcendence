@@ -3,7 +3,6 @@
 import styles from '@/components/matching/match.module.css';
 import React, { useRef, useEffect, useState } from 'react';
 
-// child components
 import MatchHome from '@/components/matching/matchHome';
 import GameRoom from '../matching/gameroom';
 import RankMatch from '../matching/rankmatch';
@@ -14,7 +13,7 @@ import { axiosToken } from '@/util/token';
 import { useCookies } from 'next-client-cookies';
 
 
-export default function Matching() {
+export default function Matching(props: any) {
 	const [render, setRender] = useState(0);
 	const [isRank, setIsRank] = useState(false);
 	const [isMode, setIsMode] = useState(false);
@@ -22,21 +21,22 @@ export default function Matching() {
 	const cookies = useCookies();
 	const [data, setData] = useState<any>([]);
 	const myRef = useRef(null);
+	const { changeStat } = props;
 
 	useEffect(() => {
 
 		const fetchData = async () => {
-			console.log("게임방확인 api call");
+
 			await axiosToken.post(`${process.env.NEXT_PUBLIC_API_URL}game/checkroom`, {
 				user1_id: Number(cookies.get('user_id')),
 			})
 			.then((res) => {
-				console.log("게임방확인 api response===", res);
+
 			})
 		}
 		
 		socket.on('render-gameroom', (data: any) => {
-			console.log("game render data===", data);
+
 			if (data.status === 'matching')
 			{
 				setIsRank(true);
@@ -49,6 +49,7 @@ export default function Matching() {
 			}
 			else if (data.status === 'ingame')
 			{
+				changeStat('ingame');
 				setRender(3);
 			}
 			else 
@@ -58,6 +59,7 @@ export default function Matching() {
 				setRender(0);
 			}
 			setData(data);
+			changeStat('');
 		});
 		fetchData();
 
@@ -71,7 +73,6 @@ export default function Matching() {
 		return <div>loading...</div>
 
 	const handleRender = () => {
-		console.log("render: ", render);
 		if (render === 1)
 			return <RankMatch setRender={setRender}/>
 		else if (render === 2)

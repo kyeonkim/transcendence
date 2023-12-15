@@ -8,7 +8,7 @@ export default function UserInfo(props: any) {
 
 	useEffect(() => {
 		const getUserInfo = async () => {
-			console.log("get user info start===", userId)
+
 			if (userId == undefined)
 				return;
 			await axiosToken.get(`${process.env.NEXT_PUBLIC_API_URL}user/getdata/id/${userId}`,{
@@ -18,11 +18,9 @@ export default function UserInfo(props: any) {
 				  },
 			})
 				.then((res) => {
-					console.log("get user info response===", res);
 					setUser(res.data.userdata);
 				})
 				.catch((err) => {
-					console.log("get user info error===", err);
 					setUser([]);
 				})
 		}
@@ -30,7 +28,6 @@ export default function UserInfo(props: any) {
 	}, [userId]);
 
 	const imageLoader = ({ src }: any) => {
-		console.log("image loader src===", user);
 		return `${process.env.NEXT_PUBLIC_API_URL}user/getimg/nickname/${src}`
 	  }
 

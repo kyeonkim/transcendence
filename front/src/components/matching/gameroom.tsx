@@ -17,7 +17,6 @@ export default function GameRoom(props: any) {
 		return <div></div>;
 
 	useEffect(() => {
-		console.log("game room data===", userData);
 		if (userData.room && userData.room.user2_ready && userData.room.user1_ready)
 			setGameStart(true);
 		else
@@ -26,7 +25,6 @@ export default function GameRoom(props: any) {
 	}, [userData]);
 
 	const handleExit = async () => {
-		console.log ("나가기 클릭");
 		await axiosToken.patch(`${process.env.NEXT_PUBLIC_API_URL}game/leaveroom`, {
 			user_id: Number(cookies.get('user_id')),
 		},
@@ -36,7 +34,6 @@ export default function GameRoom(props: any) {
 		}
 		})
 		.then((res) => {
-			console.log("leave room reesponse===", res);
 			setRender(0);
 		})
 	}
@@ -57,10 +54,10 @@ export default function GameRoom(props: any) {
 				}
 			)
 			.then((res) => {
-				console.log("Update response===", res);
+
 			})
 			.catch((error) => {
-				console.error("Error updating states:", error);
+
 			});
 		};
 		if (mod !== null && ready !== null)
@@ -76,11 +73,9 @@ export default function GameRoom(props: any) {
 	}
 
 	const handleStart = async () => {
-		console.log("게임 시작 클릭", );
+
 		await axiosToken.post(`${process.env.NEXT_PUBLIC_API_URL}game/start`, {
 			user_id: Number(cookies.get('user_id')),
-			// game_mode: mod? true : false,
-			// rank: false
 		},
 		{
 			headers: {
@@ -88,7 +83,7 @@ export default function GameRoom(props: any) {
 			}
 		})
 		.then((res) => {
-			console.log("Start response===", res);
+
 		})
 	}
 

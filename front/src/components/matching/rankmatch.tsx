@@ -13,7 +13,7 @@ export default function RankMatch(props: any) {
 
 	useEffect(() => {
 		const fetchMatch = async () => {
-			console.log("Call Match Service");
+
 			await axiosToken.post(`${process.env.NEXT_PUBLIC_API_URL}game/match`, {
 				user_id: Number(cookies.get('user_id')),
 			},
@@ -23,14 +23,14 @@ export default function RankMatch(props: any) {
 				}
 			})
 			.then((res) => {
-				console.log("Match Response===", res);
+
 			})
 		}
 		fetchMatch();
 	}, []);
 
 	const cancelMatch = async () => {
-		console.log("cancelMatch");
+
 		await axiosToken.patch(`${process.env.NEXT_PUBLIC_API_URL}game/cancelmatch`,
 		{
 			headers: {
@@ -38,7 +38,6 @@ export default function RankMatch(props: any) {
 			}
 		})
 		.then((res) => {
-			console.log("Cancel Match Response===", res);
 			setRender(0);
 		})
 	}

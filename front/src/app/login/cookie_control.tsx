@@ -23,9 +23,7 @@ export default function CookieControl ({res}: {res: any}) {
     const particlesInit = useCallback(async (engine: Engine) => {
         await loadFull(engine);
       }, []);
-    
 
-    console.log('cookie_control - res - ', res);
     async function CookieSetter (access_token:any, refresh_token:any, nick_name:any, user_id:any)
     {
         await axios.post(`${process.env.NEXT_PUBLIC_FRONT_URL}api/set_cookie`, {
@@ -35,11 +33,9 @@ export default function CookieControl ({res}: {res: any}) {
             user_id: user_id
         })
         .then((res) => {
-            console.log('cookie_control - respone - ', res.data);
             return (res);
         })
         .catch((err) => {
-            console.log('cookie_control - error - ', err);
             throw new Error ('Cookie set fail');
         });
     }
@@ -49,15 +45,12 @@ export default function CookieControl ({res}: {res: any}) {
         try
         {
             CookieSetter(access_token, refresh_token, nick_name, user_id);
-            console.log('cookie set done');
-
             
             router.push('/main_frame');
 
         }
         catch (error)
         {
-            console.log('/login/cookie_control - fail to set cookie');
             response_error = true;
             router.replace("/");
         }

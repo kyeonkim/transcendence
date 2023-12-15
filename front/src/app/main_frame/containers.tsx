@@ -21,57 +21,6 @@ import { Grid, Typography } from '@mui/material';
 import styles from './frame.module.css';
 import Head from 'next/head';
 
-// // Top left Box
-// const TLBox = styled(Box) ({
-//   // backgroundColor: 'grey',
-//   top: 0,
-//   left: 0,
-//   width:400,
-//   height:400,
-//   position: 'absolute'
-// });
-
-// // Middle Left Box
-// const MLBox = styled(Box) ({
-//   backgroundColor: 'white',
-//   top: 400,
-//   left: 0,
-//   width: 400,
-//   height:250,
-//   position: 'absolute',
-//   // opacity: '0.7'
-// });
-
-// // Bottom Left Box
-// const BLBox = styled(Box) ({
-//   backgroundColor: 'rgba(255, 255, 255, 1)',
-//   top: 650,
-//   left: 0,
-//   width: 400,
-//   height: 682,
-//   position: 'absolute',
-// });
-
-// // Middle Top Box
-// const MTBox = styled(Box) ({
-//   top: 0,
-//   left: 400,
-//   width: 1600,
-//   height: 1332,
-//   position: 'absolute'
-// });
-
-
-// const Chatbox = styled(Box) ({
-//   top: 0,
-//   left: 2000,
-//   width: 560,
-//   height: 1332,
-//   position: 'absolute',
-//   display: 'flex',
-//   flexDirection: 'column',
-// })
-
 
 export default function Main() {
   const [clicked, setClick] = useState(0);
@@ -84,26 +33,8 @@ export default function Main() {
   const minWidth = 2000;
   const minHeight = 1000;
 
-  // useEffect(() => {
-  //   const handleResize = () => {
-  //     if (window.innerWidth < minWidth || window.innerHeight < minHeight) {
-  //       console.log('잘작동중!!!!!!');
-  //       setIsSize(true);
-  //     } else {
-  //       setIsSize(false);
-  //     }
-  //   };
-
-  //   window.addEventListener('resize', handleResize);
-
-  //   // 컴포넌트가 unmount되면 리스너 제거
-  //   return () => {
-  //     window.removeEventListener('resize', handleResize);
-  //   };
-  // }, [minWidth]);
 
   const particlesInit = useCallback(async (engine: Engine) => {
-    // console.log(engine);
     await loadFull(engine);
   }, []);
 

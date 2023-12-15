@@ -22,9 +22,7 @@ export default function MatchList(props: any) {
 
 	useEffect(() => {
 		const handleScroll = (event : any) => {
-			// console.log("match list scroll", event);
-			console.log("event.currentTarget.scrollTop + event.currentTarget.clientHeight", event.currentTarget.scrollTop + event.currentTarget.clientHeight);
-			console.log("event.currentTarget.scrollHeight", event.currentTarget.scrollHeight);
+
 			if (listRef.current && listRef.current.clientHeight + listRef.current.scrollTop >= listRef.current.scrollHeight - 1) 
 			{
 				setPage((prevPage) => prevPage + 1);
@@ -43,10 +41,7 @@ export default function MatchList(props: any) {
 	}, [page]);
 
 	useEffect(() => {
-		console.log("match list api call page = ", page)
-		console.log("match list api call id = ", id);
-		console.log("match list api call res = ", res)
-		console.log("match list api call idx = ", res.length ? res[res.length - 1].idx - 1 : 0 )
+
 		const fetchData = async () => {
 		await axiosToken.get(`${process.env.NEXT_PUBLIC_API_URL}game/data`, {
 			headers: {
@@ -56,24 +51,17 @@ export default function MatchList(props: any) {
 			params: { id: id, index: res.length ? res[res.length - 1].idx - 1 : 0 },
 		})
 		.then((response) => {
-			console.log("match list api response===", response);
+
 			if (response.data.status)
 				setRes([...res, ...response.data.data]);
 		})
 		.catch((error) => {
-			console.log("match list res err===",error);
+
 		});
 		};
 		fetchData();
 	}, [page]);
 	
-	// const handlepage = (event: any) => {
-	// 	const { scrollTop, clientHeight, scrollHeight } = event.currentTarget;
-	// 	if (scrollHeight - scrollTop === clientHeight) {
-	// 		console.log("match list scroll end")
-	// 		setPage((prevPage) => prevPage + 1);
-	// 	}
-	// }
 
 	const listStyle = {
 		position: 'sticky',
@@ -113,7 +101,6 @@ export default function MatchList(props: any) {
 	return (
 		<List ref={listRef} sx={listStyle}>
 			{res.length > 0 ? (
-				console.log("match list res===", res),
 				res.map((match: any, index: any) => {
 				
 				const listItemStyle = {
@@ -123,9 +110,7 @@ export default function MatchList(props: any) {
 					padding: '0.5vw', // 옵션: 패딩 설정
 					margin : '0.1vw', // 옵션: 마진 설정
 					width: '40vw', // 옵션: 너비 설정
-					// marginLeft: '120px',
 					borderRadius: '10px', // 옵션: 모서리를 둥글게 설정
-					// opacity: '1'
 					position: 'relative',
 					fontFamily: 'Roboto,Helvetica,Arial,sans-serif'
 				};
@@ -150,27 +135,6 @@ export default function MatchList(props: any) {
 					return `${process.env.NEXT_PUBLIC_API_URL}user/getimg/nickname/${src}`
 				}
 				return (
-					// <Grid container justifyContent="center" direction="row" key={`${name}-${index}`}>
-					// <Grid item sx={listItemStyle}>
-					// 		<Grid container direction="row" alignItems="center" justifyContent="flex-start">
-					// 			<Avatar alt="Remy Sharp" src={imageLoader({src: name})} sx={avatarStyle}/>
-					// 			<Typography sx={{ ...textPrimaryStyle}}>
-					// 				{name}
-					// 			</Typography>
-					// 		</Grid>
-					// 		<Grid container direction="row" alignItems="center" justifyContent="center">
-					// 			<Typography sx={{ ...textScoreStyle}}>
-					// 				{match.my_score} : {match.enemy_score}
-					// 			</Typography>
-					// 		</Grid>
-					// 		<Grid container direction="row" alignItems="center" justifyContent="flex-end">
-					// 			<Typography sx={{ ...textPrimaryStyle, alignItems: 'flex-end'}}>
-					// 				{match.enemy_name}
-					// 			</Typography>
-					// 			<Avatar alt="Remy Sharp" src={imageLoader({src: match.enemy_name})} sx={avatarStyle}/>
-					// 	</Grid>
-					// </Grid>
-					// </Grid>
 					<Grid container display='flex' justifyContent='space-between' alignItems='center' key={index} sx={listItemStyle}>
 						<div style={{display:'flex', alignItems:'center'}}>
 							<Avatar alt="Remy Sharp" src={imageLoader({src: name})} sx={avatarStyle}/>
@@ -212,30 +176,3 @@ export default function MatchList(props: any) {
 		</List>
 	);
 }
-
-
-/*
-    margin: 0;
-    font-family: "Roboto","Helvetica","Arial",sans-serif;
-    font-weight: 400;
-    font-size: 1rem;
-    line-height: 1.5;
-    letter-spacing: 0.00938em;
-    display: block;
-    text-align: center;
-    font-weight: 700;
-    font-size: 1.5vw;
-*/
-
-/*
-    margin: 0;
-    font-family: "Roboto","Helvetica","Arial",sans-serif;
-    font-weight: 400;
-    font-size: 1rem;
-    line-height: 1.5;
-    letter-spacing: 0.00938em;
-    display: block;
-    text-align: center;
-    font-weight: 700;
-    font-size: 1.5vw;
-*/

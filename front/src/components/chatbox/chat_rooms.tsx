@@ -25,23 +25,13 @@ const MainChatRoomList = styled(Grid) ({
 	overflowY: "scroll",
 	height: '92.5%',
 	width: '92%',
-		// backgroundColor: 'white',
 	borderRadius: '10px',
-	// maxHeight: '100%',
 	scrollbarWidth: 'none',
     '&::-webkit-scrollbar': {
       display: 'none',
     },
   });
   
-  // 채팅 방 1개
-  const ChatRoom = styled(Card) ({
-	// width: 400,
-	height: 200,
-	backgroundColor: 'white',
-	opacity: 0.7,
-  })
-
 
   export default function ChatRoomList({setMTbox, handleRenderMode }: any) {
 	const socket = useChatSocket();
@@ -54,9 +44,6 @@ const MainChatRoomList = styled(Grid) ({
 	const user_id = Number(cookies.get("user_id"));
 	const user_nickname = cookies.get("nick_name");
 
-	console.log("ChatRoomList");
-	console.log("CHL - user_id - ", user_id);
-	console.log("CHL - nickname - ", user_nickname);
 
 	async function handleRoomList() {
 		setRoomList([]);
@@ -67,25 +54,11 @@ const MainChatRoomList = styled(Grid) ({
 			  },
 		}) 
 		.then((res) => {
-			console.log(res.data);
 			if (res.data.rooms.length !== 0)
 			{
-				console.log('handle room list success res==', res);
 				setRoomList(res.data.rooms);
-				// 방 목록 배열, 순차 저장
-				// res.data.rooms.map((room :any) => {
-				// 	setRoomList(prevRoomList => [...prevRoomList, room]);
-				// })
-				console.log('room list for chat_rooms - ', roomList);
 			}
-			else
-			{
-				// 방이 없음 메시지
-				console.log('no rooms for chat_rooms');
-			}
-		}).catch((err) => {
-			console.log('handle room list error');
-		});
+		})
 	}
 
 	// 분리 성공하면 ispassword 제거할 것
@@ -107,28 +80,15 @@ const MainChatRoomList = styled(Grid) ({
 		.then((res) => {
 		if (res.status === 200)
 		{
-			// 방 들어가졌으니 방으로 이동하기
-				
-			console.log('success to join !!! === data', res);
 			handleRenderMode('chatRoom');
 		}
 		else
 		{
-			// 200 말고 다른 종류의 '성공'이 존재하나?
-			// !!!!! 방 인원이 가득 찬 경우 - 방에 들어가지 못하고, 목록 다시 렌더링
-				// 에러로 뺄 수도 있을 것 같은데, 협의 필요.
-			console.log('trying to render');
-			// handleData(data);
+			// 다른 종류의 성공에 대한 분기
 		}
 		})
 		.catch ((error) => {
-			// request error
-				// 적절하지 않은 요청입니다.
-					// rerender
-			// internal error
-				// 종류 따라 다를 듯
-			console.log('trying to render');
-			// handleData(data);
+
 		});
 
 	}
@@ -140,6 +100,7 @@ const MainChatRoomList = styled(Grid) ({
 		}
 
 		socket.on('render-chat', doRenderChatRooms)
+		
 		return () => {
 			socket.off('render-chat', doRenderChatRooms);
 		}
@@ -148,10 +109,8 @@ const MainChatRoomList = styled(Grid) ({
 
 	useEffect(() => {
 
-		console.log('do handleRoomList');
 		handleRoomList();
-		// 다시 가져오는 신호는?
-		// handleRenderList(false);
+
 	}, [data])
 
 	return (
@@ -161,7 +120,6 @@ const MainChatRoomList = styled(Grid) ({
 			<div>
 				<MainChatRoomList>
 				{roomList.map((room) => {
-					console.log('room data - ', room);
 					return (
 							<ChatRoomBlock
 								key={room.idx}

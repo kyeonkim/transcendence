@@ -58,28 +58,28 @@ export default function Signup (props:any) {
 		if (imageFile) {
 			formData.append('file', imageFile);
 		}
-		console.log('access_token =',token);
 		await axios.post( `${process.env.NEXT_PUBLIC_FRONT_URL}api/user_create`, {
 				access_token: props.access_token,
 				nick_name: nickname,
 			})
 			.then(async (response) => {
-				console.log('sign up response =',response.data)
 				formData.append('access_token', response.data.access_token);
 				await axios.post(`${process.env.NEXT_PUBLIC_FRONT_URL}api/send_image`, formData)
 				.then((res) => {
-					console.log('image upload response =',res.data)
 					if(res.data.success)
 						router.replace('/main_frame');
 					else
 						window.alert('Image upload failed')
 				})})
 			.catch((error) => {
-				console.log ('sign up error =',error.response.data)
 				setLoading(false);
 				setError('중복된 닉네임이거나 한글,특수문자가 포함되어있습니다! 다시 입력해주세요.');
 			})
 	}
+
+	const imageLoader = (({ src }: any) => {
+		return `${process.env.NEXT_PUBLIC_API_URL}user/getimg/nickname/${src}`
+	});
 
 	return (
 		<div>
@@ -89,7 +89,15 @@ export default function Signup (props:any) {
 					Wellcome!!
 				</Typography>
 				<Grid item className={styles.signupImage}>
-              <Avatar src={profileImage} alt="Uploaded" style={{ width: '10vw', height: '10vw', borderRadius: '50%' }} />
+					<Avatar
+						src={profileImage ? profileImage : imageLoader('')}
+						alt="Uploaded"
+						style={{
+							width: '10vw',
+							height: '10vw',
+							borderRadius: '50%'
+						}}
+					/>
 				</Grid>
 				<Grid item className={styles.signupImageText}>
 						<Typography style={{fontSize: '1.5vw'}}>🙏이미지를 등록해주세요🙏</Typography>

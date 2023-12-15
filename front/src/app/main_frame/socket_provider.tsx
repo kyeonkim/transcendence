@@ -2,7 +2,7 @@
 
 import React, { memo, createContext, useContext, useEffect, useState } from 'react';
 import { Socket } from "socket.io-client"
-
+import { useRouter } from "next/navigation";
 import { useCookies } from "next-client-cookies"
 import { io } from "socket.io-client";
 import { redirect } from 'next/navigation';
@@ -17,13 +17,10 @@ export const useChatSocket = () => {
 
 export function ChatSocket ({ children }: any) {
   const cookies = useCookies();
+  const route = useRouter();
   const [socket, setSocket] = useState<Socket>();
 
-  console.log("ChatSocket");
-
   useEffect(() => {
-
-      console.log('user_id cookie - ', cookies.get('user_id'));
 
       const tmpSocket = io(`${process.env.NEXT_PUBLIC_WEBSOCKET_URL}`,
       {
@@ -36,13 +33,13 @@ export function ChatSocket ({ children }: any) {
       });
 
       tmpSocket.on("connect" , () => {
-        console.log('socket connected - ', tmpSocket.id); // value
+
       })
     
       tmpSocket.on("disconnect", () => {
-        console.log('socket diconnected - ', tmpSocket.id); // undefined
-        // window.alert('서버와 연결이 끊어졌습니다.');
-        // redirect('/');
+        console.log("서버와 연결이 끊김");
+        route.replace("/");
+        window.alert('서버와 연결이 끊어졌습니다.');
       });
 
       setSocket(tmpSocket);

@@ -9,20 +9,23 @@ const TextSend = ({ my_name, socket, setMTbox, scrollref}: any) => {
 	useEffect(() => {
 		const handleChat = (data: any) => {
 			const newMessage = renderMessage(data);
-			console.log('chat on', newMessage);
 			setRenderedMessages(prevMessages => [...prevMessages, newMessage]);
 
 		};
 
 		const handleNotice = (data: any) => {
 			const newMessage = rednerNotice(data);
-			console.log('notice on', newMessage);
 			setRenderedMessages(prevMessages => [...prevMessages, newMessage]);
 		};
 
 
 		socket.on("chat", handleChat);
 		socket.on("notice", handleNotice);
+
+		return () => {
+			socket.off("chat", handleChat);
+			socket.off("notice", handleNotice);
+		}
 	}, [socket]);
 
 	useLayoutEffect(() => {
@@ -62,7 +65,6 @@ const TextSend = ({ my_name, socket, setMTbox, scrollref}: any) => {
 		)
 	}
 
-	// dm의 형식에 따라 또 달라질 수 있음. 일단 받아보기.
 	const renderMessage = (message: any) => {
 		return (
 			<Grid container key={message.time}>

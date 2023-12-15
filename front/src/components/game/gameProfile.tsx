@@ -7,8 +7,6 @@ export default function GameProfile({inGameData, score1, score2, isUserPL1} :any
     const [p1, setScore1] = useState(0);
     const [p2, setScore2] = useState(0);
 
-    console.log('inGameData data - ', isUserPL1);
-
     useEffect(() => {
         setScore1(score1);
     }, [score1]);
@@ -19,11 +17,9 @@ export default function GameProfile({inGameData, score1, score2, isUserPL1} :any
 
 
     const imageLoader = (src: any) => {
-        console.log("image loader src===", src);
         return `${process.env.NEXT_PUBLIC_API_URL}user/getimg/nickname/${src}`
       }
 
-    // 자신과 상대 구분할 방법
 
     return (
         <div>
@@ -35,14 +31,14 @@ export default function GameProfile({inGameData, score1, score2, isUserPL1} :any
                                 sx={{
                                 width: '10vw',
                                 height: '10vw',
-                                // border: '2px solid white',
+
                                 boxShadow: '0px 0px 10px 0px rgba(255,255,255,0.5)',
                             }}
                         />
                         <Typography className={styles.userName}
                             style={{color: isUserPL1 ? 'white' : 'red'}}
                             sx={{
-                                // color: 'white',
+
                                 fontSize: '3vw',  whiteSpace: 'nowrap', marginLeft: '10px'}}>
                             {inGameData.user1_nickname}
                         </Typography>
@@ -65,14 +61,14 @@ export default function GameProfile({inGameData, score1, score2, isUserPL1} :any
                             sx={{
                             width: '10vw',
                             height: '10vw',
-                            // border: '2px solid white',
+
                             boxShadow: '0px 0px 10px 0px rgba(255,255,255,0.5)',
                         }}
                     />
                     <Typography className={styles.userName}
                         style={{color: isUserPL1 ? 'red' : 'white'}}
                         sx={{
-                            // color: 'white',
+
                             fontSize: '3vw',  whiteSpace: 'nowrap', marginLeft: '10px'}}>
                         {inGameData.user2_nickname}
                     </Typography>

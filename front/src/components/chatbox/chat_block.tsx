@@ -12,8 +12,7 @@ import { useCookies } from 'next-client-cookies';
 
 import  { useChatBlockContext } from '../../app/main_frame/shared_state';
 import { axiosToken } from '@/util/token';
-// chatroomlist에서 요청의 결과로 받은 응답에 채팅방의 데이터가 들어있는가?
-// chat에서 한 번 더 요청하여 채팅방의 데이터를 받아오는가?
+
 
 export default function ChatBlock(props: any) {
 	const cookies = useCookies();
@@ -41,20 +40,20 @@ export default function ChatBlock(props: any) {
 			  },
 		}) 
 		.then((res) => {
-			console.log('userData in chat==',res);
+
 			if (res.data.userData.roomuser !== null)
 			{
 				if (res.data.userData.roomuser.chatroom)
 				{
-					console.log("ChatBlock - user is in chatroom");
+
 					setRoominfo(res.data.userData.roomuser.chatroom);
-					console.log("roominfo - ", res.data.userData.roomuser.chatroom);
+
 					// setRenderMode('chatRoom');
 				}
 			}
 			else
 			{
-				console.log("user is not in chat room");
+
 				setRenderMode('chatList');
 			}
 		})
@@ -66,27 +65,18 @@ export default function ChatBlock(props: any) {
 
 	useEffect(() => {
 		
-		console.log('useEffect - render');
 
 		if (renderMode !== 'newChat')
 		{
-			console.log('rerendered');
+
 			getUserData();
 		}
 	}, [render])
 
 	useEffect(() => {
 		setRenderMode('chatRoom');
-		console.log('chat_block - roominfo');
+
 	}, [roominfo]);
-
-	// useEffect(() => {
-	// 	socket.on(`render-chat`, (data) => {
-	// 		console.log('render-chat', data);
-	// 		handleRenderMode(chatBlockRenderMode);
-
-	// 	})
-	// }, [socket])
 
 
 	const { setMTbox } = props;

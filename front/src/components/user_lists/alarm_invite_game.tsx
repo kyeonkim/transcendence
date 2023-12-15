@@ -26,7 +26,6 @@ export default function AlarmInviteGame (props: any) {
 			}
 		})
 		.then((res) => {
-			console.log('acceptInviteGame - res', res)
 			alarmReducer(alarm);
 		})
 	}

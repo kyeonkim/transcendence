@@ -18,20 +18,20 @@ export default function MatchHome(props: any) {
 				}
 			})
 			.then((res) => {
-				console.log("create room reesponse===", res);
+
 			})
 			.catch((err) => {
-				console.log("create room error===", err);
+
 			})
 	}
 
 	const handleInviteClick = () => {
-		console.log("방만들기 클릭");
+
 		createRoom();
 	}
 
 	const handleRankClick = () => {
-		console.log("랭크 매칭 클릭");
+
 		setRender(1);
 	}
 
