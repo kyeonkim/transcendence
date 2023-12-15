@@ -91,6 +91,11 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
     this.SocketService.LeaveRoom(user_id, String(room_id), this.server);
   }
   
+  async SendRerenderChatRoom(room_id: number, payload)
+  {
+    this.server.to(`chat-${room_id}`).emit(`render-chat`, {data: payload});
+  }
+
   async SendRerender(user_id: number, event: string, payload?: any)
   {
     const rtn = this.server.to(String(user_id)).emit(`render-${event}`, { data: payload ? payload : new Date().valueOf() });

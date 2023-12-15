@@ -131,7 +131,7 @@ export class ChatService {
         });
         if (ChangeRoom === null)
             return {status: false, message: 'fail to change room'};
-        await this.socketService.SendRerenderAll("chat", {name: ChangeRoom.name, is_private: ChangeRoom.is_private});
+        await this.socketService.SendRerenderChatRoom(ChangeRoom.idx, {name: ChangeRoom.name, is_private: ChangeRoom.is_private});
         return {status: true, message: 'success'};
     }
     
@@ -451,7 +451,10 @@ export class ChatService {
                     idx: event.idx,
                 },
         });
-        return await this.JoinRoom(data, true);
+        const result = await this.JoinRoom(data, true);
+        if(result.status == false)
+            await this.socketService.SendRerender(data.user_id, 'friend');
+        return result;
     }
 
     async GetDm(idx: number, user_id: number, from_id: number)
