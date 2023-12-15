@@ -4,7 +4,8 @@ import React, { createContext, useState, useContext } from 'react';
 const StatusContext = createContext<any>(null);
 
 const StatusContextProvider = ({ children }: any) => {
-	const [Status, setStatus] = useState<any>([]);
+	const [Status, setStatus] = useState('login');
+	// 'lo';
 
 	return (
 	  <StatusContext.Provider value={{ Status, setStatus }}>
@@ -14,6 +15,8 @@ const StatusContextProvider = ({ children }: any) => {
 };
 
 
-const useStatusContext = () => {
+export const useStatusContext = () => {
 	return useContext(StatusContext);
 };
+
+export default StatusContextProvider;

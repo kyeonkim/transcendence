@@ -94,7 +94,11 @@ export class SocketService {
     async JoinRoom(user_id: any, room: string, server: Server)
     {
         if(this.sockets.get(String(user_id)) !== undefined)
+        {
             server.sockets.sockets.get(this.sockets.get(String(user_id))).join(room);
+            return {status: true};
+        }
+        return {status: false};
     }
 
     async LeaveRoom(user_id: string, room: string, server: Server)

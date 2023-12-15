@@ -1,5 +1,6 @@
 .messageArea {
-	width: 500px;
-	height: 400px;
+	position: absolute;
+	width: 25vw;
+	height: 20vw;
 	overflow-y: auto;
 }

@@ -53,7 +53,14 @@ export default function DirectMessage( {dmAlarmCount, dmAlarmCountList, dmAlarmR
 	
 	return (
 		<div>
-				<Popper open={handleOpen()} anchorEl={tapref.current} placement="right-start" style={{width: '500px'}}>
+				<Popper open={handleOpen()}
+					anchorEl={tapref.current}
+					placement="right-start"
+					sx={{
+						position: 'absolute',
+						max-width: 'min-content',
+					}}
+				>
 					<AppBar position="static">
 						<Typography variant="h5" sx={{ flexGrow: 1, align: 'center', padding: '10px' }}>
 							{dmOpenNickname}

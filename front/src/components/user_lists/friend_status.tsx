@@ -3,11 +3,13 @@ import { useChatSocket } from "@/app/main_frame/socket_provider";
 import axios from "axios";
 import { useCookies } from "next-client-cookies";
 import { axiosToken } from '@/util/token';
+import { useStatusContext } from "@/app/main_frame/status_context";
 
 export function useFriendList(myId: any) {
   const [apiResponse, setApiResponse] = useState([]);
   const socket = useChatSocket();
   const cookies = useCookies();
+  const statusContext = useStatusContext();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -18,7 +20,7 @@ export function useFriendList(myId: any) {
           },
         })
         .then((response) => {
-
+          // console.log('friend list response ', response.data);
           if (response.data.status) {
             const newResponse = response.data.data.map((user: any) => {
               user.status = 'offline';
@@ -45,7 +47,6 @@ export function useFriendList(myId: any) {
     return () => {
       socket.off(`render-friend`, handleRenderFriend);
     };
-
   }, [myId, socket]);
 
   useEffect(() => {
@@ -56,22 +57,25 @@ export function useFriendList(myId: any) {
     socket.on('status', handleStatusUpdate);
     return () => {
       socket.off('status', handleStatusUpdate);
-    }
+    };
   }, [apiResponse, socket]);
 
   const updateStatus = (userId: any, status: any) => {
     setApiResponse((prevState) =>
       prevState.map((user: any) => {
         if (user.followed_user_id == Number(userId)) {
-          // console.log('update status ', user, status);
           return { ...user, status };
         }
         return user;
       })
     );
-    if (status === 'login') {
+    if (statusContext === 'login') {
+      // 내 상태를 보낸다.
       socket.emit('status', { user_id: myId, status: 'online', target: userId });
     }
+    else
+      socket.emit('status', { user_id: myId, status: statusContext, target: userId });
+
   };
 
   return apiResponse;

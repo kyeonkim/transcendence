@@ -81,6 +81,9 @@ export class SocketGameService {
 
     async JoinGameRoom(user1_id: number, user2_id: number, event_id: number)
     {
+        this.eventService.DeleteAlarms(event_id);
+        if (this.gameRoomMap.get(user2_id) !== undefined || this.InGame.get(user2_id) !== undefined)
+            return {status: false, message: "이미 게임방에 속해 있습니다."};
         if (this.gameRoomMap.get(user1_id) === undefined)
             return {status: false, message: "게임방이 존재하지 않습니다."};
         const room = this.gameRoomMap.get(user1_id);
@@ -90,7 +93,6 @@ export class SocketGameService {
         this.gameRoomMap.set(user2_id, room);
         this.server.to(String(user1_id)).emit(`render-gameroom`, {status: 'gameroom', room: this.gameRoomMap.get(user1_id)});
         this.server.to(String(user2_id)).emit(`render-gameroom`, {status: 'gameroom', room: this.gameRoomMap.get(user2_id)});
-        this.eventService.DeleteAlarms(event_id);
         return {status: true, message: "게임방 참가 성공"};
     }
 
@@ -196,9 +198,12 @@ export class SocketGameService {
 
     async ExitGame(user_id: number)
     {
+
         const room = this.InGame.get(user_id);
         if (room == undefined)
             return {status: false, message: "게임이 존재하지 않습니다."};
+        this.server.to(`status-${room.user1_id}`).emit(`status`, {user_id: room.user1_id, status: `online`});
+        this.server.to(`status-${room.user2_id}`).emit(`status`, {user_id: room.user2_id, status: `online`});
         const user1_id = room.user1_id;
         const user2_id = room.user2_id;
         this.server.to(`game-${user1_id}`).emit(`game-end`, {gameData: room});
@@ -292,6 +297,9 @@ export class SocketGameService {
         if (this.InGame.get(Number(payload.user_id)).user1_ready && this.InGame.get(Number(payload.user_id)).user2_ready)
         {
             const room = this.InGame.get(Number(payload.user_id));
+            console.log(`room:`, room);
+            this.server.to(`status-${room.user1_id}`).emit(`status`, {user_id: room.user1_id, status: `ingame`});
+            this.server.to(`status-${room.user2_id}`).emit(`status`, {user_id: room.user2_id, status: `ingame`});
             room.rank = payload.rank;
             if (room.rank === false)
                 room.game_mode = payload.game_mode;

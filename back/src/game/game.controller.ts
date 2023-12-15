@@ -58,8 +58,8 @@ export class GameController {
     }
 
     @ApiOperation({summary: `게임방 참여 API`, description: `게임방에 참여한다.`})
-	// @UseGuards(AuthGuard('jwt-access'))
-	// @ApiBearerAuth('JWT-acces')
+	@UseGuards(AuthGuard('jwt-access'))
+	@ApiBearerAuth('JWT-acces')
     @Patch ("joinroom")
     async JoinRoom(@Body() data: gameRoomDto)
     {

@@ -48,7 +48,11 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
       connect_user.roomuser ? await this.JoinRoom(connect_user.user_id, `chat-${connect_user.roomuser.chatroom_id}`) : null;
       client.join(String(connect_user.user_id));
       client.join(`status-${connect_user.user_id}`);
-      connect_user.friends.map((friend) => { this.SocketService.JoinRoom(friend.followed_user_id, `status-${connect_user.user_id}`, this.server)});
+      connect_user.friends.map(async (friend) => {
+        const res = await this.SocketService.JoinRoom(friend.followed_user_id, `status-${connect_user.user_id}`, this.server);
+        if (res.status === true)
+          this.SocketService.JoinRoom(connect_user.user_id, `status-${friend.followed_user_id}`, this.server);
+    });
       connect_user.blocks.map((block) => {this.SocketService.JoinRoom(block.blocked_user_id, `block-${connect_user.user_id}`, this.server)});
     } catch (error) {
       console.error("handleConnection: ", error);

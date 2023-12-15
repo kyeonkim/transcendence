@@ -49,7 +49,7 @@ export default function Matching(props: any) {
 			}
 			else if (data.status === 'ingame')
 			{
-				changeStat('ingame');
+				changeStat(false);
 				setRender(3);
 			}
 			else 
@@ -59,13 +59,13 @@ export default function Matching(props: any) {
 				setRender(0);
 			}
 			setData(data);
-			changeStat('');
 		});
 		fetchData();
 
 	}, []);
 
 	const exitGame = async () => {
+		changeStat(true);
 		setRender(0);
 	}
 

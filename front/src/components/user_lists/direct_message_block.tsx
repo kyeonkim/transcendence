@@ -211,7 +211,8 @@ export default function DmMessageBlock({dmOpenId, dmOpenNickname, messageAreaRef
     
                 if (res.data.status === true)
                 {
-                    if (res.data.dm.lenth !== 0)
+
+                    if (res.data.dm.length !== 0)
                     {   
                         // 가져온 리스트 임시 저장
                         // 현재 리스트 복사 보관

@@ -108,17 +108,17 @@ export default function AlarmInviteChat (
             console.log('accept res===', res);
             if (res.data.status === false)
             {
-                console.log("in err");
-                setError(true);
-                setErrMessage(res.data.message);
-                // denyRequest(alarm);
+                // console.log("in err");
+                // setError(true);
+                // setErrMessage(res.data.message);
+                denyRequest(alarm);
             }
-            // else
-            // {
-            //     alarmReducer(alarm);
-            //     setChatBlockRenderMode('chatRoom');
-            //     setChatBlockTriggerRender(true);
-            // }
+            else
+            {
+                alarmReducer(alarm);
+                setChatBlockRenderMode('chatRoom');
+                setChatBlockTriggerRender(true);
+            }
         })
     }
     const handleCloseErr = () => {
@@ -142,12 +142,12 @@ export default function AlarmInviteChat (
                 setError(true);
                 setErrMessage(res.data.message);
             }
-            // else
-            // {
-            //     alarmReducer(alarm);
-            //     setChatBlockRenderMode('chatRoom');
-            //     setChatBlockTriggerRender(true);
-            // }
+            else
+            {
+                alarmReducer(alarm);
+                setChatBlockRenderMode('chatRoom');
+                setChatBlockTriggerRender(true);
+            }
 		}
 	    })
     }
@@ -198,13 +198,13 @@ export default function AlarmInviteChat (
                         <Button sx={{top: 20}} size="small" variant="contained" onClick={() => handleCheckPassword()}>Join</Button>
                         </Box>
                     </Modal>
-                    {error && <Alert
-                        severity="error"
-                        onClose={handleCloseErr}
-                    >
-                    <strong>{errMessage}</strong>
-                    </Alert>}
         </div>
     );
   }
   
+    // {error && <Alert
+    //     severity="error"
+    //     onClose={handleCloseErr}
+    // >
+    // <strong>{errMessage}</strong>
+    // </Alert>}

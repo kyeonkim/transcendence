@@ -172,7 +172,7 @@ export default function BasicTabs({ setMTbox }: SearchUserProps) {
 			setAlarmListAdd(parsedData);
 		}
 
-		socket.emit('status', { user_id: Number(cookies.get('user_id')), status: 'online' });
+		socket.emit('status', { user_id: Number(cookies.get('user_id')), status: 'login' });
 
 		return () => {
 			sseEvents.close();

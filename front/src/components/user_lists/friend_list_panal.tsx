@@ -18,6 +18,8 @@ import Divider from '@mui/material/Divider';
 import DirectMessage from './direct_message';
 import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
 import { axiosToken } from '@/util/token';
+import { useStatusContext } from "@/app/main_frame/status_context";
+
 
 export default function FriendListPanel(props: any) {
 	
@@ -27,6 +29,8 @@ export default function FriendListPanel(props: any) {
 
 	const [loading, setloading] = useState(true);
 	const socket = useChatSocket();
+	const statusContext = useStatusContext();
+
 	const { setMTbox, dmOpenId, dmOpenNickname, handleDmAlarmCount, handleChatTarget, list, myId, tapref} = props;
 
 	const dmOpenIdRef = useRef(dmOpenId);
@@ -36,10 +40,11 @@ export default function FriendListPanel(props: any) {
 
 	useEffect(() => {
 		if (list && JSON.stringify(list) === JSON.stringify(apiResponse)) {
+			
 			return;
 		}
-		if (list) {	
-			socket.emit('status', { user_id: myId, status: 'login' });
+		if (list && statusContext === 'login') {	
+			socket.emit('status', { user_id: myId, status: statusContext });
 
 			list.map((user :any) => {
 				const target = dmCountListRef.current.find((countList :any) => countList.id === user.followed_user_id) 
@@ -122,7 +127,7 @@ export default function FriendListPanel(props: any) {
 
 	const getStatusColor = (status: string) => {
 		if (status === 'ingame')
-			return 'red';
+			return 'blue';
 		else
 			return status === 'online' || status === 'login' ? 'green' : 'grey';
 		};
