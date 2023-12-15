@@ -27,7 +27,6 @@ export class SocketService {
         if (this.sockets.get(String(user_id)) !== undefined)
         {
             server.sockets.sockets.get(this.sockets.get(String(user_id))).disconnect();
-            console.log("disconnected ?: ", server.sockets.sockets.get(String(user_id)));
             this.sockets.delete(String(user_id));
         }
         this.sockets.set(String(user_id), socket_id);
@@ -69,8 +68,6 @@ export class SocketService {
                 }
             });
         }
-        console.log("HandleChat: ", user);
-        console.log("HandleChat2: ", payload);
         if (user.chatroom_id != payload.room_id || user.is_mute === true)
             return {status: false, message: "채팅을 할 수 없습니다."};
         server.to(`chat-${payload.room_id}`).except(`block-${user.user_id}`).emit('chat', {from: payload.user_name, message: payload.message, time: new Date().valueOf()});
@@ -82,7 +79,6 @@ export class SocketService {
         const result = server.to(`chat-${chatroom_id}`).emit('notice', {message: message, time: new Date().valueOf()});
         if (result === false)
             return {status: false, message: "공지를 할 수 없습니다."}
-        console.log("HandleNotice: ", message);
         return {status: true, message: "공지를 전송하였습니다."};
     }
 
@@ -91,21 +87,18 @@ export class SocketService {
         const result = server.to(String(user_id)).emit('kick', {message: user_id, time: new Date().valueOf()});
         if (result === false)
             return {status: false, message: "kick 명령 전송 실패."}
-        console.log("HandleKick: ", user_id);
         return {status: true, message: "kick 명령 전송 완료."};
     }
     
 
     async JoinRoom(user_id: any, room: string, server: Server)
     {
-        console.log("JoinRoom user_id: ", user_id, " | JoinRoom: ", this.sockets.get(String(user_id)) || "logoff");
         if(this.sockets.get(String(user_id)) !== undefined)
             server.sockets.sockets.get(this.sockets.get(String(user_id))).join(room);
     }
 
     async LeaveRoom(user_id: string, room: string, server: Server)
     {
-        console.log("LeaveRoom user_id: ", user_id, " | LeaveRoom: ", room);
         if(this.sockets.get(String(user_id)) !== undefined)
         {
             if (server.sockets.sockets.get(this.sockets.get(String(user_id))) !== undefined)
@@ -151,7 +144,6 @@ export class SocketService {
                 is_read: false,
             },
         });
-        // console.log("GetDm: ", dm);
         dm.forEach((element) => {
             server.to(String(user_id)).emit('dm', element);
         });

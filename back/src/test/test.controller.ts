@@ -102,7 +102,6 @@ export class TestController {
 	@Get("setcookie")
 	async SetCookie(@Res() res: Response)
 	{
-		console.log("here!!!!");
 		res.cookie('test', 'test', {httpOnly: true});
 		res.end();
 		return "hello";

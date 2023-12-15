@@ -18,7 +18,6 @@ export class ChatService {
     
     async GetRoomList(id: number)
     {
-        console.log("GetRoomList: ", id);
         const rooms = await this.prismaService.chatroom.findMany(
             {
                 //코드 작동여부 확인 필요
@@ -402,7 +401,6 @@ export class ChatService {
     async GetMyRoomByHeader(headers: any)
     {
         const [type, token] = headers.authorization?.split(' ') ?? [];
-        console.log(`type : ${type}, token : ${token}`);
         const payload = this.jwtService.decode(token);
 
         const room = await this.prismaService.chatroom_user.findUnique({
@@ -506,7 +504,6 @@ export class ChatService {
             });
             return {status: true, dm: unreaddm};
         } catch (error) {
-            console.log(error);
             return {status: false, message: 'fail to update dm'};
         }
     }

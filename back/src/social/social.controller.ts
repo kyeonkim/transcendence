@@ -46,7 +46,6 @@ export class SocialController {
 	@Delete("DeleteFriend")
 	async DeleteFriend(@Body() friend: friendDto)
 	{
-		console.log(`Deletefriend call`, friend);
 		return await this.SocialService.DeleteFriend(friend);
 	}
 
@@ -74,7 +73,6 @@ export class SocialController {
 	@Post("addBlockedUser")
 	async AddBlockUser(@Body() data: friendDto)
     {
-		console.log("AddBlockUser :", data);
 		return await this.SocialService.AddBlockUser(data);
     }
 
@@ -84,7 +82,6 @@ export class SocialController {
 	@Delete("deleteBlockedUser")
 	async DeleteBlockUser(@Body() data: friendDto)
     {
-		console.log("DeleteBlockUser :", data);
 		return await this.SocialService.DeleteBlockUser(data);
     }
 }  

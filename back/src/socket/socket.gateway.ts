@@ -40,7 +40,6 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
   async handleConnection(client: Socket, ...args: any[]) {
     //토큰인증로직 
     //if 토큰인증 실패 >> disconnect
-    console.log(client.id, client.handshake.query.user_id == 'undefined');
     try {
       if (client.handshake.query.user_id == 'undefined' || client.handshake.query.user_id == undefined)
           throw new Error("user_id is undefined");
@@ -52,7 +51,7 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
       connect_user.friends.map((friend) => { this.SocketService.JoinRoom(friend.followed_user_id, `status-${connect_user.user_id}`, this.server)});
       connect_user.blocks.map((block) => {this.SocketService.JoinRoom(block.blocked_user_id, `block-${connect_user.user_id}`, this.server)});
     } catch (error) {
-      console.log(error);
+      console.error("handleConnection: ", error);
       client.disconnect();
     }
   }
@@ -61,13 +60,9 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
     if (client.handshake.query.user_id !== undefined)
     {
       this.server.to(`status-${client.handshake.query.user_id}`).emit(`status`, {user_id: client.handshake.query.user_id, status: 'offline'});
-      console.log('\n\nClient disconnected=============\n', client.handshake.query.user_id ,client.id);
       this.SocketGameService.ForceGameEnd(Number(client.handshake.query.user_id));
       this.SocketService.Disconnect(client.handshake.query.user_id, client.id);
-      // this.GameService.LeaveGameRoom(Number(client.handshake.query.user_id));
-      // console.log(this.server.sockets.sockets,"\n");
     }
-    // console.log('Client disconnected');
   }
   
   async HandleNotice(chatroom_id: number, message: string)
@@ -88,7 +83,6 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
   
   async JoinRoom(user_id: any, room_id: string)
   {
-    console.log(room_id);
     this.SocketService.JoinRoom(user_id, String(room_id), this.server);
   }
   
@@ -105,35 +99,26 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
   async SendRerenderAll(event: string, payload?: any)
   {
     const rtn = this.server.emit(`render-${event}`, { data: payload ? payload : new Date().valueOf() });
-    console.log(rtn);
   }
   
   @SubscribeMessage('chat')
   async handlechat(client: Socket, payload: any): Promise<any> {
     const rtn = await this.SocketService.HandleChat(client, payload, this.server);
-    console.log(rtn);
     return rtn;
   }
 
   @SubscribeMessage('status')
   async SendStatus(Client: Socket, payload: any)
   {
-    console.log("=====SendStatus======", payload);
-    console.log("=====SendStatusTarget======", payload.target);
     if(payload.target === undefined)
-    {
       Client.to(`status-${payload.user_id}`).emit(`status`, {user_id: payload.user_id, status: payload.status});
-      // console.log("here");
-    } 
     else
       Client.to(`${payload.target}`).emit(`status`, {user_id: payload.user_id, status: payload.status});
-
   }
 
   @SubscribeMessage(`dm`)
   async SendDM(Client: Socket, payload: any)
   {
-    console.log("=====SendDM======", payload);
     await this.SocketService.SendDm(payload.from_id, payload.to_id, payload.message, this.server);
   }
 
@@ -151,36 +136,31 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 
   async SendReRenderGameRoom(room:GameRoom, user1_id: number, user2_id: number = null)
   {
-    console.log("SendReRenderGameRoom: ", room, user1_id);
-    console.log(this.server.to(String(user1_id)).emit(`render-gameroom`, {room: room}));
+    this.server.to(String(user1_id)).emit(`render-gameroom`, {room: room});
     if (user2_id !== null)
-      console.log(this.server.to(String(user2_id)).emit(`render-gameroom`, {room: room}));
+      this.server.to(String(user2_id)).emit(`render-gameroom`, {room: room});
   }
 
   async SendDMTest(from_id: number, to_id: number, message: string)
   {
-    console.log("=====SendDM Test======", from_id, to_id, message);
     await this.SocketService.SendDm(from_id, to_id, message, this.server);
   }
 
   @SubscribeMessage(`game-start`)
   async GameStart(Client: Socket, payload: any)
   {
-    console.log("=====GameStart======", payload);
     await this.SocketGameService.GameStart(payload);
   }
 
   @SubscribeMessage(`game-user-position`)
   async GameUserPosition(Client: Socket, payload: any)
   {
-    // console.log("=====GameUserPosition======", Client.handshake.query.user_id,payload);
     await this.SocketGameService.GameUserPosition(payload, Number(Client.handshake.query.user_id));
   }
 
   @SubscribeMessage(`game-ball-hit`)
   async GameBallHit(Client: Socket, payload: any)
   {
-    console.log("=====GameBallHit======", Client.handshake.query.user_id);
     await this.SocketGameService.GameBallHit(payload, Number(Client.handshake.query.user_id));
   }
 }

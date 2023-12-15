@@ -109,10 +109,9 @@ export class SocketGameService {
         this.gameRoomMap.delete(user2);
         room.user2_id = null;
         room.user2_ready = false;
-        console.log(this.gameRoomMap);
-        console.log(this.server.to(String(room.user1_id)).emit(`render-gameroom`, {status: 'gameroom', room: room}));
+        this.server.to(String(room.user1_id)).emit(`render-gameroom`, {status: 'gameroom', room: room});
         if(user2 !== null)
-            console.log(this.server.to(String(user2)).emit(`render-gameroom`, {status: 'home', room: room}));
+            this.server.to(String(user2)).emit(`render-gameroom`, {status: 'home', room: room});
         return {status: true, message: "게임방 나가기 성공"};
     }
 
@@ -141,10 +140,9 @@ export class SocketGameService {
             room.user1_ready = ready;
         else
             room.user2_ready = ready;
-        console.log(this.gameRoomMap);
-        console.log(this.server.to(String(room.user1_id)).emit(`render-gameroom`, {status: 'gameroom', room: room, game_mode: game_mode}));
+        this.server.to(String(room.user1_id)).emit(`render-gameroom`, {status: 'gameroom', room: room, game_mode: game_mode});
         if (room.user2_id !== null)
-            console.log(this.server.to(String(room.user2_id)).emit(`render-gameroom`, {status: 'gameroom', room: room, game_mode: game_mode}));
+            this.server.to(String(room.user2_id)).emit(`render-gameroom`, {status: 'gameroom', room: room, game_mode: game_mode});
         return {status: true, message: "게임 준비 성공"};
     }
     // 일반
@@ -209,7 +207,6 @@ export class SocketGameService {
         // 객체 삭제
         this.InGame.delete(user1_id);
         this.InGame.delete(user2_id);
-        console.log("Room Rank : ", room.rank);
         if (room.rank === false)
             return {status: true, message: "게임 종료"};
         const user1 =   await this.prismaservice.user.findUnique({
@@ -294,17 +291,14 @@ export class SocketGameService {
         }
         if (this.InGame.get(Number(payload.user_id)).user1_ready && this.InGame.get(Number(payload.user_id)).user2_ready)
         {
-            console.log("game start send", this.InGame.get(Number(payload.user_id)));
             const room = this.InGame.get(Number(payload.user_id));
             room.rank = payload.rank;
             if (room.rank === false)
                 room.game_mode = payload.game_mode;
             setTimeout(() => {
-                console.log(`after time out`,room);
                 this.server.to(`game-${room.user1_id}`).emit(`game-init`, {room: room});
             }, 1000);
         }
-        console.log("game start", this.InGame.get(Number(payload.user_id)));
     }
 
     async GameUserPosition(payload: any, user_id: number)
@@ -321,23 +315,14 @@ export class SocketGameService {
 
     async GameBallHit(payload: any, user_id: number)
     {
-        // console.log("game-ball-hit : ", payload);
-        // console.log("game-ball-hit - left: ", payload.enemy.left);
-        // console.log("game-ball-hit - top: ", payload.enemy.top);
         if (this.InGame.get(user_id) === undefined)
             return ;
         this.InGame.get(user_id).score1 = payload.score.player1;
         this.InGame.get(user_id).score2 = payload.score.player2;
-        // if (this.InGame.get(user_id).score1 >= 11 || this.InGame.get(user_id).score2 >= 11)
-        //     return this.ExitGame(user_id);
-        if (this.InGame.get(user_id).user1_id === user_id) {
-            // console.log(`game-${this.InGame.get(user_id).user2_id}`);
+        if (this.InGame.get(user_id).user1_id === user_id)
             this.server.to(`${this.InGame.get(user_id).user2_id}`).emit(`game-ball-fix`, payload);
-        }
-        else {
-            // console.log(`game-${this.InGame.get(user_id).user1_id}`);
+        else
             this.server.to(`${this.InGame.get(user_id).user1_id}`).emit(`game-ball-fix`, payload);
-        }
     }
 
     async AddGameData(gameData: gameDataDto)
@@ -372,7 +357,7 @@ export class SocketGameService {
                 },
             }); 
         } catch (error) {
-            console.log("error: ", error);
+            console.error("AddGameData error: ", error);
         }
     }
 

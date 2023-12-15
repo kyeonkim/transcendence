@@ -60,9 +60,7 @@ export class ChatController {
     @Patch("joinroom")
     async JoinRoom(@Body() data : JoinRoomDto)
     {
-        const rtn =  await this.ChatService.JoinRoom(data);
-        console.log("JoinRoom: ", data, rtn);
-        return rtn;
+        return await this.ChatService.JoinRoom(data);
     }
 
     @ApiOperation({summary: `채팅 방 퇴장 API`, description: `채팅방에서 퇴장한다.`})

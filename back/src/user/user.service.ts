@@ -34,7 +34,6 @@ export class UserService {
     
     async GetUserDataByNickName(nickName: string)
     {
-        // console.log("nick_name :", nickName);
         const userData = await this.prisma.user.findUnique({
             where: {
               nick_name: nickName,
@@ -55,7 +54,6 @@ export class UserService {
                 blocks : true
             }
         });
-        // console.log(userData);
         if (userData === null)
             return {status: false, message: "유저 찾기 실패"}
         // 도전 과제 (1승, 10승, 50승) - db 에 넣을수도 있음, 우선 간단하게 작성
@@ -71,7 +69,6 @@ export class UserService {
 
     async GetUserDataById(id: number)
     {
-        // console.log("user_id :", user_id.user_id);
         const userData = await this.prisma.user.findUnique({
             where: {
               user_id: id,
@@ -91,7 +88,6 @@ export class UserService {
                 },
             }
         });
-        // console.log("====================User_data=====================\n\n",userData);
         if (userData == null)
             return {status: false, message: "유저 찾기 실패"}
         else

@@ -35,11 +35,7 @@ export class AuthController {
 	@Post("token/refresh")
 	async RecreateToken(@Headers() header, @Body() token : TokenDto, @Res({passthrough: true}) res: Response)
 	{
-		// console.log("token header: ", header);
-		// console.log("token refresh", token);
-		const newToken = await this.AuthService.ReCreateToken(token);
-		// res.cookie('access_token', newToken.access_token);		
-		// res.cookie('refresh_token', newToken.refresh_token);			
+		const newToken = await this.AuthService.ReCreateToken(token);	
 		res.cookie('test', "testtesttest", {sameSite: 'none', maxAge: 1000 * 60 * 60 * 24 * 7, secure: true});
 		return newToken;
 	}
@@ -50,9 +46,7 @@ export class AuthController {
 	@Get("token/varify")
 	async VarifyToken()
 	{
-		// console.log("token varify");
-		return `okay`;
-		// return this.UserService.VarifyToken(token);
+		return {status: true, message: "token varify success"};
 	}
 
 	@ApiOperation({summary: `2차인증 통과 API`, description: `2차인증 통과여부를 토큰에 넣는다.`})
@@ -61,8 +55,6 @@ export class AuthController {
 	@Post("2fa/pass")
 	async TwoFAPass(@Req() req, @Body() twofa: TwoFADTO)
 	{
-		// console.log("2fa/pass2fa/pass2fa/pass2fa/pass", req);
-		console.log(`twofa/pass call`, twofa);
 		return await this.AuthService.TwoFAPass(twofa);
 	}
 
@@ -81,7 +73,6 @@ export class AuthController {
 	@Post("2fa/active")
 	async Active2FA(@Body() twofa: TwoFADTO)
 	{
-		console.log("Active2FAActive2FAActive2FA",twofa);
 		return await this.AuthService.Active2FA(twofa);
 	}
 

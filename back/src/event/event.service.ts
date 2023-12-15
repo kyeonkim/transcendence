@@ -13,34 +13,18 @@ export class EventService {
     ) {}
 
     async AlarmSse(req, id: number) {
-        // console.log('Alarm sse open', id);
         if (this.AlarmSseMap.get(id) !== undefined)
             return this.AlarmSseMap.get(id);
         const newEvent = new Subject<any>();
         this.AlarmSseMap.set(id, newEvent);
         req.on('close', (_) => {
             this.AlarmSseMap.delete(id);
-            console.log('Alarm sse close', id);
         });
         return this.AlarmSseMap.get(id);
     }
 
-    // async FriendListSse(req, id: number) {
-    //     // console.log('FriendList sse open', id, this.FriendListSseMap.size);
-    //     if (this.FriendListSseMap.get(id) !== undefined)
-    //         return this.FriendListSseMap.get(id);
-    //     const newEvent = new Subject<any>();
-    //     this.FriendListSseMap.set(id, newEvent);
-    //     req.on('close', (_) => {
-    //         this.FriendListSseMap.delete(id);
-    //         console.log('FriendList sse close', id);
-    //     });
-    //     return this.FriendListSseMap.get(id);
-    // }
-
     async SendFriendEvent(id: number)
     {
-        console.log('friend event', id);
         if (this.FriendListSseMap.get(id) === undefined)
             return {status: false, message: 'no client'};
         this.FriendListSseMap.get(id).next({data: 'friend event'});
@@ -60,7 +44,6 @@ export class EventService {
             if(this.AlarmSseMap.get(id) !== undefined)
                 this.AlarmSseMap.get(id).next({data: events[i]});
         }
-        // console.log(events);
     }
 
     async DeleteAlarms(event_id: number) {
@@ -72,7 +55,6 @@ export class EventService {
             });
             return rtn;
         } catch (error) {
-            console.log('DeleteAlarms error: ', error);
             return {status: false, message: 'DeleteAlarms failed'};
         }
     }
@@ -128,7 +110,6 @@ export class EventService {
         if (this.AlarmSseMap.get(event.to) === undefined)
             return {status: true, message: 'no client'};
         this.AlarmSseMap.get(event.to).next({data: alarm});
-        console.log('SendEvent: ', alarm);
         return {status: true, message: 'success'};
     }
 }

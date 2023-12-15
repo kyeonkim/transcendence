@@ -166,7 +166,7 @@ export class TestService {
             });
         }
         catch(error) {
-            console.log("Delete DummyGame error: ", error);
+            console.error("Delete DummyGame error: ", error);
         }
         return {status: true, message: "success"};
     }

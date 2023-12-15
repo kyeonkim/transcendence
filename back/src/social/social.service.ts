@@ -65,7 +65,7 @@ export class SocialService {
         //         },
         //     });
         // } catch (error) {
-        //     console.log("AddFriend failed error: ", error);
+        //     console.error("AddFriend failed error: ", error);
         //     return {status: false, message: "AddFriend failed"}
         // }
         const sent_res = await this.eventService.SendEvent({
@@ -115,7 +115,7 @@ export class SocialService {
                 },
             });
         } catch (error) {
-            console.log("AddFriend failed error: ", error);
+            console.error("AddFriend failed error: ", error);
             return {status: false, message: "AddFriend failed"}
         }
         // await this.eventService.SendFriendEvent(addFriend.user_id);
@@ -154,7 +154,7 @@ export class SocialService {
             },);
         }
         catch (error) {
-            console.log("DeleteFriend failed error: ", error);
+            console.error("DeleteFriend failed error: ", error);
             return {status: false, message: "DeleteFriend failed"}
         }
         // await this.eventService.SendFriendEvent(delFriend.user_id);
@@ -191,7 +191,6 @@ export class SocialService {
                 blocked_user_nickname: true,
             },
         });
-        console.log("blockList : ", blockList);
         if (blockList !== null)
             return {status: true, list: blockList};
         else
@@ -271,13 +270,10 @@ export class SocialService {
             });
         }
         catch(error) {
-            console.log("DeleteblockUser failed error: ", error);
+            console.error("DeleteblockUser failed error: ", error);
             return {status: false, message: "DeleteblockUser failed"}
         }
-        // await this.socketGateway.LeaveRoom(data.user_id, `block-${data.friend_id}`);
         await this.socketGateway.LeaveRoom(data.friend_id, `block-${data.user_id}`);
-        // await this.socketGateway.SendRerender(data.user_id, `friend`);
-        // await this.socketGateway.SendRerender(data.friend_id, `friend`);
         return {status: true, message: "success"};
     }
 }
