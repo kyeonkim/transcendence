@@ -61,6 +61,16 @@ export default function ChatModal({modalOpen, setModalOpen, modalCondition,
 			hashRoomPassword = hashSync(inPassword, salt);
         }
 
+        if (modalCondition === 'remove_password' && inPassword == '')
+        console.log('set req\n', {
+            room_idx:  Number(roominfo.idx),
+            user_id: my_id, 
+            user_nickname: my_name,
+            chatroom_name: inChatname? inChatname : chatname,
+            password: inPassword ? hashRoomPassword : '',
+            private: roomMode,
+            is_changePass : (modalCondition === 'remove_password' && inPassword == '') ? true : inPassword ? true : false
+        })
 		await axiosToken.patch(`${process.env.NEXT_PUBLIC_API_URL}chat/changeroom`, {
 			room_idx: Number(roominfo.idx),
 			user_id: my_id,
@@ -68,7 +78,7 @@ export default function ChatModal({modalOpen, setModalOpen, modalCondition,
 			chatroom_name: inChatname? inChatname : chatname,
 			password: inPassword ? hashRoomPassword : '',
             private: roomMode,
-            is_changePass : inPassword ? true : false
+            is_changePass : (modalCondition === 'remove_password' && inPassword == '') ? true : inPassword ? true : false
 		},
 		{
 			headers: {

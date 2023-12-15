@@ -61,7 +61,6 @@ const MainChatRoomList = styled(Grid) ({
 		})
 	}
 
-	// 분리 성공하면 ispassword 제거할 것
 	async function handleJoin(idx :number, inPassword :string) {
 
 		await axiosToken.patch(`${process.env.NEXT_PUBLIC_API_URL}chat/joinroom`, 
@@ -124,6 +123,7 @@ const MainChatRoomList = styled(Grid) ({
 							<ChatRoomBlock
 								key={room.idx}
 								room={room}
+								roomidx={room.idx}
 								openModal={openModal}
 								setOpenModal={setOpenModal}
 								selectedIdx={selectedIdx}

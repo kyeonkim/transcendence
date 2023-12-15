@@ -204,7 +204,7 @@ export default function UserList(props: any) {
 			) : (
 			<List className={style}>
 				<Paper elevation={16}>
-					<ListItemButton>
+					<ListItemButton onClick={handleProfile}>
 						<Typography variant="inherit">프로필</Typography>
 					</ListItemButton>
 					<Divider />

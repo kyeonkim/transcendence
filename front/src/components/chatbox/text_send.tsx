@@ -38,8 +38,8 @@ const TextSend = ({ my_name, socket, setMTbox, scrollref}: any) => {
 		}
 	};
 
-	const imageLoader = useCallback(({ src }: any) => {
-		return `${process.env.NEXT_PUBLIC_API_URL}user/getimg/nickname/${src}`
+	const imageLoader = useCallback(({ src, time }: any) => {
+		return `${process.env.NEXT_PUBLIC_API_URL}user/getimg/nickname/${src}?${time}`
 	}, []);
 
 	const handleClick = (name: any) => {
@@ -71,7 +71,7 @@ const TextSend = ({ my_name, socket, setMTbox, scrollref}: any) => {
 				<ListItem style={{ padding: '5px', paddingBottom: '0px', marginLeft: message.from === my_name? '80%' : '0px'}}>
 					<Stack direction="row" spacing={1}>
 						<Chip
-							avatar={<Avatar src={imageLoader({src: message.from})} />}
+							avatar={<Avatar src={imageLoader({src: message.from, time: new Date()})} />}
 							label={message.from}
 							component='div'
 							onClick={() => handleClick(message.from)}

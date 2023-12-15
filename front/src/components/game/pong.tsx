@@ -1,8 +1,9 @@
 "use client"
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { fabric } from 'fabric';
 import { useChatSocket } from '@/app/main_frame/socket_provider';
 import { useCookies } from "next-client-cookies";
+import { useStatusContext } from "@/app/main_frame/status_context";
 
 import  GameProfile  from "./gameProfile";
 import  GameEnd from "./gameEnd";
@@ -70,6 +71,16 @@ export default function Pong (props :any){
 
 	const   cookies = useCookies();
     const   containerRef = props.containerRef;
+    const { status, setStatus } = useStatusContext();
+
+
+    const updateStatus = useCallback(
+        (newStatus :string) => {
+            console.log('updateMyStatus - ', newStatus);
+            setStatus(newStatus);
+        },
+        [setStatus]
+      );
 
 
     const handleInitialSize = () => {
@@ -149,6 +160,7 @@ export default function Pong (props :any){
         {
             handleInitialSize();
             setInitCanvas(true);
+
         }
     }, [containerRef]);
 
@@ -238,9 +250,9 @@ export default function Pong (props :any){
         {
 
             const listenGameInit = (data :any) => {
-
-    
                 gameData.startTime = Date.now();
+                console.log('game data==',data);
+                
                 if (data.room.user1_id === Number(cookies.get('user_id')))
                 {
                     setUser(player1);
@@ -251,20 +263,31 @@ export default function Pong (props :any){
                     setEnemy(player1);
                     setIsUserPL1(false);
                 }
-
-
                 setInGameData(data.room);
                 setInitListener(true);
+                setInitGame(true);
+                updateStatus('ingame');
             }
     
             setReadyResize(true);
 
             socket.on(`game-init`, listenGameInit);
+
             socket.emit(`game-start`, {user_id: Number(cookies.get('user_id')), user_nickname: cookies.get('nick_name'), rank: rank, game_mode: mode});
+
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) {
+                    console.log('pong unmount');
+                    socket.emit('game-force-end');
+                } else {
+                  console.log("re on")
+                }
+              });
 
             return () => {
 
                 socket.off('game-init', listenGameInit);
+                document.removeEventListener('visivilitychange', () => {});
             }
         }
       
@@ -302,36 +325,34 @@ export default function Pong (props :any){
     
             socket.on('game-ball-fix', listenGameBallFix);
     
-            setInitGame(true);
-    
-            return () => {
+            // setInitGame(true);
 
+            return () => {
                 socket.off('game-user-position', listenGameUserPosition);
                 socket.off('game-ball-fix', listenGameBallFix);
             };
         }
 
-    }, [initListener]);
-
+    }, [initListener]);    
 
     useEffect(() => {
 
         if (initGame === true)
         {
             const listenGameEnd = (data :any) => {
-
                 cancelAnimationFrame(lastRequestId);
     
                 setEndData(data.gameData);
 
                 setGameEnd(true);
+
+                updateStatus('online');
             }
 
             let lastRequestId :number; 
-    
+
             socket.on('game-end', listenGameEnd);
-
-
+    
             const drawPong = () => {
                 
 
@@ -496,12 +517,15 @@ export default function Pong (props :any){
                 lastRequestId = requestAnimationFrame(drawPong);
     
             };
-            drawPong();
+
+            setTimeout(() => {drawPong()
+            }, 3000);
+
         
             return () => {
                 socket.off('game-end', listenGameEnd);
                 cancelAnimationFrame(lastRequestId);
-                
+                updateStatus('online');
             };
         }
 

@@ -269,8 +269,8 @@ export default function DmMessageBlock({dmOpenId, dmOpenNickname, messageAreaRef
 		}
 	};
 
-	const imageLoader = useCallback(({ src }: any) => {
-		return `${process.env.NEXT_PUBLIC_API_URL}user/getimg/nickname/${src}`
+	const imageLoader = useCallback(({ src, time }: any) => {
+		return `${process.env.NEXT_PUBLIC_API_URL}user/getimg/nickname/${src}?${time}`
 	}, []);
 
 	const handleClick = (name: string) => {
@@ -291,7 +291,7 @@ export default function DmMessageBlock({dmOpenId, dmOpenNickname, messageAreaRef
 				<ListItem style={{ padding: '5px', paddingBottom: '0px', marginLeft: target_name === nick_name? '380px' : '0px'}}>
 					<Stack direction="row" spacing={1}>
                         <Chip
-                            avatar={<Avatar src={imageLoader({src: target_name})} />}
+                            avatar={<Avatar src={imageLoader({src: target_name, time: new Date()})} />}
                             label={target_name}
                             component='div'
                             onClick={() => handleClick(target_name)}

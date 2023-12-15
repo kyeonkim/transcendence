@@ -52,10 +52,12 @@ export default function Chat(props: any) {
 
 		const doRenderChatRooms = (data :any) => {
 			console.log("get socket", data);
-			if (data.data.name)
-				setChatname(data.data.name);
-			if (data.data.is_private)
-				setRoomMode(data.data.is_private);
+			if (data.data.idx === roominfo.idx) {
+				if (data.data.name)
+					setChatname(data.data.name);
+				if (data.data.is_private)
+					setRoomMode(data.data.is_private);
+			}
 		}
 
 		socket.on('render-chat', doRenderChatRooms)

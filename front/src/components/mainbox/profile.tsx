@@ -26,10 +26,15 @@ const ProfilePage = (props: any) => {
   const cookies = useCookies();
   const socket = useChatSocket();
   const formData = new FormData();
-  const userNickname = props.nickname;
+  const [ userNickname, setUserNickname ] = useState('');
   const { setProfile } = props;
   const my_id = Number(cookies.get('user_id'));
   const my_nick = cookies.get('nick_name');
+
+  useEffect(() => {
+    if (props.nickname)
+      setUserNickname(props.nickname);
+  }, [])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -62,24 +67,25 @@ const ProfilePage = (props: any) => {
         params: { user1: my_id , user2: userNickname},
       })
       .then((res) => {
+        console.log('friend info', res);
         if (res.data.status)
           setIsFriend(true);
         else
           setIsFriend(false);
       });
     };
-    fetchData();
-    if (userNickname !== my_nick)
-      fetchFriendData();
+    if (userNickname)
+    {
+      fetchData(); 
+      if (userNickname !== my_nick)
+        fetchFriendData();
+    }
   }, [userNickname, isFriend, isOTP, rendering]);
 
 	useEffect(() => {
 
     const renderProfile = (data :any) => {
-        if (data === 'false')
-          setIsFriend(false)
-        else
-          setIsFriend(true)
+      setRendering(data.time);
     }
 
 		socket.on(`render-profile`, renderProfile);

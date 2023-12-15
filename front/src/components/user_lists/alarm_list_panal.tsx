@@ -147,7 +147,7 @@ export default function AlarmListPanal (props: any) {
             } else if (alarm.event_type === 'game') {
               return (
                 <AlarmInviteGame
-                  ket={idx}
+                  key={idx}
                   alarm={alarm}
                   alarmReducer={alarmReducer}
                   handleProfile={handleProfile}

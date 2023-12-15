@@ -38,8 +38,8 @@ export function ChatSocket ({ children }: any) {
     
       tmpSocket.on("disconnect", () => {
         console.log("서버와 연결이 끊김");
-        route.replace("/");
-        window.alert('서버와 연결이 끊어졌습니다.');
+        // route.replace("/");
+        // window.alert('서버와 연결이 끊어졌습니다.');
       });
 
       setSocket(tmpSocket);

@@ -16,7 +16,7 @@ export default function GameEnd({endData, exitGame} :any) {
             <Grid container className={styles.profileBoxGameEnd}>
             <Box display="flex" flexDirection="column" alignItems="center" className={styles.playerContainer1}>
                     <Avatar
-                        src={imageLoader(`${endData.user1_nickname}`)}
+                        src={imageLoader(`${endData.user1_nickname}?${new Date()}`)}
                             sx={{
                             width: '10vw',
                             height: '10vw',
@@ -49,7 +49,7 @@ export default function GameEnd({endData, exitGame} :any) {
                 </Box>
                 <Box display="flex" flexDirection="column" alignItems="center" className={styles.playerContainer2}>
                     <Avatar
-                        src={imageLoader(`${endData.user2_nickname}`)}
+                        src={imageLoader(`${endData.user2_nickname}?${new Date()}`)}
                             sx={{
                             width: '10vw',
                             height: '10vw',

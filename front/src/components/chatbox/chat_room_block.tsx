@@ -31,7 +31,7 @@ const modalStyle = {
     p: 4,
 };
 
-export default function ChatRoomBlock({room, openModal, setOpenModal, selectedIdx, setSelectedIdx, handleJoin} :any) {
+export default function ChatRoomBlock({room, roomidx,openModal, setOpenModal, selectedIdx, setSelectedIdx, handleJoin} :any) {
 
 	const [inPassword, setInPassword] = useState('');
 

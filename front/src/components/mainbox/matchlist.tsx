@@ -131,13 +131,13 @@ export default function MatchList(props: any) {
 					width: '4vw', // 프로필 사진의 너비 조절
 					height: '4vw', // 프로필 사진의 높이 조절
 				};
-				const imageLoader = ({ src }: any) => {
-					return `${process.env.NEXT_PUBLIC_API_URL}user/getimg/nickname/${src}`
+				const imageLoader = ({ src, time }: any) => {
+					return `${process.env.NEXT_PUBLIC_API_URL}user/getimg/nickname/${src}?${time}`
 				}
 				return (
 					<Grid container display='flex' justifyContent='space-between' alignItems='center' key={index} sx={listItemStyle}>
 						<div style={{display:'flex', alignItems:'center'}}>
-							<Avatar alt="Remy Sharp" src={imageLoader({src: name})} sx={avatarStyle}/>
+							<Avatar alt="Remy Sharp" src={imageLoader({src: name, time: new Date()})} sx={avatarStyle}/>
 							<Typography sx={{ ...textPrimaryStyle}}>
 								{name}
 							</Typography>

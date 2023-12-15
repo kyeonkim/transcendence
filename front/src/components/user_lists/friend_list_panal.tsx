@@ -8,7 +8,7 @@ import IconButton from '@mui/material/IconButton';
 import Avatar from '@mui/material/Avatar';
 import CommentIcon from '@mui/icons-material/Comment';
 import Badge from '@mui/material/Badge';  
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { useCookies } from 'next-client-cookies';
 import axios from 'axios';
 import { useChatSocket } from "../../app/main_frame/socket_provider"
@@ -28,8 +28,11 @@ export default function FriendListPanel(props: any) {
 	const [dmCountList, setDmCountList] = useState([]);
 
 	const [loading, setloading] = useState(true);
+
+	const [ready, setReady] = useState(false);
+
 	const socket = useChatSocket();
-	const statusContext = useStatusContext();
+	const { status, setStatus } = useStatusContext();
 
 	const { setMTbox, dmOpenId, dmOpenNickname, handleDmAlarmCount, handleChatTarget, list, myId, tapref} = props;
 
@@ -39,12 +42,37 @@ export default function FriendListPanel(props: any) {
 	const cookies = useCookies();
 
 	useEffect(() => {
-		if (list && JSON.stringify(list) === JSON.stringify(apiResponse)) {
-			
-			return;
+		// 처음할 때 즉시 setStatus 들어가는 것을 방지하기 위함. 다른 확실한 조건이 있을까?
+		console.log('ready set');
+		setReady(true);
+	}, [])
+
+	const updateStatus = useCallback(
+		(newStatus :string) => {
+			console.log('updateMyStatus - ', newStatus);
+		  	setStatus(newStatus);
+		},
+		[setStatus]
+	  );
+	  
+	useEffect(() => {
+		console.log('friend list render - ', list);
+		console.log('status Context - ', status);
+
+		if (ready === true)
+		{
+			if (list && JSON.stringify(list) === JSON.stringify(apiResponse)) {
+				console.log('friend list done');
+				if (status === 'login')
+					updateStatus('online');
+				return;
+			}
 		}
-		if (list && statusContext === 'login') {	
-			socket.emit('status', { user_id: myId, status: statusContext });
+		if (list) {
+	
+			console.log('list update status loop - ', status);
+
+			socket.emit('status', { user_id: myId, status: status });
 
 			list.map((user :any) => {
 				const target = dmCountListRef.current.find((countList :any) => countList.id === user.followed_user_id) 
@@ -67,13 +95,17 @@ export default function FriendListPanel(props: any) {
 					setDmCountList(newCountList);
 				}
 			})
-			
+
+			console.log('ready to update apiResponse');
 
 			setApiResponse(list);
-
 		}
 		else
+		{
+			console.log('did set loading has happened? - not in most case');
 			setloading(true);
+		}
+
 	}, [list]);
 
 	useEffect(() => {

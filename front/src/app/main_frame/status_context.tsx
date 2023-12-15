@@ -4,11 +4,11 @@ import React, { createContext, useState, useContext } from 'react';
 const StatusContext = createContext<any>(null);
 
 const StatusContextProvider = ({ children }: any) => {
-	const [Status, setStatus] = useState('login');
-	// 'lo';
+	const [status, setStatus] = useState('login');
+	// 'login', 'online', 'inGame'
 
 	return (
-	  <StatusContext.Provider value={{ Status, setStatus }}>
+	  <StatusContext.Provider value={{ status, setStatus }}>
 			{children}
 		</StatusContext.Provider>
 	);
