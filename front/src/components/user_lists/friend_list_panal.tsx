@@ -46,14 +46,6 @@ export default function FriendListPanel(props: any) {
 		console.log('ready set');
 		setReady(true);
 	}, [])
-
-	const updateStatus = useCallback(
-		(newStatus :string) => {
-			console.log('updateMyStatus - ', newStatus);
-		  	setStatus(newStatus);
-		},
-		[setStatus]
-	  );
 	  
 	useEffect(() => {
 		console.log('friend list render - ', list);
@@ -63,16 +55,13 @@ export default function FriendListPanel(props: any) {
 		{
 			if (list && JSON.stringify(list) === JSON.stringify(apiResponse)) {
 				console.log('friend list done');
-				if (status === 'login')
-					updateStatus('online');
 				return;
 			}
 		}
 		if (list) {
-	
-			console.log('list update status loop - ', status);
 
-			socket.emit('status', { user_id: myId, status: status });
+			socket.emit('status', { user_id: myId, status: 'update' });
+			// socket.emit('status', { user_id: myId, status: status });
 
 			list.map((user :any) => {
 				const target = dmCountListRef.current.find((countList :any) => countList.id === user.followed_user_id) 
@@ -244,7 +233,7 @@ export default function FriendListPanel(props: any) {
 							<ListItemButton onClick={handleProfile(user.followed_user_nickname)}>
 								<ListItemAvatar sx={{minWidth: 'unset'}}>
 									<Avatar
-										src={`${process.env.NEXT_PUBLIC_API_URL}user/getimg/nickname/${user.followed_user_nickname}`}
+										src={`${process.env.NEXT_PUBLIC_API_URL}user/getimg/nickname/${user.followed_user_nickname}?${new Date()}`}
 										style={{ width: '2vw', height: '2vw'}}
 									/>
 								</ListItemAvatar>

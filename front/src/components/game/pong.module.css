@@ -1,4 +1,8 @@
 
+.pongCanvas {
+	left: 50%;
+}
+
 .profileBoxInGame {
 	position: absolute;
 	top: 60%;
@@ -71,3 +75,4 @@
 	height: 65%;
 	border-radius: 50%;
 }
+

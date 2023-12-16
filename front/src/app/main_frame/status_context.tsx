@@ -4,8 +4,9 @@ import React, { createContext, useState, useContext } from 'react';
 const StatusContext = createContext<any>(null);
 
 const StatusContextProvider = ({ children }: any) => {
-	const [status, setStatus] = useState('login');
-	// 'login', 'online', 'inGame'
+	const [status, setStatus] = useState('online');
+	// 'online', 'inGame' 
+		// 'update'
 
 	return (
 	  <StatusContext.Provider value={{ status, setStatus }}>

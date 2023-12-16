@@ -27,8 +27,8 @@ export default function UserInfo(props: any) {
 		getUserInfo();
 	}, [userId]);
 
-	const imageLoader = ({ src }: any) => {
-		return `${process.env.NEXT_PUBLIC_API_URL}user/getimg/nickname/${src}`
+	const imageLoader = ({ src, time }: any) => {
+		return `${process.env.NEXT_PUBLIC_API_URL}user/getimg/nickname/${src}?${time}`
 	  }
 
 	return (
@@ -36,7 +36,7 @@ export default function UserInfo(props: any) {
 			{userId ? (
 				<>
 					<Avatar
-						src={imageLoader({ src: user.nick_name })}
+						src={imageLoader({ src: user.nick_name , time: new Date()})}
 						sx={{ width: '10vw', height: '10vw', marginTop: '20px'}}
 						/>
 					<Typography align="center" style={{color: 'white',fontSize: '3vw'}}>

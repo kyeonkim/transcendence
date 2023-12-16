@@ -8,6 +8,8 @@ import { useStatusContext } from "@/app/main_frame/status_context";
 import  GameProfile  from "./gameProfile";
 import  GameEnd from "./gameEnd";
 
+import styles from './pong.module.css';
+
 export default function Pong (props :any){
     const socket = useChatSocket();
     const { rank, mode, exitGame  } = props;
@@ -43,7 +45,6 @@ export default function Pong (props :any){
 
     const [scoreValue, setScoreValue] = useState({player1: 0, player2: 0});
     const [propscore, setScore] = useState({player1: 0, player2: 0});
-    const [viewportUpdate, setViewportUpdate] = useState(false);
     const [initCanvas, setInitCanvas] = useState(false);
     const [readyResize, setReadyResize] = useState(false);
     const [initUserSetting, setInitUserSetting] = useState(false);
@@ -58,7 +59,6 @@ export default function Pong (props :any){
         y: 0,
         speed: 10
     });
-    const [ballVecLen, setBallVecLen] = useState(Math.sqrt(Math.pow(6, 2) + Math.pow(6, 2)));
 
     const [isArrowPressed, setIsArrowPressed] = useState({
         arrowUp: false,
@@ -120,31 +120,31 @@ export default function Pong (props :any){
         {
             ratio = screenWidth / 1600;
 
-            screenHeight = screenWidth / 16 * 9;
+            let newHeight = screenWidth / 16 * 9;
 
             setInitialSize({
                 canvas_width: screenWidth,
-                canvas_height: screenHeight,
+                canvas_height: newHeight,
                 board_width: screenWidth,
-                board_height: screenHeight / 9,
+                board_height: newHeight / 9,
                 ball_size: screenWidth / 50,
                 bar_width: screenWidth / 60,
-                bar_height: screenHeight / 5
+                bar_height: newHeight / 5
             });
         }
         else
         {
             ratio = screenHeight / 900;
 
-            screenWidth = screenHeight / 9 * 16;
+            let newWidth = screenHeight / 9 * 16;
 
             setInitialSize({
-                canvas_width: screenWidth,
+                canvas_width: newWidth,
                 canvas_height: screenHeight,
-                board_width: screenWidth,
+                board_width: newWidth,
                 board_height: screenHeight / 9,
-                ball_size: screenWidth / 50,
-                bar_width: screenWidth / 60, // 16
+                ball_size: newWidth / 50,
+                bar_width: newWidth / 60, // 16
                 bar_height: screenHeight / 5 // 108
             });
         }
@@ -162,6 +162,7 @@ export default function Pong (props :any){
             setInitCanvas(true);
 
         }
+
     }, [containerRef]);
 
     useEffect(() => {
@@ -172,10 +173,11 @@ export default function Pong (props :any){
                 height: initialSize.canvas_height,
                 width: initialSize.canvas_width,
                 backgroundColor: "black",
+                containerClass: "canvasCss"
             });
         
-        
             setCanvas(pongCanvas);
+
         
             let tmp_user1 = new fabric.Rect({
                 left: initialSize.bar_width * 2,
@@ -352,6 +354,8 @@ export default function Pong (props :any){
             let lastRequestId :number; 
 
             socket.on('game-end', listenGameEnd);
+
+            socket.emit('status', { user_id: Number(cookies.get('user_id')), status: status });
     
             const drawPong = () => {
                 
@@ -673,7 +677,10 @@ export default function Pong (props :any){
         return (
         
             <div>
-                <canvas id="pongCanvas"></canvas>
+                <div className={styles.pongCanvas}>
+                    <canvas id="pongCanvas">
+                    </canvas>
+                </div>
                 {initListener === true && (
                     <GameProfile
                         inGameData={inGameData}

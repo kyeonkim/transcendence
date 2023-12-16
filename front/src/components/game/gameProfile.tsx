@@ -26,7 +26,7 @@ export default function GameProfile({inGameData, score1, score2, isUserPL1} :any
             <Grid container className={styles.profileBoxInGame}>
                 <Box display="flex" flexDirection="column" alignItems="center" className={styles.playerContainer1}>
                         <Avatar
-                            src={imageLoader(`${inGameData.user1_nickname}`)}
+                            src={imageLoader(`${inGameData.user1_nickname}?${new Date()}`)}
                             style={{border: isUserPL1 ? '2px solid white' : '2px solid red'}}
                                 sx={{
                                 width: '10vw',
@@ -56,7 +56,7 @@ export default function GameProfile({inGameData, score1, score2, isUserPL1} :any
                 </Box>
                 <Box display="flex" flexDirection="column" alignItems="center" className={styles.playerContainer2}>
                     <Avatar
-                        src={imageLoader(`${inGameData.user2_nickname}`)}
+                        src={imageLoader(`${inGameData.user2_nickname}?${new Date()}`)}
                             style={{border: isUserPL1 ? '2px solid red' : '2px solid white'}}
                             sx={{
                             width: '10vw',

@@ -4,20 +4,14 @@ import axios from "axios";
 import { useCookies } from "next-client-cookies";
 import { axiosToken } from '@/util/token';
 import { useStatusContext } from "@/app/main_frame/status_context";
+import { Unstable_Grid2 } from "@mui/material";
 
 export function useFriendList(myId: any) {
   const [apiResponse, setApiResponse] = useState([]);
   const socket = useChatSocket();
   const cookies = useCookies();
-  const { status, setStatus } = useStatusContext();
+  const { status } = useStatusContext();
 
-	const updateMyStatus = useCallback(
-		(newStatus :string) => {
-			console.log('updateMyStatus - ', newStatus);
-		  	setStatus(newStatus);
-		},
-		[setStatus]
-	  );
 
   useEffect(() => {
     const fetchData = async () => {
@@ -69,31 +63,28 @@ export function useFriendList(myId: any) {
     return () => {
       socket.off('status', handleStatusUpdate);
     };
-  }, [apiResponse, socket]);
+  }, [apiResponse, status, socket]);
 
   // 상대의 status를 받는다.
   const updateStatus = (userId: any, from_status: any) => {
 
     console.log('updateOthersStatus - ', userId, from_status);
 
-    setApiResponse((prevState) =>
-      prevState.map((user: any) => {
-        if (user.followed_user_id == Number(userId)) {
-          return { ...user, status: from_status };
-        }
-        return user;
-      })
-    );
-
-    if (from_status === 'login') {
+    if (from_status === 'update') {
       // 내 상태를 보낸다.
-      let send_status = status;
-      if (status === 'login')
-          send_status = 'online'
-          
-      socket.emit('status', { user_id: myId, status: send_status, target: userId });
+      socket.emit('status', { user_id: myId, status: status, target: userId });
     }
-
+    else
+    {
+        setApiResponse((prevState) =>
+        prevState.map((user: any) => {
+          if (user.followed_user_id == Number(userId)) {
+              return { ...user, status: from_status };
+          }
+              return user;
+        })
+      );
+    }
   };
 
   return apiResponse;

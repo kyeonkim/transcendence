@@ -202,8 +202,8 @@ export class SocketGameService {
         const room = this.InGame.get(user_id);
         if (room == undefined)
             return {status: false, message: "게임이 존재하지 않습니다."};
-        this.server.to(`status-${room.user1_id}`).emit(`status`, {user_id: room.user1_id, status: `online`});
-        this.server.to(`status-${room.user2_id}`).emit(`status`, {user_id: room.user2_id, status: `online`});
+        // this.server.to(`status-${room.user1_id}`).emit(`status`, {user_id: room.user1_id, status: `online`});
+        // this.server.to(`status-${room.user2_id}`).emit(`status`, {user_id: room.user2_id, status: `online`});
         const user1_id = room.user1_id;
         const user2_id = room.user2_id;
         this.server.to(`game-${user1_id}`).emit(`game-end`, {gameData: room});
@@ -297,8 +297,8 @@ export class SocketGameService {
         if (this.InGame.get(Number(payload.user_id)).user1_ready && this.InGame.get(Number(payload.user_id)).user2_ready)
         {
             const room = this.InGame.get(Number(payload.user_id));
-            this.server.to(`status-${room.user1_id}`).emit(`status`, {user_id: room.user1_id, status: `ingame`});
-            this.server.to(`status-${room.user2_id}`).emit(`status`, {user_id: room.user2_id, status: `ingame`});
+            // this.server.to(`status-${room.user1_id}`).emit(`status`, {user_id: room.user1_id, status: `ingame`});
+            // this.server.to(`status-${room.user2_id}`).emit(`status`, {user_id: room.user2_id, status: `ingame`});
             room.rank = payload.rank;
             if (room.rank === false)
                 room.game_mode = payload.game_mode;

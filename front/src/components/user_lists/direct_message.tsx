@@ -26,8 +26,8 @@ export default function DirectMessage( {dmAlarmCount, dmAlarmCountList, dmAlarmR
 	const cookies = useCookies();
 	const messageAreaRef = useRef(null);
 	const socket = useChatSocket();
-
 	const user_id = Number(cookies.get('user_id'));
+	// const tapref = useRef(null);
 
 	const handleSendMessage = () => {
 		if (message.trim() === '') {
@@ -56,10 +56,14 @@ export default function DirectMessage( {dmAlarmCount, dmAlarmCountList, dmAlarmR
 				<Popper open={handleOpen()}
 					anchorEl={tapref.current}
 					placement="right-start"
-					sx={{ position: 'absolute', maxWidth: 'min-content'}}
+					sx={{
+						position: 'absolute',
+						maxWidth: 'min-content'
+						
+					}}
 					>
 					<AppBar position="static">
-						<Typography variant="h5" sx={{ flexGrow: 1, align: 'center', padding: '10px' }}>
+						<Typography variant="h5" sx={{ flexGrow: 1, align: 'center', padding: '10px', fontSize: '1vw'}}>
 							{dmOpenNickname}
 						</Typography>
 					</AppBar>

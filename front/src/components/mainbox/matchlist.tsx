@@ -161,7 +161,7 @@ export default function MatchList(props: any) {
 							<Typography sx={{ ...textPrimaryStyle}}>
 								{match.enemy_name}
 							</Typography>
-							<Avatar alt="Remy Sharp" src={imageLoader({src: match.enemy_name})} sx={avatarStyle}/>
+							<Avatar alt="Remy Sharp" src={imageLoader({src: match.enemy_name, time: new Date()})} sx={avatarStyle}/>
 						</div>
 					</Grid>
 				);

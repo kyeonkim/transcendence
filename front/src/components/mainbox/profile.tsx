@@ -34,7 +34,7 @@ const ProfilePage = (props: any) => {
   useEffect(() => {
     if (props.nickname)
       setUserNickname(props.nickname);
-  }, [])
+  }, [props])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -85,7 +85,7 @@ const ProfilePage = (props: any) => {
 	useEffect(() => {
 
     const renderProfile = (data :any) => {
-      setRendering(data.time);
+      setRendering(data.data);
     }
 
 		socket.on(`render-profile`, renderProfile);

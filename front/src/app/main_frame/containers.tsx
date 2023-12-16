@@ -39,6 +39,7 @@ export default function Main() {
   }, []);
 
   const handleClick = (value: number, searchTarget?: string) => {
+    console.log("clicked to", value, searchTarget);
     setClick(value);
     setSearch(searchTarget || '');
   }

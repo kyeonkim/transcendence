@@ -105,7 +105,8 @@ export class SocialService {
         await this.socketGateway.JoinRoom(friend.user_id, `status-${addFriend.user_id}`);
         await this.socketGateway.SendRerender(addFriend.user_id, 'friend');
         await this.socketGateway.SendRerender(friend.user_id, 'friend');
-        await this.socketGateway.SendRerender(friend.user_id, 'profile', 'false');
+        await this.socketGateway.SendRerender(addFriend.user_id, 'profile');
+        await this.socketGateway.SendRerender(friend.user_id, 'profile');
         return {status: true, message: "success"};
     }
     
@@ -138,8 +139,8 @@ export class SocialService {
             console.error("DeleteFriend failed error: ", error);
             return {status: false, message: "DeleteFriend failed"}
         }
-        // await this.eventService.SendFriendEvent(delFriend.user_id);
-        // await this.eventService.SendFriendEvent(friend.user_id);
+        await this.socketGateway.SendRerender(delFriend.user_id, 'profile');
+        await this.socketGateway.SendRerender(friend.user_id, 'profile');
         await this.socketGateway.SendRerender(delFriend.user_id, `friend`);
         await this.socketGateway.SendRerender(friend.user_id, `friend`);
         return {status: true, message: "success"};

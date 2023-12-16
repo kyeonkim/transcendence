@@ -69,6 +69,7 @@ export default function BasicTabs({ setMTbox }: SearchUserProps) {
 	const [dmOpenId, setDmOpenId] = useState(-1);
 	const [dmOpenNickname, setDmOpenNickname] = useState('');
 	const [dmAlarmList, setDmAlarmList] = useState([]);
+	const [render, setRender] = useState('');
 	const cookies = useCookies();
 	const socket = useChatSocket();
 	const tabsRef = useRef(null);
@@ -79,12 +80,16 @@ export default function BasicTabs({ setMTbox }: SearchUserProps) {
 		setValue(newValue);
 	};
 
-	const handleAlarmRerender = () => {
-		if (alarmRerender === true)
-			setAlarmRerender(false);
-		else
-			setAlarmRerender(true);
+	const handleAlarmRerender = (data: any) => {
+		setRender(data);
 	};
+
+	useEffect(() => {
+		if (alarmRerender === true)
+		setAlarmRerender(false);
+	else
+		setAlarmRerender(true);
+	}, [render]);
 
 	const handleAlarmGetAgain = () => {
 		setAlarmList([]);
@@ -159,7 +164,6 @@ export default function BasicTabs({ setMTbox }: SearchUserProps) {
 		const sseEvents = new EventSource(`${process.env.NEXT_PUBLIC_API_URL}event/alarmsse/${cookies.get('user_id')}`);
 
 		sseEvents.onopen = function() {
-			fetchAlarms();
 		}
 
 		sseEvents.onerror = function (error) {
@@ -172,7 +176,7 @@ export default function BasicTabs({ setMTbox }: SearchUserProps) {
 			setAlarmListAdd(parsedData);
 		}
 
-		socket.emit('status', { user_id: Number(cookies.get('user_id')), status: 'login' });
+		socket.emit('status', { user_id: Number(cookies.get('user_id')), status: 'online' });
 
 		return () => {
 			sseEvents.close();
@@ -183,24 +187,44 @@ export default function BasicTabs({ setMTbox }: SearchUserProps) {
 	useEffect(() => {
 		handleAlarmGetAgain();
 		fetchAlarms();
-		setValue(1);
+		setValue(0);
 	}, [alarmRerender]);
 
 
 	const handleChatTarget = (from_id :any, from_nickname: any) => {
 		if (dmOpenId === from_id)
 		{
+			console.log("set dm out111===", );
 			setDmOpenId(-1);
 			setDmOpenNickname('');
 		}
 		else
 		{
+			console.log("set dm out222===", );
 			setDmOpenId(from_id);
 			setDmOpenNickname(from_nickname);
 			handleRenderDmBlock();
 		}
 
 	};
+
+	useEffect(() => {
+		if (dmOpenId === -1)
+			return ;
+		else {
+			let flag = false;
+
+			friendList.map((friend :any) => {
+				if (friend.followed_user_id === dmOpenId)
+				{
+					flag = true;	
+					return ;
+				}
+			})
+			if (flag === false)
+				setDmOpenId(-1);
+		}
+	}, [friendList]);
 
 	return (
 		<Grid className={styles.userlist}>

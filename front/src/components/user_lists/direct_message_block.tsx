@@ -174,7 +174,7 @@ export default function DmMessageBlock({dmOpenId, dmOpenNickname, messageAreaRef
 
     useEffect(() => {
         const handleScroll = (e:any) => {
-          if (messageAreaRef.current && e.currentTarget.scrollTop === 0)
+          if (lastIdx !== 1 && messageAreaRef.current && e.currentTarget.scrollTop === 0)
           {
             setPage((prevPage) => prevPage + 1);
             setScrollTop(true);
@@ -195,6 +195,11 @@ export default function DmMessageBlock({dmOpenId, dmOpenNickname, messageAreaRef
 
     useEffect(() => {
         const getMoreDm = async () => {
+            console.log('lastIdx - ',lastIdx);
+
+            if (lastIdx === 1)
+                return ;
+
             await axiosToken.get(`${process.env.NEXT_PUBLIC_API_URL}chat/dm`, {
                 params: {
                     id: user_id,
@@ -211,13 +216,15 @@ export default function DmMessageBlock({dmOpenId, dmOpenNickname, messageAreaRef
     
                 if (res.data.status === true)
                 {
-
+                    console.log ('ready to get more!!!', res.data);
                     if (res.data.dm.length !== 0)
                     {   
                         // 가져온 리스트 임시 저장
                         // 현재 리스트 복사 보관
                         // 빈 현재 리스트에 가져온 리스트 저장
                         // 보관된 리스트를 현재 리스트에 추가
+                        console.log('getting!!!!');
+
                         setLastIdx(res.data.dm[res.data.dm.length - 1].idx);
                         
                         const tmpResDm = res.data.dm.reverse();
@@ -241,7 +248,9 @@ export default function DmMessageBlock({dmOpenId, dmOpenNickname, messageAreaRef
                 }
             })
         }
-        getMoreDm()
+
+        getMoreDm();
+
     }, [page]);
 
 
@@ -287,30 +296,37 @@ export default function DmMessageBlock({dmOpenId, dmOpenNickname, messageAreaRef
             target_name = nick_name;
 
 		return (
-			<Grid container key={message.created_at}>
-				<ListItem style={{ padding: '5px', paddingBottom: '0px', marginLeft: target_name === nick_name? '380px' : '0px'}}>
-					<Stack direction="row" spacing={1}>
+            <Grid container key={message.created_at}>
+                <ListItem
+                    style={{
+                        padding: '5px',
+                        paddingBottom: '0px',
+                        justifyContent: target_name === nick_name ? 'flex-end' : 'flex-start',
+                    }}
+                >
+                    <Stack direction="row" spacing={1}>
                         <Chip
                             avatar={<Avatar src={imageLoader({src: target_name, time: new Date()})} />}
                             label={target_name}
                             component='div'
                             onClick={() => handleClick(target_name)}
                         />
-					</Stack>
-				</ListItem>
-				<ListItem
-					style={{
-						display: 'flex',
-						justifyContent: target_name === nick_name ? 'flex-end' : 'flex-start',
-						paddingRight: target_name === nick_name ? '25px' : '0px',
-						wordBreak: 'break-word',
-					}}
-				>
-					<Typography style={{ overflowWrap: 'break-word' }}>
-						{`${message.content}`}
-					</Typography>
-				</ListItem>
-			</Grid>
+                    </Stack>
+                </ListItem>
+                <ListItem
+                    style={{
+                        display: 'flex',
+                        justifyContent: target_name === nick_name ? 'flex-end' : 'flex-start',
+                        padding: '0px 25px',
+                        wordBreak: 'break-word',
+                        width: '100%',
+                    }}
+                >
+                    <Typography style={{ overflowWrap: 'break-word' }}>
+                        {`${message.content}`}
+                    </Typography>
+                </ListItem>
+            </Grid>
 		);
 	};
 
