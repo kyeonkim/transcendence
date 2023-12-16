@@ -5,9 +5,9 @@ export default function RootLayout({ children }: any) {
   return (
     <html>
       <body>
-          <ClientCookiesProvider value={cookies().getAll()}>
-            {children}
-          </ClientCookiesProvider>
+        <ClientCookiesProvider value={cookies().getAll()}>
+          {children}
+        </ClientCookiesProvider>
       </body>
     </html>
   );

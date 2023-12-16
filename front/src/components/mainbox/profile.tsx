@@ -9,13 +9,15 @@ import { useCookies } from 'next-client-cookies';
 import OtpModal from '../profile/otp';
 import TwoFAPass from '@/app/login/twoFAPass';
 import { Avatar, Grid, Tooltip, Typography, Unstable_Grid2 } from '@mui/material';
-import { useChatSocket } from "../../app/main_frame/socket_provider"
 import { axiosToken } from '@/util/token';
 import { render } from 'react-dom';
 import MedalIcon from '@mui/icons-material/WorkspacePremium';
 
+import { useChatSocket } from "../../app/main_frame/socket_provider"
+import { useMainBoxContext } from '../../app/main_frame/mainbox_context';
 
 const ProfilePage = (props: any) => {
+
   const [isFriend, setIsFriend] = useState(false);
   const [isBlock, setIsBlock] = useState(false);
   const [isOTP, setIsOTP] = useState(false);
@@ -27,14 +29,14 @@ const ProfilePage = (props: any) => {
   const socket = useChatSocket();
   const formData = new FormData();
   const [ userNickname, setUserNickname ] = useState('');
-  const { setProfile } = props;
+  const { setProfile, id } = useMainBoxContext();
   const my_id = Number(cookies.get('user_id'));
   const my_nick = cookies.get('nick_name');
 
   useEffect(() => {
-    if (props.nickname)
-      setUserNickname(props.nickname);
-  }, [props])
+    if (id)
+      setUserNickname(id);
+  }, [id])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -87,11 +89,13 @@ const ProfilePage = (props: any) => {
     const renderProfile = (data :any) => {
       setRendering(data.data);
     }
-
-		socket.on(`render-profile`, renderProfile);
+    console.log(`socket Effect : ${socket}`)
+    if (socket)
+  		socket.on(`render-profile`, renderProfile);
 	
 		return () => {
-			socket.off("render-profile", renderProfile);
+      if(socket)
+  			socket.off("render-profile", renderProfile);
 		};
 	}, [socket]) 
 

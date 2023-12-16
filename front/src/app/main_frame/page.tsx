@@ -2,21 +2,15 @@
 
 import { useState, useEffect } from 'react';
 
-import Main from './containers';
-import ChatSocket  from './socket_provider';
-import ChatBlockProvider from './shared_state';
-import StatusContextProvider from './status_context';
+// import Main from './containers';
 
+import Mainbox from '@/components/mainbox/mainbox';
 
 export default function MainFrame () {
 
   return (
-        <ChatSocket>
-          <ChatBlockProvider>
-            <StatusContextProvider>
-              <Main />
-            </StatusContextProvider>
-          </ChatBlockProvider>
-        </ChatSocket>
+    // <Mainbox mod={clicked} search={id} setProfile={setProfile}/>
+      <Mainbox />
+
   );
 }

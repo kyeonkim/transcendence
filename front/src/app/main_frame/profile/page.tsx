@@ -12,7 +12,7 @@ export default function ProfilePage() {
 	const search = searchParams.get('nickname')
 
 	return (
-			<Profile nickname={search} setProfile={null}/>
+		<Profile nickname={search} setProfile={null}/>
 	)
 
 	// return <div>ProfilePage to {search}</div>;
