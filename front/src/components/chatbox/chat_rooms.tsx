@@ -33,7 +33,7 @@ const MainChatRoomList = styled(Grid) ({
   });
   
 
-  export default function ChatRoomList({setMTbox, handleRenderMode }: any) {
+  export default function ChatRoomList({handleRenderMode }: any) {
 	const socket = useChatSocket();
 	const cookies = useCookies();
 	const [roomList, setRoomList] = useState([]);
@@ -114,7 +114,7 @@ const MainChatRoomList = styled(Grid) ({
 
 	return (
 		<div>
-			<ChatRoomBar setMTbox={setMTbox} handleRenderMode={handleRenderMode} />
+			<ChatRoomBar handleRenderMode={handleRenderMode} />
             {roomList ? (
 			<div>
 				<MainChatRoomList>

@@ -4,10 +4,11 @@ import { Grid, List, ListItem, Stack, Chip, Typography, Avatar } from "@mui/mate
 import { useCookies } from 'next-client-cookies';
 import { useChatSocket } from "../../app/main_frame/socket_provider"
 import { useChatBlockContext } from '@/app/main_frame/shared_state';
+import { useMainBoxContext } from '@/app/main_frame/mainbox_context';
 
 import { axiosToken } from '@/util/token';
 
-export default function DmMessageBlock({dmOpenId, dmOpenNickname, messageAreaRef, scrollref, setMTbox} :any) {
+export default function DmMessageBlock({dmOpenId, dmOpenNickname, messageAreaRef, scrollref} :any) {
     const [tmpNewDm, setTmpNewDm] = useState([]);
     const [tmpOldDm, setTmpOldDm] = useState([]);
 	const [dmList, setDmList] = useState([]);
@@ -20,6 +21,7 @@ export default function DmMessageBlock({dmOpenId, dmOpenNickname, messageAreaRef
 
     const socket = useChatSocket();
     const cookies = useCookies();
+    const { setMTBox } = useMainBoxContext();
 
     const dmOpenIdRef = useRef(dmOpenId);
 
@@ -283,7 +285,7 @@ export default function DmMessageBlock({dmOpenId, dmOpenNickname, messageAreaRef
 	}, []);
 
 	const handleClick = (name: string) => {
-		setMTbox(1, name);
+		setMTBox(1, name);
 	};
 
 	const renderMessage = (message: any) => {

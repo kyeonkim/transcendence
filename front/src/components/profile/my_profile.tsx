@@ -1,16 +1,18 @@
 import React from 'react';
 import Image from 'next/image';
-import styles from '../mainbox/mainbox.module.css'
+import styles from './myprofile.module.css'
 import { useCookies } from 'next-client-cookies';
 import { Avatar, Grid } from '@mui/material';
 
+import { useMainBoxContext } from '@/app/main_frame/mainbox_context';
+
 export default function MyProfile(props: any) {
-  const { setMTbox, profile } = props;
+  const { setMTBox, profile } = useMainBoxContext();
   const cookies = useCookies();
   const my_nick = cookies.get('nick_name');
 
   const handleMTbox = (num: number) => () => {
-    setMTbox(num, my_nick);
+    setMTBox(num, my_nick);
   }
 
   const imageLoader = (src: any) => {

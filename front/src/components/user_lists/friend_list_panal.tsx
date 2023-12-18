@@ -18,8 +18,9 @@ import Divider from '@mui/material/Divider';
 import DirectMessage from './direct_message';
 import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
 import { axiosToken } from '@/util/token';
-import { useStatusContext } from "@/app/main_frame/status_context";
 
+import { useStatusContext } from "@/app/main_frame/status_context";
+import { useMainBoxContext } from '@/app/main_frame/mainbox_context';
 
 export default function FriendListPanel(props: any) {
 	
@@ -33,8 +34,9 @@ export default function FriendListPanel(props: any) {
 
 	const socket = useChatSocket();
 	const { status, setStatus } = useStatusContext();
+	const { setMTBox } = useMainBoxContext();
 
-	const { setMTbox, dmOpenId, dmOpenNickname, handleDmAlarmCount, handleChatTarget, list, myId, tapref} = props;
+	const { dmOpenId, dmOpenNickname, handleDmAlarmCount, handleChatTarget, list, myId, tapref} = props;
 
 	const dmOpenIdRef = useRef(dmOpenId);
 	const dmCountListRef = useRef(dmCountList);
@@ -143,7 +145,7 @@ export default function FriendListPanel(props: any) {
 
 
 	const handleProfile = (id: any) => () => {
-		setMTbox(1, id);
+		setMTBox(1, id);
 	}
 
 	const getStatusColor = (status: string) => {
@@ -269,7 +271,6 @@ export default function FriendListPanel(props: any) {
 						dmOpenId={dmOpenId}
 						dmOpenNickname={dmOpenNickname}
 						handleChatTarget={handleChatTarget}
-						setMTbox={setMTbox}
 						tapref={tapref}
 						>
 					</DirectMessage>

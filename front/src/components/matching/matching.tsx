@@ -3,16 +3,14 @@ import styles from './match.module.css';
 import { Grid, Typography } from '@mui/material';
 import { headers } from 'next/headers';
 
+import { useMainBoxContext } from '@/app/main_frame/mainbox_context';
 
-interface MyProfileProps {
-    setMTbox: (num: number, searchTarget: string) => void;
-  
-}
+export default function MatchingButton() {
 
-export default function MatchingButton({ setMTbox }: MyProfileProps) {
+    const { setMTBox } = useMainBoxContext();
 
     const handleMTbox = (num: number) => () => {
-        setMTbox(num, '');
+        setMTBox(num, '');
     }
 
     return (

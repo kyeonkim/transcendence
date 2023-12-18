@@ -27,7 +27,6 @@ export default function ChatBlock(props: any) {
 	const render = chatBlockTriggerRender;
 	const setRender = setChatBlockTriggerRender;
 
-
 	const [roominfo, setRoominfo] = useState({});
 
 	const handleRenderMode = handleRenderChatBlock;
@@ -78,14 +77,11 @@ export default function ChatBlock(props: any) {
 
 	}, [roominfo]);
 
-
-	const { setMTbox } = props;
-
 	if (renderMode === 'chatList')
 		return <ChatRoomList handleRenderMode={handleRenderMode}/>;
 	else if (renderMode === 'newChat')
 		return <ChatRoomCreate handleRenderMode={handleRenderMode} />;
 	else if (renderMode === 'chatRoom')
-		return <Chat setMTbox={setMTbox} handleRenderMode={handleRenderMode} roominfo={roominfo}/>;
+		return <Chat handleRenderMode={handleRenderMode} roominfo={roominfo}/>;
 }
 

@@ -14,15 +14,15 @@ import { Background } from 'tsparticles-engine';
 import { Alert, AlertTitle, Grid, Stack, Typography } from '@mui/material';
 import styles from './search_bar.module.css';
 
+import { useMainBoxContext } from '@/app/main_frame/mainbox_context';
 
-interface SearchUserProps {
-    setMTbox: (num: number, searchTarget: string) => void;
-}
 
-export default function SearchUser({ setMTbox }: SearchUserProps) {
+export default function SearchUser() {
     const [searchTarget, setSearchTarget] = useState('');
     const [val, setval] = useState(true);
     const cookies = useCookies();
+
+    const { setMTBox } = useMainBoxContext();
 
     const handleMTbox =  async (num: number, searchTarget: string) => {
         if (searchTarget) {
@@ -34,7 +34,7 @@ export default function SearchUser({ setMTbox }: SearchUserProps) {
                 .then((res) => {
 
                     if (res.data.status === true)
-                        setMTbox(num, searchTarget);
+                        setMTBox(num, searchTarget);
                 })
         }
     }

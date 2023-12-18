@@ -19,7 +19,7 @@ import { useChatSocket } from "../../app/main_frame/socket_provider"
 
 import DmMessageBlock from './direct_message_block';
 
-export default function DirectMessage( {dmAlarmCount, dmAlarmCountList, dmAlarmRemover, dmOpenId, dmOpenNickname, handleChatTarget, setMTbox, tapref} :any) {
+export default function DirectMessage( {dmAlarmCount, dmAlarmCountList, dmAlarmRemover, dmOpenId, dmOpenNickname, handleChatTarget, tapref} :any) {
 	
 	const [message, setMessage] = useState('');
 	
@@ -74,7 +74,6 @@ export default function DirectMessage( {dmAlarmCount, dmAlarmCountList, dmAlarmR
 								dmOpenNickname={dmOpenNickname}
 								messageAreaRef={messageAreaRef}
 								socket={socket}
-								setMTbox={setMTbox}
 								scrollref={messageAreaRef}
 							/>
 						</List>

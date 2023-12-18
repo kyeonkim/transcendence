@@ -24,14 +24,12 @@ import { useChatBlockContext } from '@/app/main_frame/shared_state';
 import { Grid } from '@mui/material';	
 import styles from '@/app/main_frame/frame.module.css';
 
+import { useMainBoxContext } from '@/app/main_frame/mainbox_context';
+
 interface TabPanelProps {
 	children?: React.ReactNode;
 	index: number;
 	value: number;
-}
-
-interface SearchUserProps {
-	setMTbox: (num: number, searchTarget: string) => void;
 }
 
 function CustomTabPanel(props: TabPanelProps) {
@@ -61,7 +59,7 @@ function a11yProps(index: number) {
 	};
 }
 
-export default function BasicTabs({ setMTbox }: SearchUserProps) {
+export default function BasicTabs() {
 	const [value, setValue] = useState(0);
 	const [alarmRerender, setAlarmRerender] = useState(false);
 	const [alarmCount, setAlarmCount] = useState(0);
@@ -73,6 +71,7 @@ export default function BasicTabs({ setMTbox }: SearchUserProps) {
 	const cookies = useCookies();
 	const socket = useChatSocket();
 	const tabsRef = useRef(null);
+
 	const { handleRenderDmBlock } = useChatBlockContext();
 	const friendList = useFriendList(cookies.get('user_id'));
 	
@@ -250,7 +249,6 @@ export default function BasicTabs({ setMTbox }: SearchUserProps) {
 					dmOpenNickname={dmOpenNickname}
 					handleDmAlarmCount={handleDmAlarmCount}
 					handleChatTarget={handleChatTarget}
-					setMTbox={setMTbox}
 					list={friendList}
 					myId={cookies.get('user_id')}
 					tapref={tabsRef}
@@ -262,7 +260,7 @@ export default function BasicTabs({ setMTbox }: SearchUserProps) {
 					alarmListRemover={setAlarmListRemover}
 					alarmCountHandler={setAlarmCountHandler}
 					handleAlarmRerender={handleAlarmRerender}
-					setMTbox={setMTbox}/>
+				/>
 			</CustomTabPanel>
 		</Grid>
 	);

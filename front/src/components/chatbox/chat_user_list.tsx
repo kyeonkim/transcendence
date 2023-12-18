@@ -3,16 +3,21 @@ import { Avatar, Box, Divider, List, ListItem, ListItemButton, Paper, Popper, Ty
 import { useCookies } from "next-client-cookies"
 import { axiosToken } from '@/util/token';
 
+import { useMainBoxContext } from '@/app/main_frame/mainbox_context';
+
 export default function UserList(props: any) {
 	const { handleDrawerClose, imageLoader, style, pop, setPop, setAnchorEl,
-		anchorEl , roominfo, socket, setMTbox} = props;
+		anchorEl , roominfo, socket } = props;
 	const [list, setList] = useState([]);
 	const [targetData, setTargetData] = useState<any>(null);
 	const [isOwner, setIsOwner] = useState(false);
 	const [Creater, setCreater] = useState(0);
+
 	const cookies = useCookies();
 	const token = cookies.get("access_token");
 	const my_id = cookies.get("user_id");
+
+	const { setMTBox } = useMainBoxContext();
 
 	useEffect(() => {
 		const fetchUserList = async () => {
@@ -139,7 +144,7 @@ export default function UserList(props: any) {
 	}
 
 	const handleProfile = () => {	
-		setMTbox(1, targetData.user_nickname);
+		setMTBox(1, targetData.user_nickname);
 	}
 
 	const handleInviteGame = async () => {

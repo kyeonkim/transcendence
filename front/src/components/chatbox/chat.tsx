@@ -38,7 +38,7 @@ export default function Chat(props: any) {
 	const [modalCondition, setModalCodition] = useState('');
 	const [modalOpen, setModalOpen] = useState(false);
 
-	const { setMTbox, handleRenderMode, roominfo } = props;
+	const { handleRenderMode, roominfo } = props;
 	const socket = useChatSocket();
 	const cookies = useCookies();
 	
@@ -219,7 +219,6 @@ export default function Chat(props: any) {
 					roominfo={roominfo}
 					my_id={my_id}
 					socket={socket}
-					setMTbox={setMTbox}
 				/>
 			</Drawer>
 			<Grid container component={Paper} sx={{
@@ -232,7 +231,6 @@ export default function Chat(props: any) {
 					<TextSend
 						my_name={my_name}
 						socket={socket}
-						setMTbox={setMTbox}
 						scrollref={messageAreaRef}
 					/>
 				</List>

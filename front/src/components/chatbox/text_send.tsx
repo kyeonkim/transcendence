@@ -2,9 +2,13 @@ import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from
 import { Grid, ListItem, Stack, Chip, Typography, Avatar } from "@mui/material";
 import { render } from 'react-dom';
 
-const TextSend = ({ my_name, socket, setMTbox, scrollref}: any) => {
+import { useMainBoxContext } from '@/app/main_frame/mainbox_context';
+
+const TextSend = ({ my_name, socket, scrollref}: any) => {
 	const [renderedMessages, setRenderedMessages] = useState([]);
 	const [index, setIndex] = useState(0);
+
+	const { setMTBox } = useMainBoxContext();
 
 	useEffect(() => {
 		const handleChat = (data: any) => {
@@ -43,7 +47,7 @@ const TextSend = ({ my_name, socket, setMTbox, scrollref}: any) => {
 	}, []);
 
 	const handleClick = (name: any) => {
-		setMTbox(1, name);
+		setMTBox(1, name);
 	};
 	
 	const rednerNotice = (message: any) => {

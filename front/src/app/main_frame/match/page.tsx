@@ -3,15 +3,15 @@
 import styles from '@/components/matching/match.module.css';
 import React, { useRef, useEffect, useState } from 'react';
 
-import MatchHome from '@/components/matching/matchHome';
-import GameRoom from '../matching/gameroom';
-import RankMatch from '../matching/rankmatch';
-import Pong from '../game/pong'
 import { Grid } from '@mui/material';
 import { useChatSocket } from '@/app/main_frame/socket_provider';
 import { axiosToken } from '@/util/token';
 import { useCookies } from 'next-client-cookies';
 
+import MatchHome from '@/components/matching/matchHome';
+import GameRoom from '@/components/matching/gameroom';
+import RankMatch from '@/components/matching/rankmatch';
+import Pong from '@/components/game/pong'
 
 export default function Matching(props: any) {
 	const [render, setRender] = useState(0);
@@ -21,7 +21,6 @@ export default function Matching(props: any) {
 	const cookies = useCookies();
 	const [data, setData] = useState<any>([]);
 	const myRef = useRef(null);
-	const { changeStat } = props;
 
 	useEffect(() => {
 
@@ -49,7 +48,6 @@ export default function Matching(props: any) {
 			}
 			else if (data.status === 'ingame')
 			{
-				changeStat(false);
 				setRender(3);
 			}
 			else 
@@ -65,7 +63,6 @@ export default function Matching(props: any) {
 	}, []);
 
 	const exitGame = async () => {
-		changeStat(true);
 		setRender(0);
 	}
 

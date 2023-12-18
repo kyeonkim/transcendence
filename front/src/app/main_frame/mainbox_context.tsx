@@ -1,5 +1,6 @@
 'use client'
 import React, { useMemo, createContext, useState, useContext } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface MainBoxState {
     clicked: number;
@@ -18,10 +19,24 @@ const MainBoxContextProvider = ({ children }: any) => {
 
     const [clicked, setClick] = useState(0);
     const [id, setSearch] = useState('');
-    const [profile, setProfile] = useState('');
-	
+    const [profile, setProfile] = useState(0);
+
+	const router = useRouter();
+
 	const setMTBox = (value: number, searchTarget?: string) => {
-		setClick(value);
+		console.log('setMTBox called - value : ', value, ', target : ', searchTarget);
+
+		// setClick(value);
+		
+		if (value === 1)
+		{
+			router.push('/main_frame/profile');
+		}
+		else
+		{
+			router.push('/main_frame/match');	
+		}
+
 		setSearch(searchTarget || '');
 	};
     
@@ -35,6 +50,9 @@ const MainBoxContextProvider = ({ children }: any) => {
 		id, setSearch,
 		profile, setProfile,
 		setMTBox]);
+
+	// const value :MainBoxState = {clicked, setClick, id, setSearch, profile, setProfile, setMTBox};
+
 
 	return (
 	  <MainBoxContext.Provider value={value}>

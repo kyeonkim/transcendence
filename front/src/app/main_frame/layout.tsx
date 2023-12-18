@@ -20,7 +20,6 @@ import StatusContextProvider from './status_context';
 import MainBoxContextProvider from './mainbox_context';
 
 import { useChatSocket } from "./socket_provider"
-import { useMainBoxContext } from './mainbox_context';
 
 import styles from './frame.module.css';
 
@@ -89,16 +88,16 @@ export default function MainFrameLayout({
                   <>
                     <Particles options={particlesOptions as ISourceOptions} init={particlesInit} />
                     <Grid container className={styles.leftBox}>
-                      <MyProfile setMTbox={handleClick} profile={profile}/>
-                      <SearchUser setMTbox={handleClick}/>
-                      <MatchingButton setMTbox={handleClick}/>
-                      <UserLists setMTbox={handleClick}/>
+                      <MyProfile />
+                      <SearchUser />
+                      <MatchingButton />
+                      <UserLists />
                     </Grid>
                     <Grid container className={styles.mainBox}>
                         {children}
                     </Grid>
                     <Grid container className={styles.rightBox}>
-                      <ChatBlock setMTbox={handleClick}/>
+                      <ChatBlock />
                     </Grid>
                   </>
                 )}
