@@ -26,6 +26,8 @@ export default function Matching(props: any) {
 
 		const fetchData = async () => {
 
+            console.log('matching - fetch data called');
+
 			await axiosToken.post(`${process.env.NEXT_PUBLIC_API_URL}game/checkroom`, {
 				user1_id: Number(cookies.get('user_id')),
 			})
@@ -34,7 +36,10 @@ export default function Matching(props: any) {
 			})
 		}
 		
-		socket.on('render-gameroom', (data: any) => {
+		//setIsMode와 gameRoom의 setMod의 차이점 질문하기
+        const listenRenderGameRoom = (data :any) => {
+
+            console.log('matching - listenRenderGameRoom triggers');
 
 			if (data.status === 'matching')
 			{
@@ -57,8 +62,16 @@ export default function Matching(props: any) {
 				setRender(0);
 			}
 			setData(data);
-		});
+        }
+
+		socket.on('render-gameroom', listenRenderGameRoom);
+
 		fetchData();
+
+        return () => {
+            console.log('matchinglist unmounting');
+            socket.off('render-gameroom', listenRenderGameRoom)
+        }
 
 	}, []);
 
@@ -73,7 +86,7 @@ export default function Matching(props: any) {
 		if (render === 1)
 			return <RankMatch setRender={setRender}/>
 		else if (render === 2)
-			return <GameRoom setRender={setRender} userData={data}/>
+			return <GameRoom setRender={setRender} userData={data} setIsMod={setIsMode} />
 		else if (render === 3)
 			return <Pong exitGame={exitGame} rank={isRank} mode={isMode} containerRef={myRef} />
 		else

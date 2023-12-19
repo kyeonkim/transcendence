@@ -35,6 +35,8 @@ const ProfilePage = (props: any) => {
   const my_id = Number(cookies.get('user_id'));
   const my_nick = cookies.get('nick_name');
 
+  console.log('profilepage - ', id);
+
   useEffect(() => {
     if (id)
       setUserNickname(id);

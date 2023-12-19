@@ -145,6 +145,7 @@ export default function ChatModal({modalOpen, setModalOpen, modalCondition,
                     className={styles.modalTextField}
                     id="chatname_text_field"
                     label="Enter new Name"
+                    inputProps={{ maxLength: 10}}
                     onChange={handleInChatname}
                 />
             }
@@ -158,6 +159,8 @@ export default function ChatModal({modalOpen, setModalOpen, modalCondition,
                     className={styles.modalTextField}
                     id="password_text_field"
                     label="Enter new Password"
+                    type="password"
+                    inputProps={{ maxLength: 20}}
                     onChange={handleInPassword}
                 />
             }

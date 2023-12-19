@@ -4,7 +4,7 @@ import { render } from 'react-dom';
 
 import { useMainBoxContext } from '@/app/main_frame/mainbox_context';
 
-const TextSend = ({ my_name, socket, scrollref}: any) => {
+const TextSend = ({ my_name, nameMargin, socket, scrollref}: any) => {
 	const [renderedMessages, setRenderedMessages] = useState([]);
 	const [index, setIndex] = useState(0);
 
@@ -21,7 +21,6 @@ const TextSend = ({ my_name, socket, scrollref}: any) => {
 			const newMessage = rednerNotice(data);
 			setRenderedMessages(prevMessages => [...prevMessages, newMessage]);
 		};
-
 
 		socket.on("chat", handleChat);
 		socket.on("notice", handleNotice);
@@ -72,7 +71,7 @@ const TextSend = ({ my_name, socket, scrollref}: any) => {
 	const renderMessage = (message: any) => {
 		return (
 			<Grid container key={message.time}>
-				<ListItem style={{ padding: '5px', paddingBottom: '0px', marginLeft: message.from === my_name? '80%' : '0px'}}>
+				<ListItem style={{ padding: '5px', paddingBottom: '0px', marginLeft: message.from === my_name? (nameMargin + '%') : '0px'}}>
 					<Stack direction="row" spacing={1}>
 						<Chip
 							avatar={<Avatar src={imageLoader({src: message.from, time: new Date()})} />}

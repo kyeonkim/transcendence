@@ -64,12 +64,12 @@ export default function ChatBlock(props: any) {
 
 	useEffect(() => {
 		
-
 		if (renderMode !== 'newChat')
 		{
 
 			getUserData();
 		}
+
 	}, [render])
 
 	useEffect(() => {

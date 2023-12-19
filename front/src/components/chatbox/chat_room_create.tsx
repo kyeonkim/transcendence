@@ -155,6 +155,7 @@ export default function ChatRoomCreate(props: any) {
 					}}
 					id="password_text_field"
 					label="password"
+					type="password"	
 					inputProps={{ maxLength: 20}}
 					onChange={handleRoomPasswordChange}
 					onKeyDown={(e) => {

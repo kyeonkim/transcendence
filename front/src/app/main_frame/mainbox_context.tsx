@@ -26,21 +26,20 @@ const MainBoxContextProvider = ({ children }: any) => {
 	const setMTBox = (value: number, searchTarget?: string) => {
 		console.log('setMTBox called - value : ', value, ', target : ', searchTarget);
 
-		// setClick(value);
-		
+		setClick(value);
+
 		if (value === 1)
 		{
+			setSearch(searchTarget || '');
 			router.push('/main_frame/profile');
 		}
 		else
 		{
-			router.push('/main_frame/match');	
+			router.push('/main_frame/match');
 		}
 
-		setSearch(searchTarget || '');
 	};
     
-
 	const value :MainBoxState = useMemo(() => ({
 		clicked, setClick,
 		id, setSearch,
