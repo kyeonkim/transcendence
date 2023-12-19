@@ -21,6 +21,7 @@ import { axiosToken } from '@/util/token';
 
 import { useStatusContext } from "@/app/main_frame/status_context";
 import { useMainBoxContext } from '@/app/main_frame/mainbox_context';
+import { useUserDataContext } from '@/app/main_frame/user_data_context';
 
 export default function FriendListPanel(props: any) {
 	
@@ -42,6 +43,7 @@ export default function FriendListPanel(props: any) {
 	const dmCountListRef = useRef(dmCountList);
 
 	const cookies = useCookies();
+	const { nickname, user_id } = useUserDataContext();
 
 	useEffect(() => {
 		// 처음할 때 즉시 setStatus 들어가는 것을 방지하기 위함. 다른 확실한 조건이 있을까?
@@ -199,7 +201,7 @@ export default function FriendListPanel(props: any) {
 
 		await axiosToken.post(`${process.env.NEXT_PUBLIC_API_URL}game/inviteroom`, {
 			user1_id: Number(myId),
-			user1_nickname: cookies.get("nick_name"),
+			user1_nickname: nickname,
 			user2_id: Number(nick),
 			user2_nickname: name,
 		},

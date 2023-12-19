@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect ,useCallback} from 'react';
 import { useChatSocket } from "../../app/main_frame/socket_provider"
+import { useUserDataContext } from '@/app/main_frame/user_data_context';
 import { useCookies } from 'next-client-cookies'
 import {Paper, Grid, Box, Divider, TextField, Typography, List,	IconButton, Popper,
 		AppBar, Toolbar, Drawer, Dialog, Button, DialogActions, DialogContent, DialogContentText, DialogTitle, ListItemButton} from "@mui/material";
@@ -39,11 +40,13 @@ export default function Chat(props: any) {
 	const [modalOpen, setModalOpen] = useState(false);
 
 	const { handleRenderMode, roominfo } = props;
+	
 	const socket = useChatSocket();
+	const { nickname, user_id } = useUserDataContext();
 	const cookies = useCookies();
 	
-	const my_name = cookies.get('nick_name');
-	const my_id = Number(cookies.get('user_id'));
+	const my_name = nickname;
+	const my_id = user_id;
 
 	useEffect (() => {
 		const handleKick = (data :any) => {

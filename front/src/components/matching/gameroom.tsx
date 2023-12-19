@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { axiosToken } from "@/util/token";
 import { useCookies } from "next-client-cookies";
 import { useChatSocket } from "@/app/main_frame/socket_provider";
+import { useUserDataContext } from "@/app/main_frame/user_data_context";
 
 export default function GameRoom(props: any) {
 	const { setRender, userData, setIsMod} = props;
@@ -12,9 +13,7 @@ export default function GameRoom(props: any) {
 	const [gameStart, setGameStart] = useState(false);
 	const [mod, setMod] = useState(false);
 	const cookies = useCookies();
-
-	if (!userData)
-		return <div></div>;
+	const { user_id, nickname } = useUserDataContext();
 
 	useEffect(() => {
 		if (userData.room && userData.room.user2_ready && userData.room.user1_ready)
@@ -30,7 +29,7 @@ export default function GameRoom(props: any) {
 
 	const handleExit = async () => {
 		await axiosToken.patch(`${process.env.NEXT_PUBLIC_API_URL}game/leaveroom`, {
-			user_id: Number(cookies.get('user_id')),
+			user_id: user_id,
 		},
 		{
 			headers: {
@@ -47,7 +46,7 @@ export default function GameRoom(props: any) {
 			await axiosToken.patch(
 				`${process.env.NEXT_PUBLIC_API_URL}game/ready`,
 				{
-					user_id: Number(cookies.get('user_id')),
+					user_id: user_id,
 					ready: ready? true : false,
 					game_mode: mod? true : false
 				},
@@ -79,7 +78,7 @@ export default function GameRoom(props: any) {
 	const handleStart = async () => {
 
 		await axiosToken.post(`${process.env.NEXT_PUBLIC_API_URL}game/start`, {
-			user_id: Number(cookies.get('user_id')),
+			user_id: user_id,
 		},
 		{
 			headers: {
@@ -122,7 +121,7 @@ export default function GameRoom(props: any) {
 				color="primary"
 				onClick={handleStart}
 				size="large"
-				disabled={!gameStart || Number(cookies.get('user_id')) !== userData?.room?.user1_id}
+				disabled={!gameStart || user_id !== userData?.room?.user1_id}
 				sx={{
 					position: 'relative',
 					width: '100%',

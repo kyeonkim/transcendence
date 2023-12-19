@@ -2,22 +2,25 @@
 
 import { Avatar, IconButton, ListItem, ListItemAvatar, ListItemButton, ListItemText, Typography } from "@mui/material";
 import { axiosToken } from "@/util/token";
-import { useCookies } from "next-client-cookies";
 
 import CheckCircleOutlineRoundedIcon from '@mui/icons-material/CheckCircleOutlineRounded';
 import ClearRoundedIcon from '@mui/icons-material/ClearRounded';
 import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
 
+import { useUserDataContext } from "@/app/main_frame/user_data_context";
+
 export default function AlarmInviteGame (props: any) {
 	const { alarm, handleProfile, imageLoader, denyRequest, cookies, alarmReducer} = props;
+
+	const { user_id, nickname } = useUserDataContext();
 
 	const acceptInviteGame = (alarm: any) => async () => {
 		console.log ('acceptInviteGame - ', alarm)
 		await axiosToken.patch(`${process.env.NEXT_PUBLIC_API_URL}game/joinroom`, {
 			user1_id: alarm.chatroom_id,
 			user1_nickname: alarm.from_nickname,
-			user2_id: Number(cookies.get('user_id')),
-			user2_nickname: cookies.get('nick_name'),
+			user2_id: user_id,
+			user2_nickname: nickname,
 			event_id: alarm.idx,
 		},
 		{

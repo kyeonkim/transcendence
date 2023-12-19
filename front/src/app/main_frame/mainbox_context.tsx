@@ -7,8 +7,8 @@ interface MainBoxState {
     setClick: React.Dispatch<React.SetStateAction<number>>;
     id: string;
     setSearch: React.Dispatch<React.SetStateAction<string>>;
-	profile: string;
-    setProfile: React.Dispatch<React.SetStateAction<string>>;
+	profile: number;
+    setProfile: React.Dispatch<React.SetStateAction<number>>;
 
 	setMTBox: (value: number, searchTarget?: string) => void;
   }
@@ -40,7 +40,7 @@ const MainBoxContextProvider = ({ children }: any) => {
 
 	};
     
-	const value :MainBoxState = useMemo(() => ({
+	const value: MainBoxState = useMemo(() => ({
 		clicked, setClick,
 		id, setSearch,
 		profile, setProfile,
@@ -49,9 +49,6 @@ const MainBoxContextProvider = ({ children }: any) => {
 		id, setSearch,
 		profile, setProfile,
 		setMTBox]);
-
-	// const value :MainBoxState = {clicked, setClick, id, setSearch, profile, setProfile, setMTBox};
-
 
 	return (
 	  <MainBoxContext.Provider value={value}>

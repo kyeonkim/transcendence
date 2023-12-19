@@ -1,16 +1,20 @@
+"use client"
 import { Grid, Button, Typography} from "@mui/material";
 import styles from './match.module.css';
 import { axiosToken } from "@/util/token";
 import { useCookies } from "next-client-cookies";
 import { useEffect } from "react";
 
+import { useUserDataContext } from "@/app/main_frame/user_data_context";
+
 export default function MatchHome(props: any) {
 	const { setRender } = props;
 	const cookies = useCookies();
+	const { user_id, nickname } = useUserDataContext();
 
 	const createRoom = async() => {
 		await axiosToken.post(`${process.env.NEXT_PUBLIC_API_URL}game/createroom`, {
-				user1_id: Number(cookies.get('user_id')),
+				user1_id: user_id,
 			},
 			{
 				headers: {

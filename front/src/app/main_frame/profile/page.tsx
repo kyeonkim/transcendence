@@ -1,25 +1,23 @@
 'use client';
-import React, { use } from 'react';
+import React from 'react';
 import styles from './mainbox.module.css';
 import Button from '@mui/material/Button';
 
-import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { useCookies } from 'next-client-cookies';
-import { Avatar, Grid, Tooltip, Typography, Unstable_Grid2 } from '@mui/material';
+import { Avatar, Grid, Tooltip, Typography } from '@mui/material';
 import { axiosToken } from '@/util/token';
-import { render } from 'react-dom';
 import MedalIcon from '@mui/icons-material/WorkspacePremium';
 import { useSearchParams } from 'next/navigation'
 
 import OtpModal from '@/components/profile/otp';
-import TwoFAPass from '@/app/login/twoFAPass';
 import Matchlist from '@/app/main_frame/profile/matchlist';
 
 import { useChatSocket } from "@/app/main_frame/socket_provider"
 import { useMainBoxContext } from '@/app/main_frame/mainbox_context';
+import { useUserDataContext } from '@/app/main_frame/user_data_context';
 
-const ProfilePage = (props: any) => {
+const ProfilePage = () => {
 
   const [isFriend, setIsFriend] = useState(false);
   const [isBlock, setIsBlock] = useState(false);
@@ -33,8 +31,7 @@ const ProfilePage = (props: any) => {
   const formData = new FormData();
   const [ userNickname, setUserNickname ] = useState('');
   const { setProfile } = useMainBoxContext();
-  const my_id = Number(cookies.get('user_id'));
-  const my_nick = cookies.get('nick_name');
+  const { user_id, nickname } = useUserDataContext();
 
   const searchParams = useSearchParams()
   const id = searchParams.get('id')
@@ -58,12 +55,12 @@ const ProfilePage = (props: any) => {
         if (res.data.userData)
         {
           setData(res.data)
-          if (res.data.userData.nick_name === my_nick && res.data.userData.twoFA)
+          if (res.data.userData.nick_name === nickname && res.data.userData.twoFA)
             setIsActivated(true);
           else
             setIsActivated(false);
-          if (res.data.userData.nick_name !== my_nick) {
-            setIsBlock(res.data.userData.blocks.some((block: any)=> block.blocked_user_id === my_id));
+          if (res.data.userData.nick_name !== nickname) {
+            setIsBlock(res.data.userData.blocks.some((block: any)=> block.blocked_user_id === user_id));
           }
         }})
       }
@@ -74,7 +71,7 @@ const ProfilePage = (props: any) => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${cookies.get('access_token')}`
           },
-        params: { user1: my_id , user2: userNickname},
+        params: { user1: user_id , user2: userNickname},
       })
       .then((res) => {
         console.log('friend info', res);
@@ -88,7 +85,7 @@ const ProfilePage = (props: any) => {
     if (userNickname)
     {
       fetchData(); 
-      if (userNickname !== my_nick)
+      if (userNickname !== nickname)
         fetchFriendData();
     }
     
@@ -117,8 +114,8 @@ const ProfilePage = (props: any) => {
           'Authorization': `Bearer ${cookies.get('access_token')}`,
         },
         data: {
-          user_id: my_id,
-          user_nickname: my_nick,
+          user_id: user_id,
+          user_nickname: nickname,
           friend_nickname: userNickname
         }})
       .then((res) => {
@@ -129,8 +126,8 @@ const ProfilePage = (props: any) => {
     }
     else {
       await axiosToken.post(`${process.env.NEXT_PUBLIC_API_URL}social/addFriend`,{
-        user_id: my_id,
-        user_nickname: my_nick,
+        user_id: user_id,
+        user_nickname: nickname,
         friend_nickname: userNickname
       },
       {
@@ -153,8 +150,8 @@ const ProfilePage = (props: any) => {
           'Authorization': `Bearer ${cookies.get('access_token')}`,
         },
         data: {
-          user_id: my_id,
-          user_nickname: my_nick,
+          user_id: user_id,
+          user_nickname: nickname,
           friend_id: Number(data.userData.user_id),
           friend_nickname: userNickname
         }})
@@ -164,8 +161,8 @@ const ProfilePage = (props: any) => {
     }
     else {
       await axiosToken.post(`${process.env.NEXT_PUBLIC_API_URL}social/addBlockedUser`,{
-        user_id: my_id,
-        user_nickname: my_nick,
+        user_id: user_id,
+        user_nickname: nickname,
         friend_id: Number(data.userData.user_id),
         friend_nickname: userNickname
       },
@@ -200,7 +197,7 @@ const ProfilePage = (props: any) => {
     setFile(file);
     formData.append('file', file);
     formData.append('access_token', cookies.get('access_token'));
-    formData.append('nick_name', my_nick);
+    formData.append('nick_name', nickname);
 
     await axiosToken.post( `${process.env.NEXT_PUBLIC_API_URL}user/upload`,
       formData,
@@ -210,7 +207,7 @@ const ProfilePage = (props: any) => {
               'Authorization': `Bearer ${formData.get('access_token')}`
           },
           params: {
-              nickname: my_nick
+              nickname: nickname
           }
       })
       .then((res) => {
@@ -240,7 +237,7 @@ const ProfilePage = (props: any) => {
             }}
           />
           <Typography sx={{color: 'white',  whiteSpace: 'nowrap', marginLeft: '5%', fontSize: '1.5vw'}}>
-            {userNickname !== my_nick ? `${userNickname}` : my_nick}
+            {userNickname !== nickname ? `${userNickname}` : nickname}
           </Typography>
         </Grid>
         <Grid container justifyContent="center" spacing={4}>
@@ -271,7 +268,7 @@ const ProfilePage = (props: any) => {
           </Grid>
         </Grid>
       </Grid>
-          {userNickname !==  my_nick ? ( 
+          {userNickname !==  nickname ? ( 
               <div className={styles.buttons}>
                 {isFriend? (
                   <Button variant="contained" onClick={() => handleFriend()}>
@@ -320,8 +317,8 @@ const ProfilePage = (props: any) => {
                 isActivated={isActivated}
                 setActive={handleActivte}
                 onClose={handleClose}
-                myId={my_id}
-                myNick={my_nick}
+                myId={user_id}
+                myNick={nickname}
                 token={cookies.get('access_token')}
                 />
               {/* <TwoFAPass/> */}
@@ -369,22 +366,3 @@ const ProfilePage = (props: any) => {
 }
 
 export default ProfilePage;
-
-
-// 'use client';
-// import ProfilePage from '@/components/mainbox/profile';
-// import { useRouter, useSearchParams } from 'next/navigation';
-// import ChatSocket  from '@/app/main_frame/socket_provider';
-// import ChatBlockProvider from '@/app/main_frame/shared_state';
-// import StatusContextProvider from '@/app/main_frame/status_context';
-
-// import { useMainBoxContext } from '@/app/main_frame/mainbox_context';
-
-// export default function Profile() {
-
-// 	return (
-// 		<ProfilePage />
-// 	)
-
-// 	// return <div>ProfilePage to {search}</div>;
-// }

@@ -23,7 +23,7 @@ export async function POST (request: NextRequest)
         });
 
     }
-    catch (err)
+    catch (err: any)
     {
         error_status = err?.response.data.statusCode;
 
