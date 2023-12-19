@@ -77,9 +77,9 @@ export default function Signup (props:any) {
 			})
 	}
 
-	const imageLoader = (({ src }: any) => {
+	const imageLoader = ({ src }: any) => {
 		return `${process.env.NEXT_PUBLIC_API_URL}user/getimg/nickname/${src}`
-	});
+	}
 
 	return (
 		<div>

@@ -39,9 +39,12 @@ const ProfilePage = () => {
   console.log('profilepage - ', id);
 
   useEffect(() => {
-    if (id)
-      setUserNickname(id);
-  }, [id])
+      if (id)
+      {
+          console.log('setUserNickname - ', id);
+          setUserNickname(id);
+      }
+  }, [id]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -216,7 +219,8 @@ const ProfilePage = () => {
       })
   }
 
-  const imageLoader = (src: any) => {
+  const imageLoader = ( src : any) => {
+    console.log('image nickname - ', src);
     return `${process.env.NEXT_PUBLIC_API_URL}user/getimg/nickname/${src}`
   }
 

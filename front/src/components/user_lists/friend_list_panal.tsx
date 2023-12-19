@@ -48,6 +48,7 @@ export default function FriendListPanel(props: any) {
 	useEffect(() => {
 		// 처음할 때 즉시 setStatus 들어가는 것을 방지하기 위함. 다른 확실한 조건이 있을까?
 		console.log('ready set');
+		console.log('socket in friend list panal\n', socket);
 		setReady(true);
 	}, [])
 	  

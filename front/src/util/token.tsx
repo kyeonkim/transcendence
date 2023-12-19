@@ -25,7 +25,12 @@ axiosToken.interceptors.response.use(
 
             try {
               const res = await axios.get(`${process.env.NEXT_PUBLIC_FRONT_URL}api/get_cookie`);
+
+              console.log('check token 401 - ', res);
+
               const newToken = await getNewToken(res.data.access_token, res.data.refresh_token);
+
+              console.log('check newToken has been created - ', newToken);
 
               axios.defaults.headers.common['Authorization'] = `Bearer ${newToken.access_token}`;
               originalRequest.headers['Authorization'] = `Bearer ${newToken.access_token}`;
@@ -36,8 +41,8 @@ axiosToken.interceptors.response.use(
               return axiosToken(originalRequest);
             } catch (e) {
               // console.error('토큰 재발급 실패', e);
-              window.location.href = '/';
-              console.log(e);
+              // window.location.href = '/';
+              console.log('token error catch - ', e);
             }
           }
           else {

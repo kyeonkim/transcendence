@@ -168,7 +168,6 @@ export default function Chat(props: any) {
 		setModalOpen(true);
 	};
 
-
 	const imageLoader = (({ src }: any) => {
 		return `${process.env.NEXT_PUBLIC_API_URL}user/getimg/nickname/${src}`
 	});

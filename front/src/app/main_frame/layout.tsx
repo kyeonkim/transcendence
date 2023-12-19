@@ -19,7 +19,11 @@ import StatusContextProvider from './status_context';
 import MainBoxContextProvider from './mainbox_context';
 import UserDataContextProvider from './user_data_context';
 
+import { useCookies } from "next-client-cookies"
+
 import { useChatSocket } from "./socket_provider"
+
+import { axiosToken } from '@/util/token';
 
 import styles from './frame.module.css';
 
@@ -44,7 +48,10 @@ export default function MainFrameLayout({
 }) {
 
   const [socketReady, setSocketReady] = useState(false);
+  const [userData, setUserData] = useState({});
+  const [loading, setLoading] = useState(false);
   const socket = useChatSocket();
+  const cookies = useCookies();
 
   console.log('socket - ', socket);
   // 아마 undefined일 것으로 판단됨.
@@ -52,60 +59,70 @@ export default function MainFrameLayout({
   const particlesInit = useCallback(async (engine: Engine) => {
     await loadFull(engine);
   }, []);
+  
+  useEffect(() => {
+        // api로 nickname 가져오기
+      const fetchUserData = async () => {
+        await axiosToken.get(`${process.env.NEXT_PUBLIC_API_URL}user/getdata/mydata`,{
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${cookies.get('access_token')}`
+            },        
+        }) 
+        .then((res :any) => {
+            console.log(`====================\nchatsocket context - fetchi\n====================`,res);
+            if (res.data.status === true)
+            {
+                setUserData(res.data.userData);
+            }
+        })
+      }
+      fetchUserData();
+  }, []);
 
   useEffect(() => {
-
-    // if (socket) {
-    //   console.log('socket done');
-    //   setSocketReady(true);
-    // }
-    
-    // return () => {
-      
-    // };
-
-    // socket보다 늦게 수행되는 이유 정리할 것. 
-    setSocketReady(true);
-
-  }, [socket]);
-
-
+    // console.log('before userData', userData, loading);
+    // console.log('before userData', Object.keys(userData).length);
+    if (Object.keys(userData).length !== 0)
+    {
+      console.log('after userData', userData, loading);
+      setLoading(true);
+    }
+  }, [userData])
   // setMTBox 참조하는 함수들에 전부 세팅해주기. profile 쓰는 객체에도 설정하기.
 
   return (
     <section>
-        <ChatSocket>
+      {!loading && (
+          <div>
+            <Particles options={particlesOptions as ISourceOptions} init={particlesInit} />
+          </div>
+      )}
+      {loading && 
+        <ChatSocket my_name={userData.nick_name} my_id={userData.user_id}>
           <ChatBlockProvider>
           <MainBoxContextProvider>
-            <UserDataContextProvider>
+            <UserDataContextProvider my_name={userData.nick_name} my_id={userData.user_id}>
             <StatusContextProvider>
-                {!socketReady && (
-                  <div>
-                    <Particles options={particlesOptions as ISourceOptions} init={particlesInit} />
-                  </div>
-                )}
-                {socketReady && (
-                  <>
-                    <Particles options={particlesOptions as ISourceOptions} init={particlesInit} />
-                    <Grid container className={styles.leftBox}>
-                      <MyProfile />
-                      <SearchUser />
-                      <MatchingButton />
-                      <UserLists />
-                    </Grid>
-                    <Grid container className={styles.mainBox}>
-                        {children}
-                    </Grid>
-                    <Grid container className={styles.rightBox}>
-                      <ChatBlock />
-                    </Grid>
-                  </>
-                )}
+            <Particles options={particlesOptions as ISourceOptions} init={particlesInit} />
+                <Grid container className={styles.leftBox}>
+                  <MyProfile />
+                  <SearchUser />
+                  <MatchingButton />
+                  <UserLists />
+                </Grid>
+                <Grid container className={styles.mainBox}>
+                    {children}
+                </Grid>
+                <Grid container className={styles.rightBox}>
+                  <ChatBlock />
+                </Grid>
             </StatusContextProvider>
             </UserDataContextProvider>
             </MainBoxContextProvider>
           </ChatBlockProvider>
         </ChatSocket>
+      }
     </section>
     )
 

@@ -43,6 +43,7 @@ const TextSend = ({ my_name, socket, scrollref}: any) => {
 		return `${process.env.NEXT_PUBLIC_API_URL}user/getimg/nickname/${src}?${time}`
 	}, []);
 
+	
 	const handleClick = (name: any) => {
 		setMTBox(1, name);
 	};

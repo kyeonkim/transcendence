@@ -7,7 +7,7 @@ import { useMainBoxContext } from '@/app/main_frame/mainbox_context';
 import { useUserDataContext } from '@/app/main_frame/user_data_context';
 
 export default function UserList(props: any) {
-	const { handleDrawerClose, imageLoader, style, pop, setPop, setAnchorEl,
+	const { handleDrawerClose, imageLoader, myImageLoader, style, pop, setPop, setAnchorEl,
 		anchorEl , roominfo, socket } = props;
 	const [list, setList] = useState([]);
 	const [targetData, setTargetData] = useState<any>(null);

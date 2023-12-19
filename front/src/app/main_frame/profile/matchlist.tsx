@@ -140,7 +140,7 @@ export default function MatchList(props: any) {
 				return (
 					<Grid container display='flex' justifyContent='space-between' alignItems='center' key={index} sx={listItemStyle}>
 						<div style={{display:'flex', alignItems:'center'}}>
-							<Avatar alt="Remy Sharp" src={imageLoader({src: name, time: new Date()})} sx={avatarStyle}/>
+							<Avatar alt="Remy Sharp" src={myImageLoader({src: name, time: new Date()})} sx={avatarStyle}/>
 							<Typography sx={{ ...textPrimaryStyle}}>
 								{name}
 							</Typography>
