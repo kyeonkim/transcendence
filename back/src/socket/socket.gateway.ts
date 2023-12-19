@@ -1,25 +1,19 @@
-import { UseGuards } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer, WsException } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { AuthService } from 'src/auth/auth.service';
 import { SocketService } from './socket.service';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { instrument } from "@socket.io/admin-ui";
 import { GameRoom } from 'src/game/game.service';
 import { SocketGameService } from 'src/socket/socket.gameservice';
+import { JwtService } from '@nestjs/jwt';
 
 //cors origin * is for development only
-// @UseGuards(AuthGuard('jwt-ws'))
-// @UseGuards(AuthGuard('jwt-ws'))
 @WebSocketGateway({cors:{origin: '*'}})
 export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect{
 
   constructor(
-    private readonly authService: AuthService,
     private readonly SocketService: SocketService,
-    private readonly prismaService: PrismaService,
     private readonly SocketGameService: SocketGameService,
+    private readonly jwtService: JwtService,
   ) {}
   @WebSocketServer() server: Server;
 
@@ -43,7 +37,8 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
     try {
       if (client.handshake.query.user_id == 'undefined' || client.handshake.query.user_id == undefined)
           throw new Error("user_id is undefined");
-      
+      const token = client.handshake.query.token;
+      await this.jwtService.verifyAsync(token, { secret: process.env.JWT_SECRET });
       const connect_user = await this.SocketService.Connect(client.handshake.query.user_id, client.id, this.server);
       connect_user.roomuser ? await this.JoinRoom(connect_user.user_id, `chat-${connect_user.roomuser.chatroom_id}`) : null;
       client.join(String(connect_user.user_id));
