@@ -24,11 +24,13 @@ export class GameController {
     }
 
     @ApiOperation({summary: `게임방 체크 API`, description: `게임방에 있는지 체크한다.`})
+	@UseGuards(AuthGuard('jwt-access'))
+	@ApiBearerAuth('JWT-acces')
     @Post("checkroom")
     async CheckRoom(@Req() req, @Body() data: gameRoomDto)
     {
 		data.user1_id = req.tokenuserdata.user_id;
-		data.user1_nickname = req.tokenuserdata.user_nickname;
+		data.user1_nickname = req.tokenuserdata.nick_name;
         return await this.GameService.CheckGameRoom(data.user1_id);
     }
 
@@ -39,7 +41,7 @@ export class GameController {
     async CreateRoom(@Req() req, @Body() data: gameRoomDto)
     {
         data.user1_id = req.tokenuserdata.user_id;
-		data.user1_nickname = req.tokenuserdata.user_nickname;
+		data.user1_nickname = req.tokenuserdata.nick_name;
         return await this.GameService.CreateGameRoom(data.user1_id);
     }
 
@@ -61,7 +63,7 @@ export class GameController {
     async InviteRoom(@Req() req, @Body() data: gameRoomDto)
     {
         data.user1_id = req.tokenuserdata.user_id;
-		data.user1_nickname = req.tokenuserdata.user_nickname;
+		data.user1_nickname = req.tokenuserdata.nick_name;
         return await this.GameService.InviteGameRoom(data.user1_id, data.user2_id, data.user1_nickname);
     }
 
@@ -72,11 +74,12 @@ export class GameController {
     async JoinRoom(@Req() req, @Body() data: gameRoomDto)
     {
         data.user1_id = req.tokenuserdata.user_id;
-		data.user1_nickname = req.tokenuserdata.user_nickname;
+		data.user1_nickname = req.tokenuserdata.nick_name;
         return await this.GameService.JoinGameRoom(data.user1_id, data.user2_id, data.event_id);
     }
 
     @ApiOperation({summary: `게임 준비 API`, description: `게임을 준비한다.`})
+	@UseGuards(AuthGuard('jwt-access'))
     @Patch("ready")
     async Ready(@Req() req, @Body() data: readyGameDto)
     {
@@ -85,6 +88,7 @@ export class GameController {
     }
 
     @ApiOperation({summary: `게임 시작 API`, description: `게임을 시작한다.`})
+	@UseGuards(AuthGuard('jwt-access'))
     @Post("start")
     async Start(@Req() req, @Body() data: startGameDto)
     {
@@ -93,6 +97,7 @@ export class GameController {
     }
 
     @ApiOperation({summary: `게임 매칭 API`, description: `게임을 매칭한다.`})
+	@UseGuards(AuthGuard('jwt-access'))
     @Post("match")
     async MatchGame(@Req() req, @Body() data: startGameDto)
     {
@@ -101,6 +106,7 @@ export class GameController {
     }
 
     @ApiOperation({summary: `게임 매칭 취소 API`, description: `게임을 매칭을 취소한다.`})
+	@UseGuards(AuthGuard('jwt-access'))
     @Patch("cancelmatch")
     async CancelMatch()
     {
@@ -108,6 +114,7 @@ export class GameController {
     }
 
     @ApiOperation({summary: `게임 종료 API`, description: `게임을 종료한다.`})
+	@UseGuards(AuthGuard('jwt-access'))
     @Patch("exitgame")
     async ExitGame(@Req() req, @Body() data: startGameDto) {
         data.user_id = req.tokenuserdata.user_id;

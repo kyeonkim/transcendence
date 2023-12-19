@@ -41,7 +41,7 @@ export class ChatController {
     async CreateRoom(@Req() req, @Body() room: ChatRoomDto)
     {
         room.user_id = req.tokenuserdata.user_id;
-        room.user_nickname = req.tokenuserdata.user_nickname;
+        room.user_nickname = req.tokenuserdata.nick_name;
         return await this.ChatService.CreateRoom(room);
     }
 
@@ -52,7 +52,7 @@ export class ChatController {
     async ChangeRoom(@Req() req, @Headers() headers, @Body() data: ChatRoomDto)
     {
         data.user_id = req.tokenuserdata.user_id;
-        data.user_nickname = req.tokenuserdata.user_nickname;
+        data.user_nickname = req.tokenuserdata.nick_name;
         const room =  await this.ChatService.GetMyRoomByHeader(headers);
         if (room === null || room.chatroom_id !== data.room_idx || room.chatroom.owner_id !== room.user_id)
             return {status: false, message: 'not manager'};
@@ -66,7 +66,7 @@ export class ChatController {
     async JoinRoom(@Req() req, @Body() data : JoinRoomDto)
     {
         data.user_id = req.tokenuserdata.user_id;
-        data.user_nickname = req.tokenuserdata.user_nickname;
+        data.user_nickname = req.tokenuserdata.nick_name;
         return await this.ChatService.JoinRoom(data);
     }
 
@@ -77,7 +77,7 @@ export class ChatController {
     async LeaveRoom(@Req() req, @Body() room : JoinRoomDto)
     {
         room.user_id = req.tokenuserdata.user_id;
-        room.user_nickname = req.tokenuserdata.user_nickname;
+        room.user_nickname = req.tokenuserdata.nick_name;
         const rtn = await this.ChatService.LeaveRoom(room);
         if (rtn.status === true)
             this.socketService.HandleNotice(room.room_id, `유저 ${room.user_nickname}님이 퇴장하였습니다.`);
@@ -185,7 +185,7 @@ export class ChatController {
     @Post("inviteuser")
     async InviteUser(@Req() req, @Body() data : InviteChatDto)
     {
-        data.from = req.tokenuserdata.user_nickname;
+        data.from = req.tokenuserdata.nick_name;
         return await this.ChatService.InviteUser(data);
     }
 
@@ -196,7 +196,7 @@ export class ChatController {
     async AcceptInvite(@Req() req, @Body() data : JoinRoomDto)
     {
         data.user_id = req.tokenuserdata.user_id;
-        data.user_nickname = req.tokenuserdata.user_nickname;
+        data.user_nickname = req.tokenuserdata.nick_name;
         return await this.ChatService.AcceptInvite(data);
     }
 

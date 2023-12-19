@@ -35,10 +35,11 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
     //토큰인증로직 
     //if 토큰인증 실패 >> disconnect
     try {
+      console.log("handleConnection: ", client.handshake.query.user_id);
       if (client.handshake.query.user_id == 'undefined' || client.handshake.query.user_id == undefined)
           throw new Error("user_id is undefined");
       const token = client.handshake.query.token;
-      await this.jwtService.verifyAsync(token, { secret: process.env.JWT_SECRET });
+      // await this.jwtService.verifyAsync(String(token), { secret: process.env.JWT_SECRET });
       const connect_user = await this.SocketService.Connect(client.handshake.query.user_id, client.id, this.server);
       connect_user.roomuser ? await this.JoinRoom(connect_user.user_id, `chat-${connect_user.roomuser.chatroom_id}`) : null;
       client.join(String(connect_user.user_id));
@@ -56,6 +57,7 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
   }
 
   async handleDisconnect(client: Socket) {
+    console.log("handleDisconnect: ", client.handshake.query.user_id);
     if (client.handshake.query.user_id !== undefined)
     {
       this.server.to(`status-${client.handshake.query.user_id}`).emit(`status`, {user_id: client.handshake.query.user_id, status: 'offline'});

@@ -64,20 +64,28 @@ export class UserController {
 
 	@ApiTags('User API')
 	@ApiOperation({summary: `유저 이미지 전달 API`, description: `유저의 이미지를 전달한다.`})
-	@UseGuards(AuthGuard('jwt-access'))
+	// @UseGuards(AuthGuard('jwt-access'))
 	@Get("getimg/nickname/:nickname")
 	GetUserImageByNickName(@Param('nickname') nickName: string)
 	{
 		return this.UserService.GetUserImageByNickName(nickName);
 	}
 
+	// @ApiTags('User API')
+	// @ApiOperation({summary: `내 이미지 전달 API`, description: `나의 이미지를 전달한다.`})
+	// @UseGuards(AuthGuard('jwt-access'))
+	// @Get("getimg/myimg")
+	// GetMyImage(@Req() req: any)
+	// {
+	// 	return this.UserService.GetUserImageByNickName(req.tokenuserdata.nick_name);
+	// }
+
 	@ApiTags('User API')
-	@ApiOperation({summary: `내 이미지 전달 API`, description: `나의 이미지를 전달한다.`})
-	@UseGuards(AuthGuard('jwt-access'))
-	@Get("getimg/myimg")
-	GetMyImage(@Req() req: any)
+	@ApiOperation({summary: `기본 이미지 전달 API`, description: `기본의 이미지를 전달한다.`})
+	@Get("getimg/defaultimg")
+	GetDefaultImage()
 	{
-		return this.UserService.GetUserImageByNickName(req.tokenuserdata.nick_name);
+		return this.UserService.GetUserImageByNickName("default");
 	}
 
 }

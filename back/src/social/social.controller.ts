@@ -19,7 +19,7 @@ export class SocialController {
 	async AddFriend(@Req() req, @Body() friend : friendDto)
     {
 		friend.user_id = req.tokenuserdata.user_id;
-		friend.user_nickname = req.tokenuserdata.user_nickname;
+		friend.user_nickname = req.tokenuserdata.nick_name;
 		return await this.SocialService.AddFriend(friend);
     }
 
@@ -30,7 +30,7 @@ export class SocialController {
 	async AcceptFriend(@Req() req, @Body() friend : friendDto)
 	{
 		friend.user_id = req.tokenuserdata.user_id;
-		friend.user_nickname = req.tokenuserdata.user_nickname;
+		friend.user_nickname = req.tokenuserdata.nick_name;
 		return await this.SocialService.AcceptFriend(friend);
 	}
 
@@ -51,7 +51,7 @@ export class SocialController {
 	async DeleteFriend(@Req() req, @Body() friend: friendDto)
 	{
 		friend.user_id = req.tokenuserdata.user_id;
-		friend.user_nickname = req.tokenuserdata.user_nickname;
+		friend.user_nickname = req.tokenuserdata.nick_name;
 		return await this.SocialService.DeleteFriend(friend);
 	}
 
@@ -82,7 +82,7 @@ export class SocialController {
 	async AddBlockUser(@Req() req, @Body() data: friendDto)
     {
 		data.user_id = req.tokenuserdata.user_id;
-		data.user_nickname = req.tokenuserdata.user_nickname;
+		data.user_nickname = req.tokenuserdata.nick_name;
 		return await this.SocialService.AddBlockUser(data);
     }
 
@@ -93,7 +93,7 @@ export class SocialController {
 	async DeleteBlockUser(@Req() req, @Body() data: friendDto)
     {
 		data.user_id = req.tokenuserdata.user_id;
-		data.user_nickname = req.tokenuserdata.user_nickname;
+		data.user_nickname = req.tokenuserdata.nick_name;
 		return await this.SocialService.DeleteBlockUser(data);
     }
 }  
