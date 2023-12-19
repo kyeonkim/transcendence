@@ -230,7 +230,6 @@ export default function Chat(props: any) {
 				<List className={styles.messageArea} ref={messageAreaRef}>
 					<TextSend
 						my_name={my_name}
-						nameMargin={100 - (my_name.length * 4)}
 						socket={socket}
 						scrollref={messageAreaRef}
 					/>

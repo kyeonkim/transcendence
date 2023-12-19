@@ -19,15 +19,15 @@ export class UserService {
     {
         const user = await this.prisma.user.findUnique({
             where: {
-                nick_name: nickName,
+                lower_nickname: nickName.toLowerCase(),
             }});
-            
         if (user !== null)
             return null;
         const newUser = await this.prisma.user.create({
             data: {
                 user_id: id,
                 nick_name: nickName,
+                lower_nickname: nickName.toLowerCase(),
             },
         });
         return newUser;
@@ -98,10 +98,14 @@ export class UserService {
     
     async GetUserImageByNickName(nickName: string)
     {
-        if(!fs.existsSync(join(process.cwd(),`./storage/${nickName}`)))
-            return new StreamableFile(createReadStream(join(process.cwd(),`./storage/default`)));
-        const file = createReadStream(join(process.cwd(),`./storage/${nickName}`));
-        return new StreamableFile(file);
+        try {
+            if(!fs.existsSync(join(process.cwd(),`./storage/${nickName}`)))
+                return new StreamableFile(createReadStream(join(process.cwd(),`./storage/default`)));
+            const file = createReadStream(join(process.cwd(),`./storage/${nickName}`));
+            return new StreamableFile(file);
+        } catch (error)
+        {
+            console.error(error);
+        }
     }
-
 }

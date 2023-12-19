@@ -17,7 +17,7 @@ axiosToken.interceptors.response.use(
   async (error) => {
       const originalRequest = error.config;
       
-      if (error.response &&error.response.status === 401 && !originalRequest._retry) {
+      if (error.response && !originalRequest._retry) {
           originalRequest._retry = true;
           
           if (!isRefreshing) {
@@ -37,6 +37,7 @@ axiosToken.interceptors.response.use(
             } catch (e) {
               // console.error('토큰 재발급 실패', e);
               window.location.href = '/';
+              console.log(e);
             }
           }
           else {

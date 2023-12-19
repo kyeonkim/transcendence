@@ -84,12 +84,14 @@ const ProfilePage = (props: any) => {
           setIsFriend(false);
       });
     };
+
     if (userNickname)
     {
       fetchData(); 
       if (userNickname !== my_nick)
         fetchFriendData();
     }
+    
   }, [userNickname, isFriend, isOTP, rendering]);
 
 	useEffect(() => {
@@ -216,6 +218,7 @@ const ProfilePage = (props: any) => {
         setProfile(res.data.time);
       })
   }
+
   const imageLoader = (src: any) => {
     return `${process.env.NEXT_PUBLIC_API_URL}user/getimg/nickname/${src}`
   }

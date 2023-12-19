@@ -21,7 +21,11 @@ export default function GameRoom(props: any) {
 			setGameStart(true);
 		else
 			setGameStart(false);
-		setMod(userData.game_mode);
+
+		// userData에 game_mode가 추가되는 시점이 다른 것 같음.
+		if (userData.game_mode != undefined)
+			setMod(userData.game_mode);
+
 	}, [userData]);
 
 	const handleExit = async () => {

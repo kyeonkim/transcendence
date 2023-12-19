@@ -14,8 +14,7 @@ export async function GET (request: NextRequest)
     
     // 조건 추가 고려
         // data에서 참조하여 판단
-    if (true)
-    {
+    if (user_id && nick_name && access_token && refresh_token) {
         return (NextResponse.json(
             {
                 success: true,

@@ -44,6 +44,9 @@ export default function MainFrameLayout({
   
   console.log('main_frame layout render start');
 
+  // access_token 보내서 nickname, user_id 받아오는 부분
+
+
   const [socketReady, setSocketReady] = useState(false);
   const socket = useChatSocket();
 

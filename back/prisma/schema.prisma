@@ -31,6 +31,7 @@ model User {
   blocks      Block[]        @relation("block_user")
   recv_messages Message[]    @relation("message_to_user")
   send_messages Message[]    @relation("message_from_user")
+  lower_nickname String      @unique
 }   
 
 model TwoFA_key {

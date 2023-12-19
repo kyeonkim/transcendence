@@ -251,6 +251,7 @@ export class JwtAccessStrategy extends PassportStrategy(Strategy, 'jwt-access') 
 	  ignoreExpiration: false,
 	  //검증 비밀 값(유출 주의)
 	  secretOrKey: process.env.JWT_SECRET,
+	  passReqToCallback: true,
 	});
   }
   /**
@@ -258,9 +259,10 @@ export class JwtAccessStrategy extends PassportStrategy(Strategy, 'jwt-access') 
    *
    * @param payload 토큰 전송 내용
    */
-  async validate(payload: UserToken): Promise<any> {
+  async validate(req: any, payload: UserToken): Promise<any> {
 	if (payload.twoFAPass === false)// 2차인증 필요
 		throw new UnauthorizedException();
+	req['tokenuserdata'] = payload;
 	return { status: true };
   }
 }

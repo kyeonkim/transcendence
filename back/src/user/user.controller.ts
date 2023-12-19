@@ -43,8 +43,9 @@ export class UserController {
 	@UseInterceptors(FileInterceptor("file", {
 		storage: diskStorage({
 		  destination: './storage',
-		  filename(req, file, callback): void {
-			return callback(null, `${req.query.nickname}`);
+		  filename(req: any, file, callback): void {
+			console.log("유저 이미지 업로드 API : ", req.tokenuserdata.nick_name);
+			return callback(null, `${req.tokenuserdata.nick_name}`);
 		  }
 		})
 	  }))
