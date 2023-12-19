@@ -5,14 +5,13 @@ import MyProfile from '@/components/profile/my_profile';
 import MatchingButton from '@/components/matching/matching';
 import SearchUser from '@/components/search_bar/search_user';
 import UserLists from '@/components/user_lists/user_lists';
-import Mainbox from '@/components/mainbox/mainbox';
 import ChatBlock from '@/components/chatbox/chat_block';
 import particlesOptions from "../particles.json";
 import { loadFull } from "tsparticles";
 import Particles from "react-tsparticles";
 import { ISourceOptions } from "tsparticles-engine";
 import type { Engine } from "tsparticles-engine";
-import { Grid, Typography } from '@mui/material';
+import { Grid } from '@mui/material';
 
 import ChatSocket  from './socket_provider';
 import ChatBlockProvider from './shared_state';

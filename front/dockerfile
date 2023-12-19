@@ -6,7 +6,9 @@ COPY . /app/front_server/
 
 RUN npm install
 
-CMD ["npm", "run", "dev"]
+RUN npm run build
+
+CMD ["npm", "run", "start"]
 
 ######dumb-init 사용시
 

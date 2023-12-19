@@ -1,26 +1,23 @@
 'use client';
-import React, { use } from 'react';
+import React from 'react';
 import styles from './mainbox.module.css';
 import Button from '@mui/material/Button';
 
-import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { useCookies } from 'next-client-cookies';
-import { Avatar, Grid, Tooltip, Typography, Unstable_Grid2 } from '@mui/material';
+import { Avatar, Grid, Tooltip, Typography } from '@mui/material';
 import { axiosToken } from '@/util/token';
-import { render } from 'react-dom';
 import MedalIcon from '@mui/icons-material/WorkspacePremium';
 import { useSearchParams } from 'next/navigation'
 
 import OtpModal from '@/components/profile/otp';
-import TwoFAPass from '@/app/login/twoFAPass';
 import Matchlist from '@/app/main_frame/profile/matchlist';
 
 import { useChatSocket } from "@/app/main_frame/socket_provider"
 import { useMainBoxContext } from '@/app/main_frame/mainbox_context';
 import { useUserDataContext } from '@/app/main_frame/user_data_context';
 
-const ProfilePage = (props: any) => {
+const ProfilePage = () => {
 
   const [isFriend, setIsFriend] = useState(false);
   const [isBlock, setIsBlock] = useState(false);

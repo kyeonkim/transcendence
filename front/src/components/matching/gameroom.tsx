@@ -15,9 +15,6 @@ export default function GameRoom(props: any) {
 	const cookies = useCookies();
 	const { user_id, nickname } = useUserDataContext();
 
-	if (!userData)
-		return <div></div>;
-
 	useEffect(() => {
 		if (userData.room && userData.room.user2_ready && userData.room.user1_ready)
 			setGameStart(true);

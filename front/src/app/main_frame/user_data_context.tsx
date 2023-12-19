@@ -1,13 +1,13 @@
 "use client"
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { useCookies } from "next-client-cookies"
+import { useCookies } from 'next-client-cookies';
+import { axiosToken } from '@/util/token';
 
 const UserDataContext = createContext<any>(null);
 
 const UserDataContextProvider = ({ children }: any) => {
 	const [nickname, setNickname] = useState('');
 	const [userId, setUserId] = useState(-1);
-
     const cookies = useCookies();
 
     useEffect(() => {
@@ -19,7 +19,7 @@ const UserDataContextProvider = ({ children }: any) => {
                 'Authorization': `Bearer ${cookies.get('access_token')}`
                 },        
             }) 
-            .then((res) => {
+            .then((res :any) => {
                 if (res.data.status === true)
                 {
                     setNickname(res.data.nickname);

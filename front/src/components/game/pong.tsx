@@ -64,7 +64,7 @@ export default function Pong (props :any){
         arrowUp: false,
         arrowDown: false
     });
-    const [ballFix, setBallFix] = useState({newData: false, time: 0, enemy: {top:0, left:0}, ball: {top:0, left:0}, ballVecXY: {x:0, y:0, speed:0}, score:{}});
+    const [ballFix, setBallFix] = useState({newData: false, time: 0, enemy: {top:0, left:0}, ball: {top:0, left:0}, ballVecXY: {x:0, y:0, speed:0}, score:{player1:0, player2:0}});
     
     // viewportRatio 1 = 1600:900
     const   [viewportRatio, setViewportRatio] = useState({value: 1.0});
