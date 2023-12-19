@@ -6,16 +6,19 @@ import { useCookies } from "next-client-cookies";
 import { useEffect } from "react";
 import { axiosToken } from "@/util/token";
 
+import { useUserDataContext } from "@/app/main_frame/user_data_context";
+
 export default function RankMatch(props: any) {
 	const { setRender, setRank } = props;
 
 	const cookies = useCookies();
+	const { user_id, nickname } = useUserDataContext();
 
 	useEffect(() => {
 		const fetchMatch = async () => {
 
 			await axiosToken.post(`${process.env.NEXT_PUBLIC_API_URL}game/match`, {
-				user_id: Number(cookies.get('user_id')),
+				user_id: user_id,
 			},
 			{
 				headers: {

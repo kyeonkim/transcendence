@@ -27,6 +27,7 @@ import { axiosToken } from '@/util/token';
 import { useCookies } from 'next-client-cookies';
 
 import  { useChatBlockContext } from '../../app/main_frame/shared_state';
+import { useUserDataContext } from '@/app/main_frame/user_data_context';
 
 const modalStyle = {
     position: 'absolute' as 'absolute',
@@ -53,8 +54,9 @@ export default function AlarmInviteChat (
 	const { setChatBlockRenderMode, setChatBlockTriggerRender, handleRenderChatBlock } = useChatBlockContext();
 
     const cookies = useCookies();
-	const user_id = Number(cookies.get("user_id"));
-	const user_nickname = cookies.get("nick_name");
+
+    const { user_id, nickname } = useUserDataContext();
+	const user_nickname = nickname;
     const [error, setError] = useState(false);
     const [errMessage, setErrMessage] = useState('');
 

@@ -18,10 +18,12 @@ import ChatSocket  from './socket_provider';
 import ChatBlockProvider from './shared_state';
 import StatusContextProvider from './status_context';
 import MainBoxContextProvider from './mainbox_context';
+import UserDataContextProvider from './user_data_context';
 
 import { useChatSocket } from "./socket_provider"
 
 import styles from './frame.module.css';
+
 
 // 여기에서는 context provider가 제공되고 있다 -> context 자체를 사용하는 건 불가능함
   // => socket은 직접 쓰는 곳이 없어서 문제가 없는데, (실제로는 undefined일 것)
@@ -41,11 +43,6 @@ export default function MainFrameLayout({
 }: {
   children: React.ReactNode
 }) {
-  
-  console.log('main_frame layout render start');
-
-  // access_token 보내서 nickname, user_id 받아오는 부분
-
 
   const [socketReady, setSocketReady] = useState(false);
   const socket = useChatSocket();
@@ -81,6 +78,7 @@ export default function MainFrameLayout({
         <ChatSocket>
           <ChatBlockProvider>
           <MainBoxContextProvider>
+            <UserDataContextProvider>
             <StatusContextProvider>
                 {!socketReady && (
                   <div>
@@ -105,6 +103,7 @@ export default function MainFrameLayout({
                   </>
                 )}
             </StatusContextProvider>
+            </UserDataContextProvider>
             </MainBoxContextProvider>
           </ChatBlockProvider>
         </ChatSocket>

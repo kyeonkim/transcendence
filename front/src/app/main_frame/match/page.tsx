@@ -5,8 +5,8 @@ import React, { useRef, useEffect, useState } from 'react';
 
 import { Grid } from '@mui/material';
 import { useChatSocket } from '@/app/main_frame/socket_provider';
+import { useUserDataContext } from '@/app/main_frame/user_data_context';
 import { axiosToken } from '@/util/token';
-import { useCookies } from 'next-client-cookies';
 
 import MatchHome from '@/components/matching/matchHome';
 import GameRoom from '@/components/matching/gameroom';
@@ -18,9 +18,10 @@ export default function Matching(props: any) {
 	const [isRank, setIsRank] = useState(false);
 	const [isMode, setIsMode] = useState(false);
 	const socket = useChatSocket();
-	const cookies = useCookies();
 	const [data, setData] = useState<any>([]);
 	const myRef = useRef(null);
+
+	const { nickname, user_id } = useUserDataContext();
 
 	useEffect(() => {
 
@@ -29,7 +30,7 @@ export default function Matching(props: any) {
             console.log('matching - fetch data called');
 
 			await axiosToken.post(`${process.env.NEXT_PUBLIC_API_URL}game/checkroom`, {
-				user1_id: Number(cookies.get('user_id')),
+				user1_id: user_id,
 			})
 			.then((res) => {
 

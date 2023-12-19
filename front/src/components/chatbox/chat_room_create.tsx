@@ -29,6 +29,8 @@ import { axiosToken } from '@/util/token';
 import { genSaltSync, hashSync } from "bcrypt-ts";
 import { Typography } from '@mui/material';
 
+import { useUserDataContext } from '@/app/main_frame/user_data_context';
+
 const CreateRoomAppBar = styled(AppBar) ({
 	backgroundColor: "white",
 	opacity: 0.7,
@@ -46,9 +48,10 @@ const MainChatRoomCreate = styled(Box) ({
   });
 
 export default function ChatRoomCreate(props: any) {
+	const { nickname, user_id } = useUserDataContext();
 	const cookies = useCookies();
-	const user_id = Number(cookies.get("user_id"));
-	const user_nickname = cookies.get("nick_name");
+
+	const user_nickname = nickname;
 
 	const [roomName, setRoomName] = useState('');
 	const [roomPrivate, setRoomPrivate] = useState(false);

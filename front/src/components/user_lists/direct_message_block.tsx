@@ -5,6 +5,7 @@ import { useCookies } from 'next-client-cookies';
 import { useChatSocket } from "../../app/main_frame/socket_provider"
 import { useChatBlockContext } from '@/app/main_frame/shared_state';
 import { useMainBoxContext } from '@/app/main_frame/mainbox_context';
+import { useUserDataContext } from '@/app/main_frame/user_data_context';
 
 import { axiosToken } from '@/util/token';
 
@@ -25,8 +26,7 @@ export default function DmMessageBlock({dmOpenId, dmOpenNickname, messageAreaRef
 
     const dmOpenIdRef = useRef(dmOpenId);
 
-    const user_id = Number(cookies.get('user_id'));
-    const nick_name = cookies.get('nick_name');
+    const { user_id, nickname } = useUserDataContext();
 
     const { dmBlockTriggerRender, handleRenderDmBlock } = useChatBlockContext();
 
@@ -295,7 +295,7 @@ export default function DmMessageBlock({dmOpenId, dmOpenNickname, messageAreaRef
         if (message.from_id === dmOpenIdRef.current)
             target_name = dmOpenNickname;
         else
-            target_name = nick_name;
+            target_name = nickname;
 
 		return (
             <Grid container key={message.created_at}>
@@ -303,7 +303,7 @@ export default function DmMessageBlock({dmOpenId, dmOpenNickname, messageAreaRef
                     style={{
                         padding: '5px',
                         paddingBottom: '0px',
-                        justifyContent: target_name === nick_name ? 'flex-end' : 'flex-start',
+                        justifyContent: target_name === nickname ? 'flex-end' : 'flex-start',
                     }}
                 >
                     <Stack direction="row" spacing={1}>
@@ -318,7 +318,7 @@ export default function DmMessageBlock({dmOpenId, dmOpenNickname, messageAreaRef
                 <ListItem
                     style={{
                         display: 'flex',
-                        justifyContent: target_name === nick_name ? 'flex-end' : 'flex-start',
+                        justifyContent: target_name === nickname ? 'flex-end' : 'flex-start',
                         padding: '0px 25px',
                         wordBreak: 'break-word',
                         width: '100%',

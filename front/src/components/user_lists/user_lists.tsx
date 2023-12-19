@@ -24,7 +24,8 @@ import { useChatBlockContext } from '@/app/main_frame/shared_state';
 import { Grid } from '@mui/material';	
 import styles from '@/app/main_frame/frame.module.css';
 
-import { useMainBoxContext } from '@/app/main_frame/mainbox_context';
+import { useChatBlockContext } from '@/app/main_frame/shared_state';
+import { useUserDataContext } from '@/app/main_frame/user_data_context';
 
 interface TabPanelProps {
 	children?: React.ReactNode;
@@ -73,7 +74,8 @@ export default function BasicTabs() {
 	const tabsRef = useRef(null);
 
 	const { handleRenderDmBlock } = useChatBlockContext();
-	const friendList = useFriendList(cookies.get('user_id'));
+	const { user_id, nickname } = useUserDataContext();
+	const friendList = useFriendList(user_id);
 	
 	const handleChange = (event: React.SyntheticEvent, newValue: number) => {
 		setValue(newValue);
@@ -150,7 +152,7 @@ export default function BasicTabs() {
 
 
 	const fetchAlarms = async () => {
-		await axiosToken.get(`${process.env.NEXT_PUBLIC_API_URL}event/getalarms/${cookies.get('user_id')}`,{
+		await axiosToken.get(`${process.env.NEXT_PUBLIC_API_URL}event/getalarms/${user_id}`,{
 			headers: {
 				'Content-Type': 'application/json',
 				'Authorization': `Bearer ${cookies.get('access_token')}`
@@ -160,7 +162,7 @@ export default function BasicTabs() {
 
 
 	useEffect(() => {
-		const sseEvents = new EventSource(`${process.env.NEXT_PUBLIC_API_URL}event/alarmsse/${cookies.get('user_id')}`);
+		const sseEvents = new EventSource(`${process.env.NEXT_PUBLIC_API_URL}event/alarmsse/${user_id}`);
 
 		sseEvents.onopen = function() {
 		}
@@ -175,7 +177,7 @@ export default function BasicTabs() {
 			setAlarmListAdd(parsedData);
 		}
 
-		socket.emit('status', { user_id: Number(cookies.get('user_id')), status: 'online' });
+		socket.emit('status', { user_id: Number(user_id), status: 'online' });
 
 		return () => {
 			sseEvents.close();
@@ -250,7 +252,7 @@ export default function BasicTabs() {
 					handleDmAlarmCount={handleDmAlarmCount}
 					handleChatTarget={handleChatTarget}
 					list={friendList}
-					myId={cookies.get('user_id')}
+					myId={user_id}
 					tapref={tabsRef}
 				/>
 			</CustomTabPanel>

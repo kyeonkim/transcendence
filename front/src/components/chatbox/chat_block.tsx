@@ -10,7 +10,8 @@ import ChatRoomList from './chat_rooms';
 
 import { useCookies } from 'next-client-cookies';
 
-import  { useChatBlockContext } from '../../app/main_frame/shared_state';
+import { useChatBlockContext } from '../../app/main_frame/shared_state';
+import { useUserDataContext } from '@/app/main_frame/user_data_context';
 import { axiosToken } from '@/util/token';
 
 
@@ -31,8 +32,10 @@ export default function ChatBlock(props: any) {
 
 	const handleRenderMode = handleRenderChatBlock;
 
+	const { nickname, user_id } = useUserDataContext();
+
 	async function getUserData() {
-		await axiosToken.get(`${process.env.NEXT_PUBLIC_API_URL}user/getdata/nickname/${cookies.get("nick_name")}`, {
+		await axiosToken.get(`${process.env.NEXT_PUBLIC_API_URL}user/getdata/nickname/${nickname}`, {
 			headers: {
 				'Content-Type': 'application/json',
 				'Authorization': `Bearer ${cookies.get('access_token')}`

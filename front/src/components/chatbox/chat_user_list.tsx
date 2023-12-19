@@ -4,6 +4,7 @@ import { useCookies } from "next-client-cookies"
 import { axiosToken } from '@/util/token';
 
 import { useMainBoxContext } from '@/app/main_frame/mainbox_context';
+import { useUserDataContext } from '@/app/main_frame/user_data_context';
 
 export default function UserList(props: any) {
 	const { handleDrawerClose, imageLoader, style, pop, setPop, setAnchorEl,
@@ -14,8 +15,8 @@ export default function UserList(props: any) {
 	const [Creater, setCreater] = useState(0);
 
 	const cookies = useCookies();
-	const token = cookies.get("access_token");
-	const my_id = cookies.get("user_id");
+	const { user_id, nickname } = useUserDataContext();
+	const my_id = user_id;
 
 	const { setMTBox } = useMainBoxContext();
 
@@ -150,7 +151,7 @@ export default function UserList(props: any) {
 	const handleInviteGame = async () => {
 		await axiosToken.post(`${process.env.NEXT_PUBLIC_API_URL}game/inviteroom`, {
 			user1_id: Number(my_id),
-			user1_nickname: cookies.get("nick_name"),
+			user1_nickname: nickname,
 			user2_id: Number(targetData.user_id),
 			user2_nickname: targetData.user_nickname,
 		},

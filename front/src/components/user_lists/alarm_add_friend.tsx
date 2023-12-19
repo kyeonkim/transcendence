@@ -14,6 +14,7 @@ import HandshakeIcon from '@mui/icons-material/Handshake';
 import CheckCircleOutlineRoundedIcon from '@mui/icons-material/CheckCircleOutlineRounded';
 import ClearRoundedIcon from '@mui/icons-material/ClearRounded';
 
+import { useUserDataContext } from '@/app/main_frame/user_data_context';
 
 // styled component (컴포넌트 고정 style로 보임)
 
@@ -24,6 +25,7 @@ import { useCookies } from 'next-client-cookies';
 
 export default function AlarmAddFriend ( {alarm, alarmReducer, handleProfile, imageLoader, denyRequest} :any) {
     const cookies = useCookies();
+    const { nickname, user_id } = useUserDataContext();
 
     const acceptFriendRequest = (alarm: any) => async () => {
 
@@ -32,7 +34,7 @@ export default function AlarmAddFriend ( {alarm, alarmReducer, handleProfile, im
         {
           event_id: alarm.idx,
           user_id: alarm.to_id,
-          user_nickname: cookies.get('nick_name'),
+          user_nickname: nickname,
           friend_id: 0,
           friend_nickname: alarm.from_nickname
         },

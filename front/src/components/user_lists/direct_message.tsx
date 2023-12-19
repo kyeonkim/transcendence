@@ -13,9 +13,9 @@ import Paper from '@mui/material/Paper';
 
 import styles from './dm.module.css';
 
-import { useCookies } from 'next-client-cookies';
 
-import { useChatSocket } from "../../app/main_frame/socket_provider"
+import { useChatSocket } from "../../app/main_frame/socket_provider";
+import { useUserDataContext } from '@/app/main_frame/user_data_context';
 
 import DmMessageBlock from './direct_message_block';
 
@@ -23,10 +23,10 @@ export default function DirectMessage( {dmAlarmCount, dmAlarmCountList, dmAlarmR
 	
 	const [message, setMessage] = useState('');
 	
-	const cookies = useCookies();
 	const messageAreaRef = useRef(null);
 	const socket = useChatSocket();
-	const user_id = Number(cookies.get('user_id'));
+	const { user_id, nickname } = useUserDataContext();
+
 	// const tapref = useRef(null);
 
 	const handleSendMessage = () => {

@@ -2,8 +2,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { fabric } from 'fabric';
 import { useChatSocket } from '@/app/main_frame/socket_provider';
-import { useCookies } from "next-client-cookies";
 import { useStatusContext } from "@/app/main_frame/status_context";
+import { useUserDataContext } from '@/app/main_frame/user_data_context';
 
 import  GameProfile  from "./gameProfile";
 import  GameEnd from "./gameEnd";
@@ -69,10 +69,9 @@ export default function Pong (props :any){
     // viewportRatio 1 = 1600:900
     const   [viewportRatio, setViewportRatio] = useState({value: 1.0});
 
-	const   cookies = useCookies();
     const   containerRef = props.containerRef;
     const { status, setStatus } = useStatusContext();
-
+    const { nickname, user_id } = useUserDataContext(); 
 
     const updateStatus = useCallback(
         (newStatus :string) => {
@@ -255,7 +254,7 @@ export default function Pong (props :any){
                 gameData.startTime = Date.now();
                 console.log('game data==',data);
                 
-                if (data.room.user1_id === Number(cookies.get('user_id')))
+                if (data.room.user1_id === user_id)
                 {
                     setUser(player1);
                     setEnemy(player2);
@@ -275,7 +274,7 @@ export default function Pong (props :any){
 
             socket.on(`game-init`, listenGameInit);
 
-            socket.emit(`game-start`, {user_id: Number(cookies.get('user_id')), user_nickname: cookies.get('nick_name'), rank: rank, game_mode: mode});
+            socket.emit(`game-start`, {user_id: user_id, user_nickname: nickname, rank: rank, game_mode: mode});
 
             document.addEventListener('visibilitychange', () => {
                 if (document.hidden) {
@@ -355,7 +354,7 @@ export default function Pong (props :any){
 
             socket.on('game-end', listenGameEnd);
 
-            socket.emit('status', { user_id: Number(cookies.get('user_id')), status: status });
+            socket.emit('status', { user_id: user_id, status: status });
     
             const drawPong = () => {
                 

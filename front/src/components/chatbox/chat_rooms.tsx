@@ -15,8 +15,11 @@ import { useCookies } from 'next-client-cookies';
 import axios from 'axios';
 
 import { useChatSocket } from "../../app/main_frame/socket_provider"
+import { useUserDataContext } from '@/app/main_frame/user_data_context';
+
 import { axiosToken } from '@/util/token';
 import { Typography } from '@mui/material';
+
 
 const MainChatRoomList = styled(Grid) ({
 	position: 'absolute',
@@ -36,13 +39,13 @@ const MainChatRoomList = styled(Grid) ({
   export default function ChatRoomList({handleRenderMode }: any) {
 	const socket = useChatSocket();
 	const cookies = useCookies();
+	const { nickname, user_id } = useUserDataContext();
 	const [roomList, setRoomList] = useState([]);
 	const [data, setData] = useState<any>();
 	const [openModal, setOpenModal] = useState(false);
 	const [selectedIdx, setSelectedIdx] = useState(-1);
 
-	const user_id = Number(cookies.get("user_id"));
-	const user_nickname = cookies.get("nick_name");
+	const user_nickname = nickname;
 
 
 	async function handleRoomList() {

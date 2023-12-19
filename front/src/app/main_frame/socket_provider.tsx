@@ -21,27 +21,51 @@ export function ChatSocket ({ children }: any) {
 
   useEffect(() => {
 
-      const tmpSocket = io(`${process.env.NEXT_PUBLIC_WEBSOCKET_URL}`,
-      {
-        query: {
-            user_id: cookies.get('user_id'),
-        },
-        extraHeaders: {
-            token: cookies.get('access_token'),
-        },
-      });
+      // api로 nickname 가져오기
+      let user_id;
 
-      tmpSocket.on("connect" , () => {
+      let tmpSocket :any;
 
-      })
-    
-      tmpSocket.on("disconnect", () => {
-        console.log("서버와 연결이 끊김");
-        // route.replace("/");
-        // window.alert('서버와 연결이 끊어졌습니다.');
-      });
+      const fetchUserData = async () => {
+        await axiosToken.get(`${process.env.NEXT_PUBLIC_API_URL}user/getdata/mydata`,{
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${cookies.get('access_token')}`
+            },        
+        }) 
+        .then((res) => {
+            if (res.data.status === true)
+            {
+                user_id = res.data.user_id;
 
-      setSocket(tmpSocket);
+                tmpSocket = io(`${process.env.NEXT_PUBLIC_WEBSOCKET_URL}`,
+                {
+                  query: {
+                      user_id: user_id,
+                  },
+                  extraHeaders: {
+                      token: cookies.get('access_token'),
+                  },
+                });
+
+                tmpSocket.on("connect" , () => {
+
+                })
+              
+                tmpSocket.on("disconnect", () => {
+                  console.log("서버와 연결이 끊김");
+                  // route.replace("/");
+                  // window.alert('서버와 연결이 끊어졌습니다.');
+                });
+
+                setSocket(tmpSocket);
+
+            }
+        })
+      }
+
+      fetchUserData();
+
 
       return () => {
           tmpSocket.disconnect();

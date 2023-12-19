@@ -1,3 +1,4 @@
+'use client'
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -8,7 +9,6 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { axiosToken } from '@/util/token';
 import { useCookies } from 'next-client-cookies';
-import { cookies } from 'next/headers';
 
 const style: React.CSSProperties = {
   position: 'absolute',
