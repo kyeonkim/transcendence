@@ -19,8 +19,9 @@ export class ChatController {
 	@UseGuards(AuthGuard('jwt-access'))
 	@ApiBearerAuth('JWT-acces')
     @Get("roomlist/:id")
-    async RoomList(@Param('id', ParseIntPipe) id: number)
+    async RoomList(@Req() req, @Param('id', ParseIntPipe) id: number)
     {
+        id = req.tokenuserdata.user_id;
         return await this.ChatService.GetRoomList(id);
     }
 
@@ -37,8 +38,10 @@ export class ChatController {
 	@UseGuards(AuthGuard('jwt-access'))
 	@ApiBearerAuth('JWT-acces')
     @Post("createroom")
-    async CreateRoom(@Body() room: ChatRoomDto)
+    async CreateRoom(@Req() req, @Body() room: ChatRoomDto)
     {
+        room.user_id = req.tokenuserdata.user_id;
+        room.user_nickname = req.tokenuserdata.user_nickname;
         return await this.ChatService.CreateRoom(room);
     }
 
@@ -46,8 +49,10 @@ export class ChatController {
 	@UseGuards(AuthGuard('jwt-access'))
 	@ApiBearerAuth('JWT-acces')
     @Patch("changeroom")
-    async ChangeRoom(@Headers() headers, @Body() data: ChatRoomDto)
+    async ChangeRoom(@Req() req, @Headers() headers, @Body() data: ChatRoomDto)
     {
+        data.user_id = req.tokenuserdata.user_id;
+        data.user_nickname = req.tokenuserdata.user_nickname;
         const room =  await this.ChatService.GetMyRoomByHeader(headers);
         if (room === null || room.chatroom_id !== data.room_idx || room.chatroom.owner_id !== room.user_id)
             return {status: false, message: 'not manager'};
@@ -58,8 +63,10 @@ export class ChatController {
 	@UseGuards(AuthGuard('jwt-access'))
 	@ApiBearerAuth('JWT-acces')
     @Patch("joinroom")
-    async JoinRoom(@Body() data : JoinRoomDto)
+    async JoinRoom(@Req() req, @Body() data : JoinRoomDto)
     {
+        data.user_id = req.tokenuserdata.user_id;
+        data.user_nickname = req.tokenuserdata.user_nickname;
         return await this.ChatService.JoinRoom(data);
     }
 
@@ -67,8 +74,10 @@ export class ChatController {
 	@UseGuards(AuthGuard('jwt-access'))
 	@ApiBearerAuth('JWT-acces')
     @Patch("leaveroom")
-    async LeaveRoom(@Body() room : JoinRoomDto)
+    async LeaveRoom(@Req() req, @Body() room : JoinRoomDto)
     {
+        room.user_id = req.tokenuserdata.user_id;
+        room.user_nickname = req.tokenuserdata.user_nickname;
         const rtn = await this.ChatService.LeaveRoom(room);
         if (rtn.status === true)
             this.socketService.HandleNotice(room.room_id, `유저 ${room.user_nickname}님이 퇴장하였습니다.`);
@@ -80,8 +89,9 @@ export class ChatController {
 	@UseGuards(AuthGuard('jwt-access'))
 	@ApiBearerAuth('JWT-acces')
     @Patch("setmanager")
-    async SetManager(@Headers() headers, @Body() data : SetChatUserDto)
+    async SetManager(@Req() req, @Headers() headers, @Body() data : SetChatUserDto)
     {
+        data.user_id = req.user_id;
         const room =  await this.ChatService.GetMyRoomByHeader(headers);
         if (room === null || room.chatroom_id !== data.room_id || room.chatroom.owner_id !== room.user_id)
             return {status: false, message: 'not manager'};
@@ -92,8 +102,9 @@ export class ChatController {
 	@UseGuards(AuthGuard('jwt-access'))
 	@ApiBearerAuth('JWT-acces')
     @Patch("unsetmanager")
-    async UnsetManager(@Headers() headers, @Body() data : SetChatUserDto)
+    async UnsetManager(@Req() req, @Headers() headers, @Body() data : SetChatUserDto)
     {
+        data.user_id = req.tokenuserdata.user_id;
         const room =  await this.ChatService.GetMyRoomByHeader(headers);
         if (room === null || room.chatroom_id !== data.room_id || room.chatroom.owner_id !== room.user_id)
             return {status: false, message: 'not manager'};
@@ -104,8 +115,9 @@ export class ChatController {
 	@UseGuards(AuthGuard('jwt-access'))
 	@ApiBearerAuth('JWT-acces')
     @Patch("muteuser")
-    async MuteUser(@Headers() headers, @Body() data : SetChatUserDto)
+    async MuteUser(@Req() req, @Headers() headers, @Body() data : SetChatUserDto)
     {
+        data.user_id = req.tokenuserdata.user_id;
         const room =  await this.ChatService.GetMyRoomByHeader(headers);
         if (room === null || room.chatroom_id !== data.room_id || room.is_manager !== true)
             return {status: false, message: 'not manager'};
@@ -116,8 +128,9 @@ export class ChatController {
 	@UseGuards(AuthGuard('jwt-access'))
 	@ApiBearerAuth('JWT-acces')
     @Patch("unmuteuser")
-    async UnmuteUser(@Headers() headers, @Body() data : SetChatUserDto)
+    async UnmuteUser(@Req() req, @Headers() headers, @Body() data : SetChatUserDto)
     {
+        data.user_id = req.tokenuserdata.user_id;
         const room =  await this.ChatService.GetMyRoomByHeader(headers);
         if (room === null || room.chatroom_id !== data.room_id || room.is_manager !== true)
             return {status: false, message: 'not manager'};
@@ -128,8 +141,9 @@ export class ChatController {
 	@UseGuards(AuthGuard('jwt-access'))
 	@ApiBearerAuth('JWT-acces')
     @Patch("banuser")
-    async BanUser(@Headers() headers, @Body() data : SetChatUserDto)
+    async BanUser(@Req() req, @Headers() headers, @Body() data : SetChatUserDto)
     {
+        data.room_id = req.tokenuserdata.user_id;
         const room =  await this.ChatService.GetMyRoomByHeader(headers);
         if (room === null || room.chatroom_id !== data.room_id || room.is_manager !== true)
             return {status: false, message: 'not manager'};
@@ -140,8 +154,9 @@ export class ChatController {
 	@UseGuards(AuthGuard('jwt-access'))
 	@ApiBearerAuth('JWT-acces')
     @Patch("unbanuser")
-    async UnbanUser(@Headers() headers, @Body() data : SetChatUserDto)
+    async UnbanUser(@Req() req, @Headers() headers, @Body() data : SetChatUserDto)
     {
+        data.user_id = req.tokenuserdata.user_id;
         const room =  await this.ChatService.GetMyRoomByHeader(headers);
         if (room === null || room.chatroom_id !== data.room_id || room.is_manager !== true)
             return {status: false, message: 'not manager'};
@@ -152,8 +167,9 @@ export class ChatController {
 	@UseGuards(AuthGuard('jwt-access'))
 	@ApiBearerAuth('JWT-acces')
     @Patch("kickuser")
-    async KickUser(@Headers() headers, @Body() data : SetChatUserDto)
+    async KickUser(@Req() req, @Headers() headers, @Body() data : SetChatUserDto)
     {
+        data.user_id = req.tokenuserdata.user_id;
         const room =  await this.ChatService.GetMyRoomByHeader(headers);
         if (room === null || room.chatroom_id !== data.room_id || room.is_manager !== true)
             return {status: false, message: 'not manager'};
@@ -167,8 +183,9 @@ export class ChatController {
 	@UseGuards(AuthGuard('jwt-access'))
 	@ApiBearerAuth('JWT-acces')
     @Post("inviteuser")
-    async InviteUser(@Body() data : InviteChatDto)
+    async InviteUser(@Req() req, @Body() data : InviteChatDto)
     {
+        data.from = req.tokenuserdata.user_nickname;
         return await this.ChatService.InviteUser(data);
     }
 
@@ -176,8 +193,10 @@ export class ChatController {
 	@UseGuards(AuthGuard('jwt-access'))
 	@ApiBearerAuth('JWT-acces')
     @Post("acceptinvite")
-    async AcceptInvite(@Body() data : JoinRoomDto)
+    async AcceptInvite(@Req() req, @Body() data : JoinRoomDto)
     {
+        data.user_id = req.tokenuserdata.user_id;
+        data.user_nickname = req.tokenuserdata.user_nickname;
         return await this.ChatService.AcceptInvite(data);
     }
 
@@ -185,8 +204,9 @@ export class ChatController {
 	@UseGuards(AuthGuard('jwt-access'))
 	@ApiBearerAuth('JWT-acces')
     @Get("dm")
-    async GetDm(@Query('id', ParseIntPipe) id: number, @Query('from_id', ParseIntPipe) from_id: number, @Query(`idx`, ParseIntPipe) idx: number)
+    async GetDm(@Req() req, @Query('id', ParseIntPipe) id: number, @Query('from_id', ParseIntPipe) from_id: number, @Query(`idx`, ParseIntPipe) idx: number)
     {
+        id = req.tokenuserdata.user_id;
         return await this.ChatService.GetDm(idx, id, from_id);
     }
 
@@ -194,8 +214,9 @@ export class ChatController {
 	@UseGuards(AuthGuard('jwt-access'))
 	@ApiBearerAuth('JWT-acces')
     @Get("unreaddm")
-    async GetUnreadDm(@Query('user_id', ParseIntPipe) user_id: number, @Query('from_id', ParseIntPipe) from_id: number)
+    async GetUnreadDm(@Req() req, @Query('user_id', ParseIntPipe) user_id: number, @Query('from_id', ParseIntPipe) from_id: number)
     {
+        user_id = req.tokenuserdata.user_id;
         return await this.ChatService.GetUnreadDm(user_id, from_id);
     }
 }
