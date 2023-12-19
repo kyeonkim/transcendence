@@ -26,7 +26,7 @@ export async function POST (request: NextRequest)
         });
 
     }
-    catch (error)
+    catch (error: any)
     {
         if (error.response)
         {

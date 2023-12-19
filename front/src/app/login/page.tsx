@@ -82,7 +82,7 @@ export default function Login ({searchParams}:any) {
       {(async () => {
         try
         {
-          const response = await Auth42(code);
+          const response: any = await Auth42(code);
 
           responseData = response?.data;
 

@@ -1,7 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Grid, ListItem, Stack, Chip, Typography, Avatar } from "@mui/material";
-import { render } from 'react-dom';
-
 import { useMainBoxContext } from '@/app/main_frame/mainbox_context';
 
 const TextSend = ({ my_name, socket, scrollref}: any) => {

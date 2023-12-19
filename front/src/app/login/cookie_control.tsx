@@ -18,8 +18,6 @@ export default function CookieControl ({res}: {res: any}) {
     const router = useRouter();
     const { access_token, refresh_token, nick_name, user_id } = res;
 
-    let   response_error = false;
-
     const particlesInit = useCallback(async (engine: Engine) => {
         await loadFull(engine);
       }, []);
@@ -51,7 +49,6 @@ export default function CookieControl ({res}: {res: any}) {
         }
         catch (error)
         {
-            response_error = true;
             router.replace("/");
         }
     }, []);
