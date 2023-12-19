@@ -4,8 +4,7 @@ import { Socket } from "socket.io-client"
 import { useRouter } from "next/navigation";
 import { useCookies } from "next-client-cookies"
 import { io } from "socket.io-client";
-import { redirect } from 'next/navigation';
-
+import { axiosToken } from '@/util/token';
 
 const ChatSocketContext = createContext<Socket>(null);
 

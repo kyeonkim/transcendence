@@ -24,7 +24,6 @@ import { useChatBlockContext } from '@/app/main_frame/shared_state';
 import { Grid } from '@mui/material';	
 import styles from '@/app/main_frame/frame.module.css';
 
-import { useChatBlockContext } from '@/app/main_frame/shared_state';
 import { useUserDataContext } from '@/app/main_frame/user_data_context';
 
 interface TabPanelProps {
