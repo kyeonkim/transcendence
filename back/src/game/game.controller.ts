@@ -1,4 +1,4 @@
-import { Body, Controller, Get, UseGuards, ParseIntPipe, Post, Query, Patch } from '@nestjs/common';
+import { Body, Controller, Get, UseGuards, ParseIntPipe, Post, Query, Patch, Req } from '@nestjs/common';
 import { ApiOperation, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { gameDataDto, gameRoomDto, leaveGameRoomDto, readyGameDto, startGameDto } from './dto/game.dto';
 import { GameService } from './game.service';
@@ -24,8 +24,10 @@ export class GameController {
 
     @ApiOperation({summary: `게임방 체크 API`, description: `게임방에 있는지 체크한다.`})
     @Post("checkroom")
-    async CheckRoom(@Body() data: gameRoomDto)
+    async CheckRoom(@Req() req, @Body() data: gameRoomDto)
     {
+		data.user1_id = req.tokenuserdata.user_id;
+		data.user1_nickname = req.tokenuserdata.user_nickname;
         return await this.GameService.CheckGameRoom(data.user1_id);
     }
 
@@ -33,8 +35,10 @@ export class GameController {
 	@UseGuards(AuthGuard('jwt-access'))
 	@ApiBearerAuth('JWT-acces')
     @Post("createroom")
-    async CreateRoom(@Body() data: gameRoomDto)
+    async CreateRoom(@Req() req, @Body() data: gameRoomDto)
     {
+        data.user1_id = req.tokenuserdata.user_id;
+		data.user1_nickname = req.tokenuserdata.user_nickname;
         return await this.GameService.CreateGameRoom(data.user1_id);
     }
 
@@ -42,8 +46,9 @@ export class GameController {
     @UseGuards(AuthGuard('jwt-access'))
     @ApiBearerAuth('JWT-acces')
     @Patch("leaveroom")
-    async LeaveRoom(@Body() data: leaveGameRoomDto)
+    async LeaveRoom(@Req() req, @Body() data: leaveGameRoomDto)
     {
+        data.user_id = req.tokenuserdata.user_id;
         const room = await this.GameService.LeaveGameRoom(data.user_id);
         return room;
     }
@@ -52,8 +57,10 @@ export class GameController {
 	@UseGuards(AuthGuard('jwt-access'))
 	@ApiBearerAuth('JWT-acces')
     @Post("inviteroom")
-    async InviteRoom(@Body() data: gameRoomDto)
+    async InviteRoom(@Req() req, @Body() data: gameRoomDto)
     {
+        data.user1_id = req.tokenuserdata.user_id;
+		data.user1_nickname = req.tokenuserdata.user_nickname;
         return await this.GameService.InviteGameRoom(data.user1_id, data.user2_id, data.user1_nickname);
     }
 
@@ -61,29 +68,34 @@ export class GameController {
 	@UseGuards(AuthGuard('jwt-access'))
 	@ApiBearerAuth('JWT-acces')
     @Patch ("joinroom")
-    async JoinRoom(@Body() data: gameRoomDto)
+    async JoinRoom(@Req() req, @Body() data: gameRoomDto)
     {
+        data.user1_id = req.tokenuserdata.user_id;
+		data.user1_nickname = req.tokenuserdata.user_nickname;
         return await this.GameService.JoinGameRoom(data.user1_id, data.user2_id, data.event_id);
     }
 
     @ApiOperation({summary: `게임 준비 API`, description: `게임을 준비한다.`})
     @Patch("ready")
-    async Ready(@Body() data: readyGameDto)
+    async Ready(@Req() req, @Body() data: readyGameDto)
     {
+        data.user_id = req.tokenuserdata.user_id;
         return await this.GameService.Ready(data.game_mode, data.user_id, data.ready);
     }
 
     @ApiOperation({summary: `게임 시작 API`, description: `게임을 시작한다.`})
     @Post("start")
-    async Start(@Body() data: startGameDto)
+    async Start(@Req() req, @Body() data: startGameDto)
     {
+        data.user_id = req.tokenuserdata.user_id;
         return await this.GameService.Start(data.user_id);
     }
 
     @ApiOperation({summary: `게임 매칭 API`, description: `게임을 매칭한다.`})
     @Post("match")
-    async MatchGame(@Body() data: startGameDto)
+    async MatchGame(@Req() req, @Body() data: startGameDto)
     {
+        data.user_id = req.tokenuserdata.user_id;
         return await this.GameService.MatchGame(data.user_id);
     }
 
@@ -96,7 +108,8 @@ export class GameController {
 
     @ApiOperation({summary: `게임 종료 API`, description: `게임을 종료한다.`})
     @Patch("exitgame")
-    async ExitGame(@Body() data: startGameDto) {
+    async ExitGame(@Req() req, @Body() data: startGameDto) {
+        data.user_id = req.tokenuserdata.user_id;
         return await this.GameService.ExitGame(data.user_id);
     }
 }
