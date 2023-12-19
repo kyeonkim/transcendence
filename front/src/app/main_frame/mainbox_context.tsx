@@ -31,7 +31,7 @@ const MainBoxContextProvider = ({ children }: any) => {
 		if (value === 1)
 		{
 			setSearch(searchTarget || '');
-			router.push('/main_frame/profile');
+			router.push(`/main_frame/profile?id=${searchTarget}`);
 		}
 		else
 		{

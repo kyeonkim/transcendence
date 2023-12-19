@@ -10,6 +10,7 @@ import { Avatar, Grid, Tooltip, Typography, Unstable_Grid2 } from '@mui/material
 import { axiosToken } from '@/util/token';
 import { render } from 'react-dom';
 import MedalIcon from '@mui/icons-material/WorkspacePremium';
+import { useSearchParams } from 'next/navigation'
 
 import OtpModal from '@/components/profile/otp';
 import TwoFAPass from '@/app/login/twoFAPass';
@@ -31,9 +32,12 @@ const ProfilePage = (props: any) => {
   const socket = useChatSocket();
   const formData = new FormData();
   const [ userNickname, setUserNickname ] = useState('');
-  const { setProfile, id } = useMainBoxContext();
+  const { setProfile } = useMainBoxContext();
   const my_id = Number(cookies.get('user_id'));
   const my_nick = cookies.get('nick_name');
+
+  const searchParams = useSearchParams()
+  const id = searchParams.get('id')
 
   console.log('profilepage - ', id);
 

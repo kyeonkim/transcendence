@@ -21,6 +21,7 @@ export class UserService {
             where: {
                 nick_name: nickName,
             }});
+            
         if (user !== null)
             return null;
         const newUser = await this.prisma.user.create({
