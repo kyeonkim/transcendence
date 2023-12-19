@@ -131,6 +131,14 @@ export class AuthService {
 
     async SignUp(userData : SignUpDto)
     {
+		if(userData.nick_name.length < 2 || userData.nick_name.length > 10)
+			return {status: false, message: "닉네임은 2글자 이상 10글자 이하로 입력해주세요."};
+		const low_nickname = userData.nick_name.toLowerCase();
+		if( low_nickname === "admin" || low_nickname === "administrator" || low_nickname === "root" || low_nickname === "system" ||
+			low_nickname === "sys" || low_nickname === "test" || low_nickname === "guest" || low_nickname === "operator" ||
+			low_nickname === "operator" || low_nickname === "user" || low_nickname === "super" || low_nickname === "default"
+		)
+			return {status: false, message: "사용할 수 없는 닉네임입니다."};
 		const authorizedId = await this.Auth42(userData.access_token);
 		if (authorizedId === null)
 			return {status: false, access_token: userData.access_token};
