@@ -1,6 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsInt, IsOptional, IsString, Matches } from "class-validator";
-import { eventDto } from "src/event/dto/event.dto";
 
 export class SignUpDto 
 {
@@ -39,4 +38,3 @@ export class TwoFADTO {
     @IsOptional()
     code?: string;
 }
-
