@@ -289,7 +289,7 @@ export class JwtTwoFAStrategy extends PassportStrategy(Strategy, 'jwt-twoFA') {
 	  ignoreExpiration: false,
 	  //검증 비밀 값(유출 주의)
 	  secretOrKey: process.env.JWT_SECRET,
-	//   passReqToCallback: true,
+	  passReqToCallback: true,
 	});
   }
   
@@ -299,6 +299,7 @@ export class JwtTwoFAStrategy extends PassportStrategy(Strategy, 'jwt-twoFA') {
    * @param payload 토큰 전송 내용
    */
   async validate(req: any, payload: UserToken): Promise<any> {
+	req['tokenuserdata'] = payload;
 	return { status: true };
   }
 }
