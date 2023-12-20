@@ -68,6 +68,7 @@ export default function BasicTabs() {
 	const [dmOpenNickname, setDmOpenNickname] = useState('');
 	const [dmAlarmList, setDmAlarmList] = useState([]);
 	const [render, setRender] = useState('');
+	const [isDm , setIsDm] = useState(false);
 	const cookies = useCookies();
 	const socket = useChatSocket();
 	const tabsRef = useRef(null);
@@ -122,7 +123,7 @@ export default function BasicTabs() {
 
 			setDmAlarmList(tmp_list);
 		}
-
+		setIsDm(false);
 	}
 
 	const setAlarmCountHandler = (increment :boolean) => {
@@ -131,10 +132,14 @@ export default function BasicTabs() {
 		else
 		{
 			if (alarmCount !== 0)
-				setAlarmCount((prevAlarmCount) => prevAlarmCount - 1);
+				setAlarmCount((prevAlarmCount) => prevAlarmCount === 0 ? 0 :  prevAlarmCount - 1);
 		}
 
 	};
+
+	const setAlarmDM = (val: boolean) => {
+		setIsDm(val);
+	}
 
 	const setAlarmListAdd = (alarm: any) => {
 		setAlarmList((prevalarmList :any) => 
@@ -232,7 +237,7 @@ export default function BasicTabs() {
 				<Paper elevation={6}>
 				<Tabs value={value} ref={tabsRef} onChange={handleChange} centered aria-label="basic tabs example">
 					<Tab icon={
-						<Badge color="error" badgeContent={dmAlarmList.length ? "!" : 0}>
+						<Badge color="error" badgeContent={(isDm || dmAlarmList.length) ? "!" : 0}>
 						<GroupIcon sx={{}}/>
 						</Badge>
 						} {...a11yProps(0)} />
@@ -261,6 +266,7 @@ export default function BasicTabs() {
 					alarmListRemover={setAlarmListRemover}
 					alarmCountHandler={setAlarmCountHandler}
 					handleAlarmRerender={handleAlarmRerender}
+					setDm={setAlarmDM}
 				/>
 			</CustomTabPanel>
 		</Grid>
