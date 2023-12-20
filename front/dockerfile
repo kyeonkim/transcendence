@@ -6,10 +6,17 @@ COPY . /app/front_server/
 
 RUN npm install
 
-# RUN npm run build
+ARG NEXT_PUBLIC_CLIENT_ID \
+    NEXT_PUBLIC_CLIENT_SECRET \
+    NEXT_PUBLIC_REDIRECT_URL \
+    NEXT_PUBLIC_FRONT_URL \
+    NEXT_PUBLIC_API_URL \
+    NEXT_PUBLIC_WEBSOCKET_URL
 
-# CMD ["npm", "run", "start"]
-CMD ["npm", "run", "dev"]
+RUN npm run build
+
+CMD ["npm", "run", "start"]
+# CMD ["npm", "run", "dev"]
 # CMD ["tail", "-f", "/dev/null"]
 
 ######dumb-init 사용시

@@ -12,4 +12,8 @@ RUN npm install
 
 RUN npx prisma generate
 
-ENTRYPOINT ["sh", "-c", "npx prisma migrate deploy && npm run start:dev"]
+RUN npm run build
+
+ENTRYPOINT ["sh", "-c", "npx prisma migrate deploy && npm run start"]
+
+# ENTRYPOINT ["sh", "-c", "npx prisma migrate deploy && npm run start:dev"]
