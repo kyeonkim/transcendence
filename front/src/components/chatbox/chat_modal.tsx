@@ -54,61 +54,54 @@ export default function ChatModal({modalOpen, setModalOpen, modalCondition,
     const handleDone = async () => {
         
         let hashRoomPassword;
-
-        if (inPassword !== '' && /^[a-zA-Z0-9]+$/.test(inPassword))
+        
+        if (inPassword !== '')
         {
+            //여기서 패스워드에 특수문자나 공백없게 필터링 했는데 어딘가에 꼬여써유 난몰루...
+            if (/^[a-zA-Z0-9]+$/.test(inPassword)) {
+                setErrShow(true);
+                setErrMessage('영문 숫자를 넣어 20자이내로 해주세요!');
+                return ;
+            }
 			const salt = genSaltSync(10);
 			hashRoomPassword = hashSync(inPassword, salt);
         }
-        else{
-            setErrShow(true);
-            setErrMessage('패스워드에 영문 숫자를 넣어 20자이내로 해주세요!');
-            return ;
+
+        if (modalCondition === 'remove_password' && inPassword == '') {
+            await axiosToken.patch(`${process.env.NEXT_PUBLIC_API_URL}chat/changeroom`, {
+                room_idx: Number(roominfo.idx),
+                user_id: my_id,
+                user_nickname: my_name,
+                chatroom_name: inChatname? inChatname : chatname,
+                password: inPassword ? hashRoomPassword : '',
+                private: roomMode,
+                is_changePass : (modalCondition === 'remove_password' && inPassword == '') ? true : inPassword ? true : false
+            },
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${cookies.get('access_token')}`
+                },
+            })
+            .then((res) => {
+
+                if (res.data.status)
+                {
+                    handleCloseModal();
+                    if (inChatname !== '')
+                        setChatname(inChatname);
+                }
+                else
+                {
+                    setErrMessage(res.data.message);
+                    setErrShow(true);
+                }
+
+            })
+            .catch((err) => {
+            })
         }
 
-        if (modalCondition === 'remove_password' && inPassword == '')
-        console.log('set req\n', {
-            room_idx:  Number(roominfo.idx),
-            user_id: my_id, 
-            user_nickname: my_name,
-            chatroom_name: inChatname? inChatname : chatname,
-            password: inPassword ? hashRoomPassword : '',
-            private: roomMode,
-            is_changePass : (modalCondition === 'remove_password' && inPassword == '') ? true : inPassword ? true : false
-        })
-		await axiosToken.patch(`${process.env.NEXT_PUBLIC_API_URL}chat/changeroom`, {
-			room_idx: Number(roominfo.idx),
-			user_id: my_id,
-			user_nickname: my_name,
-			chatroom_name: inChatname? inChatname : chatname,
-			password: inPassword ? hashRoomPassword : '',
-            private: roomMode,
-            is_changePass : (modalCondition === 'remove_password' && inPassword == '') ? true : inPassword ? true : false
-		},
-		{
-			headers: {
-				'Content-Type': 'application/json',
-				'Authorization': `Bearer ${cookies.get('access_token')}`
-			  },
-		})
-		.then((res) => {
-
-			if (res.data.status)
-            {
-                handleCloseModal();
-                if (inChatname !== '')
-                    setChatname(inChatname);
-            }
-			else
-            {
-				setErrMessage(res.data.message);
-                setErrShow(true);
-            }
-
-		})
-		.catch((err) => {
-
-		})
 
     }
 
