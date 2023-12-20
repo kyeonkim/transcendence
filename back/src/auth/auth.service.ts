@@ -268,6 +268,7 @@ export class JwtAccessStrategy extends PassportStrategy(Strategy, 'jwt-access') 
    * @param payload 토큰 전송 내용
    */
   async validate(req: any, payload: UserToken): Promise<any> {
+	// console.log("JwtAccessStrategy req: ", req.headers);
 	if (payload.twoFAPass === false)// 2차인증 필요
 		throw new UnauthorizedException();
 	req['tokenuserdata'] = payload;
@@ -326,6 +327,8 @@ export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'jwt-refresh'
    * @param payload 토큰 전송 내용
    */
   async validate(req: any, payload: UserToken): Promise<any> {
+	// console.log("JwtRefreshStrategy req: ", req.body);
+	// console.log("JwtRefreshStrategy payload: ", payload);
 	if (payload.twoFAPass === false)// 2차인증 필요
 		throw new UnauthorizedException();
 	const storedToken = await this.prisma.tokens.findUnique({
@@ -333,12 +336,14 @@ export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'jwt-refresh'
 		  user_id: payload.user_id,
 		},
 	});
+	// console.log("JwtRefreshStrategy storedToken:", storedToken);
 	if (storedToken === null)
 		throw new UnauthorizedException();
 	if (storedToken.access_token !== req.body.access_token)
 		throw new UnauthorizedException();
 	try {
 		await this.jwtService.verifyAsync(storedToken.access_token, { secret: process.env.JWT_SECRET });
+		// console.log("JwtRefreshStrategy done!");
 	} catch (error) {
 		if (error instanceof TokenExpiredError)
 			return { status: true };

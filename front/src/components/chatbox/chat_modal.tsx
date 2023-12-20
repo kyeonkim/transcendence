@@ -44,21 +44,26 @@ export default function ChatModal({modalOpen, setModalOpen, modalCondition,
     }
 
     const handleInPassword = (event :any) => {
-		setInPassword(event.target.value as string);
+		    setInPassword(event.target.value as string);
     }
 
     const handleInChatname = (event :any) => {
-		setInChatname(event.target.value as string);
+		    setInChatname(event.target.value as string);
     }
   
     const handleDone = async () => {
         
         let hashRoomPassword;
 
-        if (inPassword !== '')
+        if (inPassword !== '' && /^[a-zA-Z0-9]+$/.test(inPassword))
         {
 			const salt = genSaltSync(10);
 			hashRoomPassword = hashSync(inPassword, salt);
+        }
+        else{
+            setErrShow(true);
+            setErrMessage('패스워드에 영문 숫자를 넣어 20자이내로 해주세요!');
+            return ;
         }
 
         if (modalCondition === 'remove_password' && inPassword == '')
@@ -156,12 +161,21 @@ export default function ChatModal({modalOpen, setModalOpen, modalCondition,
             }
             {(modalCondition === 'change_password') && 
                 <TextField
+                    color={errShow ? "error" : "primary"}
                     className={styles.modalTextField}
                     id="password_text_field"
                     label="Enter new Password"
                     type="password"
-                    inputProps={{ maxLength: 20}}
+                    inputProps={{
+                        maxLength: 20
+
+                    }}
                     onChange={handleInPassword}
+                    onKeyDown={(e) => {
+						if (e.key === 'Enter') {
+							if (e.nativeEvent.isComposing) return;
+							handleDone();
+						}}}
                 />
             }
             {modalCondition === 'change_visibility' && 

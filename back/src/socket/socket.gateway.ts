@@ -61,6 +61,7 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
     if (client.handshake.query.user_id !== undefined)
     {
       this.server.to(`status-${client.handshake.query.user_id}`).emit(`status`, {user_id: client.handshake.query.user_id, status: 'offline'});
+      this.SocketGameService.CancelMatch(Number(client.handshake.query.user_id));
       this.SocketGameService.ForceGameEnd(Number(client.handshake.query.user_id));
       this.SocketService.Disconnect(client.handshake.query.user_id, client.id);
     }
@@ -175,5 +176,11 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
   {
     console.log("GameForceEndGameForceEnd : ", Client.handshake.query.user_id);
     await this.SocketGameService.ForceGameEnd(Number(Client.handshake.query.user_id));
+  }
+
+  @SubscribeMessage('game-cancelmatch')
+  async GameCancelMatch(Client: Socket)
+  {
+    await this.SocketGameService.CancelMatch(Number(Client.handshake.query.user_id));
   }
 }

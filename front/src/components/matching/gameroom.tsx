@@ -6,14 +6,27 @@ import { axiosToken } from "@/util/token";
 import { useCookies } from "next-client-cookies";
 import { useChatSocket } from "@/app/main_frame/socket_provider";
 import { useUserDataContext } from "@/app/main_frame/user_data_context";
+import { useMainBoxContext } from "@/app/main_frame/mainbox_context";
 
 export default function GameRoom(props: any) {
-	const { setRender, userData, setIsMod} = props;
+	const { render, setRender, userData } = props;
 	const [ready, setReady] = useState(false);
 	const [gameStart, setGameStart] = useState(false);
 	const [mod, setMod] = useState(false);
 	const cookies = useCookies();
 	const { user_id, nickname } = useUserDataContext();
+	const { setGameState } = useMainBoxContext();
+
+	useEffect(() => {
+
+		
+		return () => {
+			
+			handleExit();
+			setGameState(false);
+
+		}
+	}, [])
 
 	useEffect(() => {
 		if (userData.room && userData.room.user2_ready && userData.room.user1_ready)
@@ -37,14 +50,15 @@ export default function GameRoom(props: any) {
 		}
 		})
 		.then((res) => {
-			setRender(0);
+			console.log('handle Exit done - ', res.data);
+			if (res.data.status === true && render === 2)
+				setRender(0);
 		})
 	}
 
 	useEffect(() => {
 		const updateStates = async () => {
-			await axiosToken.patch(
-				`${process.env.NEXT_PUBLIC_API_URL}game/ready`,
+			await axiosToken.patch(`${process.env.NEXT_PUBLIC_API_URL}game/ready`,
 				{
 					user_id: user_id,
 					ready: ready? true : false,
@@ -86,7 +100,6 @@ export default function GameRoom(props: any) {
 			}
 		})
 		.then((res) => {
-
 		})
 	}
 
@@ -109,9 +122,14 @@ export default function GameRoom(props: any) {
 				}}
 			>
 				 <FormControlLabel
-				 	control={<Checkbox sx={{color: 'white'}} checked={mod} onChange={handleMod}/>}
+				 	control={<Checkbox
+						sx={{color: 'white'}}
+						checked={mod}
+						onChange={handleMod}
+						disabled={userData.room.user1_id !== user_id ? true : false}
+						/>}
 					label={
-						<Typography sx={{ color: 'white', fontSize: '1.5vw' }}>
+						<Typography sx={{ color: mod ? 'blue' : 'red', fontSize: '1.5vw' }}>
 							Revers Mod
 						</Typography>}
 					sx={{color: 'white'}}

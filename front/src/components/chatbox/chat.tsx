@@ -333,33 +333,13 @@ export default function Chat(props: any) {
 							<Typography>Change Name</Typography>
 						</ListItemButton>
 						<Divider />
-						{roominfo.is_password ? (
-							<>
-								<ListItemButton onClick={() => handleChatModalCondition('remove_password')}>
-									<Typography>Remove PassWord</Typography>
-								</ListItemButton>
-								
-								<Divider />
-								<ListItemButton onClick={() => handleChatModalCondition('change_password')}>
-									<Typography>Change PassWord</Typography>
-								</ListItemButton>
-
-							</>
-						) : (
-							<ListItemButton onClick={() => handleChatModalCondition('change_password')}>
-								<Typography>Set PassWord</Typography>
-							</ListItemButton>
-						)}
+						<ListItemButton onClick={() => handleChatModalCondition('change_password')}>
+							<Typography>Set PassWord</Typography>
+						</ListItemButton>
 						<Divider />
-						{roominfo.is_private ? (
-							<ListItemButton onClick={() => handleChatModalCondition('change_visibility')}>
-								<Typography>Set Public</Typography>
-							</ListItemButton>
-						) : (
-							<ListItemButton onClick={() => handleChatModalCondition('change_visibility')}>
-								<Typography>Set Private</Typography>
-							</ListItemButton>
-						)}
+						<ListItemButton onClick={() => handleChatModalCondition('change_visibility')}>
+							<Typography>Set Private</Typography>
+						</ListItemButton>
 						<Divider />
 						<Button onClick={handleSettingClose} sx={{alignItems: "center"}}>Cancel</Button>
 					</List>

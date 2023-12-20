@@ -104,11 +104,13 @@ export default function ChatRoomCreate(props: any) {
 	};
 
 	function handleRoomnameChange(event :any) {
-		setRoomName(event.target.value as string);
+		if (/^[a-zA-Z0-9]+$/.test(event.target.value as string))
+			setRoomName(event.target.value as string);
 	}
 
 	function handleRoomPasswordChange(event :any) {
-		setRoomPassword(event.target.value as string);
+		if (/^[a-zA-Z0-9]+$/.test(event.target.value as string))
+			setRoomPassword(event.target.value as string);
 	}
 
 	function handleCancel() {

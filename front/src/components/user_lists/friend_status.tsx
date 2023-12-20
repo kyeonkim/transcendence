@@ -63,7 +63,7 @@ export function useFriendList(myId: any) {
     return () => {
       socket.off('status', handleStatusUpdate);
     };
-  }, [apiResponse, status, socket]);
+  }, [apiResponse, socket]);
 
   // 상대의 status를 받는다.
   const updateStatus = (userId: any, from_status: any) => {

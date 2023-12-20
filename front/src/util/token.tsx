@@ -60,6 +60,11 @@ axiosToken.interceptors.response.use(
 
 const getNewToken = async (access: any, refresh: any) => {
   try {
+
+    console.log('newToken started');
+    console.log('access_token - ', access);
+    console.log('refresh_token - ', refresh);
+
     const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}auth/token/refresh`, {
       access_token: access.value
     }, {
@@ -68,8 +73,16 @@ const getNewToken = async (access: any, refresh: any) => {
         'Authorization': `Bearer ${refresh.value}`,
       },
     });
-    await axios.post(`${process.env.NEXT_PUBLIC_FRONT_URL}api/set_cookie`, res.data)
+
+    console.log('newToken get done - ', res);
+
+    await axios.post(`${process.env.NEXT_PUBLIC_FRONT_URL}api/set_cookie`, res.data);
+
+    console.log('set cookie done');
+
     return res.data;
+
+ 
   } catch (error) {
     throw error;
   }

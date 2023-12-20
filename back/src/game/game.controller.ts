@@ -1,4 +1,4 @@
-import { Body, Controller, Get, UseGuards, ParseIntPipe, Post, Query, Patch, Req } from '@nestjs/common';
+import { Body, Controller, Get, UseGuards, ParseIntPipe, Post, Query, Patch, Req, Headers } from '@nestjs/common';
 import { ApiOperation, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { gameDataDto, gameRoomDto, leaveGameRoomDto, readyGameDto, startGameDto } from './dto/game.dto';
 import { GameService } from './game.service';
@@ -52,6 +52,7 @@ export class GameController {
     async LeaveRoom(@Req() req, @Body() data: leaveGameRoomDto)
     {
         data.user_id = req.tokenuserdata.user_id;
+        console.log(`leave room called ${req.tokenuserdata.user_id}`)
         const room = await this.GameService.LeaveGameRoom(data.user_id);
         return room;
     }
@@ -73,8 +74,8 @@ export class GameController {
     @Patch ("joinroom")
     async JoinRoom(@Req() req, @Body() data: gameRoomDto)
     {
-        data.user1_id = req.tokenuserdata.user_id;
-		data.user1_nickname = req.tokenuserdata.nick_name;
+        data.user2_id = req.tokenuserdata.user_id;
+		data.user2_nickname = req.tokenuserdata.nick_name;
         return await this.GameService.JoinGameRoom(data.user1_id, data.user2_id, data.event_id);
     }
 
@@ -105,13 +106,13 @@ export class GameController {
         return await this.GameService.MatchGame(data.user_id);
     }
 
-    @ApiOperation({summary: `게임 매칭 취소 API`, description: `게임을 매칭을 취소한다.`})
-	@UseGuards(AuthGuard('jwt-access'))
-    @Patch("cancelmatch")
-    async CancelMatch()
-    {
-        return await this.GameService.CancleMatch();
-    }
+    // @ApiOperation({summary: `게임 매칭 취소 API`, description: `게임을 매칭을 취소한다.`})
+	// @UseGuards(AuthGuard('jwt-access'))
+    // @Patch("cancelmatch")
+    // async CancelMatch()
+    // {
+    //     return await this.GameService.CancleMatch();
+    // }
 
     @ApiOperation({summary: `게임 종료 API`, description: `게임을 종료한다.`})
 	@UseGuards(AuthGuard('jwt-access'))

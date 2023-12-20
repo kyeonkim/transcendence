@@ -51,7 +51,8 @@ export default function FriendListPanel(props: any) {
 		console.log('socket in friend list panal\n', socket);
 		setReady(true);
 	}, [])
-	  
+		
+
 	useEffect(() => {
 		console.log('friend list render - ', list);
 		console.log('status Context - ', status);

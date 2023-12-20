@@ -19,6 +19,7 @@ import { useMainBoxContext } from '@/app/main_frame/mainbox_context';
 
 export default function SearchUser() {
     const [searchTarget, setSearchTarget] = useState('');
+    const [errMesaage, setErrorMessage] = useState('');
     const [val, setval] = useState(true);
     const cookies = useCookies();
 
@@ -32,9 +33,12 @@ export default function SearchUser() {
                 },
             })
                 .then((res) => {
-
                     if (res.data.status === true)
                         setMTBox(num, searchTarget);
+                    else {
+                        setval(false);
+                        setErrorMessage('유효하지 않는 유저입니다')
+                    }
                 })
         }
     }
@@ -45,7 +49,10 @@ export default function SearchUser() {
             if (/^[a-zA-Z0-9]+$/.test(searchTarget))
                 handleMTbox(1, searchTarget);
             else
+            {
                 setval(false);
+                setErrorMessage("닉네임은 영문, 숫자만 입력해 주세요!");
+            }
         }
     }
 
@@ -56,7 +63,10 @@ export default function SearchUser() {
                 id="outlined_search_user"
                 label="유저 검색"
                 variant="outlined"
-                onChange={(e) => setSearchTarget(e.target.value)}
+                onChange={(e) => {
+                    setval(true);
+                    setSearchTarget(e.target.value)
+                }}
                 onKeyDown={handleEnterkey}
                 focused
                 sx={{input: {color: 'white'}}}
@@ -64,7 +74,6 @@ export default function SearchUser() {
             </TextField>
             {!val && <Alert
                 severity="error"
-                onClose={() => {setval(true)}}
                 sx={{
                     position: 'absolute',
                     top: '35%',
@@ -72,7 +81,7 @@ export default function SearchUser() {
                     transform: 'translate(0, 0)',
                 }}
             >
-                <strong>영문 숫자만 입력해주세요!</strong>
+                <strong>{errMesaage}</strong>
             </Alert>}
         </>
     );

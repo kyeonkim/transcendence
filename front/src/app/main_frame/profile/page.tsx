@@ -38,6 +38,10 @@ const ProfilePage = () => {
 
   console.log('profilepage - ', id);
 
+  // useEffect(() => {
+
+  // }, []);
+
   useEffect(() => {
       if (id)
       {

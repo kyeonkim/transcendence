@@ -9,6 +9,9 @@ interface MainBoxState {
     setSearch: React.Dispatch<React.SetStateAction<string>>;
 	profile: number;
     setProfile: React.Dispatch<React.SetStateAction<number>>;
+	gameState: boolean;
+    setGameState: React.Dispatch<React.SetStateAction<boolean>>;
+
 
 	setMTBox: (value: number, searchTarget?: string) => void;
   }
@@ -20,6 +23,7 @@ const MainBoxContextProvider = ({ children }: any) => {
     const [clicked, setClick] = useState(0);
     const [id, setSearch] = useState('');
     const [profile, setProfile] = useState(0);
+	const [gameState, setGameState] = useState(false);
 
 	const router = useRouter();
 
@@ -30,13 +34,21 @@ const MainBoxContextProvider = ({ children }: any) => {
 
 		if (value === 1)
 		{
-			setSearch(searchTarget || '');
-			router.push(`/main_frame/profile?id=${searchTarget}`);
+			if (gameState === false)
+			{
+				setSearch(searchTarget || '');
+				router.push(`/main_frame/profile?id=${searchTarget}`);
+			}
 		}
-		else
+		else if (value === 3)
 		{
 			router.push('/main_frame/match');
 		}
+		// else if (value === 2)
+		// {
+		// 	// render gameRoom 필요함
+		// 	router.push('/main_frame/match');
+		// }
 
 	};
     
@@ -44,10 +56,12 @@ const MainBoxContextProvider = ({ children }: any) => {
 		clicked, setClick,
 		id, setSearch,
 		profile, setProfile,
+		gameState,setGameState,
 		setMTBox
     }), [clicked, setClick,
 		id, setSearch,
 		profile, setProfile,
+		gameState,setGameState,
 		setMTBox]);
 
 	return (

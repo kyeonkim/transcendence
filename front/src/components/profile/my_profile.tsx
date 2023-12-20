@@ -7,13 +7,13 @@ import { useMainBoxContext } from '@/app/main_frame/mainbox_context';
 import { useUserDataContext } from '@/app/main_frame/user_data_context';
 
 export default function MyProfile(props: any) {
-  const { setMTBox, profile } = useMainBoxContext();
+  const { setMTBox, profile, gameState } = useMainBoxContext();
 
   const { nickname, user_id } = useUserDataContext();
   const my_nick = nickname
 
   const handleMTbox = (num: number) => () => {
-    setMTBox(num, my_nick);
+        setMTBox(num, my_nick);
   }
 
   const imageLoader = (src: any) => {

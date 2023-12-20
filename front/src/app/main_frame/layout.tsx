@@ -28,26 +28,12 @@ import { axiosToken } from '@/util/token';
 import styles from './frame.module.css';
 
 
-// 여기에서는 context provider가 제공되고 있다 -> context 자체를 사용하는 건 불가능함
-  // => socket은 직접 쓰는 곳이 없어서 문제가 없는데, (실제로는 undefined일 것)
-  // setClick 등은 제공을 시도하고 있기에 문제가 생긴다.
-
-  // 해결책
-    // 1) 상위로 끌어올리기
-        // 상위 layout에서 넣을 수는 없다. cookie-provider 때문에 server component여야 해서 setState 못씀
-    // 2) 하위로 끌어내리기
-        // 경로를 또 만들어서 layout 만드는 건 너무 좋지 않은 것 같다.
-        // 자식 컴포넌트를 만들어서 그 안에서 사용하는 건, 어떨지 잘 모르겠다.
-
-        // !!!!! prop으로 받고 있는 것들을 전부 context에서 받아가게 바꾼다 - 제일 근본적일 것 같음. 무식하지만.$
-          // setMTBox는 어차피 빼고 싶었고, profile만 주의하면 될 것 같음.
 export default function MainFrameLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
 
-  const [socketReady, setSocketReady] = useState(false);
   const [userData, setUserData] = useState({});
   const [loading, setLoading] = useState(false);
   const socket = useChatSocket();
@@ -60,6 +46,7 @@ export default function MainFrameLayout({
     await loadFull(engine);
   }, []);
   
+
   useEffect(() => {
         // api로 nickname 가져오기
       const fetchUserData = async () => {
@@ -85,6 +72,7 @@ export default function MainFrameLayout({
     // console.log('before userData', Object.keys(userData).length);
     if (Object.keys(userData).length !== 0)
     {
+      // console.log('userData length - ', Object.keys(userData).length);
       console.log('after userData', userData, loading);
       setLoading(true);
     }
@@ -94,15 +82,15 @@ export default function MainFrameLayout({
   return (
     <section>
       {!loading && (
-          <div>
-            <Particles options={particlesOptions as ISourceOptions} init={particlesInit} />
-          </div>
+        <div>
+          <Particles options={particlesOptions as ISourceOptions} init={particlesInit} />
+        </div>
       )}
       {loading && 
         <ChatSocket my_name={userData.nick_name} my_id={userData.user_id}>
           <ChatBlockProvider>
-          <MainBoxContextProvider>
             <UserDataContextProvider my_name={userData.nick_name} my_id={userData.user_id}>
+            <MainBoxContextProvider>
             <StatusContextProvider>
             <Particles options={particlesOptions as ISourceOptions} init={particlesInit} />
                 <Grid container className={styles.leftBox}>
@@ -118,8 +106,8 @@ export default function MainFrameLayout({
                   <ChatBlock />
                 </Grid>
             </StatusContextProvider>
-            </UserDataContextProvider>
             </MainBoxContextProvider>
+            </UserDataContextProvider>
           </ChatBlockProvider>
         </ChatSocket>
       }

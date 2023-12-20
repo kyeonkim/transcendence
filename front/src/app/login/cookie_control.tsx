@@ -44,7 +44,7 @@ export default function CookieControl ({res}: {res: any}) {
         {
             CookieSetter(access_token, refresh_token, nick_name, user_id);
             
-            router.push('/main_frame');
+            router.replace('/main_frame');
 
         }
         catch (error)

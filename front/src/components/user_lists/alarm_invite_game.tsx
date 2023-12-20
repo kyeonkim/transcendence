@@ -7,12 +7,14 @@ import CheckCircleOutlineRoundedIcon from '@mui/icons-material/CheckCircleOutlin
 import ClearRoundedIcon from '@mui/icons-material/ClearRounded';
 import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
 
+import { useMainBoxContext } from '@/app/main_frame/mainbox_context';
 import { useUserDataContext } from "@/app/main_frame/user_data_context";
 
 export default function AlarmInviteGame (props: any) {
 	const { alarm, handleProfile, imageLoader, denyRequest, cookies, alarmReducer} = props;
 
 	const { user_id, nickname } = useUserDataContext();
+	const { setMTBox } = useMainBoxContext();
 
 	const acceptInviteGame = (alarm: any) => async () => {
 		console.log ('acceptInviteGame - ', alarm)
@@ -29,7 +31,16 @@ export default function AlarmInviteGame (props: any) {
 			}
 		})
 		.then((res) => {
-			alarmReducer(alarm);
+			if (res.data.status === true)
+			{
+				alarmReducer(alarm);
+				setMTBox(3);
+			}
+			else
+			{
+				alarmReducer(alarm);
+				// data.message에 대한 처리 고려 가능
+			}
 		})
 	}
 	const labelId = `comment-list-secondary-label-${alarm.from_nickname}`;

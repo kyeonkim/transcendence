@@ -4,6 +4,8 @@ import { fabric } from 'fabric';
 import { useChatSocket } from '@/app/main_frame/socket_provider';
 import { useStatusContext } from "@/app/main_frame/status_context";
 import { useUserDataContext } from '@/app/main_frame/user_data_context';
+import { useMainBoxContext } from '@/app/main_frame/mainbox_context';
+
 
 import  GameProfile  from "./gameProfile";
 import  GameEnd from "./gameEnd";
@@ -12,7 +14,7 @@ import styles from './pong.module.css';
 
 export default function Pong (props :any){
     const socket = useChatSocket();
-    const { rank, mode, exitGame  } = props;
+    const { data, exitGame  } = props;
     const [gameEnd, setGameEnd] = useState(false);
     const [endData, setEndData] = useState({});
 
@@ -72,6 +74,7 @@ export default function Pong (props :any){
     const   containerRef = props.containerRef;
     const { status, setStatus } = useStatusContext();
     const { nickname, user_id } = useUserDataContext(); 
+    const { setGameState } = useMainBoxContext();
 
     const updateStatus = useCallback(
         (newStatus :string) => {
@@ -230,7 +233,7 @@ export default function Pong (props :any){
             });
 
             
-            if (mode === true)
+            if (data.room.game_mode === true)
             {
                 setReverseSign(-1);
             }
@@ -238,7 +241,7 @@ export default function Pong (props :any){
             setInitUserSetting(true);
     
             return () => {
-                pongCanvas.dispose();
+                // pongCanvas.dispose();
             }
     
         }
@@ -270,23 +273,26 @@ export default function Pong (props :any){
                 updateStatus('ingame');
             }
     
+            setGameState(true);
             setReadyResize(true);
 
             socket.on(`game-init`, listenGameInit);
-
-            socket.emit(`game-start`, {user_id: user_id, user_nickname: nickname, rank: rank, game_mode: mode});
+            console.log('game-mode : ', data.room.game_mode);
+            socket.emit(`game-start`, {user_id: user_id, user_nickname: nickname, game_mode: data.room.game_mode});
 
             document.addEventListener('visibilitychange', () => {
                 if (document.hidden) {
                     console.log('pong unmount');
                     socket.emit('game-force-end');
+                    // updateStatus('online');
                 } else {
                   console.log("re on")
                 }
               });
 
             return () => {
-
+                // canvas.clearRect(0,0,canvas.height, canvas.width);
+                socket.emit('game-force-end');
                 socket.off('game-init', listenGameInit);
                 document.removeEventListener('visivilitychange', () => {});
             }
@@ -341,14 +347,27 @@ export default function Pong (props :any){
         if (initGame === true)
         {
             const listenGameEnd = (data :any) => {
+                console.log ('pong listener end ');
                 cancelAnimationFrame(lastRequestId);
-    
+
+                console.log(`unmount`, canvas);
+                // canvas.
+                canvas.dispose();
+                setCanvas(null);
                 setEndData(data.gameData);
-
                 setGameEnd(true);
-
                 updateStatus('online');
+                setGameState(false);
+
             }
+
+            // const eventPopState = (event :any) => {
+            //     cancelAnimationFrame(lastRequestId);
+            //     updateStatus('online');
+            //     setGameState(false);
+            // }
+
+            // window.addEventListener('popstate', eventPopState);
 
             let lastRequestId :number; 
 
@@ -514,8 +533,7 @@ export default function Pong (props :any){
                         });
                     }
                 }
-
-                canvas.renderAll();
+                    canvas.renderAll();
     
                 lastRequestId = requestAnimationFrame(drawPong);
     
@@ -525,10 +543,18 @@ export default function Pong (props :any){
             }, 3000);
 
         
-            return () => {
+            return () => {  
+                // window.removeEventListener('popstate', eventPopState);
+
+                console.log('pong component unmount');
                 socket.off('game-end', listenGameEnd);
                 cancelAnimationFrame(lastRequestId);
+                console.log(`unmount`, canvas);
+                if (canvas)
+                    canvas.dispose();
                 updateStatus('online');
+                setGameState(false);
+                setGameEnd(true);
             };
         }
 
@@ -626,7 +652,8 @@ export default function Pong (props :any){
                 ballVecXY.speed = ballVecXY.speed / viewportRatio.value * ratio;
                 playerSpeed.value = playerSpeed.value / viewportRatio.value * ratio;
                 viewportRatio.value = ratio;
-
+                
+                
                 canvas.renderAll();
 
             };
