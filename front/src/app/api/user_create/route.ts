@@ -25,12 +25,12 @@ export async function POST (request: NextRequest)
     }
     catch (err: any)
     {
-        error_status = err?.response.data.statusCode;
+        error_status = err?.response.data.status;
 
         return (NextResponse.json({ error: 'api/user_create Error'}, { status: error_status}));
+        // return;
     }
-
-    if (response.data.token.status == true)
+    if (response.data.status == true && response.data.token.status == true)
     {
         const cookieBox = cookies();
 
@@ -54,16 +54,25 @@ export async function POST (request: NextRequest)
             maxAge: 60 * 60 * 3,
             // httpOnly: true,
         });
-
     }
-
+    else {
         return (NextResponse.json({
-            status: response?.data.token.status,
-            access_token: response?.data.token.access_token,
-            refresh_token: response?.data.token.refresh_token
+            status: false,
+            message: response.data.message,
         },
         {
-            status: response?.status
+            status: 201
         }
         ));
+    }
+
+    return (NextResponse.json({
+        status: response.data.token.status,
+        access_token: response.data.token.access_token,
+        refresh_token: response.data.token.refresh_token
+    },
+    {
+        status: response.status
+    }
+    ));
 }

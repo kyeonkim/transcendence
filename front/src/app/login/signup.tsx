@@ -59,22 +59,25 @@ export default function Signup (props:any) {
 			formData.append('file', imageFile);
 		}
 		await axios.post( `${process.env.NEXT_PUBLIC_FRONT_URL}api/user_create`, {
-				access_token: props.access_token,
+				access_token: token,
 				nick_name: nickname,
 			})
 			.then(async (response) => {
-				formData.append('access_token', response.data.access_token);
-				await axios.post(`${process.env.NEXT_PUBLIC_FRONT_URL}api/send_image`, formData)
-				.then((res) => {
-					if(res.data.success)
-						router.replace('/main_frame');
-					else
-						window.alert('Image upload failed')
-				})})
-			.catch((error) => {
-				setLoading(false);
-				setError('중복된 닉네임이거나 한글,특수문자가 포함되어있습니다! 다시 입력해주세요.');
-			})
+				if(!response.data.status)
+				{
+					setLoading(false);
+					setError(response.data.message);
+				}
+				else {
+					formData.append('access_token', response.data.access_token);
+					await axios.post(`${process.env.NEXT_PUBLIC_FRONT_URL}api/send_image`, formData)
+					.then((res) => {
+						if(res.data.success)
+							router.replace('/main_frame');
+						else
+							window.alert('Image upload failed')
+						})
+			}})
 	}
 
 	const imageLoader = ({ src }: any) => {
