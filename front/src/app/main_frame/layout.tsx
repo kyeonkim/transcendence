@@ -34,7 +34,7 @@ export default function MainFrameLayout({
   children: React.ReactNode
 }) {
 
-  const [userData, setUserData] = useState({});
+  const [userData, setUserData] = useState<any>({});
   const [loading, setLoading] = useState(false);
   const socket = useChatSocket();
   const cookies = useCookies();
