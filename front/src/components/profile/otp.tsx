@@ -18,6 +18,7 @@ const style: React.CSSProperties = {
   width: 400,
   border: '2px solid #000',
   boxShadow: '24',
+  backgroundColor: 'white',
   // bgcolor: 'background.paper',
   // p: 4,
 };
@@ -85,7 +86,7 @@ export default function OtpModal({ open, isActivated, setActive, onClose, myId, 
   }, []);
 
   const handleActivate2FA = async () => {
-
+    console.log('in opt', myId, myNick);
     await axiosToken.post(`${process.env.NEXT_PUBLIC_API_URL}auth/2fa/active`,
       {
         user_id: myId,
