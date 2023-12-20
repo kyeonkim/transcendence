@@ -351,9 +351,6 @@ export default function Pong (props :any){
                 cancelAnimationFrame(lastRequestId);
 
                 console.log(`unmount`, canvas);
-                // canvas.
-                canvas.dispose();
-                setCanvas(null);
                 setEndData(data.gameData);
                 setGameEnd(true);
                 updateStatus('online');
@@ -539,19 +536,17 @@ export default function Pong (props :any){
     
             };
 
-            setTimeout(() => {drawPong()
+            const id = setTimeout(() => {drawPong()
             }, 3000);
 
-        
             return () => {  
                 // window.removeEventListener('popstate', eventPopState);
-
+                clearTimeout(id);
                 console.log('pong component unmount');
                 socket.off('game-end', listenGameEnd);
                 cancelAnimationFrame(lastRequestId);
                 console.log(`unmount`, canvas);
-                if (canvas)
-                    canvas.dispose();
+                canvas.dispose();
                 updateStatus('online');
                 setGameState(false);
                 setGameEnd(true);
