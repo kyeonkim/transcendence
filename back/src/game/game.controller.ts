@@ -16,9 +16,8 @@ export class GameController {
 	@UseGuards(AuthGuard('jwt-access'))
 	@ApiBearerAuth('JWT-acces')
     @Get("data")
-    async GetGameDataById(@Req() req, @Query('id', ParseIntPipe) id: number, @Query('index', ParseIntPipe) index: number)
+    async GetGameDataById(@Query('id', ParseIntPipe) id: number, @Query('index', ParseIntPipe) index: number)
     {
-        id = req.tokenuserdata.user_id;
         const gameData = await this.GameService.GetGameDataById(id, index);
         return gameData;
     }
