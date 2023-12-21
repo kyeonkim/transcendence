@@ -221,7 +221,7 @@ export default function UserList(props: any) {
 					{Number(my_id) === Creater && !targetData?.is_manager && (
 						<>
 						<ListItemButton onClick={handleOP}>
-							<Typography variant="inherit">권한부여</Typography>
+							<Typography variant="inherit">매니저임명</Typography>
 						</ListItemButton>
 						<Divider />
 						</>
@@ -229,7 +229,7 @@ export default function UserList(props: any) {
 					{Number(my_id) === Creater && targetData?.is_manager && (
 						<>
 						<ListItemButton onClick={handleUnOP}>
-							<Typography variant="inherit">권한해제</Typography>
+							<Typography variant="inherit">매니저해제</Typography>
 						</ListItemButton>
 						<Divider />
 						</>
