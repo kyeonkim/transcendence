@@ -159,8 +159,6 @@ export default function Chat(props: any) {
 		
 		if (type === 'change_password')
 			setModalCodition('change_password');
-		else if (type === 'remove_password')
-			setModalCodition('remove_password');
 		else if (type === 'change_name')
 			setModalCodition('change_name');
 		else if (type === 'change_visibility')
