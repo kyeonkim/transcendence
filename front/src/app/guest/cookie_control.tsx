@@ -16,8 +16,10 @@ import axios from 'axios';
 
 export default function CookieControl ({res}: {res: any}) {
     const router = useRouter();
+    console.log('cookie control - ', res);
     const { access_token, refresh_token } = res.token;
     const { nick_name, user_id } = res.userdata;
+
 
     const particlesInit = useCallback(async (engine: Engine) => {
         await loadFull(engine);

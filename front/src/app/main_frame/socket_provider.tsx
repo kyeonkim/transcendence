@@ -45,7 +45,8 @@ export function ChatSocket ({ children, my_name, my_id }: any) {
           
             tmpSocket.on("disconnect", () => {
               console.log("서버와 연결이 끊김");
-              route.replace("/");
+              // check
+              // route.replace("/");
               // window.alert('서버와 연결이 끊어졌습니다.');
             });
   
