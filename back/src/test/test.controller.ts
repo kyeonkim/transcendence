@@ -16,7 +16,14 @@ export class TestController {
 		private readonly prisma: PrismaService,
     ) {}
 
-	@ApiOperation({summary: `더미유저 생생성 API`, description: `더미데이터를 생성한다.`})
+	@ApiOperation({summary: `더미 로그인 API`, description: `더미 아이디만 보고 로그인 시킨다.`})
+	@Post("login")
+	async Login(@Body() data : any)
+	{
+		return this.TestService.DummyLogin(Number(data.dummy_id));
+	}
+
+	@ApiOperation({summary: `더미유저 생성 API`, description: `더미데이터를 생성한다.`})
 	@Post("createdummy")
 	CreateDummyUser()
 	{

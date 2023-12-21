@@ -41,6 +41,14 @@ export class SocialService {
         });
         if (friend === null)
             return {status: false, message: "not found friend"}
+        const ban = await this.prismaService.block. findFirst({
+            where: {
+                user_id: friend.user_id,
+                blocked_user_id: addFriend.user_id,
+            }
+        })
+        if (ban !== null)
+            return {status: false, message: 'ban user'};
         const check =  await this.prismaService.friends.findFirst({
             where: {
                 following_user_id: addFriend.user_id,

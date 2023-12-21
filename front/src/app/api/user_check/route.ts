@@ -26,7 +26,7 @@ export async function POST (request: NextRequest)
         });
 
     }
-    catch (error)
+    catch (error: any)
     {
         if (error.response)
         {
@@ -57,7 +57,7 @@ export async function POST (request: NextRequest)
             },
             {status: 201, statusText: 'new user need to be created'}));
     }
-
+    
     const newResponse = NextResponse.json(
         {
             status: response?.data.token.status,

@@ -81,8 +81,8 @@ export class EventService {
             return {status: false, message: 'invalid user'};
         const ban = await this.pismaService.block.findFirst({
             where: { 
-                user_id: event.to,
-                blocked_user_id: fromuser.user_id,
+                user_id: fromuser.user_id,
+                blocked_user_id: event.to,
             }, 
         });
         if (ban !== null)

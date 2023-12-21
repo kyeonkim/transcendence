@@ -44,66 +44,62 @@ export default function ChatModal({modalOpen, setModalOpen, modalCondition,
     }
 
     const handleInPassword = (event :any) => {
-		setInPassword(event.target.value as string);
+		    setInPassword(event.target.value as string);
     }
 
     const handleInChatname = (event :any) => {
-		setInChatname(event.target.value as string);
+		    setInChatname(event.target.value as string);
     }
   
     const handleDone = async () => {
         
         let hashRoomPassword;
-
+        
         if (inPassword !== '')
         {
+            if (!/^[a-zA-Z0-9]+$/.test(inPassword)) {
+                setErrShow(true);
+                setErrMessage('영문 숫자를 넣어 20자이내로 해주세요!');
+                return ;
+            }
 			const salt = genSaltSync(10);
 			hashRoomPassword = hashSync(inPassword, salt);
         }
-
-        if (modalCondition === 'remove_password' && inPassword == '')
-        console.log('set req\n', {
-            room_idx:  Number(roominfo.idx),
-            user_id: my_id, 
-            user_nickname: my_name,
-            chatroom_name: inChatname? inChatname : chatname,
-            password: inPassword ? hashRoomPassword : '',
-            private: roomMode,
-            is_changePass : (modalCondition === 'remove_password' && inPassword == '') ? true : inPassword ? true : false
-        })
-		await axiosToken.patch(`${process.env.NEXT_PUBLIC_API_URL}chat/changeroom`, {
-			room_idx: Number(roominfo.idx),
-			user_id: my_id,
-			user_nickname: my_name,
-			chatroom_name: inChatname? inChatname : chatname,
-			password: inPassword ? hashRoomPassword : '',
-            private: roomMode,
-            is_changePass : (modalCondition === 'remove_password' && inPassword == '') ? true : inPassword ? true : false
-		},
-		{
-			headers: {
-				'Content-Type': 'application/json',
-				'Authorization': `Bearer ${cookies.get('access_token')}`
-			  },
-		})
-		.then((res) => {
-
-			if (res.data.status)
+        {
+            await axiosToken.patch(`${process.env.NEXT_PUBLIC_API_URL}chat/changeroom`, {
+                room_idx: Number(roominfo.idx),
+                user_id: my_id,
+                user_nickname: my_name,
+                chatroom_name: inChatname? inChatname : chatname,
+                password: inPassword ? hashRoomPassword : '',
+                private: roomMode,
+                is_changePass : (inPassword == '') ? true : inPassword ? true : false
+            },
             {
-                handleCloseModal();
-                if (inChatname !== '')
-                    setChatname(inChatname);
-            }
-			else
-            {
-				setErrMessage(res.data.message);
-                setErrShow(true);
-            }
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${cookies.get('access_token')}`
+                },
+            })
+            .then((res) => {
 
-		})
-		.catch((err) => {
+                if (res.data.status)
+                {
+                    handleCloseModal();
+                    if (inChatname !== '')
+                        setChatname(inChatname);
+                }
+                else
+                {
+                    setErrMessage(res.data.message);
+                    setErrShow(true);
+                }
 
-		})
+            })
+            .catch((err) => {
+            })
+        }
+
 
     }
 
@@ -145,6 +141,7 @@ export default function ChatModal({modalOpen, setModalOpen, modalCondition,
                     className={styles.modalTextField}
                     id="chatname_text_field"
                     label="Enter new Name"
+                    inputProps={{ maxLength: 10}}
                     onChange={handleInChatname}
                 />
             }
@@ -155,10 +152,21 @@ export default function ChatModal({modalOpen, setModalOpen, modalCondition,
             }
             {(modalCondition === 'change_password') && 
                 <TextField
+                    color={errShow ? "error" : "primary"}
                     className={styles.modalTextField}
                     id="password_text_field"
                     label="Enter new Password"
+                    type="password"
+                    inputProps={{
+                        maxLength: 20
+
+                    }}
                     onChange={handleInPassword}
+                    onKeyDown={(e) => {
+						if (e.key === 'Enter') {
+							if (e.nativeEvent.isComposing) return;
+							handleDone();
+						}}}
                 />
             }
             {modalCondition === 'change_visibility' && 

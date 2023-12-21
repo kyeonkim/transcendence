@@ -2,11 +2,18 @@ version: '3'
 
 services:
   nextjs:
-    build: ./front
+    env_file: .env
+    build: 
+      context: ./front  
+      args:
+        NEXT_PUBLIC_CLIENT_ID : $NEXT_PUBLIC_CLIENT_ID
+        NEXT_PUBLIC_CLIENT_SECRET : $NEXT_PUBLIC_CLIENT_SECRET
+        NEXT_PUBLIC_REDIRECT_URL : $NEXT_PUBLIC_REDIRECT_URL
+        NEXT_PUBLIC_FRONT_URL : $NEXT_PUBLIC_FRONT_URL
+        NEXT_PUBLIC_API_URL : $NEXT_PUBLIC_API_URL
+        NEXT_PUBLIC_WEBSOCKET_URL : $NEXT_PUBLIC_WEBSOCKET_URL
     image: front_server
     container_name: next_container
-    env_file:
-      - .env
     volumes:
       - ./front/src:/app/front_server/src
     ports:

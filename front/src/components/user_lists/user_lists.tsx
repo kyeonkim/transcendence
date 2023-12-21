@@ -24,7 +24,7 @@ import { useChatBlockContext } from '@/app/main_frame/shared_state';
 import { Grid } from '@mui/material';	
 import styles from '@/app/main_frame/frame.module.css';
 
-import { useMainBoxContext } from '@/app/main_frame/mainbox_context';
+import { useUserDataContext } from '@/app/main_frame/user_data_context';
 
 interface TabPanelProps {
 	children?: React.ReactNode;
@@ -68,12 +68,14 @@ export default function BasicTabs() {
 	const [dmOpenNickname, setDmOpenNickname] = useState('');
 	const [dmAlarmList, setDmAlarmList] = useState([]);
 	const [render, setRender] = useState('');
+	const [isDm , setIsDm] = useState(false);
 	const cookies = useCookies();
 	const socket = useChatSocket();
 	const tabsRef = useRef(null);
 
 	const { handleRenderDmBlock } = useChatBlockContext();
-	const friendList = useFriendList(cookies.get('user_id'));
+	const { user_id, nickname } = useUserDataContext();
+	const friendList = useFriendList(user_id);
 	
 	const handleChange = (event: React.SyntheticEvent, newValue: number) => {
 		setValue(newValue);
@@ -121,7 +123,7 @@ export default function BasicTabs() {
 
 			setDmAlarmList(tmp_list);
 		}
-
+		setIsDm(false);
 	}
 
 	const setAlarmCountHandler = (increment :boolean) => {
@@ -130,10 +132,14 @@ export default function BasicTabs() {
 		else
 		{
 			if (alarmCount !== 0)
-				setAlarmCount((prevAlarmCount) => prevAlarmCount - 1);
+				setAlarmCount((prevAlarmCount) => prevAlarmCount === 0 ? 0 :  prevAlarmCount - 1);
 		}
 
 	};
+
+	const setAlarmDM = (val: boolean) => {
+		setIsDm(val);
+	}
 
 	const setAlarmListAdd = (alarm: any) => {
 		setAlarmList((prevalarmList :any) => 
@@ -150,7 +156,7 @@ export default function BasicTabs() {
 
 
 	const fetchAlarms = async () => {
-		await axiosToken.get(`${process.env.NEXT_PUBLIC_API_URL}event/getalarms/${cookies.get('user_id')}`,{
+		await axiosToken.get(`${process.env.NEXT_PUBLIC_API_URL}event/getalarms/${user_id}`,{
 			headers: {
 				'Content-Type': 'application/json',
 				'Authorization': `Bearer ${cookies.get('access_token')}`
@@ -160,7 +166,7 @@ export default function BasicTabs() {
 
 
 	useEffect(() => {
-		const sseEvents = new EventSource(`${process.env.NEXT_PUBLIC_API_URL}event/alarmsse/${cookies.get('user_id')}`);
+		const sseEvents = new EventSource(`${process.env.NEXT_PUBLIC_API_URL}event/alarmsse/${user_id}`);
 
 		sseEvents.onopen = function() {
 		}
@@ -175,7 +181,7 @@ export default function BasicTabs() {
 			setAlarmListAdd(parsedData);
 		}
 
-		socket.emit('status', { user_id: Number(cookies.get('user_id')), status: 'online' });
+		socket.emit('status', { user_id: Number(user_id), status: 'online' });
 
 		return () => {
 			sseEvents.close();
@@ -231,7 +237,7 @@ export default function BasicTabs() {
 				<Paper elevation={6}>
 				<Tabs value={value} ref={tabsRef} onChange={handleChange} centered aria-label="basic tabs example">
 					<Tab icon={
-						<Badge color="error" badgeContent={dmAlarmList.length ? "!" : 0}>
+						<Badge color="error" badgeContent={(isDm || dmAlarmList.length) ? "!" : 0}>
 						<GroupIcon sx={{}}/>
 						</Badge>
 						} {...a11yProps(0)} />
@@ -246,11 +252,12 @@ export default function BasicTabs() {
 			<CustomTabPanel value={value} index={0}>
 				<FriendListPanel
 					dmOpenId={dmOpenId}
+					setDmOpenId={setDmOpenId}
 					dmOpenNickname={dmOpenNickname}
 					handleDmAlarmCount={handleDmAlarmCount}
 					handleChatTarget={handleChatTarget}
 					list={friendList}
-					myId={cookies.get('user_id')}
+					myId={user_id}
 					tapref={tabsRef}
 				/>
 			</CustomTabPanel>
@@ -259,7 +266,9 @@ export default function BasicTabs() {
 					alarmList={alarmList}
 					alarmListRemover={setAlarmListRemover}
 					alarmCountHandler={setAlarmCountHandler}
+					handleDmAlarmCount={handleDmAlarmCount}
 					handleAlarmRerender={handleAlarmRerender}
+					setDm={setAlarmDM}
 				/>
 			</CustomTabPanel>
 		</Grid>

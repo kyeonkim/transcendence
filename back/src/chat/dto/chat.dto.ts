@@ -1,6 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsBoolean, IsIn, IsInt, IsOptional, IsString } from "class-validator";
-import { Socket } from "dgram";
 
 export class ChatRoomDto
 {

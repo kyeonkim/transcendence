@@ -7,8 +7,11 @@ interface MainBoxState {
     setClick: React.Dispatch<React.SetStateAction<number>>;
     id: string;
     setSearch: React.Dispatch<React.SetStateAction<string>>;
-	profile: string;
-    setProfile: React.Dispatch<React.SetStateAction<string>>;
+	profile: number;
+    setProfile: React.Dispatch<React.SetStateAction<number>>;
+	gameState: boolean;
+    setGameState: React.Dispatch<React.SetStateAction<boolean>>;
+
 
 	setMTBox: (value: number, searchTarget?: string) => void;
   }
@@ -20,39 +23,46 @@ const MainBoxContextProvider = ({ children }: any) => {
     const [clicked, setClick] = useState(0);
     const [id, setSearch] = useState('');
     const [profile, setProfile] = useState(0);
+	const [gameState, setGameState] = useState(false);
 
 	const router = useRouter();
 
 	const setMTBox = (value: number, searchTarget?: string) => {
 		console.log('setMTBox called - value : ', value, ', target : ', searchTarget);
 
-		// setClick(value);
-		
+		setClick(value);
+
 		if (value === 1)
 		{
-			router.push('/main_frame/profile');
+			if (gameState === false)
+			{
+				setSearch(searchTarget || '');
+				router.push(`/main_frame/profile?id=${searchTarget}`);
+			}
 		}
-		else
+		else if (value === 3)
 		{
-			router.push('/main_frame/match');	
+			router.push('/main_frame/match');
 		}
+		// else if (value === 2)
+		// {
+		// 	// render gameRoom 필요함
+		// 	router.push('/main_frame/match');
+		// }
 
-		setSearch(searchTarget || '');
 	};
     
-
-	const value :MainBoxState = useMemo(() => ({
+	const value: MainBoxState = useMemo(() => ({
 		clicked, setClick,
 		id, setSearch,
 		profile, setProfile,
+		gameState,setGameState,
 		setMTBox
     }), [clicked, setClick,
 		id, setSearch,
 		profile, setProfile,
+		gameState,setGameState,
 		setMTBox]);
-
-	// const value :MainBoxState = {clicked, setClick, id, setSearch, profile, setProfile, setMTBox};
-
 
 	return (
 	  <MainBoxContext.Provider value={value}>

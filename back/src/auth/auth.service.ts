@@ -131,6 +131,14 @@ export class AuthService {
 
     async SignUp(userData : SignUpDto)
     {
+		if(userData.nick_name.length < 2 || userData.nick_name.length > 10)
+			return {status: false, message: "닉네임은 2글자 이상 10글자 이하로 입력해주세요."};
+		const low_nickname = userData.nick_name.toLowerCase();
+		if( low_nickname === "admin" || low_nickname === "administrator" || low_nickname === "root" || low_nickname === "system" ||
+			low_nickname === "sys" || low_nickname === "test" || low_nickname === "guest" || low_nickname === "operator" ||
+			low_nickname === "operator" || low_nickname === "user" || low_nickname === "super" || low_nickname === "default"
+		)
+			return {status: false, message: "사용할 수 없는 닉네임입니다."};
 		const authorizedId = await this.Auth42(userData.access_token);
 		if (authorizedId === null)
 			return {status: false, access_token: userData.access_token};
@@ -251,6 +259,7 @@ export class JwtAccessStrategy extends PassportStrategy(Strategy, 'jwt-access') 
 	  ignoreExpiration: false,
 	  //검증 비밀 값(유출 주의)
 	  secretOrKey: process.env.JWT_SECRET,
+	  passReqToCallback: true,
 	});
   }
   /**
@@ -258,9 +267,11 @@ export class JwtAccessStrategy extends PassportStrategy(Strategy, 'jwt-access') 
    *
    * @param payload 토큰 전송 내용
    */
-  async validate(payload: UserToken): Promise<any> {
+  async validate(req: any, payload: UserToken): Promise<any> {
+	// console.log("JwtAccessStrategy req: ", req.headers);
 	if (payload.twoFAPass === false)// 2차인증 필요
 		throw new UnauthorizedException();
+	req['tokenuserdata'] = payload;
 	return { status: true };
   }
 }
@@ -278,7 +289,7 @@ export class JwtTwoFAStrategy extends PassportStrategy(Strategy, 'jwt-twoFA') {
 	  ignoreExpiration: false,
 	  //검증 비밀 값(유출 주의)
 	  secretOrKey: process.env.JWT_SECRET,
-	//   passReqToCallback: true,
+	  passReqToCallback: true,
 	});
   }
   
@@ -288,6 +299,7 @@ export class JwtTwoFAStrategy extends PassportStrategy(Strategy, 'jwt-twoFA') {
    * @param payload 토큰 전송 내용
    */
   async validate(req: any, payload: UserToken): Promise<any> {
+	req['tokenuserdata'] = payload;
 	return { status: true };
   }
 }
@@ -316,6 +328,8 @@ export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'jwt-refresh'
    * @param payload 토큰 전송 내용
    */
   async validate(req: any, payload: UserToken): Promise<any> {
+	// console.log("JwtRefreshStrategy req: ", req.body);
+	// console.log("JwtRefreshStrategy payload: ", payload);
 	if (payload.twoFAPass === false)// 2차인증 필요
 		throw new UnauthorizedException();
 	const storedToken = await this.prisma.tokens.findUnique({
@@ -323,12 +337,14 @@ export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'jwt-refresh'
 		  user_id: payload.user_id,
 		},
 	});
+	// console.log("JwtRefreshStrategy storedToken:", storedToken);
 	if (storedToken === null)
 		throw new UnauthorizedException();
 	if (storedToken.access_token !== req.body.access_token)
 		throw new UnauthorizedException();
 	try {
 		await this.jwtService.verifyAsync(storedToken.access_token, { secret: process.env.JWT_SECRET });
+		// console.log("JwtRefreshStrategy done!");
 	} catch (error) {
 		if (error instanceof TokenExpiredError)
 			return { status: true };

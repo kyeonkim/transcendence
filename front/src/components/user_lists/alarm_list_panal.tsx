@@ -19,7 +19,7 @@ import AlarmInviteGame from './alarm_invite_game'
 import { axiosToken } from '@/util/token';
 
 import { useMainBoxContext } from '@/app/main_frame/mainbox_context';
-
+import { useUserDataContext } from '@/app/main_frame/user_data_context';
 
 export default function AlarmListPanal (props: any) {
 	const [openModal, setOpenModal] = useState(false);
@@ -32,13 +32,14 @@ export default function AlarmListPanal (props: any) {
   const alarmListRemover = props.alarmListRemover;
   const alarmCountHandler = props.alarmCountHandler;
   const handleAlarmRerender = props.handleAlarmRerender;
+  const handleDmAlarmCount = props.handleDmAlarmCount;
+  const setDm = props.setAlarmDM
   const { setMTBox } = useMainBoxContext();
-
+  const { clicked } = useUserDataContext();
 
 
   const alarmReducer = (alarm :any) => {
-      if (alarm.event_type === 'game')
-        setMTBox(2);
+
       alarmListRemover(alarm);
       alarmCountHandler(false);
   }
@@ -59,7 +60,17 @@ export default function AlarmListPanal (props: any) {
           }
       })
   };
-  
+  useEffect(() => {
+
+		const dmAlarmListener = (data :any) => {
+			handleDmAlarmCount(data.from_id, true);
+		}
+
+		socket.on('dm', dmAlarmListener);
+		return () => {
+			socket.off('dm', dmAlarmListener);
+		}
+	}, [socket]);
 
   useEffect(() => {
 

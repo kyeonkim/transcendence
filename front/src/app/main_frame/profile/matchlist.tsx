@@ -98,6 +98,7 @@ export default function MatchList(props: any) {
 		borderRadius: '20px',
 		border: '5px solid #000',
 	};
+	
 	return (
 		<List ref={listRef} sx={listStyle}>
 			{res.length > 0 ? (
@@ -131,9 +132,11 @@ export default function MatchList(props: any) {
 					width: '4vw', // 프로필 사진의 너비 조절
 					height: '4vw', // 프로필 사진의 높이 조절
 				};
+
 				const imageLoader = ({ src, time }: any) => {
 					return `${process.env.NEXT_PUBLIC_API_URL}user/getimg/nickname/${src}?${time}`
 				}
+
 				return (
 					<Grid container display='flex' justifyContent='space-between' alignItems='center' key={index} sx={listItemStyle}>
 						<div style={{display:'flex', alignItems:'center'}}>

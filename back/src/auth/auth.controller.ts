@@ -35,8 +35,7 @@ export class AuthController {
 	@Post("token/refresh")
 	async RecreateToken(@Headers() header, @Body() token : TokenDto, @Res({passthrough: true}) res: Response)
 	{
-		const newToken = await this.AuthService.ReCreateToken(token);	
-		res.cookie('test', "testtesttest", {sameSite: 'none', maxAge: 1000 * 60 * 60 * 24 * 7, secure: true});
+		const newToken = await this.AuthService.ReCreateToken(token);
 		return newToken;
 	}
 
@@ -62,8 +61,10 @@ export class AuthController {
 	@UseGuards(AuthGuard('jwt-access'))
 	@ApiBearerAuth('JWT-acces')
 	@Post("2fa/activeqr")
-	async Active2FAQRCode(@Body() twofa: TwoFADTO)
+	async Active2FAQRCode(@Req() req, @Body() twofa: TwoFADTO)
 	{
+		twofa.user_id = req.tokenuserdata.user_id;
+		twofa.user_nickname = req.tokenuserdata.nick_name;
 		return await this.AuthService.Active2FAQRCode(twofa);
 	}
 
@@ -71,8 +72,10 @@ export class AuthController {
 	@UseGuards(AuthGuard('jwt-twoFA'))
 	@ApiBearerAuth('JWT-twoFA')
 	@Post("2fa/active")
-	async Active2FA(@Body() twofa: TwoFADTO)
+	async Active2FA(@Req() req, @Body() twofa: TwoFADTO)
 	{
+		twofa.user_id = req.tokenuserdata.user_id;
+		twofa.user_nickname = req.tokenuserdata.nick_name;
 		return await this.AuthService.Active2FA(twofa);
 	}
 
@@ -80,17 +83,11 @@ export class AuthController {
 	@UseGuards(AuthGuard('jwt-access'))
 	@ApiBearerAuth('JWT-acces')
 	@Delete("2fa/deactive")
-	async Deactive2FA(@Body() twofa: TwoFADTO)
+	async Deactive2FA(@Req() req, @Body() twofa: TwoFADTO)
 	{
+		twofa.user_id = req.tokenuserdata.user_id;
+		twofa.user_nickname = req.tokenuserdata.nick_name;
 		return await this.AuthService.Deactive2FA(twofa);
-	}
-
-	//remove
-	@ApiOperation({summary: `TEST 용 2차인증 비활성화 API`, description: `2차인증을 비활성화 한다.`})
-	@Delete("2fa/deactivetest/:id")
-	async Deactive2FAdev(@Param('id') id: number)
-	{
-		return await this.AuthService.Deactive2FAdev(id);
 	}
 }
 

@@ -18,7 +18,8 @@ export class SocialController {
 	@Post("addfriend")
 	async AddFriend(@Req() req, @Body() friend : friendDto)
     {
-		// ExtractJwt.fromAuthHeaderAsBearerToken()(req);
+		friend.user_id = req.tokenuserdata.user_id;
+		friend.user_nickname = req.tokenuserdata.nick_name;
 		return await this.SocialService.AddFriend(friend);
     }
 
@@ -26,8 +27,10 @@ export class SocialController {
 	@UseGuards(AuthGuard('jwt-access'))
 	@ApiBearerAuth('JWT-acces')
 	@Post("acceptfriend")
-	async AcceptFriend(@Body() friend : friendDto)
+	async AcceptFriend(@Req() req, @Body() friend : friendDto)
 	{
+		friend.user_id = req.tokenuserdata.user_id;
+		friend.user_nickname = req.tokenuserdata.nick_name;
 		return await this.SocialService.AcceptFriend(friend);
 	}
 
@@ -35,8 +38,9 @@ export class SocialController {
 	@UseGuards(AuthGuard('jwt-access'))
 	@ApiBearerAuth('JWT-acces')
 	@Get("checkFriend")
-	async CheckFriend(@Query('user1', ParseIntPipe) user1_id: number, @Query('user2') user2_name: string)
+	async CheckFriend(@Req() req, @Query('user1', ParseIntPipe) user1_id: number, @Query('user2') user2_name: string)
 	{
+		user1_id = req.tokenuserdata.user_id;
 		return await this.SocialService.CheckFriend(user1_id, user2_name);
 	}
 
@@ -44,8 +48,10 @@ export class SocialController {
 	@UseGuards(AuthGuard('jwt-access'))
 	@ApiBearerAuth('JWT-acces')
 	@Delete("DeleteFriend")
-	async DeleteFriend(@Body() friend: friendDto)
+	async DeleteFriend(@Req() req, @Body() friend: friendDto)
 	{
+		friend.user_id = req.tokenuserdata.user_id;
+		friend.user_nickname = req.tokenuserdata.nick_name;
 		return await this.SocialService.DeleteFriend(friend);
 	}
 
@@ -53,8 +59,9 @@ export class SocialController {
 	@UseGuards(AuthGuard('jwt-access'))
 	@ApiBearerAuth('JWT-acces')
     @Get("getFriendList/:id")
-    async GetFriendList(@Param('id', ParseIntPipe) user_id: number)
+    async GetFriendList(@Req() req, @Param('id', ParseIntPipe) user_id: number)
     {
+		user_id = req.tokenuserdata.user_id;
         return await this.SocialService.GetFriendList(user_id);
     }
 
@@ -62,8 +69,9 @@ export class SocialController {
 	@UseGuards(AuthGuard('jwt-access'))
 	@ApiBearerAuth('JWT-acces')
     @Get("getBlockList/:id")
-	async GetBlockList(@Param('id', ParseIntPipe) user_id: number)
+	async GetBlockList(@Req() req, @Param('id', ParseIntPipe) user_id: number)
 	{
+		user_id = req.tokenuserdata.user_id;
         return await this.SocialService.GetBlockList(user_id);
 	}
 
@@ -71,8 +79,10 @@ export class SocialController {
 	@UseGuards(AuthGuard('jwt-access'))
 	@ApiBearerAuth('JWT-acces')
 	@Post("addBlockedUser")
-	async AddBlockUser(@Body() data: friendDto)
+	async AddBlockUser(@Req() req, @Body() data: friendDto)
     {
+		data.user_id = req.tokenuserdata.user_id;
+		data.user_nickname = req.tokenuserdata.nick_name;
 		return await this.SocialService.AddBlockUser(data);
     }
 
@@ -80,8 +90,10 @@ export class SocialController {
 	@UseGuards(AuthGuard('jwt-access'))
 	@ApiBearerAuth('JWT-acces')
 	@Delete("deleteBlockedUser")
-	async DeleteBlockUser(@Body() data: friendDto)
+	async DeleteBlockUser(@Req() req, @Body() data: friendDto)
     {
+		data.user_id = req.tokenuserdata.user_id;
+		data.user_nickname = req.tokenuserdata.nick_name;
 		return await this.SocialService.DeleteBlockUser(data);
     }
 }  

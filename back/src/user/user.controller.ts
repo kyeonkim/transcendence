@@ -1,9 +1,7 @@
-import { Controller, Post, Body, Get, Param, ParseIntPipe, Delete, UseInterceptors, UploadedFile, Query, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, ParseIntPipe, UseInterceptors, UploadedFile, Req, Query, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { uploadImgDto } from './dto/user.dto';
-import { friendDto } from '../social/dto/social.dto';
 import { ApiBearerAuth, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
-
 import { FileInterceptor } from '@nestjs/platform-express/multer';
 import { diskStorage } from 'multer';
 import { AuthGuard } from '@nestjs/passport';
@@ -12,12 +10,22 @@ import { AuthGuard } from '@nestjs/passport';
 export class UserController {
     constructor(
 		private readonly UserService: UserService,
-		) {}
+	) {}
+
+	@ApiTags('User API')
+	@ApiOperation({summary: `유저 내 데이터 API`, description: `내 데이터를 가져온다.`})
+	@UseGuards(AuthGuard('jwt-access'))
+	@ApiBearerAuth('JWT-access')
+	@Get("getdata/mydata")
+    GetUserMyData(@Req() req: any)
+	{
+		return this.UserService.GetUserDataByNickName(req.tokenuserdata.nick_name);
+	}
 
 	@ApiTags('User API')
 	@ApiOperation({summary: `닉네임 유저 데이터 API`, description: `닉네임으로 유저 데이터를 가져온다.`})
-	// @UseGuards(AuthGuard('jwt-access'))
-	// @ApiBearerAuth('JWT-access')
+	@UseGuards(AuthGuard('jwt-access'))
+	@ApiBearerAuth('JWT-access')
 	@Get("getdata/nickname/:nickname")
     GetUserDataByNickName(@Param('nickname') nickname: string)
 	{
@@ -43,8 +51,8 @@ export class UserController {
 	@UseInterceptors(FileInterceptor("file", {
 		storage: diskStorage({
 		  destination: './storage',
-		  filename(req, file, callback): void {
-			return callback(null, `${req.query.nickname}`);
+		  filename(req: any, file, callback): void {
+			return callback(null, `${req.tokenuserdata.nick_name}`);
 		  }
 		})
 	  }))
@@ -61,6 +69,23 @@ export class UserController {
 	GetUserImageByNickName(@Param('nickname') nickName: string)
 	{
 		return this.UserService.GetUserImageByNickName(nickName);
+	}
+
+	// @ApiTags('User API')
+	// @ApiOperation({summary: `내 이미지 전달 API`, description: `나의 이미지를 전달한다.`})
+	// @UseGuards(AuthGuard('jwt-access'))
+	// @Get("getimg/myimg")
+	// GetMyImage(@Req() req: any)
+	// {
+	// 	return this.UserService.GetUserImageByNickName(req.tokenuserdata.nick_name);
+	// }
+
+	@ApiTags('User API')
+	@ApiOperation({summary: `기본 이미지 전달 API`, description: `기본의 이미지를 전달한다.`})
+	@Get("getimg/defaultimg")
+	GetDefaultImage()
+	{
+		return this.UserService.GetUserImageByNickName("default");
 	}
 
 }

@@ -1,3 +1,4 @@
+'use client'
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -8,7 +9,6 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { axiosToken } from '@/util/token';
 import { useCookies } from 'next-client-cookies';
-import { cookies } from 'next/headers';
 
 const style: React.CSSProperties = {
   position: 'absolute',
@@ -16,10 +16,11 @@ const style: React.CSSProperties = {
   left: '50%',
   transform: 'translate(-50%, -50%)',
   width: 400,
-  bgcolor: 'background.paper',
   border: '2px solid #000',
-  boxShadow: 24,
-  p: 4,
+  boxShadow: '24',
+  backgroundColor: 'white',
+  // bgcolor: 'background.paper',
+  // p: 4,
 };
 
 const qrCodeStyle: React.CSSProperties = {
@@ -85,7 +86,7 @@ export default function OtpModal({ open, isActivated, setActive, onClose, myId, 
   }, []);
 
   const handleActivate2FA = async () => {
-
+    console.log('in opt', myId, myNick);
     await axiosToken.post(`${process.env.NEXT_PUBLIC_API_URL}auth/2fa/active`,
       {
         user_id: myId,

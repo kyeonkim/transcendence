@@ -5,11 +5,11 @@ import { SocketService } from './socket.service';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { SocketGameService } from 'src/socket/socket.gameservice';
 import { EventModule } from 'src/event/event.module';
-// import { GameModule } from 'src/game/game.module';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   providers: [SocketGateway, SocketService, SocketGameService],
-  imports: [AuthModule, PrismaModule, EventModule],
+  imports: [AuthModule, PrismaModule, EventModule, JwtModule],
   exports: [SocketService, SocketGateway, SocketGameService],
 })
 export class SocketModule {}

@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect ,useCallback} from 'react';
 import { useChatSocket } from "../../app/main_frame/socket_provider"
+import { useUserDataContext } from '@/app/main_frame/user_data_context';
 import { useCookies } from 'next-client-cookies'
 import {Paper, Grid, Box, Divider, TextField, Typography, List,	IconButton, Popper,
 		AppBar, Toolbar, Drawer, Dialog, Button, DialogActions, DialogContent, DialogContentText, DialogTitle, ListItemButton} from "@mui/material";
@@ -39,11 +40,13 @@ export default function Chat(props: any) {
 	const [modalOpen, setModalOpen] = useState(false);
 
 	const { handleRenderMode, roominfo } = props;
+	
 	const socket = useChatSocket();
+	const { nickname, user_id } = useUserDataContext();
 	const cookies = useCookies();
 	
-	const my_name = cookies.get('nick_name');
-	const my_id = Number(cookies.get('user_id'));
+	const my_name = nickname;
+	const my_id = user_id;
 
 	useEffect (() => {
 		const handleKick = (data :any) => {
@@ -156,15 +159,12 @@ export default function Chat(props: any) {
 		
 		if (type === 'change_password')
 			setModalCodition('change_password');
-		else if (type === 'remove_password')
-			setModalCodition('remove_password');
 		else if (type === 'change_name')
 			setModalCodition('change_name');
 		else if (type === 'change_visibility')
 			setModalCodition('change_visibility');
 		setModalOpen(true);
 	};
-
 
 	const imageLoader = (({ src }: any) => {
 		return `${process.env.NEXT_PUBLIC_API_URL}user/getimg/nickname/${src}`
@@ -331,33 +331,13 @@ export default function Chat(props: any) {
 							<Typography>Change Name</Typography>
 						</ListItemButton>
 						<Divider />
-						{roominfo.is_password ? (
-							<>
-								<ListItemButton onClick={() => handleChatModalCondition('remove_password')}>
-									<Typography>Remove PassWord</Typography>
-								</ListItemButton>
-								
-								<Divider />
-								<ListItemButton onClick={() => handleChatModalCondition('change_password')}>
-									<Typography>Change PassWord</Typography>
-								</ListItemButton>
-
-							</>
-						) : (
-							<ListItemButton onClick={() => handleChatModalCondition('change_password')}>
-								<Typography>Set PassWord</Typography>
-							</ListItemButton>
-						)}
+						<ListItemButton onClick={() => handleChatModalCondition('change_password')}>
+							<Typography>Set PassWord</Typography>
+						</ListItemButton>
 						<Divider />
-						{roominfo.is_private ? (
-							<ListItemButton onClick={() => handleChatModalCondition('change_visibility')}>
-								<Typography>Set Public</Typography>
-							</ListItemButton>
-						) : (
-							<ListItemButton onClick={() => handleChatModalCondition('change_visibility')}>
-								<Typography>Set Private</Typography>
-							</ListItemButton>
-						)}
+						<ListItemButton onClick={() => handleChatModalCondition('change_visibility')}>
+							<Typography>Set Private</Typography>
+						</ListItemButton>
 						<Divider />
 						<Button onClick={handleSettingClose} sx={{alignItems: "center"}}>Cancel</Button>
 					</List>

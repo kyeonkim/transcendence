@@ -5,28 +5,44 @@ import { useEffect, useState } from "react";
 import { axiosToken } from "@/util/token";
 import { useCookies } from "next-client-cookies";
 import { useChatSocket } from "@/app/main_frame/socket_provider";
+import { useUserDataContext } from "@/app/main_frame/user_data_context";
+import { useMainBoxContext } from "@/app/main_frame/mainbox_context";
 
 export default function GameRoom(props: any) {
-	const { setRender, userData, setIsMod} = props;
+	const { render, setRender, userData } = props;
 	const [ready, setReady] = useState(false);
 	const [gameStart, setGameStart] = useState(false);
 	const [mod, setMod] = useState(false);
 	const cookies = useCookies();
+	const { user_id, nickname } = useUserDataContext();
+	const { setGameState } = useMainBoxContext();
 
-	if (!userData)
-		return <div></div>;
+	useEffect(() => {
+
+		
+		return () => {
+			
+			handleExit();
+			setGameState(false);
+
+		}
+	}, [])
 
 	useEffect(() => {
 		if (userData.room && userData.room.user2_ready && userData.room.user1_ready)
 			setGameStart(true);
 		else
 			setGameStart(false);
-		setMod(userData.game_mode);
+
+		// userData에 game_mode가 추가되는 시점이 다른 것 같음.
+		if (userData.game_mode != undefined)
+			setMod(userData.game_mode);
+
 	}, [userData]);
 
 	const handleExit = async () => {
 		await axiosToken.patch(`${process.env.NEXT_PUBLIC_API_URL}game/leaveroom`, {
-			user_id: Number(cookies.get('user_id')),
+			user_id: user_id,
 		},
 		{
 			headers: {
@@ -34,16 +50,17 @@ export default function GameRoom(props: any) {
 		}
 		})
 		.then((res) => {
-			setRender(0);
+			console.log('handle Exit done - ', res.data);
+			if (res.data.status === true && render === 2)
+				setRender(0);
 		})
 	}
 
 	useEffect(() => {
 		const updateStates = async () => {
-			await axiosToken.patch(
-				`${process.env.NEXT_PUBLIC_API_URL}game/ready`,
+			await axiosToken.patch(`${process.env.NEXT_PUBLIC_API_URL}game/ready`,
 				{
-					user_id: Number(cookies.get('user_id')),
+					user_id: user_id,
 					ready: ready? true : false,
 					game_mode: mod? true : false
 				},
@@ -75,7 +92,7 @@ export default function GameRoom(props: any) {
 	const handleStart = async () => {
 
 		await axiosToken.post(`${process.env.NEXT_PUBLIC_API_URL}game/start`, {
-			user_id: Number(cookies.get('user_id')),
+			user_id: user_id,
 		},
 		{
 			headers: {
@@ -83,7 +100,6 @@ export default function GameRoom(props: any) {
 			}
 		})
 		.then((res) => {
-
 		})
 	}
 
@@ -106,9 +122,14 @@ export default function GameRoom(props: any) {
 				}}
 			>
 				 <FormControlLabel
-				 	control={<Checkbox sx={{color: 'white'}} checked={mod} onChange={handleMod}/>}
+				 	control={<Checkbox
+						sx={{color: 'white'}}
+						checked={mod}
+						onChange={handleMod}
+						disabled={userData.room.user1_id !== user_id ? true : false}
+						/>}
 					label={
-						<Typography sx={{ color: 'white', fontSize: '1.5vw' }}>
+						<Typography sx={{ color: mod ? 'blue' : 'red', fontSize: '1.5vw' }}>
 							Revers Mod
 						</Typography>}
 					sx={{color: 'white'}}
@@ -118,7 +139,7 @@ export default function GameRoom(props: any) {
 				color="primary"
 				onClick={handleStart}
 				size="large"
-				disabled={!gameStart || Number(cookies.get('user_id')) !== userData?.room?.user1_id}
+				disabled={!gameStart || user_id !== userData?.room?.user1_id}
 				sx={{
 					position: 'relative',
 					width: '100%',

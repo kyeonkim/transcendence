@@ -13,8 +13,11 @@ export class EventController {
     ) {}
 
     @ApiOperation({summary: `SSE API`, description: `SSE 테스트를 위한 API`})
+	// @UseGuards(AuthGuard('jwt-access'))
+	// @ApiBearerAuth('JWT-acces')
     @Sse('alarmsse/:id')
     async AlarmSse(@Req() req, @Param('id', ParseIntPipe) id : number) {
+        // id = req.tokenuserdata.user_id;
         return await this.EventService.AlarmSse(req, id);
     }
 
@@ -28,7 +31,8 @@ export class EventController {
 	@UseGuards(AuthGuard('jwt-access'))
 	@ApiBearerAuth('JWT-acces')
     @Get('getalarms/:id')
-    async GetAlarms(@Param('id', ParseIntPipe) id : number) {
+    async GetAlarms(@Req() req, @Param('id', ParseIntPipe) id : number) {
+        id = req.tokenuserdata.user_id;
         return await this.EventService.GetAlarms(id);
     }
 

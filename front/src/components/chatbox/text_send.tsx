@@ -1,7 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Grid, ListItem, Stack, Chip, Typography, Avatar } from "@mui/material";
-import { render } from 'react-dom';
-
 import { useMainBoxContext } from '@/app/main_frame/mainbox_context';
 
 const TextSend = ({ my_name, socket, scrollref}: any) => {
@@ -21,7 +19,6 @@ const TextSend = ({ my_name, socket, scrollref}: any) => {
 			const newMessage = rednerNotice(data);
 			setRenderedMessages(prevMessages => [...prevMessages, newMessage]);
 		};
-
 
 		socket.on("chat", handleChat);
 		socket.on("notice", handleNotice);
@@ -46,6 +43,7 @@ const TextSend = ({ my_name, socket, scrollref}: any) => {
 		return `${process.env.NEXT_PUBLIC_API_URL}user/getimg/nickname/${src}?${time}`
 	}, []);
 
+	
 	const handleClick = (name: any) => {
 		setMTBox(1, name);
 	};
@@ -72,7 +70,12 @@ const TextSend = ({ my_name, socket, scrollref}: any) => {
 	const renderMessage = (message: any) => {
 		return (
 			<Grid container key={message.time}>
-				<ListItem style={{ padding: '5px', paddingBottom: '0px', marginLeft: message.from === my_name? '80%' : '0px'}}>
+				<ListItem
+					style={{
+						padding: '5px',
+						paddingBottom: '0px',
+						justifyContent: message.from === my_name ? 'flex-end' : 'flex-start'
+					}}>
 					<Stack direction="row" spacing={1}>
 						<Chip
 							avatar={<Avatar src={imageLoader({src: message.from, time: new Date()})} />}

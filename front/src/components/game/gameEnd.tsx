@@ -3,17 +3,19 @@ import styles from './pong.module.css';
 import { Avatar, Grid, Typography, Button, Box } from '@mui/material';
 import { useChatSocket } from '@/app/main_frame/socket_provider';
 import { useEffect } from 'react';
-import { useCookies } from "next-client-cookies";
 import { useStatusContext } from "@/app/main_frame/status_context";
+import { useUserDataContext } from '@/app/main_frame/user_data_context';
 
 export default function GameEnd({endData, exitGame} :any) {
 
     const   socket = useChatSocket();
-	const   cookies = useCookies();
+    const   { nickname, user_id } = useUserDataContext();
     const { status } = useStatusContext();
 
+
+
     useEffect(() => {
-        socket.emit('status', { user_id: Number(cookies.get('user_id')), status: status });
+        socket.emit('status', { user_id: user_id, status: status });
     }, [])
 
     const imageLoader = (src: any) => {

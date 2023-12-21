@@ -6,40 +6,35 @@ import { useCookies } from "next-client-cookies";
 import { useEffect } from "react";
 import { axiosToken } from "@/util/token";
 
-export default function RankMatch(props: any) {
-	const { setRender, setRank } = props;
+import { useUserDataContext } from "@/app/main_frame/user_data_context";
+import { useChatSocket } from "@/app/main_frame/socket_provider";
 
+export default function RankMatch(props: any) {
+	const { setRender } = props;
+	const socket = useChatSocket();
 	const cookies = useCookies();
+	const { user_id, nickname } = useUserDataContext();
 
 	useEffect(() => {
 		const fetchMatch = async () => {
 
 			await axiosToken.post(`${process.env.NEXT_PUBLIC_API_URL}game/match`, {
-				user_id: Number(cookies.get('user_id')),
+				user_id: user_id,
 			},
 			{
 				headers: {
+					'Content-Type': 'application/json',
 					'Authorization': `Bearer ${cookies.get('access_token')}`
 				}
 			})
-			.then((res) => {
-
-			})
 		}
+
 		fetchMatch();
 	}, []);
 
 	const cancelMatch = async () => {
-
-		await axiosToken.patch(`${process.env.NEXT_PUBLIC_API_URL}game/cancelmatch`,
-		{
-			headers: {
-				'Authorization': `Bearer ${cookies.get('access_token')}`
-			}
-		})
-		.then((res) => {
-			setRender(0);
-		})
+		socket.emit('game-cancelmatch');
+		setRender(0);
 	}
 
 	return (

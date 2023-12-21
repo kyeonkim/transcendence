@@ -2,8 +2,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { fabric } from 'fabric';
 import { useChatSocket } from '@/app/main_frame/socket_provider';
-import { useCookies } from "next-client-cookies";
 import { useStatusContext } from "@/app/main_frame/status_context";
+import { useUserDataContext } from '@/app/main_frame/user_data_context';
+import { useMainBoxContext } from '@/app/main_frame/mainbox_context';
+
 
 import  GameProfile  from "./gameProfile";
 import  GameEnd from "./gameEnd";
@@ -12,7 +14,7 @@ import styles from './pong.module.css';
 
 export default function Pong (props :any){
     const socket = useChatSocket();
-    const { rank, mode, exitGame  } = props;
+    const { data, exitGame  } = props;
     const [gameEnd, setGameEnd] = useState(false);
     const [endData, setEndData] = useState({});
 
@@ -41,6 +43,7 @@ export default function Pong (props :any){
 
     const [gameData, setGameData] = useState({
         startTime: 0,
+        drawTime: 0,
     })
 
     const [scoreValue, setScoreValue] = useState({player1: 0, player2: 0});
@@ -64,15 +67,15 @@ export default function Pong (props :any){
         arrowUp: false,
         arrowDown: false
     });
-    const [ballFix, setBallFix] = useState({newData: false, time: 0, enemy: {top:0, left:0}, ball: {top:0, left:0}, ballVecXY: {x:0, y:0, speed:0}, score:{}});
+    const [ballFix, setBallFix] = useState({newData: false, time: 0, enemy: {top:0, left:0}, ball: {top:0, left:0}, ballVecXY: {x:0, y:0, speed:0}, score:{player1:0, player2:0}});
     
     // viewportRatio 1 = 1600:900
     const   [viewportRatio, setViewportRatio] = useState({value: 1.0});
 
-	const   cookies = useCookies();
     const   containerRef = props.containerRef;
     const { status, setStatus } = useStatusContext();
-
+    const { nickname, user_id } = useUserDataContext(); 
+    const { setGameState } = useMainBoxContext();
 
     const updateStatus = useCallback(
         (newStatus :string) => {
@@ -231,7 +234,7 @@ export default function Pong (props :any){
             });
 
             
-            if (mode === true)
+            if (data.room.game_mode === true)
             {
                 setReverseSign(-1);
             }
@@ -239,7 +242,7 @@ export default function Pong (props :any){
             setInitUserSetting(true);
     
             return () => {
-                pongCanvas.dispose();
+                // pongCanvas.dispose();
             }
     
         }
@@ -255,7 +258,7 @@ export default function Pong (props :any){
                 gameData.startTime = Date.now();
                 console.log('game data==',data);
                 
-                if (data.room.user1_id === Number(cookies.get('user_id')))
+                if (data.room.user1_id === user_id)
                 {
                     setUser(player1);
                     setEnemy(player2);
@@ -271,23 +274,26 @@ export default function Pong (props :any){
                 updateStatus('ingame');
             }
     
+            setGameState(true);
             setReadyResize(true);
 
             socket.on(`game-init`, listenGameInit);
-
-            socket.emit(`game-start`, {user_id: Number(cookies.get('user_id')), user_nickname: cookies.get('nick_name'), rank: rank, game_mode: mode});
+            console.log('game-mode : ', data.room.game_mode);
+            socket.emit(`game-start`, {user_id: user_id, user_nickname: nickname, game_mode: data.room.game_mode});
 
             document.addEventListener('visibilitychange', () => {
                 if (document.hidden) {
                     console.log('pong unmount');
                     socket.emit('game-force-end');
+                    // updateStatus('online');
                 } else {
                   console.log("re on")
                 }
               });
 
             return () => {
-
+                // canvas.clearRect(0,0,canvas.height, canvas.width);
+                socket.emit('game-force-end');
                 socket.off('game-init', listenGameInit);
                 document.removeEventListener('visivilitychange', () => {});
             }
@@ -342,34 +348,45 @@ export default function Pong (props :any){
         if (initGame === true)
         {
             const listenGameEnd = (data :any) => {
+                console.log ('pong listener end ');
                 cancelAnimationFrame(lastRequestId);
-    
+
+                console.log(`unmount`, canvas);
                 setEndData(data.gameData);
-
                 setGameEnd(true);
-
                 updateStatus('online');
+                setGameState(false);
+
             }
+
+            // const eventPopState = (event :any) => {
+            //     cancelAnimationFrame(lastRequestId);
+            //     updateStatus('online');
+            //     setGameState(false);
+            // }
+
+            // window.addEventListener('popstate', eventPopState);
 
             let lastRequestId :number; 
 
             socket.on('game-end', listenGameEnd);
 
-            socket.emit('status', { user_id: Number(cookies.get('user_id')), status: status });
+            socket.emit('status', { user_id: user_id, status: status });
     
             const drawPong = () => {
-                
-
+                if (gameData.drawTime === 0)
+                    gameData.drawTime = Date.now();
+                const drawSpeed = (Date.now() - gameData.drawTime) / 15;
                 if (reverseSign === 1)
                 {
                     if (isArrowPressed.arrowUp === true && user.top > 0) 
                     {
-                        user.set('top', Math.max(user.top - playerSpeed.value, 0));
+                        user.set('top', Math.max(user.top - (playerSpeed.value * drawSpeed), 0));
                         socket.emit(`game-user-position`, {y: user.top / viewportRatio.value});
                     }
                     if (isArrowPressed.arrowDown === true && user.top < canvas.height - user.height)
                     {
-                        user.set('top', Math.min(user.top + playerSpeed.value, canvas.height - user.height));
+                        user.set('top', Math.min(user.top + (playerSpeed.value * drawSpeed), canvas.height - user.height));
                         socket.emit(`game-user-position`, {y: user.top / viewportRatio.value});
                     }
                 }
@@ -377,19 +394,18 @@ export default function Pong (props :any){
                 {
                     if (isArrowPressed.arrowDown === true && user.top > 0)
                     {
-                        user.set('top', Math.max(user.top - playerSpeed.value, 0));
+                        user.set('top', Math.max(user.top - (playerSpeed.value * drawSpeed), 0));
                         socket.emit(`game-user-position`, {y: user.top / viewportRatio.value});
                     }
                     if (isArrowPressed.arrowUp === true && user.top < canvas.height - user.height)
                     {
-                        user.set('top', Math.min(user.top + playerSpeed.value, canvas.height - user.height));
+                        user.set('top', Math.min(user.top + (playerSpeed.value * drawSpeed), canvas.height - user.height));
                         socket.emit(`game-user-position`, {y: user.top / viewportRatio.value});
                     }
                 }
+                ball.set('left', ball.left + (ballVecXY.x * (ballVecXY.speed * drawSpeed )));
+                ball.set('top', ball.top + (ballVecXY.y * (ballVecXY.speed * drawSpeed)));
 
-                ball.set('left', ball.left + (ballVecXY.x * ballVecXY.speed));
-                ball.set('top', ball.top + (ballVecXY.y * ballVecXY.speed));
-        
                 if (ballFix.newData === true)
                 {
                     ball.set(`left`, ballFix.ball.left);
@@ -515,21 +531,27 @@ export default function Pong (props :any){
                         });
                     }
                 }
-
-                canvas.renderAll();
+                    gameData.drawTime = Date.now();
+                    canvas.renderAll();
     
                 lastRequestId = requestAnimationFrame(drawPong);
     
             };
 
-            setTimeout(() => {drawPong()
+            const id = setTimeout(() => {drawPong()
             }, 3000);
 
-        
-            return () => {
+            return () => {  
+                // window.removeEventListener('popstate', eventPopState);
+                clearTimeout(id);
+                console.log('pong component unmount');
                 socket.off('game-end', listenGameEnd);
                 cancelAnimationFrame(lastRequestId);
+                console.log(`unmount`, canvas);
+                canvas.dispose();
                 updateStatus('online');
+                setGameState(false);
+                setGameEnd(true);
             };
         }
 
@@ -627,7 +649,8 @@ export default function Pong (props :any){
                 ballVecXY.speed = ballVecXY.speed / viewportRatio.value * ratio;
                 playerSpeed.value = playerSpeed.value / viewportRatio.value * ratio;
                 viewportRatio.value = ratio;
-
+                
+                
                 canvas.renderAll();
 
             };
@@ -644,7 +667,6 @@ export default function Pong (props :any){
 
     useEffect(() => {
         function handleKeyDown(e :any) {
-                let speed = playerSpeed.value;
                 if (e.key === 'ArrowUp') {
                     isArrowPressed.arrowUp = true;
                 } 
