@@ -32,6 +32,7 @@ export default function AlarmListPanal (props: any) {
   const alarmListRemover = props.alarmListRemover;
   const alarmCountHandler = props.alarmCountHandler;
   const handleAlarmRerender = props.handleAlarmRerender;
+  const handleDmAlarmCount = props.handleDmAlarmCount;
   const setDm = props.setAlarmDM
   const { setMTBox } = useMainBoxContext();
   const { clicked } = useUserDataContext();
@@ -62,7 +63,7 @@ export default function AlarmListPanal (props: any) {
   useEffect(() => {
 
 		const dmAlarmListener = (data :any) => {
-			setDm(true);
+			handleDmAlarmCount(data.from_id, true);
 		}
 
 		socket.on('dm', dmAlarmListener);

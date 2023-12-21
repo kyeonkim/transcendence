@@ -37,7 +37,7 @@ export default function FriendListPanel(props: any) {
 	const { status, setStatus } = useStatusContext();
 	const { setMTBox } = useMainBoxContext();
 
-	const { dmOpenId, dmOpenNickname, handleDmAlarmCount, handleChatTarget, list, myId, tapref} = props;
+	const { dmOpenId, setDmOpenId, dmOpenNickname, handleDmAlarmCount, handleChatTarget, list, myId, tapref} = props;
 
 	const dmOpenIdRef = useRef(dmOpenId);
 	const dmCountListRef = useRef(dmCountList);
@@ -50,6 +50,10 @@ export default function FriendListPanel(props: any) {
 		console.log('ready set');
 		console.log('socket in friend list panal\n', socket);
 		setReady(true);
+
+		return () => {
+			setDmOpenId(-1);
+		}
 	}, [])
 		
 
@@ -126,6 +130,7 @@ export default function FriendListPanel(props: any) {
 					}
 					return countList;
 				})
+
 			setDmCountList(newDmCountList);
 		}
 

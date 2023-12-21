@@ -252,6 +252,7 @@ export default function BasicTabs() {
 			<CustomTabPanel value={value} index={0}>
 				<FriendListPanel
 					dmOpenId={dmOpenId}
+					setDmOpenId={setDmOpenId}
 					dmOpenNickname={dmOpenNickname}
 					handleDmAlarmCount={handleDmAlarmCount}
 					handleChatTarget={handleChatTarget}
@@ -265,6 +266,7 @@ export default function BasicTabs() {
 					alarmList={alarmList}
 					alarmListRemover={setAlarmListRemover}
 					alarmCountHandler={setAlarmCountHandler}
+					handleDmAlarmCount={handleDmAlarmCount}
 					handleAlarmRerender={handleAlarmRerender}
 					setDm={setAlarmDM}
 				/>
