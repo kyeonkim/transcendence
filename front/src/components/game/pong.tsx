@@ -43,6 +43,7 @@ export default function Pong (props :any){
 
     const [gameData, setGameData] = useState({
         startTime: 0,
+        drawTime: 0,
     })
 
     const [scoreValue, setScoreValue] = useState({player1: 0, player2: 0});
@@ -373,18 +374,19 @@ export default function Pong (props :any){
             socket.emit('status', { user_id: user_id, status: status });
     
             const drawPong = () => {
-                
-
+                if (gameData.drawTime === 0)
+                    gameData.drawTime = Date.now();
+                const drawSpeed = (Date.now() - gameData.drawTime) / 15;
                 if (reverseSign === 1)
                 {
                     if (isArrowPressed.arrowUp === true && user.top > 0) 
                     {
-                        user.set('top', Math.max(user.top - playerSpeed.value, 0));
+                        user.set('top', Math.max(user.top - (playerSpeed.value * drawSpeed), 0));
                         socket.emit(`game-user-position`, {y: user.top / viewportRatio.value});
                     }
                     if (isArrowPressed.arrowDown === true && user.top < canvas.height - user.height)
                     {
-                        user.set('top', Math.min(user.top + playerSpeed.value, canvas.height - user.height));
+                        user.set('top', Math.min(user.top + (playerSpeed.value * drawSpeed), canvas.height - user.height));
                         socket.emit(`game-user-position`, {y: user.top / viewportRatio.value});
                     }
                 }
@@ -392,19 +394,18 @@ export default function Pong (props :any){
                 {
                     if (isArrowPressed.arrowDown === true && user.top > 0)
                     {
-                        user.set('top', Math.max(user.top - playerSpeed.value, 0));
+                        user.set('top', Math.max(user.top - (playerSpeed.value * drawSpeed), 0));
                         socket.emit(`game-user-position`, {y: user.top / viewportRatio.value});
                     }
                     if (isArrowPressed.arrowUp === true && user.top < canvas.height - user.height)
                     {
-                        user.set('top', Math.min(user.top + playerSpeed.value, canvas.height - user.height));
+                        user.set('top', Math.min(user.top + (playerSpeed.value * drawSpeed), canvas.height - user.height));
                         socket.emit(`game-user-position`, {y: user.top / viewportRatio.value});
                     }
                 }
+                ball.set('left', ball.left + (ballVecXY.x * (ballVecXY.speed * drawSpeed )));
+                ball.set('top', ball.top + (ballVecXY.y * (ballVecXY.speed * drawSpeed)));
 
-                ball.set('left', ball.left + (ballVecXY.x * ballVecXY.speed));
-                ball.set('top', ball.top + (ballVecXY.y * ballVecXY.speed));
-        
                 if (ballFix.newData === true)
                 {
                     ball.set(`left`, ballFix.ball.left);
@@ -530,6 +531,7 @@ export default function Pong (props :any){
                         });
                     }
                 }
+                    gameData.drawTime = Date.now();
                     canvas.renderAll();
     
                 lastRequestId = requestAnimationFrame(drawPong);
@@ -665,7 +667,6 @@ export default function Pong (props :any){
 
     useEffect(() => {
         function handleKeyDown(e :any) {
-                let speed = playerSpeed.value;
                 if (e.key === 'ArrowUp') {
                     isArrowPressed.arrowUp = true;
                 } 
