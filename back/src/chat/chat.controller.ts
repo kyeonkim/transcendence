@@ -143,7 +143,7 @@ export class ChatController {
     @Patch("banuser")
     async BanUser(@Req() req, @Headers() headers, @Body() data : SetChatUserDto)
     {
-        data.room_id = req.tokenuserdata.user_id;
+        data.user_id = req.tokenuserdata.user_id;
         const room =  await this.ChatService.GetMyRoomByHeader(headers);
         if (room === null || room.chatroom_id !== data.room_id || room.is_manager !== true)
             return {status: false, message: 'not manager'};
