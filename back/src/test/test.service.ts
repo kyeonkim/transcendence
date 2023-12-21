@@ -8,6 +8,7 @@ import * as fs from 'fs';
 import { join } from 'path';
 import { ChatService } from 'src/chat/chat.service';
 import { SocketGateway } from 'src/socket/socket.gateway';
+import { AuthService } from 'src/auth/auth.service';
 
 @Injectable()
 export class TestService {
@@ -18,7 +19,23 @@ export class TestService {
         private readonly SocialService: SocialService,
         private readonly chatService: ChatService,
         private readonly SocketService: SocketGateway,
+        private readonly AuthService: AuthService,
     ) {}
+
+	async DummyLogin(dummy_id : number)
+	{
+        const userData = await this.prisma.user.findUnique({
+            where: {
+                user_id: dummy_id,
+            },
+        });
+        if (userData === null)
+            return {status: false, message: "dummy login fail"};
+            const tokenData = await this.AuthService.CreateToken(userData.user_id, userData.nick_name, !userData.twoFA);
+            const user = await this.UserService.GetUserDataById(userData.user_id);
+            return {status: true, twoFAPass: !(user.userdata.twoFA), userdata: user.userdata, token: tokenData};
+	}
+
 
     async DeleteUserByNickName(nickName: string)
     {
@@ -116,20 +133,19 @@ export class TestService {
         return {status: true, message: "success", delete_user: user.nick_name};
     }
 
-
     async CreateDummyUser()
     {
-        for(let i = 0; i < 50; i++)
+        for(let i = 0; i < 6; i++)
         {
             const user = await this.UserService.GetUserDataById(i);
             if (user.status)
                 return {status: false, message: "이미 유저가 존재합니다."};
             await this.UserService.CreateUser(i, `dummy${i}`);
         }
-        for(let i = 0; i < 50; i++)
+        for(let i = 0; i < 6; i++)
         {
             await this.SocialService.AcceptFriend({user_id: i,user_nickname: `dummy${i}`, friend_nickname: `min`});
-            for(let j = 0; j < 50; j++)
+            for(let j = 0; j < 6; j++)
             {
                 if (i != j)
                     await this.SocialService.AcceptFriend({user_id: i,user_nickname: `dummy${i}`, friend_nickname: `dummy${j}`});
