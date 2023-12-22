@@ -61,14 +61,11 @@ export default function Home() {
             Sign Up
           </Button> */}
         </Box>
-        <Box sx={{ marginBottom: '16px' }}>
+        {/* <Box sx={{ marginBottom: '16px' }}>
           <Button variant="contained" onClick={() => handleGuestLogin(0)} sx={{ marginRight: '8px' }}>
             Guest Login 0
           </Button>
-          {/* <Button variant="contained" onClick={handleSignUp}>
-            Sign Up
-          </Button> */}
-        </Box>
+        </Box> */}
         <Box sx={{ marginBottom: '16px' }}>
           <Button variant="contained" onClick={() => handleGuestLogin(1)} sx={{ marginRight: '8px' }}>
             Guest Login 1
