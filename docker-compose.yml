@@ -47,9 +47,9 @@ services:
     container_name: nest_container
     env_file:
       - .env
-    depends_on:
-      postgresql:
-        condition: service_healthy
+    # depends_on:
+    #   postgresql:
+    #     condition: service_healthy
     volumes:
       - ./back/prisma:/app/transcendence_nest_server/prisma
       - ./back/src:/app/transcendence_nest_server/src

@@ -1,4 +1,4 @@
-'use client'
+// 'use client'
 // check = 원래 client이면 안되는데, 원격 서버 관련 이슈
 
 import React from 'react';
