@@ -19,17 +19,18 @@ export default function Login ({searchParams}:any) {
 
       let responseDatabase;
 
-      await axios.post('https://api.intra.42.fr/oauth/token', {
-        code: code,
-        client_id: process.env.NEXT_PUBLIC_CLIENT_ID,
-        client_secret: process.env.NEXT_PUBLIC_CLIENT_SECRET,
-        redirect_uri: `${process.env.NEXT_PUBLIC_FRONT_URL}login`,
-        grant_type: 'authorization_code'
-      })
-      .then((res) => {
-        responseDatabase = CheckUserInDatabase(res.data);
-      })
-      .catch((err) => {
+      try {
+
+        const res = await axios.post('https://api.intra.42.fr/oauth/token', {
+          code: code,
+          client_id: process.env.NEXT_PUBLIC_CLIENT_ID,
+          client_secret: process.env.NEXT_PUBLIC_CLIENT_SECRET,
+          redirect_uri: `${process.env.NEXT_PUBLIC_FRONT_URL}login`,
+          grant_type: 'authorization_code'
+        })
+        
+        responseDatabase = await CheckUserInDatabase(res.data);
+      } catch(err: any){
         if (err.response)
         {
           return (err.response);
@@ -38,7 +39,7 @@ export default function Login ({searchParams}:any) {
         {
           return (err.request);
         }
-      });
+      };
 
       return (responseDatabase);
   };
@@ -52,7 +53,7 @@ export default function Login ({searchParams}:any) {
 
     try
     {
-      userData = await axios.post(`${process.env.NEXT_PUBLIC_FRONT_URL}api/user_check`, {
+      userData = await axios.post(`http://127.0.0.1:3000/api/user_check`, {
         access_token: data.access_token
       });
 

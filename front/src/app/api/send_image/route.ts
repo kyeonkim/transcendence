@@ -12,7 +12,7 @@ export async function POST (request: NextRequest)
 
         const name = formData.get('nick_name');
 
-        response = await axios.post( `${process.env.NEXT_PUBLIC_API_URL}user/upload`,
+        response = await axios.post( `${process.env.NEXT_PUBLIC_API_DIRECT_URL}user/upload`,
                 formData,
                 {
                     headers: {
@@ -26,7 +26,7 @@ export async function POST (request: NextRequest)
     }
     catch (error: any)
     {
-
+        
         if (error.response)
         {
             return (NextResponse.json({

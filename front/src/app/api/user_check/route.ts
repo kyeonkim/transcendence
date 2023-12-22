@@ -21,7 +21,7 @@ export async function POST (request: NextRequest)
     {
         data = await request.json();
 
-        response = await axios.post( `${process.env.NEXT_PUBLIC_API_URL}auth/login`, {  
+        response = await axios.post( `${process.env.NEXT_PUBLIC_API_DIRECT_URL}auth/login`, {  
             access_token: data.access_token,
         });
 
