@@ -77,6 +77,8 @@ export class SocialService {
         });
         if (friend === null)
             return {status: false, message: "frined user not found"};
+        if (friend.user_id === addFriend.user_id)
+            return {status: false, message: "same user"};
         const check =  await this.prismaService.friends.findFirst({
             where: {
                 following_user_id: addFriend.user_id,
