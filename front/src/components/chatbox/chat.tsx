@@ -19,6 +19,7 @@ import TextSend from './text_send';
 import UserList from './chat_user_list';
 import ChatModal from './chat_modal';
 import { axiosToken } from '@/util/token';
+import Marquee from 'react-fast-marquee';
 
 export default function Chat(props: any) {
 	const messageAreaRef = useRef(null);
@@ -157,12 +158,12 @@ export default function Chat(props: any) {
 
 	const handleChatModalCondition = (type :string) => {
 		
-		if (type === 'change_password')
-			setModalCodition('change_password');
-		else if (type === 'change_name')
-			setModalCodition('change_name');
-		else if (type === 'change_visibility')
-			setModalCodition('change_visibility');
+		if (type === 'change password')
+			setModalCodition('change password');
+		else if (type === 'change name')
+			setModalCodition('change name');
+		else if (type === 'change visibility')
+			setModalCodition('change visibility');
 		setModalOpen(true);
 	};
 
@@ -177,7 +178,7 @@ export default function Chat(props: any) {
 
 	return (
 		<div>
-			<AppBar position="absolute" sx={{borderRadius: '10px', height: '6%'}}>
+			<AppBar position="absolute" sx={{borderRadius: '10px', height: '64px'}}>
 				<Toolbar>
 				<IconButton
 					size="large"
@@ -189,9 +190,11 @@ export default function Chat(props: any) {
 				>
 					<CloseIcon />
 				</IconButton>
-				<Typography variant="h6" component="div" sx={{ flexGrow: 1 ,align: 'center' }}>
-					{chatname}
-				</Typography>
+				<Marquee>
+					<Typography variant="h6" component="div" sx={{ flexGrow: 1 ,align: 'center', color: 'white', fontSize: '1vw'}}>
+						{chatname}
+					</Typography>
+				</Marquee>
 				<IconButton
 					size="large"
 					edge="end"
@@ -223,8 +226,9 @@ export default function Chat(props: any) {
 			</Drawer>
 			<Grid container component={Paper} sx={{
 				position: 'absolute',
-				top: '5.4%',
-				height: '95%',
+				// top: '5.4%',
+				top: '64px',
+				height: '95.5%',
 				borderRadius: '10px',
 				maxWidth: '100%'}}>
 				<List className={styles.messageArea} ref={messageAreaRef}>
@@ -327,15 +331,15 @@ export default function Chat(props: any) {
 			<DialogTitle>Setting</DialogTitle>
 				<DialogActions>
 					<List>
-						<ListItemButton onClick={() => handleChatModalCondition('change_name')}>
+						<ListItemButton onClick={() => handleChatModalCondition('change name')}>
 							<Typography>Change Name</Typography>
 						</ListItemButton>
 						<Divider />
-						<ListItemButton onClick={() => handleChatModalCondition('change_password')}>
+						<ListItemButton onClick={() => handleChatModalCondition('change password')}>
 							<Typography>Set PassWord</Typography>
 						</ListItemButton>
 						<Divider />
-						<ListItemButton onClick={() => handleChatModalCondition('change_visibility')}>
+						<ListItemButton onClick={() => handleChatModalCondition('change visibility')}>
 							<Typography>Set Private</Typography>
 						</ListItemButton>
 						<Divider />

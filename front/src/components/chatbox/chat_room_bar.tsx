@@ -31,8 +31,8 @@ export default function ChatRoomBar(props: any) {
 					variant='contained'
 					onClick={handleNewChat}
 				>
-					<Typography sx={{color: 'black', fontSize: '1vw'}}>
-						새 채팅
+					<Typography sx={{color: 'black', fontSize: '0.7vw'}}>
+						NEW 
 					</Typography>
 				</Button>
 			</Toolbar>

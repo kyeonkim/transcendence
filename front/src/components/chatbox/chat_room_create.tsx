@@ -104,7 +104,7 @@ export default function ChatRoomCreate(props: any) {
 	};
 
 	function handleRoomnameChange(event :any) {
-		if (/^[a-zA-Z0-9]+$/.test(event.target.value as string))
+		// if (/^[a-zA-Z0-9]+$/.test(event.target.value as string))
 			setRoomName(event.target.value as string);
 	}
 
@@ -127,7 +127,7 @@ export default function ChatRoomCreate(props: any) {
 			<MainChatRoomCreate>
             <AppBar sx={{borderRadius: '10px'}}>
 				<Toolbar>
-					<Typography component="div" sx={{ flexGrow: 1, fontSize: '1.5vw'}}>
+					<Typography component="div" sx={{flexGrow: 1, color: 'white', fontSize: '1vw'}}>
 					채팅방 생성
 					</Typography>
 				</Toolbar>
@@ -142,7 +142,7 @@ export default function ChatRoomCreate(props: any) {
 					}}
 					id="chatroom_name_text_field"
 					label="Chatroom Name"
-					inputProps={{ maxLength: 10}}
+					inputProps={{ maxLength: 30}}
 					onChange={handleRoomnameChange}
 					onKeyDown={(e) => {
 						if (e.key === 'Enter') {

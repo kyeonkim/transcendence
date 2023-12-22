@@ -136,12 +136,12 @@ export default function ChatModal({modalOpen, setModalOpen, modalCondition,
             <Typography id="" variant="h6" component="h2">
                 {modalCondition}
             </Typography>
-            {modalCondition === 'change_name' && 
+            {modalCondition === 'change name' && 
                 <TextField
                     className={styles.modalTextField}
                     id="chatname_text_field"
                     label="Enter new Name"
-                    inputProps={{ maxLength: 10}}
+                    inputProps={{ maxLength: 30}}
                     onChange={handleInChatname}
                 />
             }
@@ -150,7 +150,7 @@ export default function ChatModal({modalOpen, setModalOpen, modalCondition,
                     정말 제거하시겠습니까?
                 </Typography>
             }
-            {(modalCondition === 'change_password') && 
+            {(modalCondition === 'change password') && 
                 <TextField
                     color={errShow ? "error" : "primary"}
                     className={styles.modalTextField}
@@ -169,7 +169,7 @@ export default function ChatModal({modalOpen, setModalOpen, modalCondition,
 						}}}
                 />
             }
-            {modalCondition === 'change_visibility' && 
+            {modalCondition === 'change visibility' && 
                     <FormControlLabel
                     sx={{
                         position: 'relative',

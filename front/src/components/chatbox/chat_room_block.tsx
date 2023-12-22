@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
@@ -18,6 +18,8 @@ import LockIcon from '@mui/icons-material/Lock';
 
 import { styled } from '@mui/system';
 import { Paper } from '@mui/material';
+
+import Marquee from "react-fast-marquee";
 
 const modalStyle = {
     position: 'absolute',
@@ -65,7 +67,6 @@ export default function ChatRoomBlock({room, roomidx,openModal, setOpenModal, se
         }
 	}
 
-
     return (
         <>
             <CardContent
@@ -79,15 +80,18 @@ export default function ChatRoomBlock({room, roomidx,openModal, setOpenModal, se
                 borderRadius: 3,
               }} 
             >
-                <Typography sx={{marginLeft: 2, marginTop: 2, color: 'white'}} variant='h4' gutterBottom>
-                    {room.name} 
-                    {room.is_password ? ( <LockIcon style={{fontSize: 40, color: 'white', marginLeft: 2,}}/>) : ( <p></p> )}		
-                </Typography>
+                <Marquee
+                pauseOnHover>
+                    <Typography sx={{marginLeft: 2, marginTop: 2, color: 'white', }} variant='h4' gutterBottom>
+                            {room.name}
+                    </Typography>
+                </Marquee>
                 <Typography sx={{marginLeft: 2, color: 'white'}} gutterBottom>
                     {room.owner_nickname}의 방
                 </Typography>	
                 <CardActions>
                     <Button sx={{marginTop: 2,}}size="small" variant="contained" onClick={() => handlePasswordModal(room.is_password, room.idx)}>Join</Button>
+                    {room.is_password ? ( <LockIcon style={{fontSize: 20, color: 'white', marginLeft: 2, marginTop: 15}}/>) : ( <p></p> )}		
                 </CardActions>
             </CardContent>
             <Modal
