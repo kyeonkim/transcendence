@@ -16,7 +16,7 @@ export async function POST (request: NextRequest)
     {
         const   data = await request.json();
 
-        response = await axios.post(process.env.NEXT_PUBLIC_API_URL + 'auth/signup', {
+        response = await axios.post(process.env.NEXT_PUBLIC_API_DIRECT_URL + 'auth/signup', {
             access_token: data.access_token,
             nick_name: data.nick_name,
             // img_name: data.img_name

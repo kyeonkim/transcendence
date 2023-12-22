@@ -89,8 +89,8 @@ export default function Pong (props :any){
     const handleInitialSize = () => {
 
 
-        let screenWidth = containerRef.current.offsetWidth;
-        let screenHeight = containerRef.current.offsetHeight * 0.5;
+        let screenWidth = containerRef.current.offsetWidth * 0.98;
+        let screenHeight = containerRef.current.offsetHeight * 0.59;
         
         let ratio;
         let fixWidth = false;
@@ -376,7 +376,7 @@ export default function Pong (props :any){
             const drawPong = () => {
                 if (gameData.drawTime === 0)
                     gameData.drawTime = Date.now();
-                const drawSpeed = (Date.now() - gameData.drawTime) / 15;
+                const drawSpeed = (Date.now() - gameData.drawTime) / 14;
                 if (reverseSign === 1)
                 {
                     if (isArrowPressed.arrowUp === true && user.top > 0) 
@@ -422,6 +422,10 @@ export default function Pong (props :any){
 
                 if (ball.top <= 0 || ball.top >= canvas.height - ball.width)
                 {
+                    if (ball.top <= 0)
+                        ball.top = 0;
+                    else
+                        ball.top = canvas.height - ball.width;
                     ballVecXY.y = -ballVecXY.y;
                 }
 
@@ -467,68 +471,83 @@ export default function Pong (props :any){
                 else
                 {
                     if (
-                        user === player1 &&
                         ballVecXY.x < 0 &&
                         ball.left <= player1.left + player1.width &&
                         ball.left >= player1.left &&
                         ball.top + ball.width >= player1.top &&
                         ball.top <= player1.top + player1.height)
                     {
-                        let angle;
-
-                        ballVecXY.speed = 20 * viewportRatio.value;
-                        if (reverseSign === -1)
+                        if (user !== player1)
                         {
-                            angle = Math.random();
-                            angle = Math.random() > 0.5 ? angle : -angle;
-                            ballVecXY.speed = (Math.random() * 20 + 10) * viewportRatio.value;
+                            ballVecXY.x = 0;
+                            ballVecXY.y = 0;
                         }
                         else
-                            angle = (ball.top - (player1.top + (player1.height / 2)))/(player1.height / 2);
+                        {
+                            let angle;
+    
+                            ballVecXY.speed = 20 * viewportRatio.value;
+                            if (reverseSign === -1)
+                            {
+                                angle = Math.random();
+                                angle = Math.random() > 0.5 ? angle : -angle;
+                                ballVecXY.speed = (Math.random() * 20 + 10) * viewportRatio.value;
+                            }
+                            else
+                                angle = (ball.top - (player1.top + (player1.height / 2)))/(player1.height / 2);
+    
+                            ballVecXY.x = Math.cos(Math.PI/4 * angle);
+                            ballVecXY.x = ballVecXY.x > 0 ? ballVecXY.x : -ballVecXY.x;
+                            ballVecXY.y = Math.sin(Math.PI/4 * angle) * reverseSign;
+    
+    
 
-                        ballVecXY.x = Math.cos(Math.PI/4 * angle);
-                        ballVecXY.x = ballVecXY.x > 0 ? ballVecXY.x : -ballVecXY.x;
-                        ballVecXY.y = Math.sin(Math.PI/4 * angle) * reverseSign;
-
-                        socket.emit('game-ball-hit', {
-                            time: Date.now(),
-                            enemy: {left: user.left / viewportRatio.value, top: user.top / viewportRatio.value},
-                            ball: {left: ball.left / viewportRatio.value, top: ball.top / viewportRatio.value},
-                            ballVecXY: {x: ballVecXY.x, y:ballVecXY.y, speed: ballVecXY.speed / viewportRatio.value},
-                            score: {player1: scoreValue.player1, player2: scoreValue.player2}
-                        });
+                            socket.emit('game-ball-hit', {
+                                time: Date.now(),
+                                enemy: {left: user.left / viewportRatio.value, top: user.top / viewportRatio.value},
+                                ball: {left: ball.left / viewportRatio.value, top: ball.top / viewportRatio.value},
+                                ballVecXY: {x: ballVecXY.x, y:ballVecXY.y, speed: ballVecXY.speed / viewportRatio.value},
+                                score: {player1: scoreValue.player1, player2: scoreValue.player2}
+                            });
+                        }
                     }
                     else if (
-                        user === player2 &&
                         ballVecXY.x > 0 &&
                         ball.left + ball.width >= player2.left &&
                         ball.left + ball.width <= player2.left + player2.width &&
                         ball.top + ball.width >= player2.top &&
                         ball.top <= player2.top + player2.height)
                     {
-                        let angle;
-
-                        ballVecXY.speed = 20 * viewportRatio.value;
-                        if (reverseSign === -1)
+                        if (user !== player2)
                         {
-                            angle = Math.random();
-                            angle = Math.random() > 0.5 ? angle : -angle;
-                            ballVecXY.speed = (Math.random() * 20 + 10) * viewportRatio.value;
+                            ballVecXY.x = 0;
+                            ballVecXY.y = 0;
+                        } else {
+                            let angle;
+    
+                            ballVecXY.speed = 20 * viewportRatio.value;
+                            if (reverseSign === -1)
+                            {
+                                angle = Math.random();
+                                angle = Math.random() > 0.5 ? angle : -angle;
+                                ballVecXY.speed = (Math.random() * 20 + 10) * viewportRatio.value;
+                            }
+                            else
+                                angle = (ball.top - (player2.top + (player2.height / 2)))/(player2.height / 2);
+    
+                            ballVecXY.x = Math.cos(Math.PI/4 * angle);
+                            ballVecXY.x = ballVecXY.x > 0 ? -ballVecXY.x : ballVecXY.x;
+                            ballVecXY.y = Math.sin(Math.PI/4 * angle) * reverseSign;
+    
+
+                            socket.emit('game-ball-hit', {
+                                time: Date.now(),
+                                enemy: {left: user.left / viewportRatio.value, top: user.top / viewportRatio.value},
+                                ball: {left: ball.left / viewportRatio.value, top: ball.top / viewportRatio.value},
+                                ballVecXY: {x: ballVecXY.x, y:ballVecXY.y, speed: ballVecXY.speed/viewportRatio.value},
+                                score: {player1: scoreValue.player1, player2: scoreValue.player2}
+                            });
                         }
-                        else
-                            angle = (ball.top - (player2.top + (player2.height / 2)))/(player2.height / 2);
-
-                        ballVecXY.x = Math.cos(Math.PI/4 * angle);
-                        ballVecXY.x = ballVecXY.x > 0 ? -ballVecXY.x : ballVecXY.x;
-                        ballVecXY.y = Math.sin(Math.PI/4 * angle) * reverseSign;
-
-                        socket.emit('game-ball-hit', {
-                            time: Date.now(),
-                            enemy: {left: user.left / viewportRatio.value, top: user.top / viewportRatio.value},
-                            ball: {left: ball.left / viewportRatio.value, top: ball.top / viewportRatio.value},
-                            ballVecXY: {x: ballVecXY.x, y:ballVecXY.y, speed: ballVecXY.speed/viewportRatio.value},
-                            score: {player1: scoreValue.player1, player2: scoreValue.player2}
-                        });
                     }
                 }
                     gameData.drawTime = Date.now();
@@ -570,8 +589,8 @@ export default function Pong (props :any){
 
             const handleResize = () => {
 
-                let screenWidth = containerRef.current.offsetWidth;
-                let screenHeight = containerRef.current.offsetHeight * 0.5;
+                let screenWidth = containerRef.current.offsetWidth * 0.98;
+                let screenHeight = containerRef.current.offsetHeight * 0.59;
                 
                 let ratio;
                 let fixWidth;
