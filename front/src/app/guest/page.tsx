@@ -14,8 +14,6 @@ export default function Guest ({searchParams}:any) {
 
   let responseData;
 
-  console.log('in Guest - ', searchParams);
-
   async function GetGuest (id :number)
   {
     let access_token;
@@ -26,10 +24,7 @@ export default function Guest ({searchParams}:any) {
       userData = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}test/login`, {
         dummy_id: id
       });
-      console.log(' guest res - ', userData);
-
       access_token = userData.data.token.access_token;
-      console.log(' guest access token - ', access_token);
 
       if (access_token == undefined
         || access_token == null)
