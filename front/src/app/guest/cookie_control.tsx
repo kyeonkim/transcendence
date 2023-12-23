@@ -26,33 +26,22 @@ export default function CookieControl ({res}: {res: any}) {
 
     async function CookieSetter (access_token:any, refresh_token:any, nick_name:any, user_id:any)
     {
-        await axios.post(`${process.env.NEXT_PUBLIC_FRONT_URL}api/set_cookie`, {
-            access_token: access_token,
-            refresh_token: refresh_token,
-            nick_name: nick_name,
-            user_id: user_id
-        })
-        .then((res) => {
-            return (res);
-        })
-        .catch((err) => {
-            throw new Error ('Cookie set fail');
-        });
+        try {
+            res = await axios.post(`${process.env.NEXT_PUBLIC_FRONT_URL}api/set_cookie`, {
+                access_token: access_token,
+                refresh_token: refresh_token,
+                nick_name: nick_name,
+                user_id: user_id
+            })
+            router.replace('/main_frame');
+            return res;
+        } catch(err) {
+            router.replace("/");
+        };
     }
 
     useEffect(() => {
-        
-        try
-        {
             CookieSetter(access_token, refresh_token, nick_name, user_id);
-            
-            router.replace('/main_frame');
-
-        }
-        catch (error)
-        {
-            router.replace("/");
-        }
     }, []);
 
     return <Particles options={particlesOptions as ISourceOptions} init={particlesInit} />;
