@@ -12,11 +12,14 @@ services:
         NEXT_PUBLIC_FRONT_URL : $NEXT_PUBLIC_FRONT_URL
         NEXT_PUBLIC_API_URL : $NEXT_PUBLIC_API_URL
         NEXT_PUBLIC_WEBSOCKET_URL : $NEXT_PUBLIC_WEBSOCKET_URL
+        NEXT_PUBLIC_API_DIRECT_URL : $NEXT_PUBLIC_API_DIRECT_URL
+        NEXT_PUBLIC_GABIA_URL : $NEXT_PUBLIC_GABIA_URL
     image: front_server
     container_name: next_container
     volumes:
       - ./front/src:/app/front_server/src
     ports:
+      - "80:80"
       - "3000:3000"
     networks:
       - transcendence_net
