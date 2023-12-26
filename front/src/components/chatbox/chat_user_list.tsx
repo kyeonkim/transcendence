@@ -48,8 +48,11 @@ export default function UserList(props: any) {
 
 	}, []);
 
-	const handlePopup = (event: any, userData: any) => {
+	useEffect(() => {
+		setPop(false);
+	}, [list]);
 
+	const handlePopup = (event: any, userData: any) => {
 		if (anchorEl === event.currentTarget) {
 			setPop(!pop);
 		} else {

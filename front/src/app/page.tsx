@@ -8,7 +8,7 @@ import { useCallback, useEffect } from 'react';
 import particlesOptions from "./particles.json";
 
 import Particles, { initParticlesEngine } from "@tsparticles/react";
-import type { Container, Engine } from "@tsparticles/engine";
+import type { Container, Engine, ISourceOptions } from "@tsparticles/engine";
 import { loadSlim } from "@tsparticles/slim";
 import { Box, TextField } from '@mui/material';
 
@@ -34,6 +34,7 @@ const particlesLoaded = async (container: Container) => {
     window.location.href = process.env.NEXT_PUBLIC_REDIRECT_URL;
   };
   
+
   // const handleGuestLogin = (value :number) => {
   //   // console.log('handlerGusetLogin - ', value);
   //   router.push(`/guest?value=${value}`);
@@ -45,7 +46,7 @@ const particlesLoaded = async (container: Container) => {
 
   return (
     <Box sx={{ position: 'relative', height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-      {init && <Particles id="tsparticles" url="http://foo.bar/particles.json" particlesLoaded={particlesLoaded}/>}
+      {init && <Particles id="tsparticles" options={particlesOptions as ISourceOptions} particlesLoaded={particlesLoaded}/>}
       <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center' }}>
         {/* <Box sx={{ marginBottom: '16px' }}>
           <TextField
@@ -99,3 +100,4 @@ const particlesLoaded = async (container: Container) => {
     </Box>
   );
 }
+

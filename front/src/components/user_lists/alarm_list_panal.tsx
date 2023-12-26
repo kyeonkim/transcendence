@@ -53,8 +53,10 @@ export default function AlarmListPanal (props: any) {
           },
       })
       .then((response) => {
+        // console.log('remove event from database - res : ', response);
           if (response.status)
           {
+              // console.log('remove event from front state');
               alarmListRemover(alarm);
               alarmCountHandler(false);
           }
@@ -94,7 +96,9 @@ export default function AlarmListPanal (props: any) {
 
 
   const denyRequest = (alarm: any) => () => {
-    // console.log('remove event from database', alarm);
+
+    // console.log('deny request remove event from database', alarm);
+
       if (alarm.event_type === 'add_friend')
       {
           removeEventFromDatabase(alarm);

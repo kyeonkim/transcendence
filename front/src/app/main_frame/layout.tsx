@@ -9,7 +9,7 @@ import ChatBlock from '@/components/chatbox/chat_block';
 import particlesOptions from "../particles.json";
 
 import Particles, { initParticlesEngine } from "@tsparticles/react";
-import type { Container, Engine } from "@tsparticles/engine";
+import type { Container, Engine, ISourceOptions } from "@tsparticles/engine";
 import { loadSlim } from "@tsparticles/slim";
 
  
@@ -52,7 +52,7 @@ export default function MainFrameLayout({
   }, []);
 
   const particlesLoaded = async (container: Container) => {
-      console.log(container);
+      // console.log(container);
   };
   
   
@@ -93,7 +93,7 @@ export default function MainFrameLayout({
     <section>
       {!loading && (
         <div>
-          {init && <Particles id="tsparticles" url="http://foo.bar/particles.json" particlesLoaded={particlesLoaded}/>}
+          {init && <Particles id="tsparticles" options={particlesOptions as ISourceOptions} particlesLoaded={particlesLoaded}/>}
         </div>
       )}
       {loading && 
@@ -102,7 +102,7 @@ export default function MainFrameLayout({
             <UserDataContextProvider my_name={userData.nick_name} my_id={userData.user_id}>
             <MainBoxContextProvider>
             <StatusContextProvider>
-            {init && <Particles id="tsparticles" url="http://foo.bar/particles.json" particlesLoaded={particlesLoaded}/>}
+            {init && <Particles id="tsparticles" options={particlesOptions as ISourceOptions} particlesLoaded={particlesLoaded}/>}
                 <Grid container className={styles.leftBox}>
                   <MyProfile />
                   <SearchUser />

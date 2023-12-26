@@ -195,6 +195,7 @@ export class ChatController {
     {
         data.user_id = req.tokenuserdata.user_id;
         data.user_nickname = req.tokenuserdata.nick_name;
+        // console.log("AcceptInviteAcceptInviteAcceptInvite : ", data);
         return await this.ChatService.AcceptInvite(data);
     }
 

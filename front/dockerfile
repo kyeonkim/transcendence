@@ -4,10 +4,6 @@ WORKDIR /app/front_server
 
 COPY . /app/front_server/
 
-RUN npm i -g npm-check-updates
-
-RUN ncu -u
-
 RUN npm install
 
 ARG NEXT_PUBLIC_CLIENT_ID \
@@ -18,10 +14,10 @@ ARG NEXT_PUBLIC_CLIENT_ID \
     NEXT_PUBLIC_WEBSOCKET_URL \
     NEXT_PUBLIC_API_DIRECT_URL
 
-# RUN npm run build
+RUN npm run build
 
-# CMD ["npm", "run", "start"]
-CMD ["npm", "run", "dev"]
+CMD ["npm", "run", "start"]
+# CMD ["npm", "run", "dev"]
 # CMD ["tail", "-f", "/dev/null"]
 
 ######dumb-init 사용시

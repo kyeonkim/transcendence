@@ -13,7 +13,7 @@ import { useEffect, useState } from 'react';
 import particlesOptions from "../particles.json";
 
 import Particles, { initParticlesEngine } from "@tsparticles/react";
-import type { Container, Engine } from "@tsparticles/engine";
+import type { Container, Engine, ISourceOptions } from "@tsparticles/engine";
 import { loadSlim } from "@tsparticles/slim";
 
 export default function Signup (props:any) {
@@ -38,7 +38,7 @@ export default function Signup (props:any) {
     }, []);
 
     const particlesLoaded = async (container: Container) => {
-        console.log(container);
+        // console.log(container);
     };
 	const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
@@ -97,7 +97,7 @@ export default function Signup (props:any) {
 
 	return (
 		<div>
-			{init && <Particles id="tsparticles" url="http://foo.bar/particles.json" particlesLoaded={particlesLoaded}/>}
+			{init && <Particles id="tsparticles" options={particlesOptions as ISourceOptions} particlesLoaded={particlesLoaded}/>}
 			<Grid container className={styles.signupBox} justifyContent="center">
 				<Typography variant="h1" className={styles.signupTitle} style={{fontSize: '7vw'}}>
 					Wellcome!!

@@ -14,7 +14,7 @@ import { useCookies } from 'next-client-cookies';
 import { useCallback } from 'react';
 import particlesOptions from "../particles.json";
 import Particles, { initParticlesEngine } from "@tsparticles/react";
-import type { Container, Engine } from "@tsparticles/engine";
+import type { Container, Engine, ISourceOptions } from "@tsparticles/engine";
 import { loadSlim } from "@tsparticles/slim";
 
 const style: React.CSSProperties = {
@@ -89,11 +89,11 @@ export default function TwoFAPass ({res}: {res: any}) {
     router.push('/');
   };
   const particlesLoaded = async (container: Container) => {
-    console.log(container);
+    // console.log(container);
   };
   return (
     <div>
-      {init && <Particles id="tsparticles" url="http://foo.bar/particles.json" particlesLoaded={particlesLoaded}/>}
+      {init && <Particles id="tsparticles" options={particlesOptions as ISourceOptions} particlesLoaded={particlesLoaded}/>}
       <Modal
         open={open}
         onClose={onClose}

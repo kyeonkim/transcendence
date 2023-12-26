@@ -83,6 +83,7 @@ export default function AlarmInviteChat (
             },
         })
         .then((res :any) => {
+            // console.log('success acceptInviteChat', res);
             handleinvite(alarm);
         });
     }
@@ -91,10 +92,12 @@ export default function AlarmInviteChat (
     // }
 
     async function handleinvite(alarm :any) {
+        // console.log('in handleInvite - ', alarm);
         await axiosToken.post(`${process.env.NEXT_PUBLIC_API_URL}chat/acceptinvite`,
         {
             user_id : user_id,
             user_nickname: user_nickname,
+            from_nickname: alarm.from_nickname,
             room_id: alarm.chatroom_id,
             event_id: alarm.idx,
         },
@@ -114,6 +117,7 @@ export default function AlarmInviteChat (
             }
             else
             {
+                // console.log('success');
                 alarmReducer(alarm);
                 setChatBlockRenderMode('chatRoom');
                 setChatBlockTriggerRender(true);
