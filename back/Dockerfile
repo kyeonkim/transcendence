@@ -8,7 +8,11 @@ COPY . /app/transcendence_nest_server/
 
 WORKDIR /app/transcendence_nest_server
 
-RUN npm install
+RUN npm i -g npm-check-updates
+
+RUN ncu -u
+
+RUN npm install --legacy-peer-deps
 
 RUN npx prisma generate
 
