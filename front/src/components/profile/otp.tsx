@@ -19,8 +19,6 @@ const style: React.CSSProperties = {
   border: '2px solid #000',
   boxShadow: '24',
   backgroundColor: 'white',
-  // bgcolor: 'background.paper',
-  // p: 4,
 };
 
 const qrCodeStyle: React.CSSProperties = {

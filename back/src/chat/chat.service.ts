@@ -121,7 +121,7 @@ export class ChatService {
             return {status: false, message: 'fail to find room'};
         let isPassWord = chatroom.is_password;
         if (room.is_changePass)
-            isPassWord = room.password ? true : false;
+            isPassWord = room.password === '' ? false : true;
         const ChangeRoom = await this.prismaService.chatroom.update({
             where: {
                 idx: room.room_idx,

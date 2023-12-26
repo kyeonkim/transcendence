@@ -53,7 +53,7 @@ export default function Login ({searchParams}:any) {
 
     try
     {
-      userData = await axios.post(`http://127.0.0.1:3000/api/user_check`, {
+      userData = await axios.post(`${process.env.NEXT_PUBLIC_FRONT_URL}/api/user_check`, {
         access_token: data.access_token
       });
 

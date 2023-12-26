@@ -27,7 +27,7 @@ export default function FriendListPanel(props: any) {
 	
 	const [apiResponse, setApiResponse] = useState([]);
 
-	const [dmCountList, setDmCountList] = useState([]);
+	// const [dmCountList, setDmCountList] = useState([]);
 
 	const [loading, setloading] = useState(true);
 
@@ -37,9 +37,9 @@ export default function FriendListPanel(props: any) {
 	const { status, setStatus } = useStatusContext();
 	const { setMTBox } = useMainBoxContext();
 
-	const { dmOpenId, setDmOpenId, dmOpenNickname, handleDmAlarmCount, handleChatTarget, list, myId, tapref} = props;
+	const { dmOpenId, setDmOpenId, dmCountList, setDmCountList, dmOpenIdRef, dmOpenNickname, handleDmAlarmCount, handleChatTarget, list, tapref} = props;
 
-	const dmOpenIdRef = useRef(dmOpenId);
+	// const dmOpenIdRef = useRef(dmOpenId);
 	const dmCountListRef = useRef(dmCountList);
 
 	const cookies = useCookies();
@@ -70,8 +70,8 @@ export default function FriendListPanel(props: any) {
 		}
 		if (list) {
 
-			socket.emit('status', { user_id: myId, status: 'update' });
-			// socket.emit('status', { user_id: myId, status: status });
+			socket.emit('status', { user_id: user_id, status: 'update' });
+			// socket.emit('status', { user_id: user_id, status: status });
 
 			list.map((user :any) => {
 				const target = dmCountListRef.current.find((countList :any) => countList.id === user.followed_user_id) 
@@ -111,41 +111,41 @@ export default function FriendListPanel(props: any) {
 		setloading(false);
 	}, [apiResponse]);
 
-	useEffect(() => {
+	// useEffect(() => {
 
-		const dmAlarmListener = (data :any) => {
-			if (dmOpenIdRef.current === Number(data.from_id))
-				return ;
+	// 	const dmAlarmListener = (data :any) => {
+	// 		if (dmOpenIdRef.current === Number(data.from_id))
+	// 			return ;
 
-			const newDmCountList = dmCountListRef.current.map((countList :any) => {
+	// 		const newDmCountList = dmCountListRef.current.map((countList :any) => {
 				
-					if (countList.id === data.from_id)
-					{
-						const newCountList = {...countList}; 
-						handleDmAlarmCount(data.from_id, true);
+	// 				if (countList.id === data.from_id)
+	// 				{
+	// 					const newCountList = {...countList}; 
+	// 					handleDmAlarmCount(data.from_id, true);
 						
-						newCountList.count += 1;
+	// 					newCountList.count += 1;
 
-						return newCountList;
-					}
-					return countList;
-				})
+	// 					return newCountList;
+	// 				}
+	// 				return countList;
+	// 			})
 
-			setDmCountList(newDmCountList);
-		}
+	// 		setDmCountList(newDmCountList);
+	// 	}
 
-		socket.on('dm', dmAlarmListener);
+	// 	socket.on('dm', dmAlarmListener);
 
-		socket.emit('getdm', { user_id: Number(myId) });
+	// 	socket.emit('getdm', { user_id: Number(user_id) });
 
-		return () => {
-			socket.off('dm', dmAlarmListener);
-		}
-	}, [socket]);
+	// 	return () => {
+	// 		socket.off('dm', dmAlarmListener);
+	// 	}
+	// }, [socket]);
 
-	useEffect(() => {
-		dmOpenIdRef.current = dmOpenId;
-	}, [dmOpenId])
+	// useEffect(() => {
+	// 	dmOpenIdRef.current = dmOpenId;
+	// }, [dmOpenId])
 
 
 	useEffect(() => {
@@ -207,7 +207,7 @@ export default function FriendListPanel(props: any) {
 	const handleInviteGame = async (nick: any, name:any) => {
 
 		await axiosToken.post(`${process.env.NEXT_PUBLIC_API_URL}game/inviteroom`, {
-			user1_id: Number(myId),
+			user1_id: Number(user_id),
 			user1_nickname: nickname,
 			user2_id: Number(nick),
 			user2_nickname: name,

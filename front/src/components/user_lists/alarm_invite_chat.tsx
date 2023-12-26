@@ -33,11 +33,8 @@ const modalStyle = {
     position: 'absolute' as 'absolute',
     top: '50%',
     left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 400,
-    bgcolor: 'background.paper',
     border: '2px solid #000',
-    boxShadow: 24,
+    boxShadow: 30,
     p: 4,
     opacity: 0.5
 };
@@ -183,6 +180,7 @@ export default function AlarmInviteChat (
                         onClose={handleModalClose}
                         aria-labelledby="input-password"
                         aria-describedby="password-text-field"
+                        sx={modalStyle}
                     >
                         <Box sx={modalStyle}>
                             <Typography id="modal-modal-title">

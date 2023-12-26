@@ -244,7 +244,7 @@ export default function Chat(props: any) {
 							sx={{
 								position: 'absolute',
 								bottom: 20,
-								right: 70,
+								right: '15%',
 								width: '80%',
 
 							}}

@@ -33,7 +33,7 @@ export default function AlarmListPanal (props: any) {
   const alarmCountHandler = props.alarmCountHandler;
   const handleAlarmRerender = props.handleAlarmRerender;
   const handleDmAlarmCount = props.handleDmAlarmCount;
-  const setDm = props.setAlarmDM
+  // const setDm = props.setAlarmDM
   const { setMTBox } = useMainBoxContext();
   const { clicked } = useUserDataContext();
 
@@ -60,17 +60,22 @@ export default function AlarmListPanal (props: any) {
           }
       })
   };
-  useEffect(() => {
 
-		const dmAlarmListener = (data :any) => {
-			handleDmAlarmCount(data.from_id, true);
-		}
 
-		socket.on('dm', dmAlarmListener);
-		return () => {
-			socket.off('dm', dmAlarmListener);
-		}
-	}, [socket]);
+
+  // useEffect(() => {
+
+	// 	const dmAlarmListener = (data :any) => {
+	// 		handleDmAlarmCount(data.from_id, true);
+	// 	}
+
+	// 	socket.on('dm', dmAlarmListener);
+	// 	return () => {
+	// 		socket.off('dm', dmAlarmListener);
+	// 	}
+	// }, [socket]);
+
+
 
   useEffect(() => {
 
@@ -86,6 +91,7 @@ export default function AlarmListPanal (props: any) {
           socket.off(`render-friend`, handleRenderAlarmList);
       }
   }, [])
+
 
   const denyRequest = (alarm: any) => () => {
     console.log('remove event from database', alarm);

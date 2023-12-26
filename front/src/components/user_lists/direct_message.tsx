@@ -10,9 +10,9 @@ import List from '@mui/material/List'
 import Divider from '@mui/material/Divider';
 import TextField from '@mui/material/TextField';
 import Paper from '@mui/material/Paper';
-
+import CloseIcon from '@mui/icons-material/Close';
 import styles from './dm.module.css';
-
+import { IconButton, Toolbar } from "@mui/material";
 
 import { useChatSocket } from "../../app/main_frame/socket_provider";
 import { useUserDataContext } from '@/app/main_frame/user_data_context';
@@ -51,6 +51,10 @@ export default function DirectMessage( {dmAlarmCount, dmAlarmCountList, dmAlarmR
 			return true;
 	}
 	
+	const handleExit = () => {
+		handleChatTarget(dmOpenId, dmOpenNickname);
+	}
+
 	return (
 		<div>
 				<Popper open={handleOpen()}
@@ -63,9 +67,20 @@ export default function DirectMessage( {dmAlarmCount, dmAlarmCountList, dmAlarmR
 					}}
 					>
 					<AppBar position="static">
-						<Typography variant="h5" sx={{ flexGrow: 1, align: 'center', padding: '10px', fontSize: '1vw'}}>
-							{dmOpenNickname}
-						</Typography>
+						<Toolbar>
+							<Typography variant="h5" sx={{ flexGrow: 1, align: 'center', padding: '10px', fontSize: '1vw'}}>
+								{dmOpenNickname}
+							</Typography>
+							<IconButton
+								size="large"
+								edge="end"
+								color="inherit"
+								aria-label="close"
+								onClick={handleExit}	
+							>
+								<CloseIcon />
+							</IconButton>
+						</Toolbar>
 					</AppBar>
 					<Grid container component={Paper}>
 						<List className={styles.messageArea} ref={messageAreaRef}>

@@ -12,6 +12,7 @@ services:
         NEXT_PUBLIC_FRONT_URL : $NEXT_PUBLIC_FRONT_URL
         NEXT_PUBLIC_API_URL : $NEXT_PUBLIC_API_URL
         NEXT_PUBLIC_WEBSOCKET_URL : $NEXT_PUBLIC_WEBSOCKET_URL
+        NEXT_PUBLIC_API_DIRECT_URL : $NEXT_PUBLIC_API_DIRECT_URL
     image: front_server
     container_name: next_container
     volumes:
