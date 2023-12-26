@@ -104,7 +104,7 @@ export default function AlarmInviteChat (
             },
         })
         .then((res) => {
-            console.log('accept res===', res);
+            // console.log('accept res===', res);
             if (res.data.status === false)
             {
                 // console.log("in err");

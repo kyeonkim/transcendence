@@ -39,7 +39,7 @@ export default function MainFrameLayout({
   const socket = useChatSocket();
   const cookies = useCookies();
 
-  console.log('socket - ', socket);
+  // console.log('socket - ', socket);
   // 아마 undefined일 것으로 판단됨.
 
   const particlesInit = useCallback(async (engine: Engine) => {
@@ -57,7 +57,7 @@ export default function MainFrameLayout({
             },        
         }) 
         .then((res :any) => {
-            console.log(`====================\nchatsocket context - fetchi\n====================`,res);
+            // console.log(`====================\nchatsocket context - fetchi\n====================`,res);
             if (res.data.status === true)
             {
                 setUserData(res.data.userData);
@@ -73,7 +73,7 @@ export default function MainFrameLayout({
     if (Object.keys(userData).length !== 0)
     {
       // console.log('userData length - ', Object.keys(userData).length);
-      console.log('after userData', userData, loading);
+      // console.log('after userData', userData, loading);
       setLoading(true);
     }
   }, [userData])

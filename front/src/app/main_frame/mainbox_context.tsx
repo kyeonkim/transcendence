@@ -28,7 +28,7 @@ const MainBoxContextProvider = ({ children }: any) => {
 	const router = useRouter();
 
 	const setMTBox = (value: number, searchTarget?: string) => {
-		console.log('setMTBox called - value : ', value, ', target : ', searchTarget);
+		// console.log('setMTBox called - value : ', value, ', target : ', searchTarget);
 
 		setClick(value);
 

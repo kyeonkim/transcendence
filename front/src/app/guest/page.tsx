@@ -52,7 +52,7 @@ export default function Guest ({searchParams}:any) {
 			const response: any = await GetGuest(id);
 
 			responseData = response?.data;
-      console.log('guest before cookie - ', responseData);
+      // console.log('guest before cookie - ', responseData);
 
 			if (responseData == undefined)
 			{

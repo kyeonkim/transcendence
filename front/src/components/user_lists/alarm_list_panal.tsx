@@ -80,7 +80,7 @@ export default function AlarmListPanal (props: any) {
   useEffect(() => {
 
       const handleRenderAlarmList = (data: any) => {
-        console.log('render alarm list');
+        // console.log('render alarm list');
           handleAlarmRerender(data.data);
       };
 
@@ -94,7 +94,7 @@ export default function AlarmListPanal (props: any) {
 
 
   const denyRequest = (alarm: any) => () => {
-    console.log('remove event from database', alarm);
+    // console.log('remove event from database', alarm);
       if (alarm.event_type === 'add_friend')
       {
           removeEventFromDatabase(alarm);

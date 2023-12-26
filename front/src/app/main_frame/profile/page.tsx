@@ -36,7 +36,7 @@ const ProfilePage = () => {
   const searchParams = useSearchParams()
   const id = searchParams.get('id')
 
-  console.log('profilepage - ', id);
+  // console.log('profilepage - ', id);
 
   // useEffect(() => {
 
@@ -45,7 +45,7 @@ const ProfilePage = () => {
   useEffect(() => {
       if (id)
       {
-          console.log('setUserNickname - ', id);
+          // console.log('setUserNickname - ', id);
           setUserNickname(id);
       }
   }, [id]);
@@ -81,7 +81,7 @@ const ProfilePage = () => {
         params: { user1: user_id , user2: userNickname},
       })
       .then((res) => {
-        console.log('friend info', res);
+        // console.log('friend info', res);
         if (res.data.status)
           setIsFriend(true);
         else
@@ -103,7 +103,7 @@ const ProfilePage = () => {
     const renderProfile = (data :any) => {
       setRendering(data.data);
     }
-    console.log(`socket Effect : ${socket}`)
+    // console.log(`socket Effect : ${socket}`)
     if (socket)
   		socket.on(`render-profile`, renderProfile);
 	
@@ -224,7 +224,7 @@ const ProfilePage = () => {
   }
 
   const imageLoader = ( src : any) => {
-    console.log('image nickname - ', src);
+    // console.log('image nickname - ', src);
     return `${process.env.NEXT_PUBLIC_API_URL}user/getimg/nickname/${src}`
   }
 

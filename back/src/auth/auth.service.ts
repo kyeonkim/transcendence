@@ -76,7 +76,7 @@ export class AuthService {
 			const { data } = await firstValueFrom(this.httpService.request(getTokenConfig));
 			return Number(data.resource_owner_id);
 		} catch (error) {
-			console.error(`42인증 실페 ==================\n`,error); // error 처리 필요 - kyoenkim
+			console.error(`42인증 실페 ==================\n`,error);
 			return null;
 		}
 	}

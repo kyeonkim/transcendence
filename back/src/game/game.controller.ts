@@ -51,7 +51,7 @@ export class GameController {
     async LeaveRoom(@Req() req, @Body() data: leaveGameRoomDto)
     {
         data.user_id = req.tokenuserdata.user_id;
-        console.log(`leave room called ${req.tokenuserdata.user_id}`)
+        // console.log(`leave room called ${req.tokenuserdata.user_id}`)
         const room = await this.GameService.LeaveGameRoom(data.user_id);
         return room;
     }

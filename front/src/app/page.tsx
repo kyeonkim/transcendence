@@ -24,9 +24,9 @@ export default function Home() {
   };
   
   const handleGuestLogin = (value :number) => {
-    console.log('handlerGusetLogin - ', value);
+    // console.log('handlerGusetLogin - ', value);
     router.push(`/guest?value=${value}`);
-    console.log('router push has done');
+    // console.log('router push has done');
   };
 
   const handleSignUp = () => {

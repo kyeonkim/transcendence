@@ -210,7 +210,7 @@ export default function BasicTabs() {
 
 				});
 		  
-				console.log('newDmCountList - ', newDmCountList);
+				// console.log('newDmCountList - ', newDmCountList);
 				return newDmCountList;
 			  });
 		  
@@ -246,16 +246,16 @@ export default function BasicTabs() {
 
 
 	const handleChatTarget = (from_id :any, from_nickname: any) => {
-		console.log(from_id, from_nickname);
+		// console.log(from_id, from_nickname);
 		if (dmOpenId === from_id)
 		{
-			console.log("set dm out111===", );
+			// console.log("set dm out111===", );
 			setDmOpenId(-1);
 			setDmOpenNickname('');
 		}
 		else
 		{
-			console.log("set dm out222===", );
+			// console.log("set dm out222===", );
 			setDmOpenId(from_id);
 			setDmOpenNickname(from_nickname);
 			handleRenderDmBlock();

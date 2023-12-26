@@ -47,8 +47,8 @@ export default function FriendListPanel(props: any) {
 
 	useEffect(() => {
 		// 처음할 때 즉시 setStatus 들어가는 것을 방지하기 위함. 다른 확실한 조건이 있을까?
-		console.log('ready set');
-		console.log('socket in friend list panal\n', socket);
+		// console.log('ready set');
+		// console.log('socket in friend list panal\n', socket);
 		setReady(true);
 
 		return () => {
@@ -58,13 +58,13 @@ export default function FriendListPanel(props: any) {
 		
 
 	useEffect(() => {
-		console.log('friend list render - ', list);
-		console.log('status Context - ', status);
+		// console.log('friend list render - ', list);
+		// console.log('status Context - ', status);
 
 		if (ready === true)
 		{
 			if (list && JSON.stringify(list) === JSON.stringify(apiResponse)) {
-				console.log('friend list done');
+				// console.log('friend list done');
 				return;
 			}
 		}
@@ -95,13 +95,13 @@ export default function FriendListPanel(props: any) {
 				}
 			})
 
-			console.log('ready to update apiResponse');
+			// console.log('ready to update apiResponse');
 
 			setApiResponse(list);
 		}
 		else
 		{
-			console.log('did set loading has happened? - not in most case');
+			// console.log('did set loading has happened? - not in most case');
 			setloading(true);
 		}
 
