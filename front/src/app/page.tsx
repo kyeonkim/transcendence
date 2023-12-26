@@ -53,58 +53,37 @@ export default function Home() {
             sx={{ marginRight: '8px' }}
           />
         </Box> */}
+
         <Box sx={{ marginBottom: '16px' }}>
           <Button variant="contained" onClick={handleLogin} sx={{ marginRight: '8px' }}>
             Sign In
           </Button>
-          {/* <Button variant="contained" onClick={handleSignUp}>
-            Sign Up
-          </Button> */}
         </Box>
         {/* <Box sx={{ marginBottom: '16px' }}>
-          <Button variant="contained" onClick={() => handleGuestLogin(0)} sx={{ marginRight: '8px' }}>
-            Guest Login 0
-          </Button>
-        </Box> */}
-        <Box sx={{ marginBottom: '16px' }}>
           <Button variant="contained" onClick={() => handleGuestLogin(1)} sx={{ marginRight: '8px' }}>
             Guest Login 1
           </Button>
-          {/* <Button variant="contained" onClick={handleSignUp}>
-            Sign Up
-          </Button> */}
         </Box>
         <Box sx={{ marginBottom: '16px' }}>
           <Button variant="contained" onClick={() => handleGuestLogin(2)} sx={{ marginRight: '8px' }}>
             Guest Login 2
           </Button>
-          {/* <Button variant="contained" onClick={handleSignUp}>
-            Sign Up
-          </Button> */}
         </Box>
         <Box sx={{ marginBottom: '16px' }}>
           <Button variant="contained" onClick={() => handleGuestLogin(3)} sx={{ marginRight: '8px' }}>
             Guest Login 3
           </Button>
-          {/* <Button variant="contained" onClick={handleSignUp}>
-            Sign Up
-          </Button> */}
         </Box>
         <Box sx={{ marginBottom: '16px' }}>
           <Button variant="contained" onClick={() => handleGuestLogin(4)} sx={{ marginRight: '8px' }}>
             Guest Login 4
           </Button>
-          {/* <Button variant="contained" onClick={handleSignUp}>
-            Sign Up
-          </Button> */}
-        </Box>        <Box sx={{ marginBottom: '16px' }}>
+        </Box>
+        <Box sx={{ marginBottom: '16px' }}>
           <Button variant="contained" onClick={() => handleGuestLogin(5)} sx={{ marginRight: '8px' }}>
             Guest Login 5
           </Button>
-          {/* <Button variant="contained" onClick={handleSignUp}>
-            Sign Up
-          </Button> */}
-        </Box>
+        </Box> */}
       </Box>
     </Box>
   );
