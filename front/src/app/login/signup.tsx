@@ -2,18 +2,19 @@
 
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { Avatar, Button, Grid, Skeleton, TextField, Typography } from "@mui/material"
+import { Avatar, Button, Grid, TextField, Typography } from "@mui/material"
 import styles from './login.module.css'
 // import '@/util/loading.css';
 
 // tsparticles
-import type { Engine } from "tsparticles-engine";
-import { ISourceOptions } from "tsparticles-engine";
-import { use, useCallback, useEffect, useState } from 'react';
-import particlesOptions from "../particles.json";
-import { loadFull } from "tsparticles";
-import Particles from "react-tsparticles";
+ 
 
+import { useEffect, useState } from 'react';
+import particlesOptions from "../particles.json";
+
+import Particles, { initParticlesEngine } from "@tsparticles/react";
+import type { Container, Engine } from "@tsparticles/engine";
+import { loadSlim } from "@tsparticles/slim";
 
 export default function Signup (props:any) {
 	const [imageFile, setFile] = useState<File>();
@@ -25,10 +26,20 @@ export default function Signup (props:any) {
 	const router = useRouter();
 	const formData = new FormData();
 
-	const particlesInit = useCallback(async (engine: Engine) => {
-		await loadFull(engine);
-	}, []);
+	const [ init, setInit ] = useState(false);
 
+    // this should be run only once per application lifetime
+    useEffect(() => {
+        initParticlesEngine(async (engine) => {
+            await loadSlim(engine);
+        }).then(() => {
+            setInit(true);
+        });
+    }, []);
+
+    const particlesLoaded = async (container: Container) => {
+        console.log(container);
+    };
 	const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
 		if (file) {
@@ -86,7 +97,7 @@ export default function Signup (props:any) {
 
 	return (
 		<div>
-			<Particles options={particlesOptions as ISourceOptions} init={particlesInit} />
+			{init && <Particles id="tsparticles" url="http://foo.bar/particles.json" particlesLoaded={particlesLoaded}/>}
 			<Grid container className={styles.signupBox} justifyContent="center">
 				<Typography variant="h1" className={styles.signupTitle} style={{fontSize: '7vw'}}>
 					Wellcome!!

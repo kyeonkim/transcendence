@@ -9,12 +9,13 @@ import CookieControl from './cookie_control';
 import { useRouter } from 'next/navigation';
 import { axiosToken } from '@/util/token';
 import { useCookies } from 'next-client-cookies';
-import type { Engine } from "tsparticles-engine";
-import { ISourceOptions } from "tsparticles-engine";
+ 
+
 import { useCallback } from 'react';
 import particlesOptions from "../particles.json";
-import { loadFull } from "tsparticles";
-import Particles from "react-tsparticles";
+import Particles, { initParticlesEngine } from "@tsparticles/react";
+import type { Container, Engine } from "@tsparticles/engine";
+import { loadSlim } from "@tsparticles/slim";
 
 const style: React.CSSProperties = {
   position: 'absolute',
@@ -45,13 +46,17 @@ export default function TwoFAPass ({res}: {res: any}) {
   const [open, setOpen] = useState(true);
   const [responseData, setResponseData] = useState(null);
   const [render, setRender] = useState(false);
-
+  const [ init, setInit ] = useState(false);
   const router = useRouter();
   const cookies = useCookies();
 
-  const particlesInit = useCallback(async (engine: Engine) => {
-    await loadFull(engine);
-  }, []);
+  useEffect(() => {
+    initParticlesEngine(async (engine) => {
+        await loadSlim(engine);
+    }).then(() => {
+        setInit(true);
+    });
+}, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -83,10 +88,12 @@ export default function TwoFAPass ({res}: {res: any}) {
     setOpen(false);
     router.push('/');
   };
-
+  const particlesLoaded = async (container: Container) => {
+    console.log(container);
+  };
   return (
     <div>
-      <Particles options={particlesOptions as ISourceOptions} init={particlesInit} />
+      {init && <Particles id="tsparticles" url="http://foo.bar/particles.json" particlesLoaded={particlesLoaded}/>}
       <Modal
         open={open}
         onClose={onClose}

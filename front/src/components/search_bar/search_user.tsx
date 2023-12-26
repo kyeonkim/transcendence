@@ -10,7 +10,6 @@ import Skeleton from '@mui/material/Skeleton';
 import { styled } from '@mui/system';
 import { axiosToken } from '@/util/token';
 import { useCookies } from 'next-client-cookies';
-import { Background } from 'tsparticles-engine';
 import { Alert, AlertTitle, Grid, Stack, Typography } from '@mui/material';
 import styles from './search_bar.module.css';
 

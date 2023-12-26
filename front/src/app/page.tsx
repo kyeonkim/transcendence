@@ -2,39 +2,50 @@
 import React, { useState } from 'react'
 import Button from '@mui/material/Button';
 import { useRouter } from 'next/navigation'
-import type { Engine } from "tsparticles-engine";
-import { ISourceOptions } from "tsparticles-engine";
-import { useCallback } from 'react';
+ 
+
+import { useCallback, useEffect } from 'react';
 import particlesOptions from "./particles.json";
-import { loadFull } from "tsparticles";
-import Particles from "react-tsparticles";
+
+import Particles, { initParticlesEngine } from "@tsparticles/react";
+import type { Container, Engine } from "@tsparticles/engine";
+import { loadSlim } from "@tsparticles/slim";
 import { Box, TextField } from '@mui/material';
 
 export default function Home() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const router = useRouter();
+  const [ init, setInit ] = useState(false);
 
-  const particlesInit = useCallback(async (engine: Engine) => {
-    await loadFull(engine);
-  }, []);
+  useEffect(() => {
+    initParticlesEngine(async (engine) => {
+        await loadSlim(engine);
+    }).then(() => {
+        setInit(true);
+    });
+}, []);
+
+const particlesLoaded = async (container: Container) => {
+    console.log(container);
+};
 
   const handleLogin = () => {
     window.location.href = process.env.NEXT_PUBLIC_REDIRECT_URL;
   };
   
-  const handleGuestLogin = (value :number) => {
-    // console.log('handlerGusetLogin - ', value);
-    router.push(`/guest?value=${value}`);
-    // console.log('router push has done');
-  };
+  // const handleGuestLogin = (value :number) => {
+  //   // console.log('handlerGusetLogin - ', value);
+  //   router.push(`/guest?value=${value}`);
+  //   // console.log('router push has done');
+  // };
 
   const handleSignUp = () => {
   };
 
   return (
     <Box sx={{ position: 'relative', height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-      <Particles options={particlesOptions as ISourceOptions} init={particlesInit} />
+      {init && <Particles id="tsparticles" url="http://foo.bar/particles.json" particlesLoaded={particlesLoaded}/>}
       <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center' }}>
         {/* <Box sx={{ marginBottom: '16px' }}>
           <TextField

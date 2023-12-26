@@ -4,12 +4,14 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 // tsparticles
-import type { Engine } from "tsparticles-engine";
-import { ISourceOptions } from "tsparticles-engine";
+ 
+
 import { useCallback } from 'react';
 import particlesOptions from "../particles.json";
-import { loadFull } from "tsparticles";
-import Particles from "react-tsparticles";
+
+import Particles, { initParticlesEngine } from "@tsparticles/react";
+import type { Container, Engine } from "@tsparticles/engine";
+import { loadSlim } from "@tsparticles/slim";
 
 import axios from 'axios';
 
@@ -17,11 +19,10 @@ import axios from 'axios';
 export default function CookieControl ({res}: {res: any}) {
     const router = useRouter();
     const { status, twoFAPass, access_token, refresh_token, nick_name, user_id } = res;
+    const [ init, setInit ] = useState(false);
     // const { nick_name, user_id } = res.userdata;
 
-    const particlesInit = useCallback(async (engine: Engine) => {
-        await loadFull(engine);
-      }, []);
+
 
     async function CookieSetter (access_token:any, refresh_token:any, nick_name:any, user_id:any)
     {
@@ -54,5 +55,21 @@ export default function CookieControl ({res}: {res: any}) {
         }
     }, []);
 
-    return <Particles options={particlesOptions as ISourceOptions} init={particlesInit} />;
+    useEffect(() => {
+        initParticlesEngine(async (engine) => {
+            await loadSlim(engine);
+        }).then(() => {
+            setInit(true);
+        });
+    }, []);
+
+    const particlesLoaded = async (container: Container) => {
+        console.log(container);
+    };
+
+    return (
+        <>
+            {init && <Particles id="tsparticles" url="http://foo.bar/particles.json" particlesLoaded={particlesLoaded}/>}
+        </>
+    )
 }

@@ -7,10 +7,12 @@ import SearchUser from '@/components/search_bar/search_user';
 import UserLists from '@/components/user_lists/user_lists';
 import ChatBlock from '@/components/chatbox/chat_block';
 import particlesOptions from "../particles.json";
-import { loadFull } from "tsparticles";
-import Particles from "react-tsparticles";
-import { ISourceOptions } from "tsparticles-engine";
-import type { Engine } from "tsparticles-engine";
+
+import Particles, { initParticlesEngine } from "@tsparticles/react";
+import type { Container, Engine } from "@tsparticles/engine";
+import { loadSlim } from "@tsparticles/slim";
+
+ 
 import { Grid } from '@mui/material';
 
 import ChatSocket  from './socket_provider';
@@ -38,13 +40,21 @@ export default function MainFrameLayout({
   const [loading, setLoading] = useState(false);
   const socket = useChatSocket();
   const cookies = useCookies();
-
+  const [ init, setInit ] = useState(false);
   // console.log('socket - ', socket);
   // 아마 undefined일 것으로 판단됨.
-
-  const particlesInit = useCallback(async (engine: Engine) => {
-    await loadFull(engine);
+  useEffect(() => {
+    initParticlesEngine(async (engine) => {
+        await loadSlim(engine);
+    }).then(() => {
+        setInit(true);
+    });
   }, []);
+
+  const particlesLoaded = async (container: Container) => {
+      console.log(container);
+  };
+  
   
 
   useEffect(() => {
@@ -83,7 +93,7 @@ export default function MainFrameLayout({
     <section>
       {!loading && (
         <div>
-          <Particles options={particlesOptions as ISourceOptions} init={particlesInit} />
+          {init && <Particles id="tsparticles" url="http://foo.bar/particles.json" particlesLoaded={particlesLoaded}/>}
         </div>
       )}
       {loading && 
@@ -92,7 +102,7 @@ export default function MainFrameLayout({
             <UserDataContextProvider my_name={userData.nick_name} my_id={userData.user_id}>
             <MainBoxContextProvider>
             <StatusContextProvider>
-            <Particles options={particlesOptions as ISourceOptions} init={particlesInit} />
+            {init && <Particles id="tsparticles" url="http://foo.bar/particles.json" particlesLoaded={particlesLoaded}/>}
                 <Grid container className={styles.leftBox}>
                   <MyProfile />
                   <SearchUser />

@@ -79,7 +79,7 @@ export default function Login ({searchParams}:any) {
   if (code)
   {
     return (
-      <div>
+      <>
       {(async () => {
         try
         {
@@ -115,9 +115,7 @@ export default function Login ({searchParams}:any) {
           else
           {
             return (
-              <div>
-                  <Signup access_token={responseData?.access_token} />
-              </div>
+                <Signup access_token={responseData?.access_token} />
             );
   
           }
@@ -127,7 +125,7 @@ export default function Login ({searchParams}:any) {
           redirect ('/');
         }
         })()}
-      </div>   
+      </>   
     );
   }
   else
