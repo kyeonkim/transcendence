@@ -1,10 +1,8 @@
-import { Headers, Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Req, Query, UseGuards } from '@nestjs/common';
+import { Headers, Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Req, Query, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ChatService } from './chat.service';
 import { ChatRoomDto, InviteChatDto, JoinRoomDto, SetChatUserDto } from './dto/chat.dto';
 import { SocketGateway } from 'src/socket/socket.gateway';
-import { JwtService } from '@nestjs/jwt';
-import { eventDto } from 'src/event/dto/event.dto';
 import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('Chat API')

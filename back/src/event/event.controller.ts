@@ -1,8 +1,6 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Query, Req, Sse, UseGuards } from '@nestjs/common';
+import { Controller, Delete, Get, Param, ParseIntPipe, Req, Sse, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { Subject } from 'rxjs';
 import { EventService } from './event.service'
-import { eventDto } from './dto/event.dto';
 import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('Event API')
