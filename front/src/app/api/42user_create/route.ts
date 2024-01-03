@@ -5,7 +5,6 @@ import { cookies } from 'next/headers';
 import { permanentRedirect } from "next/navigation";
 
 import axios from 'axios';
-import https from 'https';
 
 
 export async function POST (request: NextRequest)
@@ -15,30 +14,19 @@ export async function POST (request: NextRequest)
 
     try
     {
-        console.log('user_create req ================\n', request);
         const   data = await request.json();
-        // console.log('user_create data=================\n', data);
-
-        // console.log('====nick_name====\n', data.nick_name);
-        // console.log('====password====\n', data.password);
-
-        response = await axios.post(process.env.NEXT_PUBLIC_API_DIRECT_URL + 'auth/signup', {
-            // access_token: data.access_token,
+        
+        console.log('42user_create', data);
+        response = await axios.post(process.env.NEXT_PUBLIC_API_DIRECT_URL + 'auth/42signup', {
+            access_token: data.access_token,
             nick_name: data.nick_name,
-            password: data.password
             // img_name: data.img_name
         });
-
-        console.log('after signup ======\n ', response);
 
     }
     catch (err: any)
     {
-        console.log('auth/signup error ==========IN\n');
-        console.log(err);
-        error_status = err?.response?.data?.status;
-
-        console.log('auth/signup error ==========\n', err);
+        error_status = err?.response.data.status;
 
         return (NextResponse.json({ error: 'api/user_create Error'}, { status: error_status}));
         // return;

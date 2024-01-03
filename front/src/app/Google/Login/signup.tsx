@@ -10,7 +10,7 @@ import styles from './login.module.css'
  
 
 import { useEffect, useState } from 'react';
-import particlesOptions from "../particles.json";
+import particlesOptions from "../../particles.json";
 
 import Particles, { initParticlesEngine } from "@tsparticles/react";
 import type { Container, Engine, ISourceOptions } from "@tsparticles/engine";
@@ -58,6 +58,7 @@ export default function Signup (props:any) {
 	}
 	
 	useEffect(() => {
+		console.log(props.access_token);
 		setToken(props.access_token);
 	}
 	, [props.access_token])
@@ -69,11 +70,13 @@ export default function Signup (props:any) {
 		if (imageFile) {
 			formData.append('file', imageFile);
 		}
-		await axios.post( `${process.env.NEXT_PUBLIC_FRONT_URL}api/user_create`, {
+		console.log('create', token, nickname);
+		await axios.post( `${process.env.NEXT_PUBLIC_FRONT_URL}api/42user_create`, {
 				access_token: token,
 				nick_name: nickname,
 			})
 			.then(async (response) => {
+				console.log('42signup res', response);
 				if(!response.data.status)
 				{
 					setLoading(false);

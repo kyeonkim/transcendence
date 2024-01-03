@@ -1,7 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsInt, IsOptional, IsString, Matches } from "class-validator";
 
-export class SignUpDto 
+export class FtSignUpDto 
 {
     @ApiProperty()
     @IsString()
@@ -11,6 +11,30 @@ export class SignUpDto
     @IsString()
     @Matches(/^[a-zA-Z0-9_]*$/, {message: `영문자와 숫자만 입력 가능합니다.`})
     nick_name: string;
+}
+
+// 구글, 일반 로그인 구현 필요 - kyeonkim
+export class SignUpDto 
+{
+    @ApiProperty()
+    @IsString()
+    @Matches(/^[a-zA-Z0-9_]*$/, {message: `영문자와 숫자만 입력 가능합니다.`})
+    nick_name: string;
+
+    @ApiProperty()
+    @IsString()
+    password: string;
+}
+
+export class LoginDto {
+    @ApiProperty()
+    @IsString()
+    @Matches(/^[a-zA-Z0-9_]*$/, {message: `영문자와 숫자만 입력 가능합니다.`})
+    nick_name: string;
+
+    @ApiProperty()
+    @IsString()
+    password: string;
 }
 
 export class TokenDto {
@@ -37,4 +61,10 @@ export class TwoFADTO {
     // @IsString()
     @IsOptional()
     code?: string;
+}
+
+export class GoogleLoginDto {
+    @ApiProperty()
+    @IsString()
+    code: string;
 }

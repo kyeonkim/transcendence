@@ -1,6 +1,8 @@
 -- CreateTable
 CREATE TABLE "User" (
-    "user_id" INTEGER NOT NULL,
+    "user_id" SERIAL NOT NULL,
+    "ft_id" INTEGER,
+    "password" TEXT,
     "nick_name" TEXT NOT NULL,
     "state" INTEGER NOT NULL DEFAULT 0,
     "img_name" TEXT DEFAULT 'default.png',
@@ -135,6 +137,9 @@ CREATE TABLE "Message" (
 
     CONSTRAINT "Message_pkey" PRIMARY KEY ("idx")
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_ft_id_key" ON "User"("ft_id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_nick_name_key" ON "User"("nick_name");

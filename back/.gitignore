@@ -37,3 +37,7 @@ lerna-debug.log*
 # storage
 /storage/*
 !/storage/default
+
+#certificates
+*.key
+*.crt

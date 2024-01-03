@@ -12,7 +12,10 @@ datasource db {
 }
 
 model User {
-  user_id     Int            @id
+  user_id     Int            @default(autoincrement()) @id
+  ft_id       Int?           @unique
+  google_id   String?        @unique
+  password    String?
   nick_name   String         @unique
   state       Int            @default(0)
   img_name    String?        @default("default.png")

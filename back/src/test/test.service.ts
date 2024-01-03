@@ -22,21 +22,6 @@ export class TestService {
         private readonly AuthService: AuthService,
     ) {}
 
-	async DummyLogin(dummy_id : number)
-	{
-        const userData = await this.prisma.user.findUnique({
-            where: {
-                user_id: dummy_id,
-            },
-        });
-        if (userData === null)
-            return {status: false, message: "dummy login fail"};
-            const tokenData = await this.AuthService.CreateToken(userData.user_id, userData.nick_name, !userData.twoFA);
-            const user = await this.UserService.GetUserDataById(userData.user_id);
-            return {status: true, twoFAPass: !(user.userdata.twoFA), userdata: user.userdata, token: tokenData};
-	}
-
-
     async DeleteUserByNickName(nickName: string)
     {
         const user = await this.prisma.user.findUnique({
@@ -133,93 +118,6 @@ export class TestService {
         return {status: true, message: "success", delete_user: user.nick_name};
     }
 
-    async CreateDummyUser()
-    {
-        for(let i = 0; i < 6; i++)
-        {
-            const user = await this.UserService.GetUserDataById(i);
-            if (user.status)
-                return {status: false, message: "이미 유저가 존재합니다."};
-            await this.UserService.CreateUser(i, `dummy${i}`);
-        }
-        for(let i = 0; i < 6; i++)
-        {
-            await this.SocialService.AcceptFriend({user_id: i,user_nickname: `dummy${i}`, friend_nickname: `min`});
-            for(let j = 0; j < 6; j++)
-            {
-                if (i != j)
-                    await this.SocialService.AcceptFriend({user_id: i,user_nickname: `dummy${i}`, friend_nickname: `dummy${j}`});
-            }
-        }
-    }
-
-    async DeleteDummyUser()
-    {
-
-        for(let i = 0; i < 50; i++)
-            await this.DeleteUserByNickName(`dummy${i}`);
-    }
-
-    // async CreateDummyGame()
-    // {
-    //     for(let i = 0; i < 95; i++)
-    //         await this.GameService.AddGameData({
-    //             rank: true,
-    //             user_id: 0,
-    //             enemy_id: 1,
-    //             my_score: i,
-    //             enemy_score: 95 - i
-    //         });
-    // }
-
-    async DeleteDummyGame()
-    {
-        try {
-            await this.prisma.game.deleteMany({
-                where: {
-                    user_id: 0,
-                },
-            });
-        }
-        catch(error) {
-            console.error("Delete DummyGame error: ", error);
-        }
-        return {status: true, message: "success"};
-    }
-
-    // async CreateDummyChat()
-    // {
-    //     for (let i = 0; i < 50; i++)
-    //         await this.chatService.CreateRoom({user_id: i, user_nickname: `dummy${i}`, chatroom_name: `dummy${i} room`, private: false});
-    // }
-
-    async DeleteDummyChat()
-    {
-        for(let i = 0; i < 50; i++)
-        {
-            await this.prisma.chatroom.deleteMany({
-                where: {
-                    owner_id: i,
-                },
-            });
-        }
-        
-    }
-
-    async CreateDummyMessage()
-    {
-        for (let i = 0 ; i < 50; ++i)
-        {
-            await this.prisma.message.create({
-                data: {
-                    from_id: 1,
-                    to_id: 2,
-                    content: `dummy${i} message`,
-                }
-            })
-        }
-    }
-    
     async SendMessageByID(user_id: number, target_id: number, message: string)
     {
         this.SocketService.SendDMTest(user_id, target_id, message);

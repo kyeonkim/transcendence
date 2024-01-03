@@ -25,12 +25,14 @@ export default function Login ({searchParams}:any) {
           code: code,
           client_id: process.env.NEXT_PUBLIC_CLIENT_ID,
           client_secret: process.env.NEXT_PUBLIC_CLIENT_SECRET,
-          redirect_uri: `${process.env.NEXT_PUBLIC_FRONT_URL}login`,
+          redirect_uri: `${process.env.NEXT_PUBLIC_FRONT_URL}42login`,
           grant_type: 'authorization_code'
         })
         
         responseDatabase = await CheckUserInDatabase(res.data);
+        console.log('in 424242424242424',responseDatabase);
       } catch(err: any){
+        console.log('in 4242442errrrrrrrrrrrrr', err);
         if (err.response)
         {
           return (err.response);
@@ -86,7 +88,7 @@ export default function Login ({searchParams}:any) {
           const response: any = await Auth42(code);
 
           responseData = response?.data;
-
+          console.log(responseData);
           if(responseData == undefined)
             redirect ('/');
           if (responseData?.refresh_token != undefined
@@ -99,7 +101,6 @@ export default function Login ({searchParams}:any) {
                   <TwoFAPass res={responseData}/>
                 </div>
                 )
-                // 자식 클라이언트 컴포넌트에서 6자리 숫자를 인풋받고 여기로 가져와서 2차인증 api 진행 후 cookie 생성
               }
               cookie_control = true;
           }
