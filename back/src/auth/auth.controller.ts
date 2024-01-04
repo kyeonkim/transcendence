@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Headers, Param, Post, Res, UseGuards, Req } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { FtSignUpDto, SignUpDto, TokenDto, TwoFADTO, LoginDto, GoogleLoginDto } from './dto/token.dto';
+import { TokenSignUpDto, SignUpDto, TokenDto, TwoFADTO, LoginDto } from './dto/token.dto';
 import { AuthService } from './auth.service';
 import { UserService } from 'src/user/user.service';
 import { Response } from 'express';
@@ -16,8 +16,8 @@ export class AuthController {
 
 	@ApiTags('User API')
 	@ApiOperation({summary: `42유저 생성 API`, description: `새로 생성된 42유저를 db에 저장한다.`})
-	@Post("42signup") //42signup 으로 바꿀 필요가 있어보임 > dto를 나눠서 받고 싶음 - kyeonkim
-	async FtSignUp(@Body() user : FtSignUpDto)
+	@Post("42signup")
+	async FtSignUp(@Body() user : TokenSignUpDto)
 	{
 		return await this.AuthService.FtSignUp(user);
 	}
@@ -36,15 +36,24 @@ export class AuthController {
 	{
 		return await this.AuthService.FtLogin(token);
 	}
+
+	@ApiTags('User API')
+	@ApiOperation({summary: `구글유저 생성 API`, description: `새로 생성된 구글유저를 db에 저장한다.`})
+	@Post("googlesignup")
+	async GoogleSignUp(@Body() user : TokenSignUpDto)
+	{
+		console.log("GoogleSignUp request : ", user);
+		return await this.AuthService.GoogleSignUp(user);
+	}
 	
 	@ApiOperation({summary: `구글 로그인 API`, description: `구글에서 발급 받은 토큰을 통해 해당 유저가 가입되어 있는지 확인한다.`})
 	@Post("googlelogin")
-	async GoogleLogin(@Body() data : GoogleLoginDto)
+	async GoogleLogin(@Body() data : TokenDto)
 	{
-		const rtn = await this.AuthService.GoogleLogin(data);
-		console.log(`google login rtn : `,rtn);
-		return rtn;
-		// return await this.AuthService.GoogleLogin(data);
+		// const rtn = await this.AuthService.GoogleLogin(data);
+		// console.log(`google login rtn : `,rtn);
+		// return rtn;
+		return await this.AuthService.GoogleLogin(data);
 	}
 
 	@ApiOperation({summary: `유저 확인 API`, description: `회원가입을 통해 해당 유저가 가입되어 있는지 확인한다.`})

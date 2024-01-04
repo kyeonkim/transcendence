@@ -10,8 +10,6 @@ import TwoFAPass from './twoFAPass';
 export default function GLogin ({searchParams}:any) {
 
   const code = searchParams.code;
-  
-  console.log('searchParams - ', searchParams);
 
   let responseData;
   let cookie_control = false;
@@ -21,23 +19,25 @@ export default function GLogin ({searchParams}:any) {
   async function AuthG (code :any) {
 
       let responseDatabase;
-
-      try {
-        const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}auth/googlelogin`, {
-          code: code
-        })
-        
-        // 백에서 코드를 가지고 토큰까지 받아준다? 
-        // responseDatabase = await CheckUserInDatabase(res.data);
-        
-        // console.log('Glogin res data ', res);
-        responseDatabase = res;
-
-         
-        // console.log('in 424242424242424',responseDatabase);
-        
-      } catch(err: any){
-        // console.log('in 4242442errrrrrrrrrrrrr', err);
+      
+      console.log('AuthG called');
+      const res = await axios.post('https://oauth2.googleapis.com/token', {},
+      {
+        params : {         
+          code: code,
+          client_id: process.env.NEXT_PUBLIC_GOOGLE_ID,
+          client_secret: process.env.NEXT_PUBLIC_GOOGLE_SECRET,
+          redirect_uri: process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URL,
+          grant_type: 'authorization_code',
+        }
+      }
+      )
+      .then(async (res: any) => {
+        // console.log('google access token =============== \n', res);
+        responseDatabase = await CheckUserInDatabase(res.data);
+      })
+      .catch((err: any) => {
+        console.log('in err===',res);
         if (err.response)
         {
           return (err.response);
@@ -46,42 +46,49 @@ export default function GLogin ({searchParams}:any) {
         {
           return (err.request);
         }
-      };
+      })
 
       return (responseDatabase);
   };
 
   
-  // async function CheckUserInDatabase (data:any)
-  // {
-  //   let code;
-  //   let status;
-  //   let userData;
+  async function CheckUserInDatabase (data:any)
+  {
+    let access_token;
+    let status;
+    let userData;
+    let newResponse;
 
-  //   try
-  //   {
-  //     userData = await axios.post(`${process.env.NEXT_PUBLIC_FRONT_URL}/api/user_check`, {
-  //       code: data.access_token
-  //     });
+    try
+    {
+      userData = await axios.post(`${process.env.NEXT_PUBLIC_FRONT_URL}/api/google_user_check`, {
+        access_token: data.access_token
+      });
 
-  //     code = userData.data.access_token;
-  //     status = userData.data.status;
+      // userData = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}auth/googlelogin`, {
+      //   access_token: data.access_token
+      // })
 
-  //     if (access_token == undefined
-  //       || code == null)
-  //       {
-  //         throw new Error ('to entrance');
-  //       }
+      // console.log('CheckUserInDatabase =======', userData);
+      
+      access_token = userData.data.access_token;
+      status = userData.data.status;
 
-  //   }
-  //   catch (error)
-  //   {
-  //       // async 안에서 redirect 하지 말아야하나?
-  //       redirect('/');
-  //   }
 
-  //   return (userData);
-  // }
+      if (access_token === undefined
+        || access_token === null)
+        {
+          throw new Error ('to entrance');
+        }
+
+    }
+    catch (error)
+    {
+        redirect('/');
+    }
+
+    return (userData);
+  }
 
   if (true || code)
   {
@@ -94,14 +101,14 @@ export default function GLogin ({searchParams}:any) {
 
           responseData = response?.data;
           console.log(responseData);
-          if(responseData == undefined)
+          if(responseData === undefined)
           {
             redirect ('/');
           }
-          if (responseData?.refresh_token != undefined
-            && responseData?.refresh_token != null)
+          if (responseData?.refresh_token !== undefined
+            && responseData?.refresh_token !== null)
           {
-              if (responseData?.twoFAPass == false)
+              if (responseData?.twoFAPass === false)
               {
                 return (
                   <div>
@@ -123,7 +130,7 @@ export default function GLogin ({searchParams}:any) {
           else
           {
             return (
-                <Signup code={responseData?.access_token} />
+                <Signup access_token={responseData?.access_token} />
             );
   
           }

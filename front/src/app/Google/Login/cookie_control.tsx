@@ -13,6 +13,8 @@ import Particles, { initParticlesEngine } from "@tsparticles/react";
 import type { Container, Engine, ISourceOptions } from "@tsparticles/engine";
 import { loadSlim } from "@tsparticles/slim";
 
+import { useCookies } from 'next-client-cookies'
+
 import axios from 'axios';
 
 
@@ -20,10 +22,12 @@ export default function CookieControl ({res}: {res: any}) {
     const router = useRouter();
     const { status, twoFAPass, access_token, refresh_token, nick_name, user_id } = res;
     const [ init, setInit ] = useState(false);
+
+    const cookies = useCookies();
     // const { nick_name, user_id } = res.userdata;
 
 
-
+    // cors test '*'
     async function CookieSetter (access_token:any, refresh_token:any, nick_name:any, user_id:any)
     {
         await axios.post(`${process.env.NEXT_PUBLIC_FRONT_URL}api/set_cookie`, {
@@ -33,10 +37,12 @@ export default function CookieControl ({res}: {res: any}) {
             user_id: user_id
         })
         .then((res) => {
+            console.log('cookie-control - res : ', res);
             return (res);
         })
         .catch((err) => {
-            throw new Error ('Cookie set fail');
+            console.log('cookie-control - err : ', err);
+            // throw new Error ('Cookie set fail');
         });
     }
 
@@ -44,7 +50,14 @@ export default function CookieControl ({res}: {res: any}) {
         
         try
         {
-            CookieSetter(access_token, refresh_token, nick_name, user_id);
+            
+            cookies.set('access_token', access_token);
+            cookies.set('refresh_token', refresh_token);
+            cookies.set('nick_name', nick_name);
+            cookies.set('user_id', user_id);
+
+
+            // CookieSetter(access_token, refresh_token, nick_name, user_id);
             
             router.replace('/main_frame');
 

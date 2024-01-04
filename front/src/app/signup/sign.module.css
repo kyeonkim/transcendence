@@ -50,8 +50,7 @@
 }
 
 .signupNickname {
-    text-align: center;
-    margin-top: 30vh;
+    margin-top: 40vh;
 }
 
 .signupPassword {
@@ -72,7 +71,7 @@
 }
 
 .signupContainer {
-    height: 100vh;
+    height: 90vh;
     display: flex;
     justify-content: center;
     align-items: center;

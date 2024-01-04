@@ -1,7 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsInt, IsOptional, IsString, Matches } from "class-validator";
 
-export class FtSignUpDto 
+export class TokenSignUpDto
 {
     @ApiProperty()
     @IsString()
@@ -61,10 +61,4 @@ export class TwoFADTO {
     // @IsString()
     @IsOptional()
     code?: string;
-}
-
-export class GoogleLoginDto {
-    @ApiProperty()
-    @IsString()
-    code: string;
 }

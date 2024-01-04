@@ -35,26 +35,14 @@ export default function Home() {
 
 
 const particlesLoaded = async (container: Container) => {
-    console.log(container);
 };
 
   const handleLogin = async () => {
-      let hashPassword = password;
-      
-      // let hashPassword;
-
-      // const salt = genSaltSync(10);
-      // hashPassword = hashSync(password, salt);
-
-      console.log('password - ', password);
-
-      // api 형태 확인 후 조정하기
       try
       {
           const response = await axios.post( `${process.env.NEXT_PUBLIC_API_DIRECT_URL}auth/login`, {  
 
             nick_name: username,
-            // password: hashPassword
             password: password
 
           });
@@ -67,8 +55,6 @@ const particlesLoaded = async (container: Container) => {
               return ;
           }
 
-          // response에서 access_token, refresh_token 수령하기
-          // 설정하기
           await axios.post(`${process.env.NEXT_PUBLIC_FRONT_URL}api/set_cookie`, {
                 access_token: response.data.token.access_token,
                 refresh_token: response.data.token.refresh_token,
@@ -111,7 +97,7 @@ const particlesLoaded = async (container: Container) => {
 
 
   return (
-  <Box sx={{ position: 'relative', height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+  <Box sx={{ position: 'relative', height: '90vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
     {init && <Particles id="tsparticles" options={particlesOptions as ISourceOptions} particlesLoaded={particlesLoaded}/>}
     <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center' }}>
       <Typography color="white" style={{ fontWeight: 'bold', fontSize: '5vw' }}>
@@ -173,14 +159,13 @@ const particlesLoaded = async (container: Container) => {
         </Box>
       </Box>
       <Box sx={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', width: '10vw', justifyContent: 'center'}}>
-        <Button variant="contained" onClick={handleSignUp} sx={{ marginBottom: '8px', width: '100%' }}>
-          회원 가입
+        <Button variant="contained" onClick={handle42Login} className={styles.button}>
+          <img src={`https://upload.wikimedia.org/wikipedia/commons/8/8d/42_Logo.svg`} alt="42 logo" className={styles.Logo42}/>
+          <span>42 로그인</span>
         </Button>
-        <Button variant="contained" onClick={handle42Login} sx={{ width: '100%' }}>
-          42 로그인
-        </Button>
-        <Button variant="contained" onClick={handleGLogin} sx={{ width: '100%' }}>
-          구글 로그인
+        <Button variant="contained" onClick={handleGLogin} className={styles.button}>
+          <img src={`https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg`} alt="google logo" className={styles.LogoGoogle}/>
+          <span>구글 로그인</span>
         </Button>
       </Box>
     </Box>

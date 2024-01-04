@@ -28,11 +28,9 @@ export default function Login ({searchParams}:any) {
           redirect_uri: `${process.env.NEXT_PUBLIC_FRONT_URL}42login`,
           grant_type: 'authorization_code'
         })
-        
         responseDatabase = await CheckUserInDatabase(res.data);
-        console.log('in 424242424242424',responseDatabase);
       } catch(err: any){
-        console.log('in 4242442errrrrrrrrrrrrr', err);
+
         if (err.response)
         {
           return (err.response);
@@ -62,8 +60,8 @@ export default function Login ({searchParams}:any) {
       access_token = userData.data.access_token;
       status = userData.data.status;
 
-      if (access_token == undefined
-        || access_token == null)
+      if (access_token === undefined
+        || access_token === null)
         {
           throw new Error ('to entrance');
         }
@@ -87,8 +85,13 @@ export default function Login ({searchParams}:any) {
         {
           const response: any = await Auth42(code);
 
+          if (response === null)
+            redirect ('/');
+
           responseData = response?.data;
-          console.log(responseData);
+
+          // console.log(responseData);
+
           if(responseData == undefined)
             redirect ('/');
           if (responseData?.refresh_token != undefined

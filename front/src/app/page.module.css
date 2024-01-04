@@ -3,3 +3,30 @@
 	flex-direction: column;
 	align-items: center;
 }
+
+.Logo42 {
+	width: 20px;
+    height: 20px;
+}
+
+.Logo42 + span {
+	flex: 1;
+	color: black;
+}
+.LogoGoogle {
+	width: 20px;
+    height: 20px;
+}
+
+.LogoGoogle + span {
+	flex: 1;
+	color: black;
+}
+
+.button {
+	display: flex;
+	align-items: center;
+	width: 100%;
+	margin-bottom: 8px;
+	background-color: white;
+}

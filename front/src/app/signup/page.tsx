@@ -17,6 +17,8 @@ import { loadSlim } from "@tsparticles/slim";
 
 import { genSaltSync, hashSync } from "bcrypt-ts";
 
+import { useCookies } from 'next-client-cookies';
+
 export default function Signup (props:any) {
 	const [imageFile, setFile] = useState<File>();
 	const [profileImage, setProfileImage] = useState<string | null>(null);
@@ -29,9 +31,10 @@ export default function Signup (props:any) {
 	const router = useRouter();
 	const formData = new FormData();
 
+	const cookies = useCookies();
+
 	const [ init, setInit ] = useState(false);
 
-    // this should be run only once per application lifetime
     useEffect(() => {
         initParticlesEngine(async (engine) => {
             await loadSlim(engine);
@@ -41,7 +44,7 @@ export default function Signup (props:any) {
     }, []);
 
     const particlesLoaded = async (container: Container) => {
-        // console.log(container);
+
     };
 
 	const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -57,31 +60,11 @@ export default function Signup (props:any) {
 		}
 	}
 
-	// const handleNicknameChange = (e: any) => {
-	// 	setNickname(e.target.value);
-	// }
-	
-	// const handlePasswordChange = (value :any) => {
-	// 	setError("");
-	// 	const regex = /^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[~!@#$%^&*]).{8,}$/;
-
-	// 	if (regex.test(value))
-	// 		setPassword(value);
-	// 	else
-	// 		setPassword("");
-	// }
-
-
 	useEffect(() => {
 		setToken(props.access_token);
 	}
 	, [props.access_token])
 
-
-    // password 같이 보내기
-        // back에서 password 조합 검사?
-    // api 바꾸기
-    // 
 	const handleEnter = async () => {
 		if (nickname === "")
 		{
@@ -95,15 +78,13 @@ export default function Signup (props:any) {
 		}
 
 		const regex = /^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[~!@#$%^&*]).{8,}$/;
-		console.log(password,regex.test(password));
-		if (!regex.test(password))
-		{
+
+		if (!regex.test(password)) {
 			setError("비밀번호를 규칙에 맞게 다시 입력해주세요")
 			return ;
 		}
         let hashPassword;
 
-		console.log(password)
         const salt = genSaltSync(10);
         hashPassword = hashSync(password, salt);
 
@@ -115,30 +96,46 @@ export default function Signup (props:any) {
 		if (imageFile) {
 			formData.append('file', imageFile);
 		}
-        
-		console.log('hashPassword - ', hashPassword);
 
-		await axios.post( `${process.env.NEXT_PUBLIC_FRONT_URL}api/user_create`, {
-				access_token: token,
-				nick_name: nickname,
-				password: hashPassword
-			})
-			.then(async (response) => {
-				if(!response.data.status)
+        await axios.post(process.env.NEXT_PUBLIC_API_DIRECT_URL + 'auth/signup', {
+            nick_name: nickname,
+            password: hashPassword
+        }).then(async (response:any) => {
+
+			if(!response.data.status) {
+				setLoading(false);
+				setError(response.data.message);
+			} else {
+				cookies.set('access_token', response.data.token.access_token);
+				cookies.set('refresh_token', response.data.token.refresh_token);
+				cookies.set('nick_name', response.data.nick_name);
+				cookies.set('user_id', response.data.user_id);
+
+				formData.append('access_token', response.data.token.access_token);
+
+				await axios.post( `${process.env.NEXT_PUBLIC_API_DIRECT_URL}user/upload`,
+				formData,
 				{
-					setLoading(false);
-					setError(response.data.message);
-				}
-				else {
-					formData.append('access_token', response.data.access_token);
-					await axios.post(`${process.env.NEXT_PUBLIC_FRONT_URL}api/send_image`, formData)
-					.then((res) => {
-						if(res.data.success)
-							router.replace('/main_frame');
-						else
-							window.alert('Image upload failed')
-						})
-			}})
+					headers: {
+						'Content-Type': 'multipart/form-data',
+						'Authorization': `Bearer ${response.data.token.access_token}`
+					},
+					params: {
+						nickname: nickname
+					}
+				}).then((res :any) => {					
+					if(res.data.status)
+						router.replace('/main_frame');
+					else
+					{
+						setLoading(false);
+						window.alert('Image upload failed');
+					}
+
+				}).catch((err:any) => {
+					// console.log('signup err');
+				})
+		}})
 	}
 
 	const imageLoader = ({ src }: any) => {
@@ -236,7 +233,7 @@ export default function Signup (props:any) {
 					<Grid item className={styles.signupPassword}>
 						<TextField
 							color={error ? "error" : "primary"}
-							id="outlined-password"
+							id="outlined-confirmPassword"
 							label="Confirm Password"
 							variant="outlined"
 							type="password"

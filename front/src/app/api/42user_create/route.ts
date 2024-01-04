@@ -16,7 +16,6 @@ export async function POST (request: NextRequest)
     {
         const   data = await request.json();
         
-        console.log('42user_create', data);
         response = await axios.post(process.env.NEXT_PUBLIC_API_DIRECT_URL + 'auth/42signup', {
             access_token: data.access_token,
             nick_name: data.nick_name,

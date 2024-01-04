@@ -38,7 +38,6 @@ export default function Signup (props:any) {
     }, []);
 
     const particlesLoaded = async (container: Container) => {
-        // console.log(container);
     };
 	const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
@@ -58,7 +57,6 @@ export default function Signup (props:any) {
 	}
 	
 	useEffect(() => {
-		console.log(props.access_token);
 		setToken(props.access_token);
 	}
 	, [props.access_token])
@@ -70,13 +68,11 @@ export default function Signup (props:any) {
 		if (imageFile) {
 			formData.append('file', imageFile);
 		}
-		console.log('create', token, nickname);
 		await axios.post( `${process.env.NEXT_PUBLIC_FRONT_URL}api/42user_create`, {
 				access_token: token,
 				nick_name: nickname,
 			})
 			.then(async (response) => {
-				console.log('42signup res', response);
 				if(!response.data.status)
 				{
 					setLoading(false);
@@ -84,14 +80,32 @@ export default function Signup (props:any) {
 				}
 				else {
 					formData.append('access_token', response.data.access_token);
-					await axios.post(`${process.env.NEXT_PUBLIC_FRONT_URL}api/send_image`, formData)
-					.then((res) => {
-						if(res.data.success)
+
+					await axios.post( `${process.env.NEXT_PUBLIC_API_DIRECT_URL}user/upload`,
+					formData,
+					{
+						headers: {
+
+							'Content-Type': 'multipart/form-data',
+							'Authorization': `Bearer ${response.data.access_token}`
+						},
+						params: {
+							nickname: nickname
+						}
+
+					}).then((res :any) => {
+						if(res.data.status)
 							router.replace('/main_frame');
 						else
-							window.alert('Image upload failed')
+						{
+							setLoading(false);
+							window.alert('Image upload failed');
+						}
+
+						}).catch((err:any) => {
+							// console.log('signup err');
 						})
-			}})
+				}})
 	}
 
 	const imageLoader = ({ src }: any) => {

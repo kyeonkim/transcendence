@@ -2,7 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
-import { FtSignUpDto, GoogleLoginDto, LoginDto, SignUpDto, TokenDto, TwoFADTO } from 'src/auth/dto/token.dto';
+import { TokenSignUpDto, LoginDto, SignUpDto, TokenDto, TwoFADTO } from 'src/auth/dto/token.dto';
 import { firstValueFrom } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
 import { TokenExpiredError } from 'jsonwebtoken';
@@ -87,7 +87,7 @@ export class AuthService {
 		try {
 			const authorizedId = await this.Auth42(token.access_token);
 			if (authorizedId === null)
-				return {status: false, access_token: token.access_token};
+				return {status: false, access_token: null};
 			const userData = await this.prisma.user.findUnique({
 				where: {
 				  ft_id: authorizedId,
@@ -99,7 +99,7 @@ export class AuthService {
 			return {status: true, twoFAPass: !(userData.twoFA), userdata: userData, token: tokenData};
 		} catch (error) {
 			console.error(error);
-			return {status: false, access_token: token.access_token};
+			return {status: false, access_token: null};
 		}
 	}
 
@@ -110,7 +110,7 @@ export class AuthService {
 				  nick_name: loginData.nick_name,
 				},
 			});
-			if (userData === null)
+			if (userData === null || userData.password === null)
 				return {status: false, message: "유저 찾기 실패"};
 			if (bcrypt.compareSync(loginData.password, userData.password) !== true)
 				return {status: false, message: "비밀번호가 틀렸습니다."};
@@ -122,7 +122,7 @@ export class AuthService {
 		}
 	}
 
-	async FtSignUp(userData : FtSignUpDto)
+	async FtSignUp(userData : TokenSignUpDto)
     {
 		if(userData.nick_name.length < 2 || userData.nick_name.length > 10)
 			return {status: false, message: "닉네임은 2글자 이상 10글자 이하로 입력해주세요."};
@@ -145,29 +145,6 @@ export class AuthService {
 		return {status: true,  message: "success", userdata: newUser, token: tokenData};
     }
 	
-    // async GoogleSignUp(userData : FtSignUpDto)
-    // {
-	// 	if(userData.nick_name.length < 2 || userData.nick_name.length > 10)
-	// 		return {status: false, message: "닉네임은 2글자 이상 10글자 이하로 입력해주세요."};
-	// 	const low_nickname = userData.nick_name.toLowerCase();
-	// 	if( low_nickname === "admin" || low_nickname === "administrator" || low_nickname === "root" || low_nickname === "system" ||
-	// 		low_nickname === "sys" || low_nickname === "test" || low_nickname === "guest" || low_nickname === "operator" ||
-	// 		low_nickname === "operator" || low_nickname === "user" || low_nickname === "super" || low_nickname === "default" )
-	// 		return {status: false, message: "사용할 수 없는 닉네임입니다."};
-	// 	const authorizedId = await this.Auth42(userData.access_token);
-	// 	if (authorizedId === null)
-	// 		return {status: false, access_token: userData.access_token};
-	// 	const newUser = await this.userService.CreateUser(userData.nick_name);
-    // 	if (newUser == null)
-	// 		return {status: false, message: "이미 사용 중인  이름입니다."};
-	// 	await this.prisma.user.update({
-	// 		where: { user_id: newUser.user_id },
-	// 		data: {ft_id: authorizedId}
-	// 	});
-	// 	const tokenData = await this.CreateToken(newUser.user_id, newUser.nick_name, !newUser.twoFA);
-	// 	return {status: true,  message: "success", userdata: newUser, token: tokenData};
-    // }
-
 	// 일반 로그인 구현 필요 - kyeonkim
     async SignUp(userData : SignUpDto){
 		if(userData.nick_name.length < 2 || userData.nick_name.length > 10)
@@ -192,48 +169,62 @@ export class AuthService {
 		return {status: true,  message: "success", userdata: newUser, token: tokenData};
 	}
 
-	async GoogleLogin(data : GoogleLoginDto) {
+	async GoogleLogin(data : TokenDto) {
 		try {
-			const authorized = await this.AuthGoogle(data.code);
-			console.log("GoogleLogin authorized : ", authorized);
-			if (authorized === null)
-				return {status: false, access_token: data.code};
-			return {status: true, access_token: authorized};
-		// 	if (authorizedId === null)
-		// 		return {status: false, access_token: token.access_token};
-		// 	const userData = await this.prisma.user.findUnique({
-		// 		where: {
-		// 		  ft_id: authorizedId,
-		// 		},
-		// 	});
-		// 	if (userData === null)
-		// 		return {status: false, access_token: token.access_token};
-		// 	const tokenData = await this.CreateToken(userData.user_id, userData.nick_name, !userData.twoFA);
-		// 	return {status: true, twoFAPass: !(userData.twoFA), userdata: userData, token: tokenData};
+			const authorizedId = await this.AuthGoogle(data.access_token);
+			console.log("GoogleLogin authorized : ", authorizedId);
+			if (authorizedId === null)
+				return {status: false, access_token: null};
+			const userData = await this.prisma.user.findUnique({
+				where: {
+					google_id: String(authorizedId),
+				},
+			});
+			if (userData === null)
+				return {status: false, access_token: data.access_token};
+			const tokenData = await this.CreateToken(userData.user_id, userData.nick_name, !userData.twoFA);
+			return {status: true, twoFAPass: !(userData.twoFA), userdata: userData, token: tokenData};
 		} catch (error) {
 			console.error(error);
-		// 	return {status: false, access_token: token.access_token};
+			return {status: false, access_token: null};
 		}
 	}
 
-	async AuthGoogle(code: string) {
+	async GoogleSignUp(userData : TokenSignUpDto)
+    {
+		if(userData.nick_name.length < 2 || userData.nick_name.length > 10)
+			return {status: false, message: "닉네임은 2글자 이상 10글자 이하로 입력해주세요."};
+		const low_nickname = userData.nick_name.toLowerCase();
+		if( low_nickname === "admin" || low_nickname === "administrator" || low_nickname === "root" || low_nickname === "system" ||
+			low_nickname === "sys" || low_nickname === "test" || low_nickname === "guest" || low_nickname === "operator" ||
+			low_nickname === "operator" || low_nickname === "user" || low_nickname === "super" || low_nickname === "default" )
+			return {status: false, message: "사용할 수 없는 닉네임입니다."};
+		const authorizedId = await this.AuthGoogle(userData.access_token);
+		if (authorizedId === null)
+			return {status: false, access_token: null};
+		const newUser = await this.userService.CreateUser(userData.nick_name);
+    	if (newUser == null)
+			return {status: false, message: "이미 사용 중인  이름입니다."};
+		await this.prisma.user.update({
+			where: { user_id: newUser.user_id },
+			data: {google_id: String(authorizedId)}
+		});
+		const tokenData = await this.CreateToken(newUser.user_id, newUser.nick_name, !newUser.twoFA);
+		return {status: true,  message: "success", userdata: newUser, token: tokenData};
+    }
+
+	async AuthGoogle(token: string) {
 		const getTokenConfig = {
-			url: '/token',
-			method: 'post',
-			baseURL : 'https://oauth2.googleapis.com/',
-			params: {
-				code: code,
-				client_id: process.env.NEXT_PUBLIC_GOOGLE_ID,
-				client_secret: process.env.NEXT_PUBLIC_GOOGLE_SECRET,
-				redirect_uri: process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URL,
-				grant_type: 'authorization_code',
-				scope: ["https://www.googleapis.com/auth/userinfo.email"]
+			url: '/oauth2/v2/userinfo',
+			method: 'get',
+			baseURL : 'https://www.googleapis.com/',
+			headers: {
+				Authorization: `Bearer ${token}`
 			}
 		};
 		try {
 			const { data } = await firstValueFrom(this.httpService.request(getTokenConfig));
-			console.log("AuthGoogle data: ", data);
-			return this.jwtService.decode(data.id_token).sub;
+			return data.id;
 		} catch (error) {
 			console.error(error);
 			return null;
