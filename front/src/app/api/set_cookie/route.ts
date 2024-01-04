@@ -37,14 +37,20 @@ export const OPTIONS = async (request: NextRequest) => {
     );
 };
 
-export async function POST (request: NextRequest)
-{
+
+export async function POST(request: Request){
     let data = await request.json();
     let access_token = data.access_token;
     let refresh_token = data.refresh_token;
     let nick_name = data.nick_name;
     let user_id = data.user_id;
 
+    const corsHeaders = {
+        'Access-Control-Allow-Origin': 'http://localhost:3000',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        'Access-Control-Allow-Credentials': 'true'
+      }
 
     if (access_token != undefined && refresh_token != undefined
         && access_token != null && refresh_token != null)
@@ -53,23 +59,23 @@ export async function POST (request: NextRequest)
         cookieBox.set('access_token', access_token, {
             path: '/',
             maxAge: 600 * 60 * 3,
-            // httpOnly: true,
+
         });
         cookieBox.set('refresh_token', refresh_token, {
             path: '/',
             maxAge: 600 * 60 * 3,
-            // httpOnly: true,
+
         });
         if (nick_name && user_id) {
             cookieBox.set('nick_name', nick_name, {
                 path: '/',
                 maxAge: 600 * 60 * 3,
-                // httpOnly: true,
+
             });
             cookieBox.set('user_id', user_id, {
                 path: '/',
                 maxAge: 600 * 60 * 3,
-                // httpOnly: true,
+
             });
         }
 

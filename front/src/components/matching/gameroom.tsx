@@ -50,7 +50,7 @@ export default function GameRoom(props: any) {
 		}
 		})
 		.then((res) => {
-			console.log('handle Exit done - ', res.data);
+			// console.log('handle Exit done - ', res.data);
 			if (res.data.status === true && render === 2)
 				setRender(0);
 		})

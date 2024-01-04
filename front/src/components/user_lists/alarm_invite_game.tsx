@@ -17,7 +17,7 @@ export default function AlarmInviteGame (props: any) {
 	const { setMTBox } = useMainBoxContext();
 
 	const acceptInviteGame = (alarm: any) => async () => {
-		console.log ('acceptInviteGame - ', alarm)
+		// console.log ('acceptInviteGame - ', alarm)
 		await axiosToken.patch(`${process.env.NEXT_PUBLIC_API_URL}game/joinroom`, {
 			user1_id: alarm.chatroom_id,
 			user1_nickname: alarm.from_nickname,

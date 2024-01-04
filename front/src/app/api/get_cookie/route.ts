@@ -84,3 +84,45 @@ export async function GET (request: NextRequest)
         }
     ));
 }
+// import { NextRequest, NextResponse } from "next/server";
+// import cors from 'cors';
+
+// export async function GET(request: NextRequest) {
+//   const corsMiddleware = cors();
+
+//   return new Promise((resolve, reject) => {
+//     corsMiddleware(request.nextRequest, request.nextResponse, (error) => {
+//       if (error) {
+//         return reject(error);
+//       }
+
+//       const cookieBox = cookies();
+//       const access_token = cookieBox.get('access_token');
+//       const refresh_token = cookieBox.get('refresh_token');
+//       const nick_name = cookieBox.get('nick_name');
+//       const user_id = cookieBox.get('user_id');
+
+//       if (user_id && nick_name && access_token && refresh_token) {
+//         return resolve(
+//           NextResponse.json({
+//             success: true,
+//             user_id: user_id,
+//             nick_name: nick_name,
+//             access_token: access_token,
+//             refresh_token: refresh_token
+//           }, {
+//             status: 200
+//           })
+//         );
+//       }
+
+//       return resolve(
+//         NextResponse.json({
+//           success: false
+//         }, {
+//           status: 500
+//         })
+//       );
+//     });
+//   });
+// }

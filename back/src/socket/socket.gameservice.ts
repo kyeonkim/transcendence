@@ -93,9 +93,9 @@ export class SocketGameService {
         room.user2_id = user2_id;
         this.gameRoomMap.set(user2_id, room);
         const rtn = this.server.to(String(user1_id)).emit(`render-gameroom`, {status: 'gameroom', room: this.gameRoomMap.get(user1_id)});
-        console.log(`${this.gameRoomMap.get(user1_id)} ${rtn}`)
+        // console.log(`${this.gameRoomMap.get(user1_id)} ${rtn}`)
         const rtn2 = this.server.to(String(user2_id)).emit(`render-gameroom`, {status: 'gameroom', room: this.gameRoomMap.get(user2_id)});
-        console.log(`${this.gameRoomMap.get(user1_id)} ${rtn2}`)
+        // console.log(`${this.gameRoomMap.get(user1_id)} ${rtn2}`)
         return {status: true, message: "게임방 참가 성공"};
     }
 
@@ -198,9 +198,9 @@ export class SocketGameService {
 
     CancelMatch(user_id: number)
     {
-        console.log("before CancelMatch : ", this.gameMatchQue);
+        // console.log("before CancelMatch : ", this.gameMatchQue);
         this.gameMatchQue = this.gameMatchQue.filter((id) => id !== user_id);
-        console.log(`after CancelMatch : ${this.gameMatchQue}`);
+        // console.log(`after CancelMatch : ${this.gameMatchQue}`);
         return {status: true, message: "매칭 취소 완료", data: user_id}
     }
 
@@ -221,7 +221,7 @@ export class SocketGameService {
         // 객체 삭제
         this.InGame.delete(user1_id);
         this.InGame.delete(user2_id);
-        console.log("ExitGame : ", room.rank);
+        // console.log("ExitGame : ", room.rank);
         if (room.rank === false)
             return {status: true, message: "게임 종료"};
         const user1 =   await this.prismaservice.user.findUnique({
@@ -312,7 +312,7 @@ export class SocketGameService {
             // room.rank = payload.rank;
             // if (room.rank === false)
             //     room.game_mode = payload.game_mode;
-            console.log(room);
+            // console.log(room);
             this.server.to(`game-${room.user1_id}`).emit(`game-init`, {room: room});
         }
     }

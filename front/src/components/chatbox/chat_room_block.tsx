@@ -100,7 +100,7 @@ export default function ChatRoomBlock({room, roomidx,openModal, setOpenModal, se
                 aria-labelledby="input-password"
                 aria-describedby="password-text-field"
                 BackdropProps={{
-                    invisible: true,
+                    invisible: false,
                   }}
             >
                 <Box sx={modalStyle}>

@@ -44,7 +44,11 @@ export class JoinRoomDto
     @ApiProperty()
     @IsString()
     user_nickname: string;
-    
+
+    @ApiProperty()
+    @IsString()
+    @IsOptional()
+    from_nickname?: string;
 
     @ApiProperty()
     @IsInt()

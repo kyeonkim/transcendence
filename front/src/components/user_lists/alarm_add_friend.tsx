@@ -29,7 +29,7 @@ export default function AlarmAddFriend ( {alarm, alarmReducer, handleProfile, im
 
     const acceptFriendRequest = (alarm: any) => async () => {
 
-        console.log ('acceptFriendAddRequest - ', alarm)
+        // console.log ('acceptFriendAddRequest - ', alarm)
         await axiosToken.post(`${process.env.NEXT_PUBLIC_API_URL}social/acceptfriend`,
         {
           event_id: alarm.idx,

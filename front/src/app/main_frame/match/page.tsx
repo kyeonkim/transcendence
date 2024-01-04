@@ -36,7 +36,7 @@ export default function Matching(props: any) {
 
 		const fetchData = async () => {
 
-            console.log('matching - fetch data called');
+            // console.log('matching - fetch data called');
 
 			await axiosToken.post(`${process.env.NEXT_PUBLIC_API_URL}game/checkroom`, {
 				user1_id: user_id,
@@ -54,7 +54,7 @@ export default function Matching(props: any) {
 		
 		//setIsMode와 gameRoom의 setMod의 차이점 질문하기
         const listenRenderGameRoom = (data :any) => {
-            console.log('mode check', data);
+            // console.log('mode check', data);
 			setData(data);
         }
 
@@ -63,7 +63,7 @@ export default function Matching(props: any) {
 		fetchData();
 
         return () => {
-            console.log('matchinglist unmounting');
+            // console.log('matchinglist unmounting');
             socket.off('render-gameroom', listenRenderGameRoom);
 			socket.emit('game-cancelmatch');
         }

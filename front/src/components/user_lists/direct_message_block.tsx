@@ -197,7 +197,7 @@ export default function DmMessageBlock({dmOpenId, dmOpenNickname, messageAreaRef
 
     useEffect(() => {
         const getMoreDm = async () => {
-            console.log('lastIdx - ',lastIdx);
+            // console.log('lastIdx - ',lastIdx);
 
             if (lastIdx === 1)
                 return ;
@@ -218,14 +218,14 @@ export default function DmMessageBlock({dmOpenId, dmOpenNickname, messageAreaRef
     
                 if (res.data.status === true)
                 {
-                    console.log ('ready to get more!!!', res.data);
+                    // console.log ('ready to get more!!!', res.data);
                     if (res.data.dm.length !== 0)
                     {   
                         // 가져온 리스트 임시 저장
                         // 현재 리스트 복사 보관
                         // 빈 현재 리스트에 가져온 리스트 저장
                         // 보관된 리스트를 현재 리스트에 추가
-                        console.log('getting!!!!');
+                        // console.log('getting!!!!');
 
                         setLastIdx(res.data.dm[res.data.dm.length - 1].idx);
                         

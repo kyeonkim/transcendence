@@ -25,12 +25,12 @@ export default function Login ({searchParams}:any) {
           code: code,
           client_id: process.env.NEXT_PUBLIC_CLIENT_ID,
           client_secret: process.env.NEXT_PUBLIC_CLIENT_SECRET,
-          redirect_uri: `${process.env.NEXT_PUBLIC_FRONT_URL}login`,
+          redirect_uri: `${process.env.NEXT_PUBLIC_FRONT_URL}42login`,
           grant_type: 'authorization_code'
         })
-        
         responseDatabase = await CheckUserInDatabase(res.data);
       } catch(err: any){
+
         if (err.response)
         {
           return (err.response);
@@ -53,15 +53,15 @@ export default function Login ({searchParams}:any) {
 
     try
     {
-      userData = await axios.post(`http://127.0.0.1:3000/api/user_check`, {
+      userData = await axios.post(`${process.env.NEXT_PUBLIC_FRONT_URL}/api/user_check`, {
         access_token: data.access_token
       });
 
       access_token = userData.data.access_token;
       status = userData.data.status;
 
-      if (access_token == undefined
-        || access_token == null)
+      if (access_token === undefined
+        || access_token === null)
         {
           throw new Error ('to entrance');
         }
@@ -79,13 +79,18 @@ export default function Login ({searchParams}:any) {
   if (code)
   {
     return (
-      <div>
+      <>
       {(async () => {
         try
         {
           const response: any = await Auth42(code);
 
+          if (response === null)
+            redirect ('/');
+
           responseData = response?.data;
+
+          // console.log(responseData);
 
           if(responseData == undefined)
             redirect ('/');
@@ -99,7 +104,6 @@ export default function Login ({searchParams}:any) {
                   <TwoFAPass res={responseData}/>
                 </div>
                 )
-                // 자식 클라이언트 컴포넌트에서 6자리 숫자를 인풋받고 여기로 가져와서 2차인증 api 진행 후 cookie 생성
               }
               cookie_control = true;
           }
@@ -115,9 +119,7 @@ export default function Login ({searchParams}:any) {
           else
           {
             return (
-              <div>
-                  <Signup access_token={responseData?.access_token} />
-              </div>
+                <Signup access_token={responseData?.access_token} />
             );
   
           }
@@ -127,7 +129,7 @@ export default function Login ({searchParams}:any) {
           redirect ('/');
         }
         })()}
-      </div>   
+      </>   
     );
   }
   else

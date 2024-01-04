@@ -7,10 +7,10 @@
 // import Mainbox from '@/components/mainbox/mainbox';
 // import ChatBlock from '@/components/chatbox/chat_block';
 // import particlesOptions from "../particles.json";
-// import { loadFull } from "tsparticles";
-// import Particles from "react-tsparticles";
-// import { ISourceOptions } from "tsparticles-engine";
-// import type { Engine } from "tsparticles-engine";
+// 
+// import Particles, { initParticlesEngine } from "@tsparticles/react";
+// 
+//  
 // import { useChatSocket } from "../../app/main_frame/socket_provider"
 // import { Grid, Typography } from '@mui/material';
 
@@ -23,12 +23,12 @@
 //     <>
 //         {!socketReady && (
 //           <div>
-//             <Particles options={particlesOptions as ISourceOptions} init={particlesInit} />
+//             <Particles id="tsparticles" options={particlesOptions}/>
 //           </div>
 //         )}
 //         {socketReady && (
 //           <>
-//             <Particles options={particlesOptions as ISourceOptions} init={particlesInit} />
+//             <Particles id="tsparticles" options={particlesOptions}/>
 //             <Grid container className={styles.leftBox}>
 //               <MyProfile setMTbox={handleClick} profile={profile}/>
 //               <SearchUser setMTbox={handleClick}/>

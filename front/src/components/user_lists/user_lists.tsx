@@ -68,14 +68,22 @@ export default function BasicTabs() {
 	const [dmOpenNickname, setDmOpenNickname] = useState('');
 	const [dmAlarmList, setDmAlarmList] = useState([]);
 	const [render, setRender] = useState('');
-	const [isDm , setIsDm] = useState(false);
-	const cookies = useCookies();
-	const socket = useChatSocket();
+
 	const tabsRef = useRef(null);
 
+	const [dmCountList, setDmCountList] = useState([]);
+
+	const dmOpenIdRef = useRef(dmOpenId);
+	const dmCountListRef = useRef(dmCountList);
+
+	const cookies = useCookies();
+	const socket = useChatSocket();
 	const { handleRenderDmBlock } = useChatBlockContext();
 	const { user_id, nickname } = useUserDataContext();
 	const friendList = useFriendList(user_id);
+
+	let		getDmEmitted = false;
+
 	
 	const handleChange = (event: React.SyntheticEvent, newValue: number) => {
 		setValue(newValue);
@@ -99,31 +107,25 @@ export default function BasicTabs() {
 
 	const handleDmAlarmCount = (user_id :number, is_add :boolean) => {
 
-		if (is_add === true)
-		{
-			dmAlarmList.map((user :any) => {
-				if (user === user_id)
-				{
-					return ;
-				}
-			})
+		setDmAlarmList((prevDmAlarmList: any) => {
 
-			setDmAlarmList((prevDmAlarmList :any) => [...prevDmAlarmList, user_id]);
-		}
-		else
-		{
-			var tmp_list :any = [];
+			if (is_add === true)
+			{
 
-			dmAlarmList.map((user :any) => {
-				if (user !== user_id)
-				{
-					tmp_list.push(user_id);
-				}
-			})
+			  if (!prevDmAlarmList.includes(user_id))
+			  {
+				return [...prevDmAlarmList, user_id];
+			  }
 
-			setDmAlarmList(tmp_list);
-		}
-		setIsDm(false);
+			}
+			else
+			{
+			  return prevDmAlarmList.filter((user: any) => user !== user_id);
+			}
+		
+			return prevDmAlarmList;
+		  });
+
 	}
 
 	const setAlarmCountHandler = (increment :boolean) => {
@@ -136,10 +138,6 @@ export default function BasicTabs() {
 		}
 
 	};
-
-	const setAlarmDM = (val: boolean) => {
-		setIsDm(val);
-	}
 
 	const setAlarmListAdd = (alarm: any) => {
 		setAlarmList((prevalarmList :any) => 
@@ -190,6 +188,57 @@ export default function BasicTabs() {
 
 
 	useEffect(() => {
+
+		const dmAlarmListener = (data :any) => {
+
+			if (dmOpenIdRef.current === Number(data.from_id))
+				return ;
+
+			setDmCountList((prevDmCountList) => {
+				const newDmCountList = prevDmCountList.map((countList) => {
+					
+						if (countList.id === data.from_id)
+						{
+							const newCountList = {...countList}; 
+							handleDmAlarmCount(data.from_id, true);
+							
+							newCountList.count += 1;
+
+							return newCountList;
+						}
+						return countList;
+
+				});
+		  
+				// console.log('newDmCountList - ', newDmCountList);
+				return newDmCountList;
+			  });
+		  
+		};
+
+		socket.on('dm', dmAlarmListener);
+
+		if (getDmEmitted == false)
+		{
+			socket.emit('getdm', { user_id: Number(user_id) });
+			getDmEmitted = true;
+		}
+
+		return () => {
+			socket.off('dm', dmAlarmListener);
+		}
+	}, [socket, setDmCountList, setDmAlarmList]);
+
+
+	useEffect(() => {
+		dmOpenIdRef.current = dmOpenId;
+	}, [dmOpenId])
+
+	useEffect(() => {
+		dmCountListRef.current = dmCountList;
+	}, [dmCountList]);
+
+	useEffect(() => {
 		handleAlarmGetAgain();
 		fetchAlarms();
 		setValue(0);
@@ -197,15 +246,16 @@ export default function BasicTabs() {
 
 
 	const handleChatTarget = (from_id :any, from_nickname: any) => {
+		// console.log(from_id, from_nickname);
 		if (dmOpenId === from_id)
 		{
-			console.log("set dm out111===", );
+			// console.log("set dm out111===", );
 			setDmOpenId(-1);
 			setDmOpenNickname('');
 		}
 		else
 		{
-			console.log("set dm out222===", );
+			// console.log("set dm out222===", );
 			setDmOpenId(from_id);
 			setDmOpenNickname(from_nickname);
 			handleRenderDmBlock();
@@ -237,7 +287,7 @@ export default function BasicTabs() {
 				<Paper elevation={6}>
 				<Tabs value={value} ref={tabsRef} onChange={handleChange} centered aria-label="basic tabs example">
 					<Tab icon={
-						<Badge color="error" badgeContent={(isDm || dmAlarmList.length) ? "!" : 0}>
+						<Badge color="error" badgeContent={(dmAlarmList.length) ? "!" : 0}>
 						<GroupIcon sx={{}}/>
 						</Badge>
 						} {...a11yProps(0)} />
@@ -253,11 +303,14 @@ export default function BasicTabs() {
 				<FriendListPanel
 					dmOpenId={dmOpenId}
 					setDmOpenId={setDmOpenId}
+					dmCountList={dmCountList}
+					setDmCountList={setDmCountList}
+					dmOpenIdRef={dmOpenIdRef}
+					dmCountListRef={dmCountListRef}
 					dmOpenNickname={dmOpenNickname}
 					handleDmAlarmCount={handleDmAlarmCount}
 					handleChatTarget={handleChatTarget}
 					list={friendList}
-					myId={user_id}
 					tapref={tabsRef}
 				/>
 			</CustomTabPanel>
@@ -268,7 +321,7 @@ export default function BasicTabs() {
 					alarmCountHandler={setAlarmCountHandler}
 					handleDmAlarmCount={handleDmAlarmCount}
 					handleAlarmRerender={handleAlarmRerender}
-					setDm={setAlarmDM}
+					// setDm={setAlarmDM}
 				/>
 			</CustomTabPanel>
 		</Grid>

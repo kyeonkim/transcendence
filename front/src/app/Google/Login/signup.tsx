@@ -2,18 +2,14 @@
 
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { Avatar, Button, Grid, Skeleton, TextField, Typography } from "@mui/material"
+import { Avatar, Button, Grid, TextField, Typography } from "@mui/material"
 import styles from './login.module.css'
-// import '@/util/loading.css';
+import { useEffect, useState } from 'react';
+import particlesOptions from "../../particles.json";
 
-// tsparticles
-import type { Engine } from "tsparticles-engine";
-import { ISourceOptions } from "tsparticles-engine";
-import { use, useCallback, useEffect, useState } from 'react';
-import particlesOptions from "../particles.json";
-import { loadFull } from "tsparticles";
-import Particles from "react-tsparticles";
-
+import Particles, { initParticlesEngine } from "@tsparticles/react";
+import type { Container, Engine, ISourceOptions } from "@tsparticles/engine";
+import { loadSlim } from "@tsparticles/slim";
 
 export default function Signup (props:any) {
 	const [imageFile, setFile] = useState<File>();
@@ -25,10 +21,20 @@ export default function Signup (props:any) {
 	const router = useRouter();
 	const formData = new FormData();
 
-	const particlesInit = useCallback(async (engine: Engine) => {
-		await loadFull(engine);
-	}, []);
+	const [ init, setInit ] = useState(false);
 
+    // this should be run only once per application lifetime
+    useEffect(() => {
+        initParticlesEngine(async (engine: any) => {
+            await loadSlim(engine);
+        }).then(() => {
+            setInit(true);
+        });
+    }, []);
+
+    const particlesLoaded = async (container: Container) => {
+
+    };
 	const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
 		if (file) {
@@ -51,6 +57,8 @@ export default function Signup (props:any) {
 	}
 	, [props.access_token])
 
+
+
 	const handleEnter = async () => {
 		setError('');
 		setLoading(true);
@@ -58,25 +66,40 @@ export default function Signup (props:any) {
 		if (imageFile) {
 			formData.append('file', imageFile);
 		}
-		await axios.post( `${process.env.NEXT_PUBLIC_FRONT_URL}api/user_create`, {
+
+		await axios.post( `${process.env.NEXT_PUBLIC_API_URL}auth/googlesignup`, {
 				access_token: token,
 				nick_name: nickname,
 			})
 			.then(async (response) => {
-				if(!response.data.status)
-				{
+				if(!response.data.status) {
 					setLoading(false);
 					setError(response.data.message);
-				}
-				else {
-					formData.append('access_token', response.data.access_token);
-					await axios.post(`${process.env.NEXT_PUBLIC_FRONT_URL}api/send_image`, formData)
-					.then((res) => {
-						if(res.data.success)
+				} else {
+					formData.append('access_token', response.data.token.access_token);
+
+					await axios.post( `${process.env.NEXT_PUBLIC_API_DIRECT_URL}user/upload`,
+					formData,
+					{
+						headers: {
+							'Content-Type': 'multipart/form-data',
+							'Authorization': `Bearer ${response.data.token.access_token}`
+						},
+						params: {
+							nickname: nickname
+						}
+					}).then((res :any) => {					
+						if(res.data.status)
 							router.replace('/main_frame');
 						else
-							window.alert('Image upload failed')
-						})
+						{
+							setLoading(false);
+							window.alert('Image upload failed');
+						}
+
+					}).catch((err:any) => {
+						// console.log('signup err');
+					})
 			}})
 	}
 
@@ -86,7 +109,7 @@ export default function Signup (props:any) {
 
 	return (
 		<div>
-			<Particles options={particlesOptions as ISourceOptions} init={particlesInit} />
+			{init && <Particles id="tsparticles" options={particlesOptions as ISourceOptions} particlesLoaded={particlesLoaded}/>}
 			<Grid container className={styles.signupBox} justifyContent="center">
 				<Typography variant="h1" className={styles.signupTitle} style={{fontSize: '7vw'}}>
 					Wellcome!!

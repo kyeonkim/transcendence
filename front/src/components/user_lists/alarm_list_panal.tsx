@@ -33,7 +33,7 @@ export default function AlarmListPanal (props: any) {
   const alarmCountHandler = props.alarmCountHandler;
   const handleAlarmRerender = props.handleAlarmRerender;
   const handleDmAlarmCount = props.handleDmAlarmCount;
-  const setDm = props.setAlarmDM
+  // const setDm = props.setAlarmDM
   const { setMTBox } = useMainBoxContext();
   const { clicked } = useUserDataContext();
 
@@ -53,29 +53,36 @@ export default function AlarmListPanal (props: any) {
           },
       })
       .then((response) => {
+        // console.log('remove event from database - res : ', response);
           if (response.status)
           {
+              // console.log('remove event from front state');
               alarmListRemover(alarm);
               alarmCountHandler(false);
           }
       })
   };
-  useEffect(() => {
 
-		const dmAlarmListener = (data :any) => {
-			handleDmAlarmCount(data.from_id, true);
-		}
 
-		socket.on('dm', dmAlarmListener);
-		return () => {
-			socket.off('dm', dmAlarmListener);
-		}
-	}, [socket]);
+
+  // useEffect(() => {
+
+	// 	const dmAlarmListener = (data :any) => {
+	// 		handleDmAlarmCount(data.from_id, true);
+	// 	}
+
+	// 	socket.on('dm', dmAlarmListener);
+	// 	return () => {
+	// 		socket.off('dm', dmAlarmListener);
+	// 	}
+	// }, [socket]);
+
+
 
   useEffect(() => {
 
       const handleRenderAlarmList = (data: any) => {
-        console.log('render alarm list');
+        // console.log('render alarm list');
           handleAlarmRerender(data.data);
       };
 
@@ -87,8 +94,11 @@ export default function AlarmListPanal (props: any) {
       }
   }, [])
 
+
   const denyRequest = (alarm: any) => () => {
-    console.log('remove event from database', alarm);
+
+    // console.log('deny request remove event from database', alarm);
+
       if (alarm.event_type === 'add_friend')
       {
           removeEventFromDatabase(alarm);

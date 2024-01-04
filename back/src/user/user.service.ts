@@ -15,7 +15,7 @@ export class UserService {
         private readonly jwtService: JwtService,
         ) {}
 
-    async CreateUser(id: number, nickName: string)
+    async CreateUser(nickName: string)
     {
         const user = await this.prisma.user.findUnique({
             where: {
@@ -25,7 +25,6 @@ export class UserService {
             return null;
         const newUser = await this.prisma.user.create({
             data: {
-                user_id: id,
                 nick_name: nickName,
                 lower_nickname: nickName.toLowerCase(),
             },

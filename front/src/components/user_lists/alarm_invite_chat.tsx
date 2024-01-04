@@ -33,11 +33,8 @@ const modalStyle = {
     position: 'absolute' as 'absolute',
     top: '50%',
     left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 400,
-    bgcolor: 'background.paper',
     border: '2px solid #000',
-    boxShadow: 24,
+    boxShadow: 30,
     p: 4,
     opacity: 0.5
 };
@@ -86,6 +83,7 @@ export default function AlarmInviteChat (
             },
         })
         .then((res :any) => {
+            // console.log('success acceptInviteChat', res);
             handleinvite(alarm);
         });
     }
@@ -94,10 +92,12 @@ export default function AlarmInviteChat (
     // }
 
     async function handleinvite(alarm :any) {
+        // console.log('in handleInvite - ', alarm);
         await axiosToken.post(`${process.env.NEXT_PUBLIC_API_URL}chat/acceptinvite`,
         {
             user_id : user_id,
             user_nickname: user_nickname,
+            from_nickname: alarm.from_nickname,
             room_id: alarm.chatroom_id,
             event_id: alarm.idx,
         },
@@ -107,7 +107,7 @@ export default function AlarmInviteChat (
             },
         })
         .then((res) => {
-            console.log('accept res===', res);
+            // console.log('accept res===', res);
             if (res.data.status === false)
             {
                 // console.log("in err");
@@ -117,6 +117,7 @@ export default function AlarmInviteChat (
             }
             else
             {
+                // console.log('success');
                 alarmReducer(alarm);
                 setChatBlockRenderMode('chatRoom');
                 setChatBlockTriggerRender(true);
@@ -183,6 +184,7 @@ export default function AlarmInviteChat (
                         onClose={handleModalClose}
                         aria-labelledby="input-password"
                         aria-describedby="password-text-field"
+                        sx={modalStyle}
                     >
                         <Box sx={modalStyle}>
                             <Typography id="modal-modal-title">

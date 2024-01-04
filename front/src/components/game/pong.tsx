@@ -79,7 +79,7 @@ export default function Pong (props :any){
 
     const updateStatus = useCallback(
         (newStatus :string) => {
-            console.log('updateMyStatus - ', newStatus);
+            // console.log('updateMyStatus - ', newStatus);
             setStatus(newStatus);
         },
         [setStatus]
@@ -256,7 +256,7 @@ export default function Pong (props :any){
 
             const listenGameInit = (data :any) => {
                 gameData.startTime = Date.now();
-                console.log('game data==',data);
+                // console.log('game data==',data);
                 
                 if (data.room.user1_id === user_id)
                 {
@@ -278,16 +278,16 @@ export default function Pong (props :any){
             setReadyResize(true);
 
             socket.on(`game-init`, listenGameInit);
-            console.log('game-mode : ', data.room.game_mode);
+            // console.log('game-mode : ', data.room.game_mode);
             socket.emit(`game-start`, {user_id: user_id, user_nickname: nickname, game_mode: data.room.game_mode});
 
             document.addEventListener('visibilitychange', () => {
                 if (document.hidden) {
-                    console.log('pong unmount');
+                    // console.log('pong unmount');
                     socket.emit('game-force-end');
                     // updateStatus('online');
                 } else {
-                  console.log("re on")
+                //   console.log("re on")
                 }
               });
 
@@ -348,10 +348,10 @@ export default function Pong (props :any){
         if (initGame === true)
         {
             const listenGameEnd = (data :any) => {
-                console.log ('pong listener end ');
+                // console.log ('pong listener end ');
                 cancelAnimationFrame(lastRequestId);
 
-                console.log(`unmount`, canvas);
+                // console.log(`unmount`, canvas);
                 setEndData(data.gameData);
                 setGameEnd(true);
                 updateStatus('online');
@@ -563,10 +563,10 @@ export default function Pong (props :any){
             return () => {  
                 // window.removeEventListener('popstate', eventPopState);
                 clearTimeout(id);
-                console.log('pong component unmount');
+                // console.log('pong component unmount');
                 socket.off('game-end', listenGameEnd);
                 cancelAnimationFrame(lastRequestId);
-                console.log(`unmount`, canvas);
+                // console.log(`unmount`, canvas);
                 canvas.dispose();
                 updateStatus('online');
                 setGameState(false);

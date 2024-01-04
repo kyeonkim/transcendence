@@ -55,7 +55,7 @@ export default function Chat(props: any) {
 		};
 
 		const doRenderChatRooms = (data :any) => {
-			console.log("get socket", data);
+			// console.log("get socket", data);
 			if (data.data.idx === roominfo.idx) {
 				if (data.data.name)
 					setChatname(data.data.name);
@@ -244,7 +244,7 @@ export default function Chat(props: any) {
 							sx={{
 								position: 'absolute',
 								bottom: 20,
-								right: 70,
+								right: '15%',
 								width: '80%',
 
 							}}

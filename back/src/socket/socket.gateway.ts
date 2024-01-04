@@ -35,7 +35,7 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
     //토큰인증로직 
     //if 토큰인증 실패 >> disconnect
     try {
-      console.log("handleConnection: ", client.handshake.query.user_id);
+      // console.log("handleConnection: ", client.handshake.query.user_id);
       if (client.handshake.query.user_id == 'undefined' || client.handshake.query.user_id == undefined)
           throw new Error("user_id is undefined");
       const token = client.handshake.query.token;
@@ -57,7 +57,7 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
   }
 
   async handleDisconnect(client: Socket) {
-    console.log("handleDisconnect: ", client.handshake.query.user_id);
+    // console.log("handleDisconnect: ", client.handshake.query.user_id);
     if (client.handshake.query.user_id !== undefined)
     {
       this.server.to(`status-${client.handshake.query.user_id}`).emit(`status`, {user_id: client.handshake.query.user_id, status: 'offline'});
@@ -174,7 +174,7 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
   @SubscribeMessage('game-force-end')
   async GameForceEnd(Client: Socket)
   {
-    console.log("GameForceEndGameForceEnd : ", Client.handshake.query.user_id);
+    // console.log("GameForceEndGameForceEnd : ", Client.handshake.query.user_id);
     await this.SocketGameService.ForceGameEnd(Number(Client.handshake.query.user_id));
   }
 

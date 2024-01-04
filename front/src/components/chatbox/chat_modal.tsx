@@ -22,14 +22,13 @@ export default function ChatModal({modalOpen, setModalOpen, modalCondition,
         my_id, my_name, roominfo, chatname, setChatname, roomMode, setRoomMode} :any) {
     
     const [inChatname, setInChatname] = useState('');
-    const [inPassword, setInPassword] = useState('');
-
+    const [inPassword, setInPassword] = useState<any>('');
     const [errShow, setErrShow] = useState(false);
     const [errMessage, setErrMessage] = useState('');
 
     const cookies = useCookies();
 
-
+        
     const handleCloseModal = () => {
         setModalOpen(false);
         setInChatname('');
@@ -50,11 +49,10 @@ export default function ChatModal({modalOpen, setModalOpen, modalCondition,
     const handleInChatname = (event :any) => {
 		    setInChatname(event.target.value as string);
     }
-  
+
     const handleDone = async () => {
         
         let hashRoomPassword;
-        
         if (inPassword !== '')
         {
             if (!/^[a-zA-Z0-9]+$/.test(inPassword)) {
@@ -73,7 +71,7 @@ export default function ChatModal({modalOpen, setModalOpen, modalCondition,
                 chatroom_name: inChatname? inChatname : chatname,
                 password: inPassword ? hashRoomPassword : '',
                 private: roomMode,
-                is_changePass : (inPassword == '') ? true : inPassword ? true : false
+                is_changePass : modalCondition === 'change password' ? true : false
             },
             {
                 headers: {
@@ -109,11 +107,6 @@ export default function ChatModal({modalOpen, setModalOpen, modalCondition,
         else
             setRoomMode(false);
     }
-
-    useEffect(() => {
-
-    }, [roomMode]);
- 
 
     return (
         <Modal

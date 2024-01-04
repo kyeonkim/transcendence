@@ -68,7 +68,7 @@ export function useFriendList(myId: any) {
   // 상대의 status를 받는다.
   const updateStatus = (userId: any, from_status: any) => {
 
-    console.log('updateOthersStatus - ', userId, from_status);
+    // console.log('updateOthersStatus - ', userId, from_status);
 
     if (from_status === 'update') {
       // 내 상태를 보낸다.

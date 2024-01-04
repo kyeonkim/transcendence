@@ -17,21 +17,8 @@ ARG NEXT_PUBLIC_CLIENT_ID \
     NEXT_PUBLIC_FRONT_URL_PORT
 
 
-RUN npm run build
+# RUN npm run build
 
-CMD ["npm", "run", "start"]
-# CMD ["npm", "run", "dev"]
+# CMD ["npm", "run", "start"]
+CMD ["npm", "run", "dev"]
 # CMD ["tail", "-f", "/dev/null"]
-
-######dumb-init 사용시
-
-# FROM node:latest
-
-# WORKDIR /app/front_server
-
-# COPY . /app/front_server/
-
-# RUN apt install -y dumb-init
-# RUN npm install
-
-# CMD ["/usr/bin/dumb-init", "--", "npm", "run", "dev"]
