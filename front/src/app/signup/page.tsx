@@ -71,6 +71,11 @@ export default function Signup (props:any) {
 			setError("닉네임이 비어있습니다")
 			return;
 		}
+		const rex = /^[a-zA-Z0-9]{2,10}$/;
+		if (!rex.test(nickname)) {
+			setError('영문, 숫자를 조합해서 2~10자 내로 입력해주세요.');
+			return;
+		}
 		if (password !== confrimPassword)
 		{
 			setError("확인비밀번호가 다릅니다 확인해주세요!")

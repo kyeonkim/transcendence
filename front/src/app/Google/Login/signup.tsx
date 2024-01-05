@@ -62,6 +62,12 @@ export default function Signup (props:any) {
 	const handleEnter = async () => {
 		setError('');
 		setLoading(true);
+		const rex = /^[a-zA-Z0-9]{2,10}$/;
+		if (!rex.test(nickname)) {
+			setLoading(false);
+			setError('영문, 숫자를 조합해서 2~10자 내로 입력해주세요.');
+			return;
+		}
 		formData.append('nick_name', nickname);
 		if (imageFile) {
 			formData.append('file', imageFile);
