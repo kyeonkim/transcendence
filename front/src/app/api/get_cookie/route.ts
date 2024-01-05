@@ -49,13 +49,13 @@ export async function GET (request: NextRequest)
     const nick_name = cookieBox.get('nick_name');
     const user_id = cookieBox.get('user_id');
     
-    console.log('get cookie called',{
-        success: true,
-        user_id: user_id,
-        nick_name: nick_name,
-        access_token: access_token,
-        refresh_token: refresh_token
-    });
+    // console.log('get cookie called',{
+    //     success: true,
+    //     user_id: user_id,
+    //     nick_name: nick_name,
+    //     access_token: access_token,
+    //     refresh_token: refresh_token
+    // });
     // 조건 추가 고려
         // data에서 참조하여 판단
     if (user_id && nick_name && access_token && refresh_token) {

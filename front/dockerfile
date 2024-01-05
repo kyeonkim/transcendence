@@ -14,11 +14,14 @@ ARG NEXT_PUBLIC_CLIENT_ID \
     NEXT_PUBLIC_WEBSOCKET_URL \
     NEXT_PUBLIC_API_DIRECT_URL \
     NEXT_PUBLIC_GABIA_URL \
-    NEXT_PUBLIC_FRONT_URL_PORT
+    NEXT_PUBLIC_FRONT_URL_PORT \
+    NEXT_PUBLIC_GOOGLE_ID \
+    NEXT_PUBLIC_GOOGLE_SECRET \
+    NEXT_PUBLIC_GOOGLE_AUTH_URL \
+    NEXT_PUBLIC_GOOGLE_REDIRECT_URL
 
+RUN npm run build
 
-# RUN npm run build
-
-# CMD ["npm", "run", "start"]
-CMD ["npm", "run", "dev"]
+CMD ["npm", "run", "start"]
+# CMD ["npm", "run", "dev"]
 # CMD ["tail", "-f", "/dev/null"]

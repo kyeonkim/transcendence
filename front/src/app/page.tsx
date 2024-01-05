@@ -15,6 +15,8 @@ import { Box, TextField, Typography} from '@mui/material';
 
 import axios from 'axios';
 
+import Image from 'next/image'
+
 import { genSaltSync, hashSync } from "bcrypt-ts";
 
 export default function Home() {
@@ -47,7 +49,7 @@ const particlesLoaded = async (container: Container) => {
 
           });
           
-          console.log('login response - ', response);
+          // console.log('login response - ', response);
 
           if (response.data.status === false)
           {
@@ -80,7 +82,7 @@ const particlesLoaded = async (container: Container) => {
   const handleGLogin = () => {
     // window.location.href = 'https://accounts.google.com/o/oauth2/v2/auth?client_id=457413645332-5vvn6emirn4uk8f8tc1lp500pbvaterl.apps.googleusercontent.com&response_type=token&redirect_uri=http://localhost:3000/Google/Login&scope=https://www.googleapis.com/auth/userinfo.email';
     
-    window.location.href = 'https://accounts.google.com/o/oauth2/v2/auth?client_id=457413645332-5vvn6emirn4uk8f8tc1lp500pbvaterl.apps.googleusercontent.com&response_type=code&redirect_uri=http://localhost:3000/Google/Login&scope=https://www.googleapis.com/auth/userinfo.email';
+    window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.NEXT_PUBLIC_GOOGLE_ID}&response_type=code&redirect_uri=${process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URL}&scope=https://www.googleapis.com/auth/userinfo.email`;
 
     // window.location.href = 'https://identitytoolkit.googleapis.com/v1/accounts:signInWithIdp?key=[API_KEY]';
   };
@@ -160,11 +162,11 @@ const particlesLoaded = async (container: Container) => {
       </Box>
       <Box sx={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', width: '10vw', justifyContent: 'center'}}>
         <Button variant="contained" onClick={handle42Login} className={styles.button}>
-          <img src={`https://upload.wikimedia.org/wikipedia/commons/8/8d/42_Logo.svg`} alt="42 logo" className={styles.Logo42}/>
+          <Image src={`https://upload.wikimedia.org/wikipedia/commons/8/8d/42_Logo.svg`} alt="42 logo" className={styles.Logo42}/>
           <span>42 로그인</span>
         </Button>
         <Button variant="contained" onClick={handleGLogin} className={styles.button}>
-          <img src={`https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg`} alt="google logo" className={styles.LogoGoogle}/>
+          <Image src={`https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg`} alt="google logo" className={styles.LogoGoogle}/>
           <span>구글 로그인</span>
         </Button>
       </Box>

@@ -5,12 +5,12 @@ import { ValidationPipe } from '@nestjs/common';
 import * as fs from 'fs';
 
 async function bootstrap() {
-  // const httpsOptions = {
-  //   key: fs.readFileSync('./certificate/cert.key'),
-  //   cert: fs.readFileSync('./certificate/cert.crt'),
-  // };
-  // const app = await NestFactory.create(AppModule, {httpsOptions});
-  const app = await NestFactory.create(AppModule);
+  const httpsOptions = {
+    key: fs.readFileSync('/etc/ssl/privkey.pem'),
+    cert: fs.readFileSync('/etc/ssl/fullchain.pem'),
+  };
+  const app = await NestFactory.create(AppModule, {httpsOptions});
+  // const app = await NestFactory.create(AppModule);
   app.enableCors({origin: [process.env.CORS_ORIGIN_FRONT, process.env.CORS_ORIGIN_DOMAIN, process.env.CORS_ORIGIN_GABIA, process.env.CORS_ORIGIN_FRONT_PORT],});
   app.useGlobalPipes(
     new ValidationPipe({
