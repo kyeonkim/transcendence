@@ -4,13 +4,8 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { Avatar, Button, Grid, TextField, Typography } from "@mui/material"
 import styles from './login.module.css'
-// import '@/util/loading.css';
-
-// tsparticles
- 
-
 import { useEffect, useState } from 'react';
-import particlesOptions from "../particles.json";
+import particlesOptions from "../../particles.json";
 
 import Particles, { initParticlesEngine } from "@tsparticles/react";
 import type { Container, Engine, ISourceOptions } from "@tsparticles/engine";
@@ -30,7 +25,7 @@ export default function Signup (props:any) {
 
     // this should be run only once per application lifetime
     useEffect(() => {
-        initParticlesEngine(async (engine) => {
+        initParticlesEngine(async (engine: any) => {
             await loadSlim(engine);
         }).then(() => {
             setInit(true);
@@ -38,7 +33,7 @@ export default function Signup (props:any) {
     }, []);
 
     const particlesLoaded = async (container: Container) => {
-        // console.log(container);
+
     };
 	const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
@@ -62,32 +57,55 @@ export default function Signup (props:any) {
 	}
 	, [props.access_token])
 
+
+
 	const handleEnter = async () => {
 		setError('');
 		setLoading(true);
+		const rex = /^[a-zA-Z0-9]{2,10}$/;
+		if (!rex.test(nickname)) {
+			setLoading(false);
+			setError('영문, 숫자를 조합해서 2~10자 내로 입력해주세요.');
+			return;
+		}
 		formData.append('nick_name', nickname);
 		if (imageFile) {
 			formData.append('file', imageFile);
 		}
-		await axios.post( `${process.env.NEXT_PUBLIC_FRONT_URL}api/user_create`, {
+
+		await axios.post( `${process.env.NEXT_PUBLIC_API_URL}auth/googlesignup`, {
 				access_token: token,
 				nick_name: nickname,
 			})
 			.then(async (response) => {
-				if(!response.data.status)
-				{
+				if(!response.data.status) {
 					setLoading(false);
 					setError(response.data.message);
-				}
-				else {
-					formData.append('access_token', response.data.access_token);
-					await axios.post(`${process.env.NEXT_PUBLIC_FRONT_URL}api/send_image`, formData)
-					.then((res) => {
-						if(res.data.success)
+				} else {
+					formData.append('access_token', response.data.token.access_token);
+
+					await axios.post( `${process.env.NEXT_PUBLIC_API_DIRECT_URL}user/upload`,
+					formData,
+					{
+						headers: {
+							'Content-Type': 'multipart/form-data',
+							'Authorization': `Bearer ${response.data.token.access_token}`
+						},
+						params: {
+							nickname: nickname
+						}
+					}).then((res :any) => {					
+						if(res.data.status)
 							router.replace('/main_frame');
 						else
-							window.alert('Image upload failed')
-						})
+						{
+							setLoading(false);
+							window.alert('Image upload failed');
+						}
+
+					}).catch((err:any) => {
+						// console.log('signup err');
+					})
 			}})
 	}
 

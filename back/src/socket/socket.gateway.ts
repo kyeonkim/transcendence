@@ -34,13 +34,17 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
   async handleConnection(client: Socket, ...args: any[]) {
     //토큰인증로직 
     //if 토큰인증 실패 >> disconnect
+    // console.log("handleConnection: ", client.handshake.query.user_id);
     try {
       // console.log("handleConnection: ", client.handshake.query.user_id);
       if (client.handshake.query.user_id == 'undefined' || client.handshake.query.user_id == undefined)
           throw new Error("user_id is undefined");
-      const token = client.handshake.query.token;
-      // await this.jwtService.verifyAsync(String(token), { secret: process.env.JWT_SECRET });
-      const connect_user = await this.SocketService.Connect(client.handshake.query.user_id, client.id, this.server);
+      const token = client.handshake.headers.cookie.split(';').filter((item) => item.includes('access_token'))[0].split('=')[1];
+      await this.jwtService.verifyAsync(String(token), { secret: process.env.JWT_SECRET });
+      const user_id = await this.jwtService.decode(token).user_id
+      if (Number(user_id) !== Number(client.handshake.query.user_id))
+        throw new Error("user_id is invalid");
+      const connect_user = await this.SocketService.Connect(user_id, client.id, this.server);
       connect_user.roomuser ? await this.JoinRoom(connect_user.user_id, `chat-${connect_user.roomuser.chatroom_id}`) : null;
       client.join(String(connect_user.user_id));
       client.join(`status-${connect_user.user_id}`);
@@ -51,13 +55,13 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
     });
       connect_user.blocks.map((block) => {this.SocketService.JoinRoom(block.blocked_user_id, `block-${connect_user.user_id}`, this.server)});
     } catch (error) {
-      console.error("handleConnection: ", error);
+      console.error("handleConnection Error : ", error);
       client.disconnect();
     }
   }
 
   async handleDisconnect(client: Socket) {
-    // console.log("handleDisconnect: ", client.handshake.query.user_id);
+    console.log("handleDisconnect: ", client.handshake.query.user_id);
     if (client.handshake.query.user_id !== undefined)
     {
       this.server.to(`status-${client.handshake.query.user_id}`).emit(`status`, {user_id: client.handshake.query.user_id, status: 'offline'});

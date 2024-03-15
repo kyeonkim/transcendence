@@ -41,3 +41,5 @@ server:
 	docker exec -it nest_container bash
 in-front:
 	docker exec -it next_container bash
+nginx:
+	docker exec -it nginx_container bash

@@ -2,10 +2,16 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
+import * as fs from 'fs';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  app.enableCors({origin: [process.env.CORS_ORIGIN_FRONT],});
+  const httpsOptions = {
+    key: fs.readFileSync('/etc/ssl/privkey.pem'),
+    cert: fs.readFileSync('/etc/ssl/fullchain.pem'),
+  };
+  const app = await NestFactory.create(AppModule, {httpsOptions});
+  // const app = await NestFactory.create(AppModule);
+  app.enableCors({origin: [process.env.CORS_ORIGIN_FRONT, process.env.CORS_ORIGIN_DOMAIN, process.env.CORS_ORIGIN_GABIA, process.env.CORS_ORIGIN_FRONT_PORT],});
   app.useGlobalPipes(
     new ValidationPipe({
       /**
@@ -48,6 +54,7 @@ async function bootstrap() {
     },
     'JWT-refresh', // This name here is important for matching up with @ApiBearerAuth() in your controller!
   ).build();
+
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);

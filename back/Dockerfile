@@ -8,7 +8,7 @@ COPY . /app/transcendence_nest_server/
 
 WORKDIR /app/transcendence_nest_server
 
-RUN npm install
+RUN npm install --legacy-peer-deps
 
 RUN npx prisma generate
 
@@ -17,3 +17,5 @@ RUN npm run build
 ENTRYPOINT ["sh", "-c", "npx prisma migrate deploy && npm run start"]
 
 # ENTRYPOINT ["sh", "-c", "npx prisma migrate deploy && npm run start:dev"]
+
+# CMD ["tail", "-f", "/dev/null"]
